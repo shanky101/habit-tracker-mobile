@@ -40,26 +40,26 @@ export default function HomePage() {
               <div className="w-10 h-10 bg-gradient-earth rounded-full flex items-center justify-center shadow-[0_4px_12px_rgba(62,39,35,0.08)]" aria-hidden="true">
                 <Leaf className="w-6 h-6 text-white" />
               </div>
-              <span className="font-[family-name:var(--font-display)] font-semibold text-2xl text-[#1A1410]">
+              <span className="font-[family-name:var(--font-display)] font-medium text-2xl text-[#1A1410]">
                 HabitFlow
               </span>
             </Link>
             <div className="flex items-center gap-8">
               <Link
                 href="#features"
-                className="hidden md:inline-block text-[#2C2416] hover:text-[#B85C38] transition-colors font-medium"
+                className="hidden md:inline-block text-[#1A1410] hover:text-[#B85C38] transition-colors font-medium text-[15px]"
               >
                 Features
               </Link>
               <Link
                 href="#testimonials"
-                className="hidden md:inline-block text-[#2C2416] hover:text-[#B85C38] transition-colors font-medium"
+                className="hidden md:inline-block text-[#1A1410] hover:text-[#B85C38] transition-colors font-medium text-[15px]"
               >
                 Stories
               </Link>
               <Link
                 href="/blog"
-                className="hidden md:inline-block text-[#2C2416] hover:text-[#B85C38] transition-colors font-medium"
+                className="hidden md:inline-block text-[#1A1410] hover:text-[#B85C38] transition-colors font-medium text-[15px]"
               >
                 Wisdom
               </Link>
@@ -78,29 +78,29 @@ export default function HomePage() {
         <div className="relative z-10 max-w-5xl mx-auto text-center">
           <div className="animate-fade-in-up">
             <div className="inline-block mb-6">
-              <span className="px-6 py-2 rounded-full bg-white/30 backdrop-blur-sm text-white text-sm font-semibold border border-white/50 tracking-wide">
+              <span className="px-6 py-2 rounded-full bg-white/30 backdrop-blur-sm text-white text-sm font-medium border border-white/50 tracking-wide">
                 🌱 Grow Naturally, Live Intentionally
               </span>
             </div>
 
-            <h1 id="hero-heading" className="font-[family-name:var(--font-display)] font-bold text-white text-5xl md:text-6xl lg:text-7xl leading-[1.1] mb-8 tracking-tight" style={{ textShadow: '0 4px 20px rgba(0, 0, 0, 0.3)' }}>
+            <h1 id="hero-heading" className="font-[family-name:var(--font-display)] font-light text-white text-5xl md:text-6xl lg:text-7xl leading-[1.15] mb-8">
               Cultivate habits that{" "}
               <br className="hidden md:block" />
               root deep and{" "}
-              <span className="italic">bloom forever</span>
+              <span className="font-normal italic">bloom forever</span>
             </h1>
 
-            <p className="font-[family-name:var(--font-body)] text-white/95 text-xl md:text-2xl mb-12 max-w-3xl mx-auto leading-relaxed font-medium italic" style={{ textShadow: '0 2px 8px rgba(0, 0, 0, 0.2)' }}>
+            <p className="font-[family-name:var(--font-body)] text-white/95 text-lg md:text-xl mb-12 max-w-3xl mx-auto leading-relaxed">
               Like seeds planted in fertile soil, your habits grow strong with patience and care.
               Track your daily rituals, celebrate progress, and transform—one mindful step at a time.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button size="lg" className="bg-white text-[#1A1410] hover:bg-white/90 shadow-[0_10px_30px_rgba(44,95,45,0.15)] font-semibold" aria-label="Download HabitFlow for iOS">
+              <Button size="lg" className="bg-white text-[#1A1410] hover:bg-white/90 font-medium" aria-label="Download HabitFlow for iOS">
                 <Apple className="w-5 h-5" aria-hidden="true" />
                 Download for iOS
               </Button>
-              <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white/20 hover:border-white font-semibold" aria-label="Download HabitFlow for Android">
+              <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white/20 hover:border-white font-medium" aria-label="Download HabitFlow for Android">
                 <Smartphone className="w-5 h-5" aria-hidden="true" />
                 Get on Android
               </Button>
@@ -116,8 +116,8 @@ export default function HomePage() {
                 ))}
               </div>
               <div className="text-sm">
-                <div className="font-semibold">Join 25,000+ mindful people</div>
-                <div className="opacity-95">building lasting habits</div>
+                <div className="font-medium">Join 25,000+ mindful people</div>
+                <div className="opacity-90">building lasting habits</div>
               </div>
             </div>
           </div>
@@ -128,17 +128,17 @@ export default function HomePage() {
       <section className="py-24 lg:py-32 px-6 lg:px-8 bg-[#FAF8F3]" aria-labelledby="philosophy-heading">
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <div className="animate-fade-in-up">
-            <span className="font-[family-name:var(--font-body)] text-[#4A7C59] text-sm font-semibold italic tracking-wide uppercase mb-4 block">
+            <span className="font-[family-name:var(--font-body)] text-[#4A7C59] text-xs font-semibold tracking-[0.15em] uppercase mb-4 block">
               Chapter One
             </span>
-            <h2 id="philosophy-heading" className="font-[family-name:var(--font-display)] font-bold text-[#1A1410] text-4xl md:text-5xl lg:text-6xl mb-8 leading-tight">
+            <h2 id="philosophy-heading" className="font-[family-name:var(--font-display)] font-normal text-[#1A1410] text-4xl md:text-5xl lg:text-6xl mb-8 leading-tight">
               Why force never works
             </h2>
-            <p className="text-[#2C2416] text-lg md:text-xl leading-relaxed mb-6 font-medium">
+            <p className="text-[#1A1410] text-lg md:text-xl leading-relaxed mb-6">
               You've tried willpower. You've tried discipline. You've tried punishing yourself into change.
               And none of it lasted—because that's not how nature works.
             </p>
-            <p className="font-[family-name:var(--font-body)] text-[#4A3E2A] text-lg md:text-xl leading-relaxed italic font-medium">
+            <p className="font-[family-name:var(--font-display)] text-[#2C2416] text-lg md:text-xl leading-relaxed italic font-light">
               "A tree doesn't force its growth. It simply creates the right conditions,
               then allows nature to take its course. Your habits are no different."
             </p>
@@ -150,13 +150,13 @@ export default function HomePage() {
       <section id="features" className="py-24 lg:py-32 px-6 lg:px-8 bg-[#F5F1E8]" aria-labelledby="features-heading">
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-20">
-            <span className="font-[family-name:var(--font-body)] text-[#4A7C59] text-sm font-semibold italic tracking-wide uppercase mb-4 block">
+            <span className="font-[family-name:var(--font-body)] text-[#4A7C59] text-xs font-semibold tracking-[0.15em] uppercase mb-4 block">
               Chapter Two
             </span>
-            <h2 id="features-heading" className="font-[family-name:var(--font-display)] font-bold text-[#1A1410] text-4xl md:text-5xl mb-6">
+            <h2 id="features-heading" className="font-[family-name:var(--font-display)] font-normal text-[#1A1410] text-4xl md:text-5xl mb-6">
               How HabitFlow works with your nature
             </h2>
-            <p className="text-[#2C2416] text-lg md:text-xl max-w-3xl mx-auto leading-relaxed font-medium">
+            <p className="text-[#1A1410] text-lg md:text-xl max-w-3xl mx-auto leading-relaxed">
               Not another productivity app trying to turn you into a machine.
               HabitFlow honors your humanity—the rhythms, the seasons, the natural pace of growth.
             </p>
@@ -197,16 +197,16 @@ export default function HomePage() {
             ].map((feature, i) => (
               <article
                 key={feature.title}
-                className="bg-[#FAF8F3] rounded-[32px] p-8 shadow-[0_4px_12px_rgba(62,39,35,0.08)] border-l-[5px] border-[#4A7C59] hover:shadow-[0_16px_48px_rgba(62,39,35,0.16)] transition-all duration-400 hover:translate-x-3 animate-fade-in-up"
+                className="bg-[#FAF8F3] rounded-[32px] p-8 shadow-[0_2px_8px_rgba(26,20,16,0.04)] border-l-[4px] border-[#4A7C59] hover:shadow-[0_8px_24px_rgba(26,20,16,0.08)] transition-all duration-400 hover:translate-x-2 animate-fade-in-up"
                 style={{ animationDelay: `${i * 0.1}s` }}
               >
-                <div className="w-16 h-16 bg-gradient-forest rounded-full flex items-center justify-center mb-6 shadow-[0_10px_30px_rgba(44,95,45,0.15)]" aria-hidden="true">
+                <div className="w-16 h-16 bg-gradient-forest rounded-full flex items-center justify-center mb-6 shadow-[0_4px_12px_rgba(44,95,45,0.12)]" aria-hidden="true">
                   <feature.icon className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="font-[family-name:var(--font-display)] font-bold text-[#1A1410] text-xl mb-3">
+                <h3 className="font-[family-name:var(--font-display)] font-medium text-[#1A1410] text-xl mb-3">
                   {feature.title}
                 </h3>
-                <p className="text-[#2C2416] leading-relaxed font-medium">
+                <p className="text-[#1A1410] leading-relaxed text-[15px]">
                   {feature.description}
                 </p>
               </article>
@@ -219,13 +219,13 @@ export default function HomePage() {
       <section id="testimonials" className="py-24 lg:py-32 px-6 lg:px-8 bg-[#FAF8F3]" aria-labelledby="testimonials-heading">
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-20">
-            <span className="font-[family-name:var(--font-body)] text-[#4A7C59] text-sm font-semibold italic tracking-wide uppercase mb-4 block">
+            <span className="font-[family-name:var(--font-body)] text-[#4A7C59] text-xs font-semibold tracking-[0.15em] uppercase mb-4 block">
               Chapter Three
             </span>
-            <h2 id="testimonials-heading" className="font-[family-name:var(--font-display)] font-bold text-[#1A1410] text-4xl md:text-5xl mb-6">
+            <h2 id="testimonials-heading" className="font-[family-name:var(--font-display)] font-normal text-[#1A1410] text-4xl md:text-5xl mb-6">
               Stories of transformation
             </h2>
-            <p className="text-[#2C2416] text-lg md:text-xl max-w-3xl mx-auto font-medium">
+            <p className="text-[#1A1410] text-lg md:text-xl max-w-3xl mx-auto">
               Real people. Real change. Real habits that took root and grew.
             </p>
           </div>
@@ -256,22 +256,22 @@ export default function HomePage() {
             ].map((testimonial, i) => (
               <article
                 key={testimonial.name}
-                className="bg-[#F5F1E8] rounded-[32px] p-8 shadow-[0_4px_12px_rgba(62,39,35,0.08)] animate-fade-in-up"
+                className="bg-white rounded-[32px] p-8 shadow-[0_2px_8px_rgba(26,20,16,0.04)] animate-fade-in-up"
                 style={{ animationDelay: `${i * 0.1}s` }}
               >
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-14 h-14 bg-gradient-earth rounded-full flex items-center justify-center font-[family-name:var(--font-display)] font-bold text-white text-lg" aria-hidden="true">
+                  <div className="w-14 h-14 bg-gradient-earth rounded-full flex items-center justify-center font-[family-name:var(--font-display)] font-medium text-white text-lg" aria-hidden="true">
                     {testimonial.avatar}
                   </div>
                   <div className="flex-1">
-                    <div className="font-bold text-[#1A1410]">{testimonial.name}</div>
-                    <div className="text-sm text-[#4A3E2A] font-medium">{testimonial.role}</div>
+                    <div className="font-medium text-[#1A1410]">{testimonial.name}</div>
+                    <div className="text-sm text-[#4A3E2A]">{testimonial.role}</div>
                   </div>
                 </div>
-                <blockquote className="text-[#2C2416] leading-relaxed mb-6 font-[family-name:var(--font-body)] italic font-medium">
+                <blockquote className="text-[#1A1410] leading-relaxed mb-6 font-[family-name:var(--font-display)] italic font-light text-[15px]">
                   "{testimonial.content}"
                 </blockquote>
-                <div className="flex items-center gap-2 text-sm font-semibold text-[#4A7C59]">
+                <div className="flex items-center gap-2 text-sm font-medium text-[#4A7C59]">
                   <Leaf className="w-4 h-4" aria-hidden="true" />
                   <span>{testimonial.streak}</span>
                 </div>
@@ -286,17 +286,17 @@ export default function HomePage() {
         <div className="absolute top-[-30%] left-[-10%] w-[400px] h-[400px] bg-[#B5C99A]/15 rounded-full" aria-hidden="true" />
 
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          <h2 id="cta-heading" className="font-[family-name:var(--font-display)] font-bold text-4xl md:text-5xl lg:text-6xl mb-8" style={{ textShadow: '0 2px 8px rgba(0, 0, 0, 0.2)' }}>
+          <h2 id="cta-heading" className="font-[family-name:var(--font-display)] font-light text-4xl md:text-5xl lg:text-6xl mb-8">
             Ready to grow?
           </h2>
-          <p className="text-white/95 text-lg md:text-xl mb-12 max-w-2xl mx-auto font-[family-name:var(--font-body)] italic font-medium" style={{ textShadow: '0 1px 4px rgba(0, 0, 0, 0.2)' }}>
+          <p className="text-white/95 text-lg md:text-xl mb-12 max-w-2xl mx-auto leading-relaxed">
             Join thousands who've discovered that lasting change doesn't come from force—
             it comes from nurturing the conditions where good habits naturally take root.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
             <Button
               size="lg"
-              className="bg-white text-[#1A1410] hover:bg-white/90 font-semibold"
+              className="bg-white text-[#1A1410] hover:bg-white/90 font-medium"
               aria-label="Download HabitFlow on App Store"
             >
               <Apple className="w-5 h-5" aria-hidden="true" />
@@ -305,14 +305,14 @@ export default function HomePage() {
             <Button
               size="lg"
               variant="outline"
-              className="border-2 border-white text-white hover:bg-white/20 hover:border-white font-semibold"
+              className="border-2 border-white text-white hover:bg-white/20 hover:border-white font-medium"
               aria-label="Get HabitFlow on Google Play"
             >
               <Smartphone className="w-5 h-5" aria-hidden="true" />
               Get it on Google Play
             </Button>
           </div>
-          <p className="text-sm text-white/90">
+          <p className="text-sm text-white/85">
             Free to start • No credit card • Premium features available
           </p>
         </div>
@@ -327,41 +327,41 @@ export default function HomePage() {
                 <div className="w-10 h-10 bg-gradient-earth rounded-full flex items-center justify-center" aria-hidden="true">
                   <Leaf className="w-6 h-6 text-white" />
                 </div>
-                <span className="font-[family-name:var(--font-display)] font-semibold text-2xl text-white">
+                <span className="font-[family-name:var(--font-display)] font-medium text-2xl text-white">
                   HabitFlow
                 </span>
               </div>
-              <p className="text-sm text-[#D4C9B8] font-[family-name:var(--font-body)] italic">
+              <p className="text-sm text-[#D4C9B8]">
                 Grow naturally. Live intentionally.
               </p>
             </div>
             <div>
-              <h4 className="font-bold text-white mb-4">Product</h4>
+              <h4 className="font-medium text-white mb-4 text-sm">Product</h4>
               <ul className="space-y-3 text-sm text-[#D4C9B8]">
-                <li><a href="#features" className="hover:text-[#D4A574] transition-colors">Features</a></li>
-                <li><a href="#" className="hover:text-[#D4A574] transition-colors">Premium</a></li>
-                <li><a href="#" className="hover:text-[#D4A574] transition-colors">Download</a></li>
+                <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Premium</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Download</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-bold text-white mb-4">Wisdom</h4>
+              <h4 className="font-medium text-white mb-4 text-sm">Wisdom</h4>
               <ul className="space-y-3 text-sm text-[#D4C9B8]">
-                <li><a href="/blog" className="hover:text-[#D4A574] transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-[#D4A574] transition-colors">Guides</a></li>
-                <li><a href="#" className="hover:text-[#D4A574] transition-colors">Community</a></li>
+                <li><a href="/blog" className="hover:text-white transition-colors">Blog</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Guides</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Community</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-bold text-white mb-4">Company</h4>
+              <h4 className="font-medium text-white mb-4 text-sm">Company</h4>
               <ul className="space-y-3 text-sm text-[#D4C9B8]">
-                <li><a href="#" className="hover:text-[#D4A574] transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-[#D4A574] transition-colors">Privacy</a></li>
-                <li><a href="#" className="hover:text-[#D4A574] transition-colors">Terms</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">About</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Privacy</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Terms</a></li>
               </ul>
             </div>
           </div>
           <div className="pt-8 border-t border-[#4A3E2A] text-center text-sm text-[#D4C9B8]">
-            <p className="font-[family-name:var(--font-body)] italic">
+            <p>
               © 2024 HabitFlow. Built with care for those who choose to grow.
             </p>
           </div>
