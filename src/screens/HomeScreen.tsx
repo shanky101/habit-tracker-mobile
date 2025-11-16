@@ -8,27 +8,15 @@ import {
   Animated,
   Dimensions,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
+import { useHabits } from '@/contexts/HabitsContext';
 import CelebrationModal from '@/components/CelebrationModal';
 
 type HomeScreenNavigationProp = StackNavigationProp<any, 'Home'>;
 type HomeScreenRouteProp = RouteProp<{ Home: { newHabit?: any } }, 'Home'>;
-
-interface Habit {
-  id: string;
-  name: string;
-  emoji: string;
-  completed: boolean;
-  streak: number;
-  category: string;
-  color: string;
-  frequency: 'daily' | 'weekly';
-  selectedDays: number[];
-  reminderEnabled: boolean;
-  reminderTime: string | null;
-}
 
 const { width } = Dimensions.get('window');
 
@@ -36,61 +24,7 @@ const HomeScreen: React.FC = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const route = useRoute<HomeScreenRouteProp>();
   const { theme } = useTheme();
-
-  const [habits, setHabits] = useState<Habit[]>([
-    {
-      id: '1',
-      name: 'Morning Meditation',
-      emoji: '🧘',
-      completed: true,
-      streak: 7,
-      category: 'mindfulness',
-      color: 'purple',
-      frequency: 'daily',
-      selectedDays: [0, 1, 2, 3, 4, 5, 6],
-      reminderEnabled: true,
-      reminderTime: '07:00',
-    },
-    {
-      id: '2',
-      name: 'Read 30 minutes',
-      emoji: '📚',
-      completed: false,
-      streak: 12,
-      category: 'learning',
-      color: 'blue',
-      frequency: 'daily',
-      selectedDays: [0, 1, 2, 3, 4, 5, 6],
-      reminderEnabled: false,
-      reminderTime: null,
-    },
-    {
-      id: '3',
-      name: 'Drink 8 glasses of water',
-      emoji: '💧',
-      completed: true,
-      streak: 5,
-      category: 'health',
-      color: 'teal',
-      frequency: 'daily',
-      selectedDays: [0, 1, 2, 3, 4, 5, 6],
-      reminderEnabled: true,
-      reminderTime: '09:00',
-    },
-    {
-      id: '4',
-      name: 'Exercise',
-      emoji: '🏃',
-      completed: false,
-      streak: 3,
-      category: 'fitness',
-      color: 'green',
-      frequency: 'weekly',
-      selectedDays: [1, 3, 5],
-      reminderEnabled: true,
-      reminderTime: '18:00',
-    },
-  ]);
+  const { habits, addHabit, toggleHabit: toggleHabitContext } = useHabits();
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
@@ -123,23 +57,17 @@ const HomeScreen: React.FC = () => {
   // Handle new habit creation
   useEffect(() => {
     if (route.params?.newHabit) {
-      setHabits((prevHabits) => [route.params.newHabit, ...prevHabits]);
+      addHabit(route.params.newHabit);
       // Clear the param to avoid re-adding on subsequent renders
       navigation.setParams({ newHabit: undefined });
     }
   }, [route.params?.newHabit]);
 
-  const completedCount = habits.filter((h) => h.completed).length;
-  const totalCount = habits.length;
+  // Filter out archived habits
+  const activeHabits = habits.filter((h) => !h.archived);
+  const completedCount = activeHabits.filter((h) => h.completed).length;
+  const totalCount = activeHabits.length;
   const progressPercentage = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
-
-  const toggleHabit = (id: string) => {
-    setHabits((prevHabits) =>
-      prevHabits.map((habit) =>
-        habit.id === id ? { ...habit, completed: !habit.completed } : habit
-      )
-    );
-  };
 
   const [showCelebration, setShowCelebration] = useState(false);
   const [celebrationType, setCelebrationType] = useState<'firstCheckin' | 'allComplete' | 'streak'>('firstCheckin');
@@ -298,7 +226,7 @@ const HomeScreen: React.FC = () => {
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]} edges={['top']}>
       {/* Header */}
       <Animated.View
         style={[
@@ -350,7 +278,7 @@ const HomeScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
       >
         {/* Progress Ring */}
-        {habits.length > 0 && (
+        {activeHabits.length > 0 && (
           <Animated.View
             style={[
               {
@@ -364,7 +292,7 @@ const HomeScreen: React.FC = () => {
         )}
 
         {/* Habits List */}
-        {habits.length > 0 ? (
+        {activeHabits.length > 0 ? (
           <Animated.View
             style={[
               styles.habitsSection,
@@ -386,7 +314,7 @@ const HomeScreen: React.FC = () => {
             >
               YOUR HABITS
             </Text>
-            {habits.map((habit, index) => (
+            {activeHabits.map((habit, index) => (
               <Animated.View
                 key={habit.id}
                 style={[
@@ -456,7 +384,7 @@ const HomeScreen: React.FC = () => {
                         : 'transparent',
                     },
                   ]}
-                  onPress={() => toggleHabit(habit.id)}
+                  onPress={() => toggleHabitContext(habit.id)}
                   activeOpacity={0.7}
                 >
                   {habit.completed && (
@@ -511,7 +439,7 @@ const HomeScreen: React.FC = () => {
           setShowCelebration(false);
         }}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -524,7 +452,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 24,
-    paddingTop: 60,
+    paddingTop: 20,
     paddingBottom: 20,
   },
   greeting: {

@@ -11,9 +11,11 @@ import {
   Alert,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
+import { useHabits } from '@/contexts/HabitsContext';
 import { CATEGORIES, COLORS } from './AddHabitStep2Screen';
 
 type EditHabitScreenNavigationProp = StackNavigationProp<any, 'EditHabit'>;
@@ -41,6 +43,7 @@ const EditHabitScreen: React.FC = () => {
   const navigation = useNavigation<EditHabitScreenNavigationProp>();
   const route = useRoute<EditHabitScreenRouteProp>();
   const { theme } = useTheme();
+  const { updateHabit, deleteHabit, archiveHabit } = useHabits();
 
   const { habitId, habitData } = route.params;
 
@@ -80,9 +83,7 @@ const EditHabitScreen: React.FC = () => {
       return;
     }
 
-    // In a real app, save to local storage and/or cloud
-    const updatedHabit = {
-      id: habitId,
+    const updates = {
       name: habitName.trim(),
       category: selectedCategory,
       color: selectedColor,
@@ -90,11 +91,9 @@ const EditHabitScreen: React.FC = () => {
       selectedDays: frequency === 'daily' ? [0, 1, 2, 3, 4, 5, 6] : selectedDays,
       reminderEnabled,
       reminderTime: reminderEnabled ? reminderTime : null,
-      updatedAt: new Date().toISOString(),
     };
 
-    console.log('Updating habit:', updatedHabit);
-
+    updateHabit(habitId, updates);
     navigation.goBack();
   };
 
@@ -110,7 +109,7 @@ const EditHabitScreen: React.FC = () => {
         {
           text: 'Archive',
           onPress: () => {
-            console.log('Archiving habit:', habitId);
+            archiveHabit(habitId);
             navigation.goBack();
           },
         },
@@ -131,7 +130,7 @@ const EditHabitScreen: React.FC = () => {
           text: 'Delete',
           style: 'destructive',
           onPress: () => {
-            console.log('Deleting habit:', habitId);
+            deleteHabit(habitId);
             navigation.navigate('Home');
           },
         },
@@ -154,7 +153,7 @@ const EditHabitScreen: React.FC = () => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]} edges={['top']}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -474,8 +473,7 @@ const EditHabitScreen: React.FC = () => {
               style={[
                 styles.archiveButton,
                 {
-                  backgroundColor: theme.colors.backgroundSecondary,
-                  borderColor: theme.colors.border,
+                  backgroundColor: theme.colors.primary,
                 },
               ]}
               onPress={handleArchive}
@@ -485,10 +483,10 @@ const EditHabitScreen: React.FC = () => {
                 style={[
                   styles.archiveButtonText,
                   {
-                    color: theme.colors.text,
+                    color: theme.colors.white,
                     fontFamily: theme.typography.fontFamilyBody,
                     fontSize: theme.typography.fontSizeMD,
-                    fontWeight: theme.typography.fontWeightMedium,
+                    fontWeight: theme.typography.fontWeightSemibold,
                   },
                 ]}
               >
@@ -500,8 +498,7 @@ const EditHabitScreen: React.FC = () => {
               style={[
                 styles.deleteButton,
                 {
-                  backgroundColor: theme.colors.errorLight,
-                  borderColor: theme.colors.error,
+                  backgroundColor: theme.colors.error,
                 },
               ]}
               onPress={handleDelete}
@@ -511,7 +508,7 @@ const EditHabitScreen: React.FC = () => {
                 style={[
                   styles.deleteButtonText,
                   {
-                    color: theme.colors.error,
+                    color: theme.colors.white,
                     fontFamily: theme.typography.fontFamilyBody,
                     fontSize: theme.typography.fontSizeMD,
                     fontWeight: theme.typography.fontWeightSemibold,
@@ -524,7 +521,7 @@ const EditHabitScreen: React.FC = () => {
           </View>
         </Animated.View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -538,7 +535,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 24,
-    paddingTop: 60,
+    paddingTop: 20,
     paddingBottom: 40,
   },
   header: {
@@ -651,7 +648,6 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 24,
     borderRadius: 16,
-    borderWidth: 1.5,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
@@ -664,7 +660,6 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 24,
     borderRadius: 16,
-    borderWidth: 1.5,
     alignItems: 'center',
     justifyContent: 'center',
   },
