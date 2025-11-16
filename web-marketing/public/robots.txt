@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://habitflow.app
+
+# Sitemaps
+Sitemap: https://habitflow.app/sitemap.xml
