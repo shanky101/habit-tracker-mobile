@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker - Mobile Screen Comparison</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=IBM+Plex+Mono:wght@500;600;700&family=Major+Mono+Display&family=Playfair+Display:wght@400;600;700&family=Source+Serif+4:wght@400;500;600&family=Lora:ital,wght@0,500;1,400&family=Cormorant+Garamond:wght@400;600&family=Quicksand:wght@400;500;600;700&family=Assistant:wght@400;500;600&family=Inter:wght@400;500;600;700;800&family=Work+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            overflow-x: auto;
+        }
+
+        .container {
+            max-width: 2000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            color: white;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 400;
+        }
+
+        .phones-container {
+            display: flex;
+            gap: 32px;
+            justify-content: center;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            padding: 20px;
+        }
+
+        .phone-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .phone-label {
+            background: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .phone-label.variant-1 { color: #6366f1; }
+        .phone-label.variant-2 { color: #FF6183; }
+        .phone-label.variant-3 { color: #B85C38; }
+        .phone-label.variant-4 { color: #2B2621; }
+        .phone-label.variant-5 { color: #1B1B1B; }
+
+        /* iPhone Frame */
+        .phone {
+            width: 375px;
+            height: 812px;
+            background: #1a1a1a;
+            border-radius: 48px;
+            padding: 12px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        /* Notch */
+        .phone::before {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 30px;
+            background: #1a1a1a;
+            border-radius: 0 0 20px 20px;
+            z-index: 10;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 38px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            height: 44px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 15px;
+            font-weight: 600;
+            position: relative;
+            z-index: 5;
+        }
+
+        /* Common Styles */
+        .screen-content {
+            height: calc(100% - 44px);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .header-section {
+            padding: 20px;
+        }
+
+        .date {
+            font-size: 15px;
+            margin-bottom: 4px;
+            opacity: 0.7;
+        }
+
+        .greeting {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .progress-card {
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .progress-ring-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .progress-ring {
+            position: relative;
+            width: 120px;
+            height: 120px;
+        }
+
+        .progress-ring svg {
+            transform: rotate(-90deg);
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .progress-number {
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .progress-label {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+
+        .motivational-text {
+            text-align: center;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        .quick-stats {
+            display: flex;
+            justify-content: space-around;
+            font-size: 14px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .stat-label {
+            opacity: 0.7;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .habits-section {
+            padding: 0 20px 100px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .habit-card {
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .habit-checkbox {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 3px solid;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .habit-checkbox.checked {
+            position: relative;
+        }
+
+        .habit-checkbox.checked::after {
+            content: '✓';
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .habit-info {
+            flex: 1;
+        }
+
+        .habit-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .habit-streak {
+            font-size: 13px;
+            opacity: 0.7;
+        }
+
+        .fab {
+            position: absolute;
+            bottom: 90px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 300;
+            color: white;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 8px 0 24px;
+            z-index: 10;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            opacity: 0.5;
+        }
+
+        .nav-item.active {
+            opacity: 1;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        /* VARIANT 1: Momentum & Joy */
+        .variant-1 .phone-screen {
+            background: #fafafa;
+        }
+
+        .variant-1 .status-bar {
+            color: #171717;
+        }
+
+        .variant-1 .greeting {
+            font-family: 'Syne', sans-serif;
+            color: #6366f1;
+        }
+
+        .variant-1 .progress-card {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+        }
+
+        .variant-1 .progress-ring-progress {
+            stroke: white;
+        }
+
+        .variant-1 .habit-card {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .variant-1 .habit-checkbox {
+            border-color: #6366f1;
+        }
+
+        .variant-1 .habit-checkbox.checked {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-color: transparent;
+        }
+
+        .variant-1 .habit-name {
+            font-family: 'Syne', sans-serif;
+            color: #171717;
+        }
+
+        .variant-1 .fab {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        }
+
+        .variant-1 .bottom-nav {
+            background: white;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        .variant-1 .nav-item {
+            color: #737373;
+        }
+
+        .variant-1 .nav-item.active {
+            color: #6366f1;
+        }
+
+        /* VARIANT 2: Retro Futurism */
+        .variant-2 .phone-screen {
+            background: #000000;
+            color: white;
+        }
+
+        .variant-2 .status-bar {
+            color: #00E5FF;
+        }
+
+        .variant-2 .greeting {
+            font-family: 'Major Mono Display', monospace;
+            color: #FF6183;
+            text-transform: uppercase;
+            font-size: 24px;
+            letter-spacing: 0.1em;
+        }
+
+        .variant-2 .progress-card {
+            background: linear-gradient(135deg, #FF6183 0%, #E91E63 50%, #9C27B0 100%);
+            border: 2px solid #FF6183;
+            box-shadow: 0 0 20px rgba(255, 97, 131, 0.4);
+        }
+
+        .variant-2 .progress-ring-progress {
+            stroke: #00E5FF;
+        }
+
+        .variant-2 .motivational-text {
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        .variant-2 .habit-card {
+            background: #1A1A1A;
+            border: 2px solid #FF6183;
+        }
+
+        .variant-2 .habit-checkbox {
+            border-color: #FF6183;
+            background: #000;
+        }
+
+        .variant-2 .habit-checkbox.checked {
+            background: linear-gradient(135deg, #FF6183 0%, #E91E63 100%);
+            box-shadow: 0 0 20px rgba(255, 97, 131, 0.6);
+        }
+
+        .variant-2 .habit-name {
+            font-family: 'IBM Plex Mono', monospace;
+            color: #FFFFFF;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        .variant-2 .habit-streak {
+            font-family: 'Space Mono', monospace;
+            color: #00E5FF;
+        }
+
+        .variant-2 .fab {
+            background: linear-gradient(90deg, #00E5FF 0%, #7C4DFF 100%);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.6);
+        }
+
+        .variant-2 .bottom-nav {
+            background: #1A1A1A;
+            border-top: 2px solid #FF6183;
+        }
+
+        .variant-2 .nav-item {
+            color: #00E5FF;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .variant-2 .nav-item.active {
+            color: #FF6183;
+        }
+
+        /* VARIANT 3: Earthy Zen */
+        .variant-3 .phone-screen {
+            background: #FAF8F3;
+        }
+
+        .variant-3 .status-bar {
+            color: #3E2723;
+        }
+
+        .variant-3 .greeting {
+            font-family: 'Playfair Display', serif;
+            color: #B85C38;
+        }
+
+        .variant-3 .progress-card {
+            background: linear-gradient(135deg, #B85C38 0%, #D4A574 100%);
+            color: white;
+            box-shadow: 0 8px 24px rgba(184, 92, 56, 0.2);
+        }
+
+        .variant-3 .progress-ring-progress {
+            stroke: white;
+        }
+
+        .variant-3 .motivational-text {
+            font-family: 'Lora', serif;
+            font-style: italic;
+        }
+
+        .variant-3 .habit-card {
+            background: #FFFFFF;
+            box-shadow: 0 4px 12px rgba(62, 39, 35, 0.08);
+            border-left: 4px solid #2C5F2D;
+        }
+
+        .variant-3 .habit-checkbox {
+            border-color: #2C5F2D;
+        }
+
+        .variant-3 .habit-checkbox.checked {
+            background: linear-gradient(135deg, #2C5F2D 0%, #B5C99A 100%);
+            border-color: transparent;
+        }
+
+        .variant-3 .habit-name {
+            font-family: 'Playfair Display', serif;
+            color: #3E2723;
+        }
+
+        .variant-3 .habit-streak {
+            font-family: 'Lora', serif;
+            color: #4A7C59;
+            font-style: italic;
+        }
+
+        .variant-3 .fab {
+            background: linear-gradient(135deg, #B85C38 0%, #D4A574 100%);
+        }
+
+        .variant-3 .bottom-nav {
+            background: #FFFFFF;
+            border-top: 1px solid rgba(160, 82, 45, 0.2);
+        }
+
+        .variant-3 .nav-item {
+            color: #7D8F69;
+        }
+
+        .variant-3 .nav-item.active {
+            color: #B85C38;
+        }
+
+        /* VARIANT 4: Minimal Refinement */
+        .variant-4 .phone-screen {
+            background: #FDFCFA;
+        }
+
+        .variant-4 .status-bar {
+            color: #1A1714;
+        }
+
+        .variant-4 .greeting {
+            font-family: 'Cormorant Garamond', serif;
+            color: #2B2621;
+            font-weight: 400;
+        }
+
+        .variant-4 .progress-card {
+            background: #FFFFFF;
+            border: 1px solid #E8E3DA;
+            box-shadow: 0 2px 8px rgba(26, 23, 20, 0.05);
+        }
+
+        .variant-4 .progress-ring-progress {
+            stroke: #2B2621;
+        }
+
+        .variant-4 .progress-number {
+            color: #2B2621;
+        }
+
+        .variant-4 .motivational-text {
+            font-family: 'Quicksand', sans-serif;
+            color: #4D4539;
+            font-weight: 400;
+        }
+
+        .variant-4 .habit-card {
+            background: #FFFFFF;
+            border: 1px solid #E8E3DA;
+            box-shadow: 0 1px 4px rgba(26, 23, 20, 0.03);
+        }
+
+        .variant-4 .habit-checkbox {
+            border-color: #4D4539;
+        }
+
+        .variant-4 .habit-checkbox.checked {
+            background: #1A1714;
+            border-color: #1A1714;
+        }
+
+        .variant-4 .habit-name {
+            font-family: 'Cormorant Garamond', serif;
+            color: #1A1714;
+        }
+
+        .variant-4 .habit-streak {
+            color: #7A7265;
+        }
+
+        .variant-4 .fab {
+            background: #1A1714;
+        }
+
+        .variant-4 .bottom-nav {
+            background: #FFFFFF;
+            border-top: 1px solid #E8E3DA;
+        }
+
+        .variant-4 .nav-item {
+            color: #A39889;
+            font-family: 'Assistant', sans-serif;
+        }
+
+        .variant-4 .nav-item.active {
+            color: #2B2621;
+        }
+
+        /* VARIANT 5: Professional Polish */
+        .variant-5 .phone-screen {
+            background: #FFFFFF;
+        }
+
+        .variant-5 .status-bar {
+            color: #1B1B1B;
+        }
+
+        .variant-5 .greeting {
+            font-family: 'Work Sans', sans-serif;
+            color: #1B1B1B;
+        }
+
+        .variant-5 .progress-card {
+            background: linear-gradient(135deg, #B1D8FC 0%, #C7E2FE 100%);
+            border: 1px solid rgba(27, 27, 27, 0.08);
+            box-shadow: 0 4px 16px rgba(27, 27, 27, 0.08);
+        }
+
+        .variant-5 .progress-ring-progress {
+            stroke: #1B1B1B;
+        }
+
+        .variant-5 .progress-number {
+            color: #1B1B1B;
+        }
+
+        .variant-5 .motivational-text {
+            font-family: 'Inter', sans-serif;
+            color: #1B1B1B;
+        }
+
+        .variant-5 .habit-card {
+            background: #FFFFFF;
+            border: 1px solid rgba(27, 27, 27, 0.08);
+            box-shadow: 0 2px 8px rgba(27, 27, 27, 0.06);
+        }
+
+        .variant-5 .habit-checkbox {
+            border-color: #1B1B1B;
+        }
+
+        .variant-5 .habit-checkbox.checked {
+            background: #1B1B1B;
+            border-color: #1B1B1B;
+        }
+
+        .variant-5 .habit-name {
+            font-family: 'Work Sans', sans-serif;
+            color: #1B1B1B;
+        }
+
+        .variant-5 .habit-streak {
+            color: rgba(27, 27, 27, 0.70);
+        }
+
+        .variant-5 .fab {
+            background: #1B1B1B;
+        }
+
+        .variant-5 .bottom-nav {
+            background: #FFFFFF;
+            border-top: 1px solid rgba(27, 27, 27, 0.08);
+        }
+
+        .variant-5 .nav-item {
+            color: rgba(27, 27, 27, 0.50);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .variant-5 .nav-item.active {
+            color: #1B1B1B;
+        }
+
+        /* Responsive */
+        @media (max-width: 1600px) {
+            .phones-container {
+                gap: 20px;
+            }
+            .phone {
+                transform: scale(0.9);
+            }
+        }
+
+        @media (max-width: 1400px) {
+            .phone {
+                transform: scale(0.8);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .phones-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .phone {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Mobile Screen Comparison</h1>
+            <p class="subtitle">Home Screen (Today View) across all 5 design variants</p>
+        </div>
+
+        <div class="phones-container">
+            <!-- VARIANT 1: Momentum & Joy -->
+            <div class="phone-wrapper">
+                <div class="phone-label variant-1">Variant 1: Momentum & Joy</div>
+                <div class="phone variant-1">
+                    <div class="phone-screen">
+                        <div class="status-bar">
+                            <span>9:41</span>
+                            <span>●●●●</span>
+                        </div>
+                        <div class="screen-content">
+                            <div class="header-section">
+                                <div class="date">Monday, November 16</div>
+                                <div class="greeting">Today's Habits</div>
+
+                                <div class="progress-card">
+                                    <div class="progress-ring-container">
+                                        <div class="progress-ring">
+                                            <svg width="120" height="120">
+                                                <circle cx="60" cy="60" r="50" stroke="rgba(255,255,255,0.3)" stroke-width="8" fill="none"></circle>
+                                                <circle class="progress-ring-progress" cx="60" cy="60" r="50" stroke="white" stroke-width="8" fill="none" stroke-dasharray="314" stroke-dashoffset="94" stroke-linecap="round"></circle>
+                                            </svg>
+                                            <div class="progress-text">
+                                                <div class="progress-number">3/5</div>
+                                                <div class="progress-label">complete</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="motivational-text">Keep going! 2 more to go</div>
+                                    <div class="quick-stats">
+                                        <div class="stat">
+                                            <div class="stat-value">7 days 🔥</div>
+                                            <div class="stat-label">Streak</div>
+                                        </div>
+                                        <div class="stat">
+                                            <div class="stat-value">18/21</div>
+                                            <div class="stat-label">This week</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="habits-section">
+                                <div class="section-title">Your Habits</div>
+
+                                <div class="habit-card">
+                                    <div class="habit-checkbox"></div>
+                                    <div class="habit-info">
+                                        <div class="habit-name">Morning Meditation</div>
+                                        <div class="habit-streak">Health • 5 days 🔥</div>
+                                    </div>
+                                </div>
+
+                                <div class="habit-card">
+                                    <div class="habit-checkbox checked"></div>
+                                    <div class="habit-info">
+                                        <div class="habit-name">Read 20 Pages</div>
+                                        <div class="habit-streak">Learning • 12 days 🔥</div>
+                                    </div>
+                                </div>
+
+                                <div class="habit-card">
+                                    <div class="habit-checkbox checked"></div>
+                                    <div class="habit-info">
+                                        <div class="habit-name">Exercise 30 Min</div>
+                                        <div class="habit-streak">Fitness • 7 days 🔥</div>
+                                    </div>
+                                </div>
+
+                                <div class="habit-card">
+                                    <div class="habit-checkbox"></div>
+                                    <div class="habit-info">
+                                        <div class="habit-name">Drink 8 Glasses</div>
+                                        <div class="habit-streak">Health • 3 days 🔥</div>
+                                    </div>
+                                </div>
+
+                                <div class="habit-card">
+                                    <div class="habit-checkbox checked"></div>
+                                    <div class="habit-info">
+                                        <div class="habit-name">Journal 5 Min</div>
+                                        <div class="habit-streak">Mindfulness • 24 days 🔥</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="fab">+</div>
+
+                            <div class="bottom-nav">
+                                <div class="nav-item active">
+                                    <div class="nav-icon">🏠</div>
+                                    <div>Home</div>
+                                </div>
+                                <div class="nav-item">
+                                    <div class="nav-icon">📊</div>
+                                    <div>Analytics</div>
+                                </div>
+                                <div class="nav-item">
+                                    <div class="nav-icon">🔍</div>
+                                    <div>Discover</div>
+                                </div>
+                                <div class="nav-item">
+                                    <div class="nav-icon">👤</div>
+                                    <div>Profile</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VARIANT 2: Retro Futurism -->
+            <div class="phone-wrapper">
+                <div class="phone-label variant-2">Variant 2: Retro Futurism</div>
+                <div class="phone variant-2">
+                    <div class="phone-screen">
+                        <div class="status-bar">
+                            <span>9:41</span>
+                            <span>●●●●</span>
+                        </div>
+                        <div class="screen-content">
+                            <div class="header-section">
+                                <div class="date" style="font-family: 'Space Mono', monospace;">MON_NOV_16</div>
+                                <div class="greeting">TODAY</div>
+
+                                <div class="progress-card">
+                                    <div class="progress-ring-container">
+                                        <div class="progress-ring">
+                                            <svg width="120" height="120">
+                                                <circle cx="60" cy="60" r="50" stroke="rgba(0,229,255,0.2)" stroke-width="8" fill="none"></circle>
+                                                <circle class="progress-ring-progress" cx="60" cy="60" r="50" stroke="#00E5FF" stroke-width="8" fill="none" stroke-dasharray="314" stroke-dashoffset="94" stroke-linecap="round"></circle>
+                                            </svg>
+                                            <div class="progress-text">
+                                                <div class="progress-number">3/5</div>
+                                                <div class="progress-label">COMPLETE</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="motivational-text">SYSTEM: 2 MORE TO GO</div>
+                                    <div class="quick-stats">
+                                        <div class="stat">
+                                            <div class="stat-value" style="color: #FFCF25;">7_DAYS</div>
+                                            <div class="stat-label">STREAK</div>
+                                        </div>
+                                        <div class="stat">
+                                            <div class="stat-value">18/21</div>
+                                            <div class="stat-label">THIS_WEEK</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="habits-section">
+                                <div class="section-title" style="font-family: 'Major Mono Display', monospace; font-size: 16px; color: #00E5FF;">HABITS_LIST</div>
+
+                                <div class="habit-card">
+                                    <div class="habit-checkbox"></div>
+                                    <div class="habit-info">
+                                        <div class="habit-name">MEDITATION</div>
+                                        <div class="habit-streak">STREAK: 5 DAYS</div>
+                                    </div>
+                                </div>
+
+                                <div class="habit-card">
+                                    <div class="habit-checkbox checked"></div>
+                                    <div class="habit-info">
+                                        <div class="habit-name">READ 20 PAGES</div>
+                                        <div class="habit-streak">STREAK: 12 DAYS</div>
+                                    </div>
+                                </div>
+
+                                <div class="habit-card">
+                                    <div class="habit-checkbox checked"></div>
+                                    <div class="habit-info">
+                                        <div class="habit-name">EXERCISE</div>
+                                        <div class="habit-streak">STREAK: 7 DAYS</div>
+                                    </div>
+                                </div>
+
+                                <div class="habit-card">
+                                    <div class="habit-checkbox"></div>
+                                    <div class="habit-info">
+                                        <div class="habit-name">H2O INTAKE</div>
+                                        <div class="habit-streak">STREAK: 3 DAYS</div>
+                                    </div>
+                                </div>
+
+                                <div class="habit-card">
+                                    <div class="habit-checkbox checked"></div>
+                                    <div class="habit-info">
+                                        <div class="habit-name">JOURNAL</div>
+                                        <div class="habit-streak">STREAK: 24 DAYS</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="fab">+</div>
+
+                            <div class="bottom-nav">
+                                <div class="nav-item active">
+                                    <div class="nav-icon">■</div>
+                                    <div>HOME</div>
+                                </div>
+                                <div class="nav-item">
+                                    <div class="nav-icon">◆</div>
+                                    <div>DATA</div>
+                                </div>
+                                <div class="nav-item">
+                                    <div class="nav-icon">●</div>
+                                    <div>FIND</div>
+                                </div>
+                                <div class="nav-item">
+                                    <div class="nav-icon">▲</div>
+                                    <div>USER</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VARIANT 3: Earthy Zen -->
+            <div class="phone-wrapper">
+                <div class="phone-label variant-3">Variant 3: Earthy Zen</div>
+                <div class="phone variant-3">
+                    <div class="phone-screen">
+                        <div class="status-bar">
+                            <span>9:41</span>
+                            <span>●●●●</span>
+                        </div>
+                        <div class="screen-content">
+                            <div class="header-section">
+                                <div class="date" style="font-family: 'Lora', serif; font-style: italic; color: #7D8F69;">Monday, November 16</div>
+                                <div class="greeting">Today's Journey</div>
+
+                                <div class="progress-card">
+                                    <div class="progress-ring-container">
+                                        <div class="progress-ring">
+                                            <svg width="120" height="120">
+                                                <circle cx="60" cy="60" r="50" stroke="rgba(255,255,255,0.3)" stroke-width="8" fill="none"></circle>
+                                                <circle class="progress-ring-progress" cx="60" cy="60" r="50" stroke="white" stroke-width="8" fill="none" stroke-dasharray="314" stroke-dashoffset="94" stroke-linecap="round"></circle>
+                                            </svg>
+                                            <div class="progress-text">
+                                                <div class="progress-number">3/5</div>
+                                                <div class="progress-label">growing</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="motivational-text">Small steps lead to great changes</div>
+                                    <div class="quick-stats">
+                                        <div class="stat">
+                                            <div class="stat-value">7 days 🌱</div>
+                                            <div class="stat-label">Growing</div>
+                                        </div>
+                                        <div class="stat">
+                                            <div class="stat-value">18/21</div>
+                                            <div class="stat-label">This week</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="habits-section">
+                                <div class="section-title" style="font-family: 'Playfair Display', serif; color: #B85C38;">Daily Habits</div>
+
+                                <div class="habit-card">
+                                    <div class="habit-checkbox"></div>
+                                    <div class="habit-info">
+                                        <div class="habit-name">Morning Meditation</div>
+                                        <div class="habit-streak">🧘 Growing for 5 days</div>
+                                    </div>
+                                </div>
+
+                                <div class="habit-card">
+                                    <div class="habit-checkbox checked"></div>
+                                    <div class="habit-info">
+                                        <div class="habit-name">Read 20 Pages</div>
+                                        <div class="habit-streak">📚 Growing for 12 days</div>
+                                    </div>
+                                </div>
+
+                                <div class="habit-card">
+                                    <div class="habit-checkbox checked"></div>
+                                    <div class="habit-info">
+                                        <div class="habit-name">Exercise 30 Min</div>
+                                        <div class="habit-streak">💪 Growing for 7 days</div>
+                                    </div>
+                                </div>
+
+                                <div class="habit-card">
+                                    <div class="habit-checkbox"></div>
+                                    <div class="habit-info">
+                                        <div class="habit-name">Drink 8 Glasses</div>
+                                        <div class="habit-streak">💧 Growing for 3 days</div>
+                                    </div>
+                                </div>
+
+                                <div class="habit-card">
+                                    <div class="habit-checkbox checked"></div>
+                                    <div class="habit-info">
+                                        <div class="habit-name">Journal 5 Min</div>
+                                        <div class="habit-streak">✍️ Growing for 24 days</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="fab">+</div>
+
+                            <div class="bottom-nav">
+                                <div class="nav-item active">
+                                    <div class="nav-icon">🏠</div>
+                                    <div>Home</div>
+                                </div>
+                                <div class="nav-item">
+                                    <div class="nav-icon">🌱</div>
+                                    <div>Progress</div>
+                                </div>
+                                <div class="nav-item">
+                                    <div class="nav-icon">🌿</div>
+                                    <div>Explore</div>
+                                </div>
+                                <div class="nav-item">
+                                    <div class="nav-icon">🌾</div>
+                                    <div>Profile</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VARIANT 4: Minimal Refinement -->
+            <div class="phone-wrapper">
+                <div class="phone-label variant-4">Variant 4: Minimal Refinement</div>
+                <div class="phone variant-4">
+                    <div class="phone-screen">
+                        <div class="status-bar">
+                            <span>9:41</span>
+                            <span>●●●●</span>
+                        </div>
+                        <div class="screen-content">
+                            <div class="header-section">
+                                <div class="date" style="color: #A39889;">Monday, November 16</div>
+                                <div class="greeting">Today</div>
+
+                                <div class="progress-card">
+                                    <div class="progress-ring-container">
+                                        <div class="progress-ring">
+                                            <svg width="120" height="120">
+                                                <circle cx="60" cy="60" r="50" stroke="#E8E3DA" stroke-width="6" fill="none"></circle>
+                                                <circle class="progress-ring-progress" cx="60" cy="60" r="50" stroke="#2B2621" stroke-width="6" fill="none" stroke-dasharray="314" stroke-dashoffset="94" stroke-linecap="round"></circle>
+                                            </svg>
+                                            <div class="progress-text">
+                                                <div class="progress-number">3/5</div>
+                                                <div class="progress-label" style="color: #7A7265;">complete</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="motivational-text">Continue with intention</div>
+                                    <div class="quick-stats" style="color: #4D4539;">
+                                        <div class="stat">
+                                            <div class="stat-value">7 days</div>
+                                            <div class="stat-label">Current</div>
+                                        </div>
+                                        <div class="stat">
+                                            <div class="stat-value">18/21</div>
+                                            <div class="stat-label">Week</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="habits-section">
+                                <div class="section-title" style="font-family: 'Cormorant Garamond', serif; color: #2B2621;">Habits</div>
+
+                                <div class="habit-card">
+                                    <div class="habit-checkbox"></div>
+                                    <div class="habit-info">
+                                        <div class="habit-name">Morning Meditation</div>
+                                        <div class="habit-streak">5 days</div>
+                                    </div>
+                                </div>
+
+                                <div class="habit-card">
+                                    <div class="habit-checkbox checked"></div>
+                                    <div class="habit-info">
+                                        <div class="habit-name">Read 20 Pages</div>
+                                        <div class="habit-streak">12 days</div>
+                                    </div>
+                                </div>
+
+                                <div class="habit-card">
+                                    <div class="habit-checkbox checked"></div>
+                                    <div class="habit-info">
+                                        <div class="habit-name">Exercise 30 Min</div>
+                                        <div class="habit-streak">7 days</div>
+                                    </div>
+                                </div>
+
+                                <div class="habit-card">
+                                    <div class="habit-checkbox"></div>
+                                    <div class="habit-info">
+                                        <div class="habit-name">Drink 8 Glasses</div>
+                                        <div class="habit-streak">3 days</div>
+                                    </div>
+                                </div>
+
+                                <div class="habit-card">
+                                    <div class="habit-checkbox checked"></div>
+                                    <div class="habit-info">
+                                        <div class="habit-name">Journal 5 Min</div>
+                                        <div class="habit-streak">24 days</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="fab">+</div>
+
+                            <div class="bottom-nav">
+                                <div class="nav-item active">
+                                    <div class="nav-icon">○</div>
+                                    <div>Home</div>
+                                </div>
+                                <div class="nav-item">
+                                    <div class="nav-icon">◇</div>
+                                    <div>Data</div>
+                                </div>
+                                <div class="nav-item">
+                                    <div class="nav-icon">◻</div>
+                                    <div>Find</div>
+                                </div>
+                                <div class="nav-item">
+                                    <div class="nav-icon">◎</div>
+                                    <div>You</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VARIANT 5: Professional Polish -->
+            <div class="phone-wrapper">
+                <div class="phone-label variant-5">Variant 5: Professional Polish</div>
+                <div class="phone variant-5">
+                    <div class="phone-screen">
+                        <div class="status-bar">
+                            <span>9:41</span>
+                            <span>●●●●</span>
+                        </div>
+                        <div class="screen-content">
+                            <div class="header-section">
+                                <div class="date" style="color: rgba(27, 27, 27, 0.60);">Monday, November 16</div>
+                                <div class="greeting">Today's Habits</div>
+
+                                <div class="progress-card">
+                                    <div class="progress-ring-container">
+                                        <div class="progress-ring">
+                                            <svg width="120" height="120">
+                                                <circle cx="60" cy="60" r="50" stroke="rgba(27,27,27,0.1)" stroke-width="8" fill="none"></circle>
+                                                <circle class="progress-ring-progress" cx="60" cy="60" r="50" stroke="#1B1B1B" stroke-width="8" fill="none" stroke-dasharray="314" stroke-dashoffset="94" stroke-linecap="round"></circle>
+                                            </svg>
+                                            <div class="progress-text">
+                                                <div class="progress-number">3/5</div>
+                                                <div class="progress-label" style="color: rgba(27, 27, 27, 0.70);">complete</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="motivational-text">Keep building momentum</div>
+                                    <div class="quick-stats">
+                                        <div class="stat">
+                                            <div class="stat-value">7 days</div>
+                                            <div class="stat-label" style="color: rgba(27, 27, 27, 0.60);">Streak</div>
+                                        </div>
+                                        <div class="stat">
+                                            <div class="stat-value">18/21</div>
+                                            <div class="stat-label" style="color: rgba(27, 27, 27, 0.60);">This week</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="habits-section">
+                                <div class="section-title" style="font-family: 'Work Sans', sans-serif; color: #1B1B1B;">Your Habits</div>
+
+                                <div class="habit-card">
+                                    <div class="habit-checkbox"></div>
+                                    <div class="habit-info">
+                                        <div class="habit-name">Morning Meditation</div>
+                                        <div class="habit-streak">5 days • Health</div>
+                                    </div>
+                                </div>
+
+                                <div class="habit-card">
+                                    <div class="habit-checkbox checked"></div>
+                                    <div class="habit-info">
+                                        <div class="habit-name">Read 20 Pages</div>
+                                        <div class="habit-streak">12 days • Learning</div>
+                                    </div>
+                                </div>
+
+                                <div class="habit-card">
+                                    <div class="habit-checkbox checked"></div>
+                                    <div class="habit-info">
+                                        <div class="habit-name">Exercise 30 Min</div>
+                                        <div class="habit-streak">7 days • Fitness</div>
+                                    </div>
+                                </div>
+
+                                <div class="habit-card">
+                                    <div class="habit-checkbox"></div>
+                                    <div class="habit-info">
+                                        <div class="habit-name">Drink 8 Glasses</div>
+                                        <div class="habit-streak">3 days • Health</div>
+                                    </div>
+                                </div>
+
+                                <div class="habit-card">
+                                    <div class="habit-checkbox checked"></div>
+                                    <div class="habit-info">
+                                        <div class="habit-name">Journal 5 Min</div>
+                                        <div class="habit-streak">24 days • Mindfulness</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="fab">+</div>
+
+                            <div class="bottom-nav">
+                                <div class="nav-item active">
+                                    <div class="nav-icon">●</div>
+                                    <div>Home</div>
+                                </div>
+                                <div class="nav-item">
+                                    <div class="nav-icon">◆</div>
+                                    <div>Analytics</div>
+                                </div>
+                                <div class="nav-item">
+                                    <div class="nav-icon">◇</div>
+                                    <div>Discover</div>
+                                </div>
+                                <div class="nav-item">
+                                    <div class="nav-icon">◎</div>
+                                    <div>Profile</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

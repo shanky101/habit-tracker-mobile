@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker - Design System (Variant 5: Professional Polish)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Core Brand Colors - Deel Inspired */
+            --primary-dark: #1B1B1B;
+            --primary-charcoal: #2D2D2D;
+            --primary-medium: #4E4E4E;
+            --primary-light: #7A7A7A;
+
+            /* Accent Colors */
+            --accent-sky: #B1D8FC;
+            --accent-blue-light: #C7E2FE;
+            --accent-blue-pale: #E5F3FF;
+            --accent-yellow: #FFCF25;
+            --accent-yellow-light: #FFE588;
+            --accent-purple: #D6C9FD;
+            --accent-purple-light: #EDE8FF;
+
+            /* Neutrals */
+            --white: #FFFFFF;
+            --cream: #FAF4EE;
+            --cream-light: #FFFBF4;
+            --off-white: #F9F9F9;
+            --border-light: rgba(27, 27, 27, 0.08);
+            --border-medium: rgba(27, 27, 27, 0.16);
+            --text-secondary: rgba(27, 27, 27, 0.70);
+
+            /* Semantic Colors */
+            --success: #22C55E;
+            --success-light: #D1FAE5;
+            --warning: #F59E0B;
+            --warning-light: #FEF3C7;
+            --error: #EF4444;
+            --error-light: #FEE2E2;
+
+            /* Typography */
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-display: 'Work Sans', sans-serif;
+
+            /* Spacing Scale - 8px base */
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+            --space-8: 32px;
+            --space-10: 40px;
+            --space-12: 48px;
+            --space-16: 64px;
+            --space-20: 80px;
+            --space-24: 96px;
+
+            /* Border Radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --radius-pill: 200px;
+
+            /* Shadows - Deel Style */
+            --shadow-sm: 0px 2px 4px rgba(27, 27, 27, 0.04);
+            --shadow-md: 0px 2px 8px rgba(27, 27, 27, 0.06), 0px 4px 12px rgba(27, 27, 27, 0.04);
+            --shadow-lg: 0px 4px 16px rgba(27, 27, 27, 0.08), 0px 8px 24px rgba(27, 27, 27, 0.06);
+            --shadow-xl: 0px 8px 32px rgba(27, 27, 27, 0.12), 0px 12px 48px rgba(27, 27, 27, 0.08);
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background: var(--white);
+            color: var(--primary-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: var(--cream-light);
+            padding: var(--space-24) var(--space-6);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 75vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Decorative shapes */
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+            background: var(--accent-blue-pale);
+            border-radius: 50%;
+            opacity: 0.5;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            left: -80px;
+            width: 300px;
+            height: 300px;
+            background: var(--accent-yellow-light);
+            border-radius: 50%;
+            opacity: 0.4;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            background: var(--primary-dark);
+            color: var(--white);
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-pill);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: var(--space-6);
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: var(--space-6);
+            letter-spacing: -0.02em;
+            animation: fadeInUp 1s ease-out;
+            line-height: 1.1;
+        }
+
+        .hero-subtitle {
+            font-family: var(--font-primary);
+            font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-8);
+            animation: fadeInUp 1s ease-out 0.2s both;
+            font-weight: 400;
+            line-height: 1.6;
+        }
+
+        .hero-cta {
+            display: inline-flex;
+            gap: var(--space-4);
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-20) var(--space-6);
+            position: relative;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: var(--space-20);
+        }
+
+        .section-header {
+            margin-bottom: var(--space-12);
+            text-align: center;
+        }
+
+        .section-tag {
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--accent-sky);
+            margin-bottom: var(--space-3);
+            display: block;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            color: var(--primary-dark);
+            letter-spacing: -0.02em;
+            margin-bottom: var(--space-4);
+            line-height: 1.1;
+        }
+
+        .section-description {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* Card System */
+        .card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-10);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-light);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-sky), var(--accent-purple));
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Color Grid */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-6);
+        }
+
+        .color-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+        }
+
+        .color-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .color-swatch {
+            height: 200px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .color-info {
+            padding: var(--space-6);
+        }
+
+        .color-name {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: var(--space-2);
+            color: var(--primary-dark);
+        }
+
+        .color-usage {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-4);
+            line-height: 1.6;
+        }
+
+        .color-code {
+            font-family: var(--font-primary);
+            font-size: 0.8rem;
+            color: var(--primary-medium);
+            background: var(--off-white);
+            padding: var(--space-2) var(--space-3);
+            border-radius: var(--radius-sm);
+            display: inline-block;
+            margin: 2px;
+            font-weight: 500;
+        }
+
+        /* Typography Specimens */
+        .type-grid {
+            display: grid;
+            gap: var(--space-8);
+        }
+
+        .type-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-10);
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .type-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--primary-light);
+            margin-bottom: var(--space-4);
+        }
+
+        /* Buttons */
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-4);
+        }
+
+        .btn {
+            font-family: var(--font-primary);
+            font-weight: 600;
+            padding: var(--space-4) var(--space-8);
+            border-radius: var(--radius-pill);
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-dark);
+            color: var(--white);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-medium);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary-dark);
+            border: 2px solid var(--border-medium);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-dark);
+            background: var(--off-white);
+        }
+
+        .btn-accent {
+            background: var(--accent-sky);
+            color: var(--primary-dark);
+        }
+
+        .btn-accent:hover {
+            background: var(--accent-blue-light);
+            transform: translateY(-1px);
+        }
+
+        /* Habit Card */
+        .habit-card {
+            display: flex;
+            align-items: center;
+            gap: var(--space-6);
+            background: var(--white);
+            padding: var(--space-6);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-light);
+        }
+
+        .habit-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .habit-checkbox {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: 3px solid var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            background: var(--white);
+        }
+
+        .habit-checkbox:hover {
+            background: var(--accent-blue-pale);
+            border-color: var(--accent-sky);
+            transform: scale(1.05);
+        }
+
+        .habit-checkbox.checked {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .habit-checkbox svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--white);
+            stroke-width: 3;
+            fill: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .habit-checkbox.checked svg {
+            opacity: 1;
+        }
+
+        .habit-info {
+            flex: 1;
+        }
+
+        .habit-name {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 1.3rem;
+            color: var(--primary-dark);
+            margin-bottom: var(--space-1);
+        }
+
+        .habit-streak {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .habit-streak strong {
+            color: var(--primary-dark);
+        }
+
+        /* Gestures */
+        .gestures-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-6);
+        }
+
+        .gesture-card {
+            background: var(--white);
+            padding: var(--space-8);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-light);
+            text-align: center;
+        }
+
+        .gesture-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-4px);
+        }
+
+        .gesture-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--accent-blue-pale);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--space-6);
+            font-size: 2.5rem;
+        }
+
+        .gesture-name {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: var(--space-3);
+            color: var(--primary-dark);
+        }
+
+        .gesture-action {
+            color: var(--text-secondary);
+            margin-bottom: var(--space-4);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .gesture-feedback {
+            display: inline-block;
+            font-size: 0.8rem;
+            color: var(--primary-dark);
+            background: var(--cream);
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-pill);
+            font-weight: 500;
+        }
+
+        /* Motion Examples */
+        .motion-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-6);
+        }
+
+        .motion-card {
+            background: var(--white);
+            padding: var(--space-8);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+            text-align: center;
+        }
+
+        .demo-box {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-dark);
+            border-radius: var(--radius-md);
+            margin: var(--space-6) auto;
+        }
+
+        .demo-smooth { animation: smoothSlide 3s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+        .demo-bounce { animation: professionalBounce 2s ease-in-out infinite; }
+        .demo-fade { animation: subtleFade 3s ease-in-out infinite; }
+        .demo-scale { animation: cleanScale 2s ease-in-out infinite; }
+
+        @keyframes smoothSlide {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(30px); }
+        }
+
+        @keyframes professionalBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes subtleFade {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        @keyframes cleanScale {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(0.9); }
+        }
+
+        /* UX Principles */
+        .principle-grid {
+            display: grid;
+            gap: var(--space-6);
+        }
+
+        .principle-card {
+            background: var(--white);
+            padding: var(--space-8);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+        }
+
+        .principle-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .principle-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            margin-bottom: var(--space-4);
+        }
+
+        .principle-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--accent-blue-pale);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .principle-title {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .principle-description {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--primary-dark);
+            color: var(--white);
+            padding: var(--space-20) var(--space-6);
+            text-align: center;
+            margin-top: var(--space-24);
+        }
+
+        .footer-content {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .footer h3 {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            margin-bottom: var(--space-4);
+            font-weight: 700;
+        }
+
+        .footer p {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.7;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--space-12) var(--space-4);
+            }
+
+            .color-grid,
+            .button-grid,
+            .gestures-grid,
+            .motion-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                padding: var(--space-16) var(--space-4);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <span class="hero-tag">Variant 05</span>
+            <h1>Habit Tracker</h1>
+            <p class="hero-subtitle">Professional design system built for clarity, consistency, and scale</p>
+            <div class="hero-cta">
+                <button class="btn btn-primary">Get Started</button>
+                <button class="btn btn-secondary">Learn More</button>
+            </div>
+        </div>
+    </section>
+
+    <div class="container">
+        <!-- Colors Section -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-tag">Foundation</span>
+                <h2 class="section-title">Color System</h2>
+                <p class="section-description">A refined palette balancing professional depth with approachable accent colors</p>
+            </div>
+
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #1B1B1B;">
+                        <span style="color: white; font-size: 3rem;">●</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Primary Dark</div>
+                        <div class="color-usage">Main text, primary buttons, bold headlines, core brand presence</div>
+                        <code class="color-code">#1B1B1B</code>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: linear-gradient(135deg, #B1D8FC 0%, #C7E2FE 100%);">
+                        <span style="color: #1B1B1B; font-size: 3rem;">○</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Accent Sky Blue</div>
+                        <div class="color-usage">Interactive elements, highlights, success states, friendly touches</div>
+                        <code class="color-code">#B1D8FC</code>
+                        <code class="color-code">#C7E2FE</code>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: linear-gradient(135deg, #FFCF25 0%, #FFE588 100%);">
+                        <span style="color: #1B1B1B; font-size: 3rem;">★</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Accent Yellow</div>
+                        <div class="color-usage">Celebrations, achievements, premium features, attention-grabbing</div>
+                        <code class="color-code">#FFCF25</code>
+                        <code class="color-code">#FFE588</code>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: linear-gradient(135deg, #D6C9FD 0%, #EDE8FF 100%);">
+                        <span style="color: #1B1B1B; font-size: 3rem;">◆</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Accent Purple</div>
+                        <div class="color-usage">Secondary accents, premium touches, sophisticated highlights</div>
+                        <code class="color-code">#D6C9FD</code>
+                        <code class="color-code">#EDE8FF</code>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #22C55E;">
+                        <span style="color: white; font-size: 3rem;">✓</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Success Green</div>
+                        <div class="color-usage">Completions, positive feedback, habit streaks, confirmations</div>
+                        <code class="color-code">#22C55E</code>
+                        <code class="color-code">#D1FAE5 (light)</code>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: linear-gradient(180deg, #FAF4EE 0%, #FFFBF4 100%);">
+                        <span style="color: #4E4E4E; font-size: 3rem;">□</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Warm Cream</div>
+                        <div class="color-usage">Background sections, warm contrast, subtle surfaces</div>
+                        <code class="color-code">#FAF4EE</code>
+                        <code class="color-code">#FFFBF4</code>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #FFFFFF; border: 1px solid rgba(27,27,27,0.1);">
+                        <span style="color: #1B1B1B; font-size: 3rem;">○</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Pure White</div>
+                        <div class="color-usage">Card backgrounds, primary surfaces, maximum contrast</div>
+                        <code class="color-code">#FFFFFF</code>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: linear-gradient(135deg, #4E4E4E 0%, #7A7A7A 100%);">
+                        <span style="color: white; font-size: 3rem;">■</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Neutral Grays</div>
+                        <div class="color-usage">Secondary text, disabled states, supporting elements</div>
+                        <code class="color-code">#4E4E4E</code>
+                        <code class="color-code">#7A7A7A</code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Typography -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-tag">Typography</span>
+                <h2 class="section-title">Type System</h2>
+                <p class="section-description">Professional typefaces optimized for clarity and hierarchy</p>
+            </div>
+
+            <div class="type-grid">
+                <div class="type-card">
+                    <div class="type-label">Display — Work Sans</div>
+                    <div style="font-family: var(--font-display); font-size: clamp(3rem, 6vw, 5rem); color: var(--primary-dark); margin: var(--space-4) 0; line-height: 1.1; font-weight: 700;">
+                        Build Better Habits
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 1rem; line-height: 1.7;">Bold, geometric sans-serif for headlines. Strong presence without overwhelming. Perfect for hero sections and major headings.</p>
+                </div>
+
+                <div class="type-card">
+                    <div class="type-label">Body — Inter</div>
+                    <div style="font-family: var(--font-primary); font-size: 1.5rem; color: var(--primary-dark); margin: var(--space-4) 0; font-weight: 600;">
+                        Your 24-day streak is active
+                    </div>
+                    <div style="font-family: var(--font-primary); font-size: 1rem; color: var(--text-secondary); margin: var(--space-4) 0; line-height: 1.8; font-weight: 400;">
+                        Track your daily habits with precision and care. Our professional-grade system ensures every action is recorded with clarity. Build consistency through intentional design that supports your growth journey.
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 1rem; line-height: 1.7;">Highly legible system font. Optimized for screens at all sizes. Industry-standard for professional applications.</p>
+                </div>
+
+                <div class="type-card">
+                    <div class="type-label">Scale Reference</div>
+                    <div style="display: grid; gap: var(--space-3); margin-top: var(--space-4);">
+                        <div style="font-family: var(--font-display); font-size: 3.5rem; font-weight: 700; color: var(--primary-dark);">Headline XL</div>
+                        <div style="font-family: var(--font-display); font-size: 2.5rem; font-weight: 700; color: var(--primary-dark);">Headline L</div>
+                        <div style="font-family: var(--font-display); font-size: 2rem; font-weight: 600; color: var(--primary-dark);">Headline M</div>
+                        <div style="font-family: var(--font-primary); font-size: 1.25rem; font-weight: 600; color: var(--primary-dark);">Body Large</div>
+                        <div style="font-family: var(--font-primary); font-size: 1rem; font-weight: 400; color: var(--text-secondary);">Body Regular (16px, the optimal reading size)</div>
+                        <div style="font-family: var(--font-primary); font-size: 0.875rem; font-weight: 400; color: var(--text-secondary);">Body Small for captions and metadata</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Components -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-tag">Components</span>
+                <h2 class="section-title">UI Elements</h2>
+                <p class="section-description">Consistent, accessible components built for scale</p>
+            </div>
+
+            <div class="card">
+                <h3 style="font-family: var(--font-display); font-size: 1.8rem; color: var(--primary-dark); margin-bottom: var(--space-6); font-weight: 600;">Buttons</h3>
+                <div class="button-grid">
+                    <button class="btn btn-primary">Primary Action</button>
+                    <button class="btn btn-secondary">Secondary Action</button>
+                    <button class="btn btn-accent">Accent Action</button>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: var(--space-8);">
+                <h3 style="font-family: var(--font-display); font-size: 1.8rem; color: var(--primary-dark); margin-bottom: var(--space-6); font-weight: 600;">Habit Card</h3>
+                <div class="habit-card">
+                    <div class="habit-checkbox" onclick="this.classList.toggle('checked')">
+                        <svg viewBox="0 0 24 24">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                    <div class="habit-info">
+                        <div class="habit-name">Morning Meditation</div>
+                        <div class="habit-streak"><strong>24 days</strong> • Last completed today at 9:15 AM</div>
+                    </div>
+                    <div style="color: var(--primary-light); font-size: 1.5rem;">→</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gestures -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-tag">Interactions</span>
+                <h2 class="section-title">Gesture System</h2>
+                <p class="section-description">Intuitive touch patterns with professional feedback</p>
+            </div>
+
+            <div class="gestures-grid">
+                <div class="gesture-card">
+                    <div class="gesture-icon">👆</div>
+                    <h3 class="gesture-name">Tap</h3>
+                    <p class="gesture-action">Quick, precise interaction for check-ins and selections</p>
+                    <span class="gesture-feedback">Crisp haptic response</span>
+                </div>
+
+                <div class="gesture-card">
+                    <div class="gesture-icon">👉</div>
+                    <h3 class="gesture-name">Swipe Right</h3>
+                    <p class="gesture-action">Complete habit with smooth sliding animation</p>
+                    <span class="gesture-feedback">Satisfying confirmation</span>
+                </div>
+
+                <div class="gesture-card">
+                    <div class="gesture-icon">👈</div>
+                    <h3 class="gesture-name">Swipe Left</h3>
+                    <p class="gesture-action">Reveal contextual actions elegantly</p>
+                    <span class="gesture-feedback">Subtle slide reveal</span>
+                </div>
+
+                <div class="gesture-card">
+                    <div class="gesture-icon">✊</div>
+                    <h3 class="gesture-name">Long Press</h3>
+                    <p class="gesture-action">Activate reorder mode with visual lift</p>
+                    <span class="gesture-feedback">Firm haptic hold</span>
+                </div>
+
+                <div class="gesture-card">
+                    <div class="gesture-icon">👇</div>
+                    <h3 class="gesture-name">Pull to Refresh</h3>
+                    <p class="gesture-action">Sync data with professional loading state</p>
+                    <span class="gesture-feedback">Smooth sync animation</span>
+                </div>
+
+                <div class="gesture-card">
+                    <div class="gesture-icon">🤏</div>
+                    <h3 class="gesture-name">Pinch</h3>
+                    <p class="gesture-action">Scale calendar between month and year views</p>
+                    <span class="gesture-feedback">Fluid zoom transition</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Motion -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-tag">Animation</span>
+                <h2 class="section-title">Motion Principles</h2>
+                <p class="section-description">Professional animations with precise timing and purpose</p>
+            </div>
+
+            <div class="motion-grid">
+                <div class="motion-card">
+                    <h3 style="font-family: var(--font-display); color: var(--primary-dark); margin-bottom: var(--space-3); font-size: 1.4rem; font-weight: 600;">Smooth Slide</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: var(--space-4); line-height: 1.6;">Professional easing for transitions</p>
+                    <div class="demo-box demo-smooth"></div>
+                    <div style="font-size: 0.8rem; color: var(--primary-light); margin-top: var(--space-3);">cubic-bezier(0.4, 0, 0.2, 1)</div>
+                </div>
+
+                <div class="motion-card">
+                    <h3 style="font-family: var(--font-display); color: var(--primary-dark); margin-bottom: var(--space-3); font-size: 1.4rem; font-weight: 600;">Refined Bounce</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: var(--space-4); line-height: 1.6;">Subtle spring for check-in feedback</p>
+                    <div class="demo-box demo-bounce"></div>
+                    <div style="font-size: 0.8rem; color: var(--primary-light); margin-top: var(--space-3);">ease-in-out timing</div>
+                </div>
+
+                <div class="motion-card">
+                    <h3 style="font-family: var(--font-display); color: var(--primary-dark); margin-bottom: var(--space-3); font-size: 1.4rem; font-weight: 600;">Subtle Fade</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: var(--space-4); line-height: 1.6;">Elegant opacity transitions</p>
+                    <div class="demo-box demo-fade"></div>
+                    <div style="font-size: 0.8rem; color: var(--primary-light); margin-top: var(--space-3);">smooth fade curve</div>
+                </div>
+
+                <div class="motion-card">
+                    <h3 style="font-family: var(--font-display); color: var(--primary-dark); margin-bottom: var(--space-3); font-size: 1.4rem; font-weight: 600;">Clean Scale</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: var(--space-4); line-height: 1.6;">Precise size transformations</p>
+                    <div class="demo-box demo-scale"></div>
+                    <div style="font-size: 0.8rem; color: var(--primary-light); margin-top: var(--space-3);">proportional scaling</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- UX Principles -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-tag">Philosophy</span>
+                <h2 class="section-title">Design Principles</h2>
+                <p class="section-description">Core values guiding every design decision</p>
+            </div>
+
+            <div class="principle-grid">
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <div class="principle-icon">🎯</div>
+                        <h3 class="principle-title">Clarity First</h3>
+                    </div>
+                    <p class="principle-description">
+                        Every element serves a clear purpose. Information hierarchy is immediately apparent through consistent typography, spacing, and visual weight. Users never guess what to do next.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <div class="principle-icon">⚡</div>
+                        <h3 class="principle-title">Professional Speed</h3>
+                    </div>
+                    <p class="principle-description">
+                        Interactions respond instantly with subtle, purposeful animations. Loading states are clear and reassuring. The system feels fast and reliable, never sluggish or overly animated.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <div class="principle-icon">📐</div>
+                        <h3 class="principle-title">Systematic Consistency</h3>
+                    </div>
+                    <p class="principle-description">
+                        Design tokens ensure visual coherence across all screens. 8px spacing grid creates predictable rhythm. Components behave consistently, building user confidence through repetition.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <div class="principle-icon">♿</div>
+                        <h3 class="principle-title">Inclusive Access</h3>
+                    </div>
+                    <p class="principle-description">
+                        WCAG AA compliant color contrasts. Touch targets meet minimum 44×44px size. Screen reader friendly markup. Keyboard navigation fully supported. Design that works for everyone.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <div class="principle-icon">🔧</div>
+                        <h3 class="principle-title">Scalable Foundation</h3>
+                    </div>
+                    <p class="principle-description">
+                        Design system built to grow. New components inherit existing patterns. Documentation ensures team alignment. Tokens allow theme customization without breaking consistency.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <div class="principle-icon">✨</div>
+                        <h3 class="principle-title">Delightful Details</h3>
+                    </div>
+                    <p class="principle-description">
+                        Professional doesn't mean boring. Subtle animations reward actions. Thoughtful micro-interactions create moments of joy. Color accents add personality without compromising clarity.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Spacing System -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-tag">Foundation</span>
+                <h2 class="section-title">Spacing System</h2>
+                <p class="section-description">8px base grid for consistent rhythm and alignment</p>
+            </div>
+
+            <div class="card">
+                <div style="display: grid; gap: var(--space-4);">
+                    <div style="display: flex; align-items: center; gap: var(--space-4); padding: var(--space-3); border-bottom: 1px solid var(--border-light);">
+                        <div style="min-width: 100px; font-family: var(--font-primary); font-weight: 600; color: var(--primary-dark);">4px (1)</div>
+                        <div style="height: 4px; background: var(--accent-sky); flex: 1; border-radius: 2px;"></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: var(--space-4); padding: var(--space-3); border-bottom: 1px solid var(--border-light);">
+                        <div style="min-width: 100px; font-family: var(--font-primary); font-weight: 600; color: var(--primary-dark);">8px (2)</div>
+                        <div style="height: 8px; background: var(--accent-sky); flex: 1; border-radius: 4px;"></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: var(--space-4); padding: var(--space-3); border-bottom: 1px solid var(--border-light);">
+                        <div style="min-width: 100px; font-family: var(--font-primary); font-weight: 600; color: var(--primary-dark);">16px (4)</div>
+                        <div style="height: 16px; background: var(--accent-sky); flex: 1; border-radius: 8px;"></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: var(--space-4); padding: var(--space-3); border-bottom: 1px solid var(--border-light);">
+                        <div style="min-width: 100px; font-family: var(--font-primary); font-weight: 600; color: var(--primary-dark);">24px (6)</div>
+                        <div style="height: 24px; background: var(--accent-sky); flex: 1; border-radius: 12px;"></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: var(--space-4); padding: var(--space-3); border-bottom: 1px solid var(--border-light);">
+                        <div style="min-width: 100px; font-family: var(--font-primary); font-weight: 600; color: var(--primary-dark);">32px (8)</div>
+                        <div style="height: 32px; background: var(--accent-sky); flex: 1; border-radius: 16px;"></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: var(--space-4); padding: var(--space-3); border-bottom: 1px solid var(--border-light);">
+                        <div style="min-width: 100px; font-family: var(--font-primary); font-weight: 600; color: var(--primary-dark);">48px (12)</div>
+                        <div style="height: 48px; background: var(--accent-sky); flex: 1; border-radius: 24px;"></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: var(--space-4); padding: var(--space-3);">
+                        <div style="min-width: 100px; font-family: var(--font-primary); font-weight: 600; color: var(--primary-dark);">64px (16)</div>
+                        <div style="height: 64px; background: var(--accent-sky); flex: 1; border-radius: 32px;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <h3>Build Better Habits</h3>
+            <p style="margin-top: var(--space-4); font-size: 1.1rem;">
+                Professional design system for consistent, scalable habit tracking
+            </p>
+            <p style="margin-top: var(--space-8); font-size: 0.9rem; opacity: 0.7;">
+                Variant 5 — Professional Polish — Inspired by Deel — 2024
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth reveal on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.section').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(30px)';
+            section.style.transition = 'opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+            observer.observe(section);
+        });
+
+        // Interactive checkbox
+        document.querySelectorAll('.habit-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('click', function() {
+                this.classList.toggle('checked');
+            });
+        });
+    </script>
+</body>
+</html>

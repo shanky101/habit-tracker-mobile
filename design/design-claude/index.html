@@ -106,6 +106,10 @@
             background: linear-gradient(135deg, #1A1714 0%, #4D4539 100%);
         }
 
+        .variant-5::before {
+            background: linear-gradient(135deg, #1B1B1B 0%, #B1D8FC 100%);
+        }
+
         .variant-number {
             font-size: 0.85rem;
             font-weight: 600;
@@ -119,6 +123,7 @@
         .variant-2 .variant-number { color: #FF6183; }
         .variant-3 .variant-number { color: #B85C38; }
         .variant-4 .variant-number { color: #2B2621; }
+        .variant-5 .variant-number { color: #1B1B1B; }
 
         .variant-name {
             font-size: 2rem;
@@ -162,6 +167,7 @@
         .variant-2 .variant-features li::before { color: #FF6183; }
         .variant-3 .variant-features li::before { color: #B85C38; }
         .variant-4 .variant-features li::before { color: #4D4539; }
+        .variant-5 .variant-features li::before { color: #B1D8FC; }
 
         .view-button {
             display: inline-block;
@@ -189,6 +195,10 @@
 
         .variant-4 .view-button {
             background: linear-gradient(135deg, #2B2621 0%, #4D4539 100%);
+        }
+
+        .variant-5 .view-button {
+            background: linear-gradient(135deg, #1B1B1B 0%, #B1D8FC 100%);
         }
 
         .view-button:hover {
@@ -312,6 +322,26 @@
                     <li>Refined serif + geometric sans</li>
                     <li>Subtle, elegant animations</li>
                     <li>Ultra-minimal, luxurious feel</li>
+                </ul>
+                <span class="view-button">View Design System</span>
+            </a>
+
+            <!-- Variant 5 -->
+            <a href="variant-5.html" class="variant-card variant-5">
+                <div class="variant-number">Variant 05</div>
+                <h2 class="variant-name">Professional Polish</h2>
+                <div class="color-preview">
+                    <div class="color-dot" style="background: #1B1B1B;"></div>
+                    <div class="color-dot" style="background: #B1D8FC;"></div>
+                    <div class="color-dot" style="background: #FFCF25;"></div>
+                    <div class="color-dot" style="background: #D6C9FD;"></div>
+                </div>
+                <p class="variant-description">Deel-inspired professional design. Refined minimalism with systematic consistency. Built for clarity and scale.</p>
+                <ul class="variant-features">
+                    <li>Professional dark + sky blue</li>
+                    <li>Inter + Work Sans typefaces</li>
+                    <li>8px spacing grid system</li>
+                    <li>Scalable, enterprise-grade</li>
                 </ul>
                 <span class="view-button">View Design System</span>
             </a>
