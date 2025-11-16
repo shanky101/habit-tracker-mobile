@@ -89,20 +89,20 @@ export default function BlogPage() {
               <div className="w-10 h-10 bg-gradient-earth rounded-full flex items-center justify-center shadow-[0_4px_12px_rgba(62,39,35,0.08)]" aria-hidden="true">
                 <Leaf className="w-6 h-6 text-white" />
               </div>
-              <span className="font-[family-name:var(--font-display)] font-semibold text-2xl text-[#1A1410]">
+              <span className="font-[family-name:var(--font-display)] font-medium text-2xl text-[#1A1410]">
                 HabitFlow
               </span>
             </Link>
             <div className="flex items-center gap-8">
               <Link
                 href="/#features"
-                className="hidden md:inline-block text-[#2C2416] hover:text-[#B85C38] transition-colors font-medium"
+                className="hidden md:inline-block text-[#1A1410] hover:text-[#B85C38] transition-colors font-medium text-[15px]"
               >
                 Features
               </Link>
               <Link
                 href="/blog"
-                className="hidden md:inline-block text-[#B85C38] font-semibold"
+                className="hidden md:inline-block text-[#B85C38] font-medium text-[15px]"
               >
                 Wisdom
               </Link>
@@ -116,14 +116,14 @@ export default function BlogPage() {
       <section className="pt-32 pb-16 px-6 lg:px-8 bg-gradient-to-br from-[#F5F1E8] to-[#FAF8F3]" aria-labelledby="blog-hero-heading">
         <div className="max-w-4xl mx-auto text-center">
           <div className="animate-fade-in-up">
-            <span className="font-[family-name:var(--font-body)] text-[#4A7C59] text-sm font-semibold italic tracking-wide uppercase mb-4 block">
+            <span className="font-[family-name:var(--font-body)] text-[#4A7C59] text-xs font-semibold tracking-[0.15em] uppercase mb-4 block">
               The Wisdom Library
             </span>
-            <h1 id="blog-hero-heading" className="font-[family-name:var(--font-display)] font-bold text-[#1A1410] text-4xl md:text-5xl lg:text-6xl mb-6">
+            <h1 id="blog-hero-heading" className="font-[family-name:var(--font-display)] font-normal text-[#1A1410] text-4xl md:text-5xl lg:text-6xl mb-6">
               The Science of{" "}
-              <span className="text-[#B85C38] italic">Building Better Habits</span>
+              <span className="text-[#B85C38] italic font-light">Building Better Habits</span>
             </h1>
-            <p className="text-[#2C2416] text-lg md:text-xl max-w-2xl mx-auto mb-8 leading-relaxed font-medium">
+            <p className="text-[#1A1410] text-lg md:text-xl max-w-2xl mx-auto mb-8 leading-relaxed">
               Evidence-based insights, practical strategies, and real stories to
               help you build habits that actually stick—naturally and sustainably.
             </p>
@@ -138,7 +138,7 @@ export default function BlogPage() {
             {blogPosts.map((post, i) => (
               <article
                 key={post.slug}
-                className="group bg-white rounded-[32px] overflow-hidden border border-[#B85C38]/10 hover:border-[#B85C38]/30 transition-all hover:shadow-[0_16px_48px_rgba(62,39,35,0.12)] cursor-pointer animate-fade-in-up"
+                className="group bg-white rounded-[32px] overflow-hidden border border-[#B85C38]/10 hover:border-[#B85C38]/30 transition-all hover:shadow-[0_8px_24px_rgba(26,20,16,0.08)] cursor-pointer animate-fade-in-up"
                 style={{ animationDelay: `${i * 0.1}s` }}
               >
                 <Link href={`/blog/${post.slug}`}>
@@ -150,28 +150,28 @@ export default function BlogPage() {
                   </div>
                   <div className="p-6">
                     <div className="flex items-center gap-3 mb-3 text-xs">
-                      <span className="px-3 py-1 rounded-full bg-[#4A7C59]/10 text-[#4A7C59] font-semibold">
+                      <span className="px-3 py-1 rounded-full bg-[#4A7C59]/10 text-[#4A7C59] font-medium">
                         {post.category}
                       </span>
-                      <span className="text-[#6B5D4F] flex items-center gap-1 font-medium">
+                      <span className="text-[#1A1410] flex items-center gap-1">
                         <Clock className="w-3 h-3" aria-hidden="true" />
                         {post.readTime}
                       </span>
                     </div>
-                    <h3 className="font-[family-name:var(--font-display)] font-bold text-[#1A1410] text-xl mb-3 group-hover:text-[#B85C38] transition-colors leading-tight">
+                    <h3 className="font-[family-name:var(--font-display)] font-medium text-[#1A1410] text-xl mb-3 group-hover:text-[#B85C38] transition-colors leading-tight">
                       {post.title}
                     </h3>
-                    <p className="text-[#2C2416] text-sm leading-relaxed mb-4 font-medium">
+                    <p className="text-[#1A1410] text-[15px] leading-relaxed mb-4">
                       {post.excerpt}
                     </p>
-                    <div className="flex items-center justify-between text-xs text-[#6B5D4F] font-medium">
+                    <div className="flex items-center justify-between text-xs text-[#4A3E2A]">
                       <span>{post.author}</span>
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" aria-hidden="true" />
                         {post.date}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm font-semibold text-[#B85C38] mt-4">
+                    <div className="flex items-center gap-2 text-sm font-medium text-[#B85C38] mt-4">
                       Read article
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
                     </div>
@@ -189,10 +189,10 @@ export default function BlogPage() {
           <div className="mb-4">
             <Leaf className="w-12 h-12 mx-auto mb-4 text-white/80" aria-hidden="true" />
           </div>
-          <h2 id="newsletter-heading" className="font-[family-name:var(--font-display)] font-bold text-3xl md:text-4xl mb-6" style={{ textShadow: '0 2px 8px rgba(0, 0, 0, 0.2)' }}>
+          <h2 id="newsletter-heading" className="font-[family-name:var(--font-display)] font-light text-3xl md:text-4xl mb-6">
             Weekly wisdom delivered to your inbox
           </h2>
-          <p className="text-white/95 text-lg mb-8 font-medium" style={{ textShadow: '0 1px 4px rgba(0, 0, 0, 0.2)' }}>
+          <p className="text-white/95 text-lg mb-8">
             Join 15,000+ mindful readers who get evidence-based insights on habit formation, productivity, and intentional living every Sunday morning.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
@@ -204,7 +204,7 @@ export default function BlogPage() {
             />
             <Button
               size="lg"
-              className="bg-white text-[#1A1410] hover:bg-white/90 rounded-full font-semibold"
+              className="bg-white text-[#1A1410] hover:bg-white/90 rounded-full font-medium"
               aria-label="Subscribe to newsletter"
             >
               Subscribe
@@ -219,16 +219,16 @@ export default function BlogPage() {
       {/* CTA Section */}
       <section className="py-20 px-6 lg:px-8 bg-[#F5F1E8]" aria-labelledby="cta-heading">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 id="cta-heading" className="font-[family-name:var(--font-display)] font-bold text-[#1A1410] text-3xl md:text-4xl mb-6">
+          <h2 id="cta-heading" className="font-[family-name:var(--font-display)] font-normal text-[#1A1410] text-3xl md:text-4xl mb-6">
             Ready to build better habits?
           </h2>
-          <p className="text-[#2C2416] text-lg mb-8 font-medium">
+          <p className="text-[#1A1410] text-lg mb-8">
             Join 25,000+ people transforming their lives with HabitFlow
           </p>
           <Button
             size="lg"
             variant="earth"
-            className="font-semibold"
+            className="font-medium"
             aria-label="Get started with HabitFlow"
           >
             Get Started Free
@@ -238,8 +238,8 @@ export default function BlogPage() {
 
       {/* Footer */}
       <footer className="py-12 px-6 lg:px-8 border-t border-[#B85C38]/10 bg-white" role="contentinfo">
-        <div className="max-w-7xl mx-auto text-center text-sm text-[#6B5D4F] font-medium">
-          <p className="font-[family-name:var(--font-body)] italic">
+        <div className="max-w-7xl mx-auto text-center text-sm text-[#4A3E2A]">
+          <p>
             © 2024 HabitFlow. Built with care for habit builders.
           </p>
         </div>
