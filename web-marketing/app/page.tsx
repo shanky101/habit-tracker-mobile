@@ -1,7 +1,4 @@
-"use client"
-
 import { Button } from "@/components/ui/button"
-import { motion } from "framer-motion"
 import {
   Calendar,
   TrendingUp,
@@ -79,11 +76,7 @@ export default function HomePage() {
         <div className="absolute bottom-[-10%] right-[-5%] w-[50%] h-[50%] bg-[#2C5F2D]/20 rounded-[40%_60%_70%_30%/40%_50%_60%_50%] animate-breathe" style={{ animationDuration: '10s', animationDirection: 'reverse' }} />
 
         <div className="relative z-10 max-w-5xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
+          <div className="animate-fade-in-up">
             <div className="inline-block mb-6">
               <span className="px-6 py-2 rounded-full bg-white/25 backdrop-blur-sm text-[#FAF8F3] text-sm font-medium border border-white/40 tracking-wide">
                 🌱 Grow Naturally, Live Intentionally
@@ -127,19 +120,14 @@ export default function HomePage() {
                 <div className="opacity-90">building lasting habits</div>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Philosophy Section */}
       <section className="py-24 lg:py-32 px-6 lg:px-8 bg-[#FAF8F3]">
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
+          <div className="animate-fade-in-up">
             <span className="font-[family-name:var(--font-accent)] text-[#4A7C59] text-sm font-semibold italic tracking-wide uppercase mb-4 block">
               Chapter One
             </span>
@@ -151,10 +139,10 @@ export default function HomePage() {
               And none of it lasted—because that's not how nature works.
             </p>
             <p className="font-[family-name:var(--font-accent)] text-[#795548] text-lg md:text-xl leading-relaxed italic">
-              "A tree doesn't force its growth. It simply creates the right conditions, 
+              "A tree doesn't force its growth. It simply creates the right conditions,
               then allows nature to take its course. Your habits are no different."
             </p>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -207,13 +195,10 @@ export default function HomePage() {
                 description: "Start each day with intention. Review yesterday, set today's focus, and plant seeds for tomorrow—all in moments.",
               },
             ].map((feature, i) => (
-              <motion.div
+              <div
                 key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="bg-[#FAF8F3] rounded-[32px] p-8 shadow-[0_4px_12px_rgba(62,39,35,0.08)] border-l-[5px] border-[#4A7C59] hover:shadow-[0_16px_48px_rgba(62,39,35,0.16)] transition-all duration-400 hover:translate-x-3"
+                className="bg-[#FAF8F3] rounded-[32px] p-8 shadow-[0_4px_12px_rgba(62,39,35,0.08)] border-l-[5px] border-[#4A7C59] hover:shadow-[0_16px_48px_rgba(62,39,35,0.16)] transition-all duration-400 hover:translate-x-3 animate-fade-in-up"
+                style={{ animationDelay: `${i * 0.1}s` }}
               >
                 <div className="w-16 h-16 bg-gradient-forest rounded-full flex items-center justify-center mb-6 shadow-[0_10px_30px_rgba(44,95,45,0.15)]">
                   <feature.icon className="w-8 h-8 text-[#FAF8F3]" />
@@ -224,7 +209,7 @@ export default function HomePage() {
                 <p className="text-[#4A4A42] leading-relaxed">
                   {feature.description}
                 </p>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -269,13 +254,10 @@ export default function HomePage() {
                 avatar: "AP",
               },
             ].map((testimonial, i) => (
-              <motion.div
+              <div
                 key={testimonial.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="bg-[#F5F1E8] rounded-[32px] p-8 shadow-[0_4px_12px_rgba(62,39,35,0.08)]"
+                className="bg-[#F5F1E8] rounded-[32px] p-8 shadow-[0_4px_12px_rgba(62,39,35,0.08)] animate-fade-in-up"
+                style={{ animationDelay: `${i * 0.1}s` }}
               >
                 <div className="flex items-center gap-4 mb-6">
                   <div className="w-14 h-14 bg-gradient-earth rounded-full flex items-center justify-center font-[family-name:var(--font-display)] font-bold text-[#FAF8F3] text-lg">
@@ -293,7 +275,7 @@ export default function HomePage() {
                   <Leaf className="w-4 h-4" />
                   <span>{testimonial.streak}</span>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
