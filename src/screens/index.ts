@@ -8,3 +8,7 @@ export { default as SignUpScreen } from './SignUpScreen';
 export { default as LoginScreen } from './LoginScreen';
 export { default as PasswordResetScreen } from './PasswordResetScreen';
 export { default as HomeScreen } from './HomeScreen';
+export { default as AddHabitStep1Screen } from './AddHabitStep1Screen';
+export { default as AddHabitStep2Screen } from './AddHabitStep2Screen';
+export { default as AddHabitStep3Screen } from './AddHabitStep3Screen';
+export { default as EditHabitScreen } from './EditHabitScreen';

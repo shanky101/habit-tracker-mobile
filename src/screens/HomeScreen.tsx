@@ -11,6 +11,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
+import CelebrationModal from '@/components/CelebrationModal';
 
 type HomeScreenNavigationProp = StackNavigationProp<any, 'Home'>;
 
@@ -75,9 +76,12 @@ const HomeScreen: React.FC = () => {
     );
   };
 
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [celebrationType, setCelebrationType] = useState<'firstCheckin' | 'allComplete' | 'streak'>('firstCheckin');
+  const [celebrationHabit, setCelebrationHabit] = useState('');
+
   const handleAddHabit = () => {
-    // In a real app, this would navigate to Add Habit screen
-    console.log('Add new habit');
+    navigation.navigate('AddHabitStep1');
   };
 
   const getCurrentDate = () => {
@@ -420,6 +424,19 @@ const HomeScreen: React.FC = () => {
           <Text style={[styles.fabText, { color: theme.colors.white }]}>+</Text>
         </TouchableOpacity>
       </Animated.View>
+
+      {/* Celebration Modal */}
+      <CelebrationModal
+        visible={showCelebration}
+        type={celebrationType}
+        habitName={celebrationHabit}
+        streakDays={7}
+        onDismiss={() => setShowCelebration(false)}
+        onShare={() => {
+          console.log('Share achievement');
+          setShowCelebration(false);
+        }}
+      />
     </View>
   );
 };

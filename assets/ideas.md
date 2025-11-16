@@ -1,0 +1,1 @@
+Create a  super cute mascot which can be act as a character which can be shown in the app. The character can be happy, sad, annoyed, ecsatsic based on the app state and based on how many tasks the user has completed. Create a persona which runs inside the app thereby giving the user a fantatsic companaion in managing their habits
