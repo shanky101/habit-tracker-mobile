@@ -1,21 +1,21 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Lora } from "next/font/google";
+import { EB_Garamond, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 
-// Display font - elegant serif for headlines
-const playfairDisplay = Playfair_Display({
+// Display font - elegant, timeless serif for headlines
+const ebGaramond = EB_Garamond({
   variable: "--font-display",
   subsets: ["latin"],
   display: "swap",
   weight: ["400", "500", "600", "700"],
 });
 
-// Accent font - italic serif for quotes and emphasis
-const lora = Lora({
-  variable: "--font-accent",
+// Body font - readable serif optimized for screen reading
+const sourceSerif = Source_Serif_4({
+  variable: "--font-body",
   subsets: ["latin"],
   display: "swap",
-  weight: ["400", "500", "600"],
+  weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
 });
 
@@ -25,8 +25,8 @@ export const metadata: Metadata = {
     default: "HabitFlow - Grow Naturally, Live Intentionally",
     template: "%s | HabitFlow"
   },
-  description: "Transform your life through mindful habit building. Track your daily rituals, celebrate growth, and cultivate lasting change - one intentional step at a time.",
-  keywords: ["habit tracker", "mindfulness", "personal growth", "daily rituals", "self improvement", "habit formation", "wellness app", "intentional living"],
+  description: "Build lasting habits naturally with HabitFlow. Science-backed habit tracking app designed for mindful growth. Track daily rituals, visualize progress, and transform your life one intentional step at a time. Start your journey today.",
+  keywords: ["habit tracker app", "mindfulness app", "personal growth", "daily habit tracker", "self improvement app", "habit formation", "wellness app", "intentional living", "build better habits", "habit tracking", "morning routine", "productivity app", "goal tracking", "streak tracker"],
   authors: [{ name: "HabitFlow" }],
   creator: "HabitFlow",
   publisher: "HabitFlow",
@@ -84,7 +84,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body
-        className={`${playfairDisplay.variable} ${lora.variable} antialiased`}
+        className={`${ebGaramond.variable} ${sourceSerif.variable} antialiased`}
       >
         {children}
       </body>

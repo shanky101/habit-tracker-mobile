@@ -1,36 +1,38 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const baseUrl = 'https://habitflow.app'
+
+  // Blog posts
+  const blogPosts = [
+    '21-day-habit-myth',
+    'procrastination-is-fear',
+    '2-minute-rule',
+    'habit-stacking',
+    'streaks-psychology',
+    'morning-routine',
+  ]
+
+  const blogUrls = blogPosts.map((slug) => ({
+    url: `${baseUrl}/blog/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  }))
+
   return [
     {
-      url: 'https://habitflow.app',
+      url: baseUrl,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 1,
     },
     {
-      url: 'https://habitflow.app/blog',
+      url: `${baseUrl}/blog`,
       lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.8,
+      changeFrequency: 'weekly',
+      priority: 0.9,
     },
-    {
-      url: 'https://habitflow.app/blog/21-day-habit-myth',
-      lastModified: new Date('2024-11-15'),
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
-      url: 'https://habitflow.app/blog/procrastination-is-fear',
-      lastModified: new Date('2024-11-12'),
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
-      url: 'https://habitflow.app/blog/2-minute-rule',
-      lastModified: new Date('2024-11-08'),
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
+    ...blogUrls,
   ]
 }

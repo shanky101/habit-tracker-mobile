@@ -10,9 +10,9 @@
 }
 
 body {
-  font-family: Georgia, serif;
+  font-family: var(--font-body), Georgia, 'Times New Roman', serif;
   background: #FAF8F3;
-  color: #3E2723;
+  color: #2C2416;
   line-height: 1.7;
   overflow-x: hidden;
   font-feature-settings: "rlig" 1, "calt" 1;
@@ -44,7 +44,27 @@ body::before {
 /* Selection */
 ::selection {
   background-color: rgba(181, 201, 154, 0.3);
-  color: #3E2723;
+  color: #2C2416;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display), Georgia, serif;
+  color: #1A1410;
+  font-weight: 600;
+}
+
+/* Improved text contrast colors */
+.text-primary {
+  color: #2C2416;
+}
+
+.text-secondary {
+  color: #4A3E2A;
+}
+
+.text-muted {
+  color: #6B5D4F;
 }
 
 /* Focus visible */
