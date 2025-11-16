@@ -1,70 +1,6 @@
-@import "tailwindcss";
-
-@theme inline {
-  /* Earthy Natural Palette */
-  --color-earth-clay: #A0522D;
-  --color-earth-terracotta: #C8553D;
-  --color-earth-rust: #B85C38;
-  --color-earth-amber: #D4A574;
-  --color-earth-sand: #E8D5B7;
-
-  /* Botanical Greens */
-  --color-forest-deep: #2C5F2D;
-  --color-forest-moss: #4A7C59;
-  --color-forest-sage: #7D8F69;
-  --color-forest-mint: #B5C99A;
-  --color-forest-celery: #D4E09B;
-
-  /* Natural Browns */
-  --color-wood-dark: #3E2723;
-  --color-wood-walnut: #5D4037;
-  --color-wood-cedar: #795548;
-  --color-wood-oak: #8D6E63;
-  --color-wood-birch: #A1887F;
-
-  /* Soft Neutrals */
-  --color-cream-light: #FAF8F3;
-  --color-cream-warm: #F5F1E8;
-  --color-cream-beige: #E8DCC7;
-  --color-stone-light: #D9D3C7;
-  --color-stone-gray: #B4AFA4;
-  --color-charcoal: #4A4A42;
-
-  /* Accent Colors */
-  --color-sunset-coral: #E07A5F;
-  --color-sunrise-peach: #F2A490;
-  --color-earth-gold: #C9A961;
-  --color-sky-blue: #88B2CC;
-
-  /* Base colors for Tailwind */
-  --color-background: #FAF8F3;
-  --color-foreground: #3E2723;
-  --color-primary: #B85C38;
-  --color-secondary: #4A7C59;
-  --color-accent: #E07A5F;
-  --color-muted: #F5F1E8;
-
-  /* Spacing - Organic scale */
-  --spacing-xs: 6px;
-  --spacing-sm: 12px;
-  --spacing-md: 20px;
-  --spacing-lg: 32px;
-  --spacing-xl: 48px;
-  --spacing-2xl: 64px;
-  --spacing-3xl: 96px;
-
-  /* Border Radius - Organic curves */
-  --radius-sm: 12px;
-  --radius-md: 20px;
-  --radius-lg: 32px;
-  --radius-xl: 48px;
-
-  /* Shadows - Soft and natural */
-  --shadow-sm: 0 4px 12px rgba(62, 39, 35, 0.08);
-  --shadow-md: 0 8px 24px rgba(62, 39, 35, 0.12);
-  --shadow-lg: 0 16px 48px rgba(62, 39, 35, 0.16);
-  --shadow-organic: 0 10px 30px rgba(44, 95, 45, 0.15);
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Base styles */
 * {
@@ -74,7 +10,7 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Georgia, serif;
+  font-family: Georgia, serif;
   background: #FAF8F3;
   color: #3E2723;
   line-height: 1.7;
@@ -100,100 +36,9 @@ body::before {
   z-index: 0;
 }
 
-/* Gradients */
-.bg-gradient-earth {
-  background: linear-gradient(135deg, #B85C38 0%, #D4A574 100%);
-}
-
-.bg-gradient-forest {
-  background: linear-gradient(135deg, #2C5F2D 0%, #B5C99A 100%);
-}
-
-.bg-gradient-sunset {
-  background: linear-gradient(180deg, #E07A5F 0%, #F2A490 100%);
-}
-
-.bg-gradient-natural {
-  background: linear-gradient(135deg, #FAF8F3 0%, #E8DCC7 100%);
-}
-
-/* Text gradients */
-.text-gradient-earth {
-  background: linear-gradient(135deg, #B85C38 0%, #D4A574 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.text-gradient-forest {
-  background: linear-gradient(135deg, #2C5F2D 0%, #B5C99A 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
 /* Organic shapes */
 .organic-shape {
   border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
-}
-
-/* Animations */
-@keyframes floatLeaf {
-  0%, 100% {
-    transform: translateY(0) rotate(0deg);
-    opacity: 0.1;
-  }
-  50% {
-    transform: translateY(-40px) rotate(180deg);
-    opacity: 0.2;
-  }
-}
-
-@keyframes breathe {
-  0%, 100% { transform: scale(1) rotate(0deg); }
-  50% { transform: scale(1.1) rotate(5deg); }
-}
-
-@keyframes organicGrow {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-
-@keyframes sway {
-  0%, 100% { transform: rotate(0deg) translateX(0); }
-  25% { transform: rotate(-3deg) translateX(-5px); }
-  75% { transform: rotate(3deg) translateX(5px); }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(40px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-float {
-  animation: floatLeaf 15s ease-in-out infinite;
-}
-
-.animate-breathe {
-  animation: breathe 8s ease-in-out infinite;
-}
-
-.animate-grow {
-  animation: organicGrow 3s ease-in-out infinite;
-}
-
-.animate-sway {
-  animation: sway 4s ease-in-out infinite;
-}
-
-.animate-fade-in-up {
-  animation: fadeInUp 1s ease-out;
 }
 
 /* Selection */
