@@ -206,17 +206,16 @@ const HabitTemplatesScreen: React.FC = () => {
       <Modal
         visible={selectedTemplate !== null}
         transparent
-        animationType="slide"
+        animationType="none"
         onRequestClose={() => setSelectedTemplate(null)}
       >
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setSelectedTemplate(null)}
-        >
+        <View style={styles.modalOverlay}>
           <TouchableOpacity
+            style={styles.modalBackdrop}
             activeOpacity={1}
-            onPress={(e) => e.stopPropagation()}
+            onPress={() => setSelectedTemplate(null)}
+          />
+          <View
             style={[
               styles.modalContent,
               {
@@ -364,8 +363,8 @@ const HabitTemplatesScreen: React.FC = () => {
                 Add This Habit
               </Text>
             </TouchableOpacity>
-          </TouchableOpacity>
-        </TouchableOpacity>
+          </View>
+        </View>
       </Modal>
     );
   };
@@ -658,8 +657,7 @@ const styles = StyleSheet.create({
   searchIcon: {
     position: 'absolute',
     left: 36,
-    top: '50%',
-    transform: [{ translateY: -10 }],
+    top: 28,
     fontSize: 20,
   },
   categoriesScroll: {
@@ -736,8 +734,11 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
+  },
+  modalBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
     maxHeight: '80%',
