@@ -1,23 +1,9 @@
 import type { Metadata } from "next";
-import { EB_Garamond, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 
-// Display font - elegant, timeless serif for headlines
-const ebGaramond = EB_Garamond({
-  variable: "--font-display",
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["400", "500", "600", "700"],
-});
-
-// Body font - readable serif optimized for screen reading
-const sourceSerif = Source_Serif_4({
-  variable: "--font-body",
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
-});
+// Fonts loaded via CSS with system fallbacks for reliability
+// Google Fonts will be loaded via globals.css link tags for better performance
+// System font stack provides excellent fallback
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://habitflow.app'),
@@ -83,9 +69,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body
-        className={`${ebGaramond.variable} ${sourceSerif.variable} antialiased`}
-      >
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="antialiased">
         {children}
       </body>
     </html>

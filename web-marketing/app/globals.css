@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Font Definitions */
+:root {
+  --font-display: 'EB Garamond', 'Crimson Text', 'Georgia', 'Times New Roman', serif;
+  --font-body: 'Source Serif 4', 'Charter', 'Georgia', 'Times New Roman', serif;
+}
+
 /* Base styles */
 * {
   margin: 0;
@@ -10,7 +16,7 @@
 }
 
 body {
-  font-family: var(--font-body), Georgia, 'Times New Roman', serif;
+  font-family: var(--font-body);
   background: #FAF8F3;
   color: #2C2416;
   line-height: 1.7;
@@ -49,7 +55,7 @@ body::before {
 
 /* Headings */
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-display), Georgia, serif;
+  font-family: var(--font-display);
   color: #1A1410;
   font-weight: 600;
 }
