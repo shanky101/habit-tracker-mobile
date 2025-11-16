@@ -12,3 +12,6 @@ export { default as AddHabitStep1Screen } from './AddHabitStep1Screen';
 export { default as AddHabitStep2Screen } from './AddHabitStep2Screen';
 export { default as AddHabitStep3Screen } from './AddHabitStep3Screen';
 export { default as EditHabitScreen } from './EditHabitScreen';
+export { default as HabitDetailScreen } from './HabitDetailScreen';
+export { default as CalendarViewScreen } from './CalendarViewScreen';
+export { default as HabitTemplatesScreen } from './HabitTemplatesScreen';

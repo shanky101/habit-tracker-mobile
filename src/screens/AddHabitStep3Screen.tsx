@@ -9,7 +9,9 @@ import {
   Switch,
   ActivityIndicator,
   Platform,
+  TextInput,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
@@ -42,6 +44,7 @@ const AddHabitStep3Screen: React.FC = () => {
   const [selectedDays, setSelectedDays] = useState<number[]>([0, 1, 2, 3, 4, 5, 6]);
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [reminderTime, setReminderTime] = useState('09:00');
+  const [notes, setNotes] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   // Use custom animation hook
@@ -82,6 +85,7 @@ const AddHabitStep3Screen: React.FC = () => {
       selectedDays: frequency === 'daily' ? [0, 1, 2, 3, 4, 5, 6] : selectedDays,
       reminderEnabled,
       reminderTime: reminderEnabled ? reminderTime : null,
+      notes: notes.trim() || undefined,
       completed: false,
       streak: 0,
       createdAt: new Date().toISOString(),
@@ -100,7 +104,7 @@ const AddHabitStep3Screen: React.FC = () => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -389,6 +393,67 @@ const AddHabitStep3Screen: React.FC = () => {
             )}
           </View>
 
+          {/* Notes Section */}
+          <View style={styles.section}>
+            <Text
+              style={[
+                styles.sectionTitle,
+                {
+                  color: theme.colors.text,
+                  fontFamily: theme.typography.fontFamilyDisplay,
+                  fontSize: theme.typography.fontSizeLG,
+                  fontWeight: theme.typography.fontWeightBold,
+                },
+              ]}
+            >
+              Notes 📝
+            </Text>
+            <Text
+              style={[
+                styles.sectionSubtitle,
+                {
+                  color: theme.colors.textSecondary,
+                  fontFamily: theme.typography.fontFamilyBody,
+                  fontSize: theme.typography.fontSizeSM,
+                },
+              ]}
+            >
+              Add motivation or tips for this habit (optional)
+            </Text>
+            <TextInput
+              style={[
+                styles.notesInput,
+                {
+                  backgroundColor: theme.colors.backgroundSecondary,
+                  borderColor: theme.colors.border,
+                  color: theme.colors.text,
+                  fontFamily: theme.typography.fontFamilyBody,
+                  fontSize: theme.typography.fontSizeMD,
+                },
+              ]}
+              placeholder="e.g., Why this habit matters to me..."
+              placeholderTextColor={theme.colors.textSecondary}
+              value={notes}
+              onChangeText={setNotes}
+              multiline
+              numberOfLines={3}
+              maxLength={200}
+              textAlignVertical="top"
+            />
+            <Text
+              style={[
+                styles.characterCount,
+                {
+                  color: theme.colors.textSecondary,
+                  fontFamily: theme.typography.fontFamilyBody,
+                  fontSize: theme.typography.fontSizeXS,
+                },
+              ]}
+            >
+              {notes.length}/200
+            </Text>
+          </View>
+
           {/* Summary Section */}
           <View style={styles.section}>
             <Text
@@ -482,7 +547,7 @@ const AddHabitStep3Screen: React.FC = () => {
           </TouchableOpacity>
         </Animated.View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -540,6 +605,20 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     marginBottom: 16,
+  },
+  sectionSubtitle: {
+    marginBottom: 12,
+  },
+  notesInput: {
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 16,
+    minHeight: 80,
+    marginTop: 8,
+  },
+  characterCount: {
+    textAlign: 'right',
+    marginTop: 6,
   },
   radioOption: {
     borderRadius: 16,

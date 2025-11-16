@@ -12,6 +12,7 @@ export interface Habit {
   selectedDays: number[];
   reminderEnabled: boolean;
   reminderTime: string | null;
+  notes?: string; // Optional notes/description for the habit
   isDefault?: boolean; // Track if this is a default habit
   archived?: boolean; // Track if this habit is archived
 }
