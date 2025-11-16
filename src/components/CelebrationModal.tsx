@@ -19,6 +19,9 @@ export interface CelebrationModalProps {
   type: CelebrationType;
   habitName?: string;
   streakDays?: number;
+  completedCount?: number;
+  totalCount?: number;
+  activeStreaks?: number;
   onDismiss: () => void;
   onShare?: () => void;
 }
@@ -28,6 +31,9 @@ const CelebrationModal: React.FC<CelebrationModalProps> = ({
   type,
   habitName,
   streakDays = 0,
+  completedCount = 0,
+  totalCount = 0,
+  activeStreaks = 0,
   onDismiss,
   onShare,
 }) => {
@@ -65,13 +71,26 @@ const CelebrationModal: React.FC<CelebrationModalProps> = ({
     }
   }, [visible, scaleAnim, fadeAnim, confettiAnim]);
 
+  const getMotivationalQuote = () => {
+    const quotes = [
+      "Success is the sum of small efforts repeated day in and day out.",
+      "The secret of getting ahead is getting started.",
+      "You don't have to be great to start, but you have to start to be great.",
+      "Small daily improvements are the key to staggering long-term results.",
+      "The only way to do great work is to love what you do.",
+    ];
+    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
+    return quotes[dayOfYear % quotes.length];
+  };
+
   const getMessage = () => {
     switch (type) {
       case 'allComplete':
         return {
           emoji: '🎉',
-          title: 'All Done!',
-          subtitle: 'Amazing! You completed all habits today',
+          title: 'All Habits Complete!',
+          subtitle: `${completedCount}/${totalCount} habits • ${activeStreaks} active streaks`,
+          quote: getMotivationalQuote(),
         };
       case 'streak':
         if (streakDays === 3) {
@@ -79,36 +98,42 @@ const CelebrationModal: React.FC<CelebrationModalProps> = ({
             emoji: '🔥',
             title: 'Great Start!',
             subtitle: `${streakDays} day streak on ${habitName || 'your habit'}`,
+            quote: undefined,
           };
         } else if (streakDays === 7) {
           return {
             emoji: '🎉',
             title: 'One Week!',
             subtitle: `${streakDays} day streak! You're building momentum`,
+            quote: undefined,
           };
         } else if (streakDays === 30) {
           return {
             emoji: '🏆',
             title: 'One Month!',
             subtitle: 'Incredible! 30 days of consistency',
+            quote: undefined,
           };
         } else if (streakDays === 100) {
           return {
             emoji: '💯',
             title: 'Century!',
             subtitle: "You're unstoppable! 100 days!",
+            quote: undefined,
           };
         } else if (streakDays === 365) {
           return {
             emoji: '👑',
             title: 'One Year!',
             subtitle: 'Legend status! 365 days!',
+            quote: undefined,
           };
         }
         return {
           emoji: '🔥',
           title: `${streakDays} Day Streak!`,
           subtitle: "Keep the momentum going!",
+          quote: undefined,
         };
       case 'firstCheckin':
       default:
@@ -116,6 +141,7 @@ const CelebrationModal: React.FC<CelebrationModalProps> = ({
           emoji: '✓',
           title: 'Nice!',
           subtitle: 'Habit checked in',
+          quote: undefined,
         };
     }
   };
@@ -183,6 +209,26 @@ const CelebrationModal: React.FC<CelebrationModalProps> = ({
           >
             {message.subtitle}
           </Text>
+
+          {/* Motivational Quote (for allComplete) */}
+          {type === 'allComplete' && message.quote && (
+            <View style={[styles.quoteContainer, { backgroundColor: theme.colors.background }]}>
+              <Text
+                style={[
+                  styles.quote,
+                  {
+                    color: theme.colors.text,
+                    fontFamily: theme.typography.fontFamilyBody,
+                    fontSize: theme.typography.fontSizeSM,
+                    fontStyle: 'italic',
+                    lineHeight: theme.typography.lineHeightRelaxed,
+                  },
+                ]}
+              >
+                "{message.quote}"
+              </Text>
+            </View>
+          )}
 
           {/* Stats (for streaks) */}
           {type === 'streak' && (
@@ -314,6 +360,15 @@ const styles = StyleSheet.create({
   subtitle: {
     textAlign: 'center',
     marginBottom: 24,
+  },
+  quoteContainer: {
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 24,
+    width: '100%',
+  },
+  quote: {
+    textAlign: 'center',
   },
   statsContainer: {
     borderRadius: 12,

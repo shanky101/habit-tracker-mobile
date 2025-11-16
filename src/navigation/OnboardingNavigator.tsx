@@ -15,6 +15,9 @@ import {
   AddHabitStep2Screen,
   AddHabitStep3Screen,
   EditHabitScreen,
+  HabitDetailScreen,
+  CalendarViewScreen,
+  HabitTemplatesScreen,
 } from '@/screens';
 
 export type OnboardingStackParamList = {
@@ -32,6 +35,9 @@ export type OnboardingStackParamList = {
   AddHabitStep2: { habitName: string };
   AddHabitStep3: { habitName: string; category: string; color: string };
   EditHabit: { habitId: string; habitData: any };
+  HabitDetail: { habitId: string; habitData: any };
+  CalendarView: undefined;
+  HabitTemplates: undefined;
 };
 
 const Stack = createStackNavigator<OnboardingStackParamList>();
@@ -58,6 +64,9 @@ const OnboardingNavigator: React.FC = () => {
       <Stack.Screen name="AddHabitStep2" component={AddHabitStep2Screen} />
       <Stack.Screen name="AddHabitStep3" component={AddHabitStep3Screen} />
       <Stack.Screen name="EditHabit" component={EditHabitScreen} />
+      <Stack.Screen name="HabitDetail" component={HabitDetailScreen} />
+      <Stack.Screen name="CalendarView" component={CalendarViewScreen} />
+      <Stack.Screen name="HabitTemplates" component={HabitTemplatesScreen} />
     </Stack.Navigator>
   );
 };

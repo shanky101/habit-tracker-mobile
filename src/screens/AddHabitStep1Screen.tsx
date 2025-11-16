@@ -238,6 +238,25 @@ const AddHabitStep1Screen: React.FC = () => {
                 </TouchableOpacity>
               ))}
             </View>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('HabitTemplates')}
+              style={styles.browseTemplatesButton}
+              activeOpacity={0.7}
+            >
+              <Text
+                style={[
+                  styles.browseTemplatesText,
+                  {
+                    color: theme.colors.primary,
+                    fontFamily: theme.typography.fontFamilyBody,
+                    fontSize: theme.typography.fontSizeSM,
+                    fontWeight: theme.typography.fontWeightMedium,
+                  },
+                ]}
+              >
+                📚 Browse More Templates
+              </Text>
+            </TouchableOpacity>
           </View>
 
           {/* Next Button */}
@@ -364,6 +383,14 @@ const styles = StyleSheet.create({
     margin: 4,
   },
   suggestionText: {
+    // styles from theme
+  },
+  browseTemplatesButton: {
+    marginTop: 16,
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  browseTemplatesText: {
     // styles from theme
   },
   nextButton: {

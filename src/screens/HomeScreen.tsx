@@ -146,7 +146,10 @@ const HomeScreen: React.FC = () => {
           },
         ]}
       >
-        <View>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('CalendarView')}
+          activeOpacity={0.7}
+        >
           <Text
             style={[
               styles.greeting,
@@ -159,20 +162,23 @@ const HomeScreen: React.FC = () => {
           >
             Today
           </Text>
-          <Text
-            style={[
-              styles.date,
-              {
-                color: theme.colors.text,
-                fontFamily: theme.typography.fontFamilyDisplay,
-                fontSize: theme.typography.fontSizeXL,
-                fontWeight: theme.typography.fontWeightBold,
-              },
-            ]}
-          >
-            {getCurrentDate()}
-          </Text>
-        </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text
+              style={[
+                styles.date,
+                {
+                  color: theme.colors.text,
+                  fontFamily: theme.typography.fontFamilyDisplay,
+                  fontSize: theme.typography.fontSizeXL,
+                  fontWeight: theme.typography.fontWeightBold,
+                },
+              ]}
+            >
+              {getCurrentDate()}
+            </Text>
+            <Text style={{ fontSize: 16, marginLeft: 8 }}>📅</Text>
+          </View>
+        </TouchableOpacity>
         <TouchableOpacity
           style={[styles.profileButton, { backgroundColor: theme.colors.backgroundSecondary }]}
           activeOpacity={0.7}
@@ -247,7 +253,7 @@ const HomeScreen: React.FC = () => {
                 <TouchableOpacity
                   style={styles.habitInfo}
                   onPress={() =>
-                    navigation.navigate('EditHabit', {
+                    navigation.navigate('HabitDetail', {
                       habitId: habit.id,
                       habitData: habit,
                     })
