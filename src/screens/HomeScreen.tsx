@@ -355,7 +355,7 @@ const HomeScreen: React.FC = () => {
         streakDays={7}
         onDismiss={() => setShowCelebration(false)}
         onShare={() => {
-          console.log('Share achievement');
+          // TODO: Implement share achievement functionality
           setShowCelebration(false);
         }}
       />

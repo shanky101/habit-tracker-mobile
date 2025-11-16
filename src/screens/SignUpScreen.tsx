@@ -14,6 +14,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
+import { sanitizeEmail, validateEmailFormat, validatePasswordStrength, rateLimiter } from '@/utils/security';
 
 type SignUpScreenNavigationProp = StackNavigationProp<any, 'SignUp'>;
 
@@ -50,16 +51,6 @@ const SignUpScreen: React.FC = () => {
     ]).start();
   }, [fadeAnim, slideAnim]);
 
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  const validatePassword = (password: string): boolean => {
-    // At least 8 characters, 1 uppercase, 1 lowercase, 1 number
-    return password.length >= 8;
-  };
-
   const handleSignUp = async () => {
     // Reset errors
     setErrors({
@@ -77,21 +68,29 @@ const SignUpScreen: React.FC = () => {
       general: '',
     };
 
-    // Validate email
-    if (!email) {
+    // Rate limiting check (max 3 signup attempts per minute)
+    if (!rateLimiter.isAllowed('signup', 3, 60000)) {
+      setErrors({
+        ...newErrors,
+        general: 'Too many signup attempts. Please try again in a minute.',
+      });
+      return;
+    }
+
+    // Sanitize and validate email
+    const sanitizedEmail = sanitizeEmail(email);
+    if (!sanitizedEmail) {
       newErrors.email = 'Email is required';
       hasError = true;
-    } else if (!validateEmail(email)) {
+    } else if (!validateEmailFormat(sanitizedEmail)) {
       newErrors.email = 'Please enter a valid email address';
       hasError = true;
     }
 
-    // Validate password
-    if (!password) {
-      newErrors.password = 'Password is required';
-      hasError = true;
-    } else if (!validatePassword(password)) {
-      newErrors.password = 'Password must be at least 8 characters';
+    // Validate password strength
+    const passwordValidation = validatePasswordStrength(password);
+    if (!passwordValidation.isValid) {
+      newErrors.password = passwordValidation.errors[0]; // Show first error
       hasError = true;
     }
 
@@ -112,8 +111,11 @@ const SignUpScreen: React.FC = () => {
     // Simulate API call
     setIsLoading(true);
     try {
-      // In a real app, this would be an API call
+      // In a real app, this would be an API call with sanitizedEmail
       await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      // Reset rate limiter on successful signup
+      rateLimiter.reset('signup');
 
       // Navigate to Home screen after successful sign up
       navigation.navigate('Home');
@@ -267,7 +269,7 @@ const SignUpScreen: React.FC = () => {
                     fontSize: theme.typography.fontSizeMD,
                   },
                 ]}
-                placeholder="At least 8 characters"
+                placeholder="Min 8 chars, uppercase, lowercase, number"
                 placeholderTextColor={theme.colors.textSecondary}
                 value={password}
                 onChangeText={(text) => {

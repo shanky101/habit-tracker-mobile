@@ -59,6 +59,7 @@ const CalendarViewScreen: React.FC = () => {
   const getDayCompletionData = (date: Date) => {
     const totalHabits = activeHabits.length;
     // Mock: 70% chance of completion for each habit
+    // NOTE: Math.random() is only used here for UI mock data, not security-sensitive operations
     const completedHabits = Math.floor(Math.random() * (totalHabits + 1));
 
     return {
@@ -205,6 +206,7 @@ const CalendarViewScreen: React.FC = () => {
             {/* Habit List */}
             <View style={styles.habitsList}>
               {activeHabits.map((habit, index) => {
+                // NOTE: Math.random() is only used here for UI mock data, not security-sensitive operations
                 const completed = Math.random() > 0.3; // Mock completion
 
                 return (

@@ -38,12 +38,12 @@ const WelcomeScreen: React.FC = () => {
 
   const handleTerms = () => {
     // In a real app, this would navigate to Terms of Service
-    console.log('Navigate to Terms of Service');
+    // TODO: Implement Terms of Service navigation
   };
 
   const handlePrivacy = () => {
     // In a real app, this would navigate to Privacy Policy
-    console.log('Navigate to Privacy Policy');
+    // TODO: Implement Privacy Policy navigation
   };
 
   return (

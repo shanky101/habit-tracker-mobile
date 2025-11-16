@@ -76,7 +76,7 @@ const AddHabitStep3Screen: React.FC = () => {
 
     // In a real app, save to local storage and/or cloud
     const newHabit = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       name: habitName,
       emoji: categoryIcon,
       category,
@@ -91,8 +91,7 @@ const AddHabitStep3Screen: React.FC = () => {
       createdAt: new Date().toISOString(),
     };
 
-    console.log('Creating habit:', newHabit);
-
+    // Habit created successfully - navigation will occur next
     setIsLoading(false);
 
     // Navigate back to Home with the new habit

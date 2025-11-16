@@ -14,6 +14,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
+import { sanitizeEmail, validateEmailFormat, rateLimiter } from '@/utils/security';
 
 type PasswordResetScreenNavigationProp = StackNavigationProp<any, 'PasswordReset'>;
 
@@ -59,11 +60,6 @@ const PasswordResetScreen: React.FC = () => {
     }
   }, [isSuccess, successAnim]);
 
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
   const handleResetPassword = async () => {
     // Reset errors
     setErrors({
@@ -77,11 +73,21 @@ const PasswordResetScreen: React.FC = () => {
       general: '',
     };
 
-    // Validate email
-    if (!email) {
+    // Rate limiting check (max 3 reset attempts per 5 minutes)
+    if (!rateLimiter.isAllowed('password_reset', 3, 300000)) {
+      setErrors({
+        ...newErrors,
+        general: 'Too many reset attempts. Please try again in a few minutes.',
+      });
+      return;
+    }
+
+    // Sanitize and validate email
+    const sanitizedEmail = sanitizeEmail(email);
+    if (!sanitizedEmail) {
       newErrors.email = 'Email is required';
       hasError = true;
-    } else if (!validateEmail(email)) {
+    } else if (!validateEmailFormat(sanitizedEmail)) {
       newErrors.email = 'Please enter a valid email address';
       hasError = true;
     }
@@ -94,11 +100,14 @@ const PasswordResetScreen: React.FC = () => {
     // Simulate API call
     setIsLoading(true);
     try {
-      // In a real app, this would be an API call
+      // In a real app, this would be an API call with sanitizedEmail
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // Show success message
       setIsSuccess(true);
+
+      // Reset rate limiter on successful request
+      rateLimiter.reset('password_reset');
     } catch (error) {
       setErrors({
         ...newErrors,

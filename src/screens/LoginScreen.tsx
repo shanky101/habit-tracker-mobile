@@ -15,6 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
+import { sanitizeEmail, validateEmailFormat, rateLimiter } from '@/utils/security';
 
 type LoginScreenNavigationProp = StackNavigationProp<any, 'Login'>;
 
@@ -34,11 +35,6 @@ const LoginScreen: React.FC = () => {
   // Use custom animation hook
   const { fadeAnim, slideAnim } = useScreenAnimation();
 
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
   const handleLogin = async () => {
     // Reset errors
     setErrors({
@@ -54,11 +50,21 @@ const LoginScreen: React.FC = () => {
       general: '',
     };
 
-    // Validate email
-    if (!email) {
+    // Rate limiting check (max 5 attempts per minute)
+    if (!rateLimiter.isAllowed('login', 5, 60000)) {
+      setErrors({
+        ...newErrors,
+        general: 'Too many login attempts. Please try again in a minute.',
+      });
+      return;
+    }
+
+    // Sanitize and validate email
+    const sanitizedEmail = sanitizeEmail(email);
+    if (!sanitizedEmail) {
       newErrors.email = 'Email is required';
       hasError = true;
-    } else if (!validateEmail(email)) {
+    } else if (!validateEmailFormat(sanitizedEmail)) {
       newErrors.email = 'Please enter a valid email address';
       hasError = true;
     }
@@ -77,8 +83,11 @@ const LoginScreen: React.FC = () => {
     // Simulate API call
     setIsLoading(true);
     try {
-      // In a real app, this would be an API call
+      // In a real app, this would be an API call with sanitizedEmail
       await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      // Reset rate limiter on successful login
+      rateLimiter.reset('login');
 
       // Navigate to Home screen after successful login
       navigation.navigate('Home');

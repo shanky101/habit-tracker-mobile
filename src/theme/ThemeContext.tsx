@@ -24,7 +24,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
     // Check if theme is premium and user has access
     if (selectedTheme.isPremium && !isPremiumUnlocked) {
-      console.warn('This is a premium theme. Please unlock premium to use it.');
+      // Premium theme access denied - silently fail for security
       return;
     }
 

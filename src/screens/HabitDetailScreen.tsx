@@ -45,6 +45,7 @@ const HabitDetailScreen: React.FC = () => {
       date.setDate(date.getDate() - i);
 
       // Mock completion pattern - 80% completion rate
+      // NOTE: Math.random() is only used here for UI mock data, not security-sensitive operations
       const completed = Math.random() > 0.2;
 
       days.push({
