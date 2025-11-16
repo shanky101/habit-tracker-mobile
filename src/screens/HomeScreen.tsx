@@ -8,12 +8,13 @@ import {
   Animated,
   Dimensions,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import CelebrationModal from '@/components/CelebrationModal';
 
 type HomeScreenNavigationProp = StackNavigationProp<any, 'Home'>;
+type HomeScreenRouteProp = RouteProp<{ Home: { newHabit?: any } }, 'Home'>;
 
 interface Habit {
   id: string;
@@ -21,19 +22,74 @@ interface Habit {
   emoji: string;
   completed: boolean;
   streak: number;
+  category: string;
+  color: string;
+  frequency: 'daily' | 'weekly';
+  selectedDays: number[];
+  reminderEnabled: boolean;
+  reminderTime: string | null;
 }
 
 const { width } = Dimensions.get('window');
 
 const HomeScreen: React.FC = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
+  const route = useRoute<HomeScreenRouteProp>();
   const { theme } = useTheme();
 
   const [habits, setHabits] = useState<Habit[]>([
-    { id: '1', name: 'Morning Meditation', emoji: '🧘', completed: true, streak: 7 },
-    { id: '2', name: 'Read 30 minutes', emoji: '📚', completed: false, streak: 12 },
-    { id: '3', name: 'Drink 8 glasses of water', emoji: '💧', completed: true, streak: 5 },
-    { id: '4', name: 'Exercise', emoji: '🏃', completed: false, streak: 3 },
+    {
+      id: '1',
+      name: 'Morning Meditation',
+      emoji: '🧘',
+      completed: true,
+      streak: 7,
+      category: 'mindfulness',
+      color: 'purple',
+      frequency: 'daily',
+      selectedDays: [0, 1, 2, 3, 4, 5, 6],
+      reminderEnabled: true,
+      reminderTime: '07:00',
+    },
+    {
+      id: '2',
+      name: 'Read 30 minutes',
+      emoji: '📚',
+      completed: false,
+      streak: 12,
+      category: 'learning',
+      color: 'blue',
+      frequency: 'daily',
+      selectedDays: [0, 1, 2, 3, 4, 5, 6],
+      reminderEnabled: false,
+      reminderTime: null,
+    },
+    {
+      id: '3',
+      name: 'Drink 8 glasses of water',
+      emoji: '💧',
+      completed: true,
+      streak: 5,
+      category: 'health',
+      color: 'teal',
+      frequency: 'daily',
+      selectedDays: [0, 1, 2, 3, 4, 5, 6],
+      reminderEnabled: true,
+      reminderTime: '09:00',
+    },
+    {
+      id: '4',
+      name: 'Exercise',
+      emoji: '🏃',
+      completed: false,
+      streak: 3,
+      category: 'fitness',
+      color: 'green',
+      frequency: 'weekly',
+      selectedDays: [1, 3, 5],
+      reminderEnabled: true,
+      reminderTime: '18:00',
+    },
   ]);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -63,6 +119,15 @@ const HomeScreen: React.FC = () => {
       friction: 7,
     }).start();
   }, [fadeAnim, slideAnim, fabScale]);
+
+  // Handle new habit creation
+  useEffect(() => {
+    if (route.params?.newHabit) {
+      setHabits((prevHabits) => [route.params.newHabit, ...prevHabits]);
+      // Clear the param to avoid re-adding on subsequent renders
+      navigation.setParams({ newHabit: undefined });
+    }
+  }, [route.params?.newHabit]);
 
   const completedCount = habits.filter((h) => h.completed).length;
   const totalCount = habits.length;
@@ -337,7 +402,16 @@ const HomeScreen: React.FC = () => {
                   },
                 ]}
               >
-                <View style={styles.habitInfo}>
+                <TouchableOpacity
+                  style={styles.habitInfo}
+                  onPress={() =>
+                    navigation.navigate('EditHabit', {
+                      habitId: habit.id,
+                      habitData: habit,
+                    })
+                  }
+                  activeOpacity={0.7}
+                >
                   <Text style={styles.habitEmoji}>{habit.emoji}</Text>
                   <View style={styles.habitDetails}>
                     <Text
@@ -369,7 +443,7 @@ const HomeScreen: React.FC = () => {
                       </Text>
                     </View>
                   </View>
-                </View>
+                </TouchableOpacity>
                 <TouchableOpacity
                   style={[
                     styles.checkbox,

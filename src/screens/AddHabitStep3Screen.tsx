@@ -82,15 +82,22 @@ const AddHabitStep3Screen: React.FC = () => {
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
+    // Get category icon
+    const categoryIcon = CATEGORIES.find((c) => c.id === category)?.icon || '⭐';
+
     // In a real app, save to local storage and/or cloud
     const newHabit = {
+      id: Date.now().toString(),
       name: habitName,
+      emoji: categoryIcon,
       category,
       color,
       frequency,
       selectedDays: frequency === 'daily' ? [0, 1, 2, 3, 4, 5, 6] : selectedDays,
       reminderEnabled,
       reminderTime: reminderEnabled ? reminderTime : null,
+      completed: false,
+      streak: 0,
       createdAt: new Date().toISOString(),
     };
 
@@ -98,8 +105,8 @@ const AddHabitStep3Screen: React.FC = () => {
 
     setIsLoading(false);
 
-    // Navigate back to Home
-    navigation.navigate('Home');
+    // Navigate back to Home with the new habit
+    navigation.navigate('Home', { newHabit });
   };
 
   const getCategoryLabel = () => {

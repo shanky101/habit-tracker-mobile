@@ -27,7 +27,7 @@ export type OnboardingStackParamList = {
   SignUp: undefined;
   Login: undefined;
   PasswordReset: undefined;
-  Home: undefined;
+  Home: { newHabit?: any } | undefined;
   AddHabitStep1: undefined;
   AddHabitStep2: { habitName: string };
   AddHabitStep3: { habitName: string; category: string; color: string };
