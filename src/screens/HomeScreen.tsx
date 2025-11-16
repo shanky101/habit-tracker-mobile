@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,8 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { useHabits } from '@/contexts/HabitsContext';
 import CelebrationModal from '@/components/CelebrationModal';
+import { ProgressRing } from '@/components/ProgressRing';
+import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 
 type HomeScreenNavigationProp = StackNavigationProp<any, 'Home'>;
 type HomeScreenRouteProp = RouteProp<{ Home: { newHabit?: any } }, 'Home'>;
@@ -26,42 +28,17 @@ const HomeScreen: React.FC = () => {
   const { theme } = useTheme();
   const { habits, addHabit, toggleHabit: toggleHabitContext } = useHabits();
 
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(30)).current;
-  const fabScale = useRef(new Animated.Value(0)).current;
+  // Use custom animation hook to reduce boilerplate
+  const { fadeAnim, slideAnim, fabScale } = useScreenAnimation({ enableFAB: true });
 
+  // Handle new habit creation - optimized to avoid unnecessary re-renders
+  const newHabit = route.params?.newHabit;
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-    ]).start();
-
-    // Animate FAB with delay
-    Animated.spring(fabScale, {
-      toValue: 1,
-      delay: 300,
-      useNativeDriver: true,
-      tension: 50,
-      friction: 7,
-    }).start();
-  }, [fadeAnim, slideAnim, fabScale]);
-
-  // Handle new habit creation
-  useEffect(() => {
-    if (route.params?.newHabit) {
-      addHabit(route.params.newHabit);
-      // Clear the param to avoid re-adding on subsequent renders
+    if (newHabit) {
+      addHabit(newHabit);
       navigation.setParams({ newHabit: undefined });
     }
-  }, [route.params?.newHabit]);
+  }, [newHabit]);
 
   // Filter out archived habits
   const activeHabits = habits.filter((h) => !h.archived);
@@ -100,74 +77,6 @@ const HomeScreen: React.FC = () => {
     return `${dayName}, ${monthName} ${date}`;
   };
 
-  const renderProgressRing = () => {
-    const size = 120;
-    const strokeWidth = 12;
-    const center = size / 2;
-    const radius = (size - strokeWidth) / 2;
-    const circumference = 2 * Math.PI * radius;
-    const strokeDashoffset = circumference - (progressPercentage / 100) * circumference;
-
-    return (
-      <View style={styles.progressRingContainer}>
-        <View style={styles.progressRing}>
-          {/* Background Circle */}
-          <View
-            style={[
-              styles.progressCircleBg,
-              {
-                width: size,
-                height: size,
-                borderRadius: size / 2,
-                borderWidth: strokeWidth,
-                borderColor: theme.colors.borderLight,
-              },
-            ]}
-          />
-          {/* Progress Circle - simplified for React Native without SVG */}
-          <View style={styles.progressContent}>
-            <Text
-              style={[
-                styles.progressPercentage,
-                {
-                  color: theme.colors.primary,
-                  fontFamily: theme.typography.fontFamilyDisplay,
-                  fontSize: theme.typography.fontSize2XL,
-                  fontWeight: theme.typography.fontWeightBold,
-                },
-              ]}
-            >
-              {Math.round(progressPercentage)}%
-            </Text>
-            <Text
-              style={[
-                styles.progressLabel,
-                {
-                  color: theme.colors.textSecondary,
-                  fontFamily: theme.typography.fontFamilyBody,
-                  fontSize: theme.typography.fontSizeXS,
-                },
-              ]}
-            >
-              Complete
-            </Text>
-          </View>
-        </View>
-        <Text
-          style={[
-            styles.progressSubtext,
-            {
-              color: theme.colors.textSecondary,
-              fontFamily: theme.typography.fontFamilyBody,
-              fontSize: theme.typography.fontSizeSM,
-            },
-          ]}
-        >
-          {completedCount} of {totalCount} habits
-        </Text>
-      </View>
-    );
-  };
 
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
@@ -226,7 +135,7 @@ const HomeScreen: React.FC = () => {
   );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       {/* Header */}
       <Animated.View
         style={[
@@ -237,7 +146,10 @@ const HomeScreen: React.FC = () => {
           },
         ]}
       >
-        <View>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('CalendarView')}
+          activeOpacity={0.7}
+        >
           <Text
             style={[
               styles.greeting,
@@ -250,20 +162,23 @@ const HomeScreen: React.FC = () => {
           >
             Today
           </Text>
-          <Text
-            style={[
-              styles.date,
-              {
-                color: theme.colors.text,
-                fontFamily: theme.typography.fontFamilyDisplay,
-                fontSize: theme.typography.fontSizeXL,
-                fontWeight: theme.typography.fontWeightBold,
-              },
-            ]}
-          >
-            {getCurrentDate()}
-          </Text>
-        </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text
+              style={[
+                styles.date,
+                {
+                  color: theme.colors.text,
+                  fontFamily: theme.typography.fontFamilyDisplay,
+                  fontSize: theme.typography.fontSizeXL,
+                  fontWeight: theme.typography.fontWeightBold,
+                },
+              ]}
+            >
+              {getCurrentDate()}
+            </Text>
+            <Text style={{ fontSize: 16, marginLeft: 8 }}>📅</Text>
+          </View>
+        </TouchableOpacity>
         <TouchableOpacity
           style={[styles.profileButton, { backgroundColor: theme.colors.backgroundSecondary }]}
           activeOpacity={0.7}
@@ -276,6 +191,7 @@ const HomeScreen: React.FC = () => {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        bounces={true}
       >
         {/* Progress Ring */}
         {activeHabits.length > 0 && (
@@ -287,7 +203,11 @@ const HomeScreen: React.FC = () => {
               },
             ]}
           >
-            {renderProgressRing()}
+            <ProgressRing
+              progress={progressPercentage}
+              completedCount={completedCount}
+              totalCount={totalCount}
+            />
           </Animated.View>
         )}
 
@@ -333,7 +253,7 @@ const HomeScreen: React.FC = () => {
                 <TouchableOpacity
                   style={styles.habitInfo}
                   onPress={() =>
-                    navigation.navigate('EditHabit', {
+                    navigation.navigate('HabitDetail', {
                       habitId: habit.id,
                       habitData: habit,
                     })
@@ -476,33 +396,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 24,
     paddingBottom: 100,
-  },
-  progressRingContainer: {
-    alignItems: 'center',
-    marginVertical: 32,
-  },
-  progressRing: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-  },
-  progressCircleBg: {
-    position: 'absolute',
-  },
-  progressContent: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1,
-  },
-  progressPercentage: {
-    marginBottom: 2,
-  },
-  progressLabel: {
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  progressSubtext: {
-    marginTop: 4,
   },
   habitsSection: {
     marginTop: 8,

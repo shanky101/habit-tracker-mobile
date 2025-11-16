@@ -13,6 +13,7 @@ import {
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
+import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 
 type AddHabitStep1ScreenNavigationProp = StackNavigationProp<any, 'AddHabitStep1'>;
 type AddHabitStep1ScreenRouteProp = RouteProp<any, 'AddHabitStep1'>;
@@ -35,28 +36,29 @@ const AddHabitStep1Screen: React.FC = () => {
   const [error, setError] = useState('');
   const textInputRef = useRef<TextInput>(null);
 
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(30)).current;
+  // Use custom animation hook
+  const { fadeAnim, slideAnim } = useScreenAnimation();
+
+  // Animation for Browse Templates button
+  const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-    ]).start();
-
-    // Auto-focus the input
-    setTimeout(() => {
-      textInputRef.current?.focus();
-    }, 300);
-  }, [fadeAnim, slideAnim]);
+    // Pulsing animation for the border
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.05,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
 
   const handleNext = () => {
     // Validation
@@ -169,6 +171,7 @@ const AddHabitStep1Screen: React.FC = () => {
           <View style={styles.inputContainer}>
             <TextInput
               ref={textInputRef}
+              autoFocus
               style={[
                 styles.input,
                 {
@@ -256,6 +259,56 @@ const AddHabitStep1Screen: React.FC = () => {
                 </TouchableOpacity>
               ))}
             </View>
+            <Animated.View
+              style={[
+                styles.browseTemplatesContainer,
+                {
+                  transform: [{ scale: pulseAnim }],
+                },
+              ]}
+            >
+              <TouchableOpacity
+                onPress={() => navigation.navigate('HabitTemplates')}
+                style={[
+                  styles.browseTemplatesButton,
+                  {
+                    backgroundColor: `${theme.colors.primary}15`,
+                    borderColor: theme.colors.primary,
+                  },
+                ]}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.templateIcon}>📚</Text>
+                <View style={styles.browseTemplatesContent}>
+                  <Text
+                    style={[
+                      styles.browseTemplatesText,
+                      {
+                        color: theme.colors.primary,
+                        fontFamily: theme.typography.fontFamilyBody,
+                        fontSize: theme.typography.fontSizeMD,
+                        fontWeight: theme.typography.fontWeightBold,
+                      },
+                    ]}
+                  >
+                    Browse Templates
+                  </Text>
+                  <Text
+                    style={[
+                      styles.browseTemplatesSubtext,
+                      {
+                        color: theme.colors.textSecondary,
+                        fontFamily: theme.typography.fontFamilyBody,
+                        fontSize: theme.typography.fontSizeXS,
+                      },
+                    ]}
+                  >
+                    Get inspired by popular habits
+                  </Text>
+                </View>
+                <Text style={styles.arrowIcon}>→</Text>
+              </TouchableOpacity>
+            </Animated.View>
           </View>
 
           {/* Next Button */}
@@ -383,6 +436,35 @@ const styles = StyleSheet.create({
   },
   suggestionText: {
     // styles from theme
+  },
+  browseTemplatesContainer: {
+    marginTop: 20,
+  },
+  browseTemplatesButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderStyle: 'dashed',
+  },
+  templateIcon: {
+    fontSize: 32,
+    marginRight: 12,
+  },
+  browseTemplatesContent: {
+    flex: 1,
+  },
+  browseTemplatesText: {
+    marginBottom: 2,
+  },
+  browseTemplatesSubtext: {
+    // styles from theme
+  },
+  arrowIcon: {
+    fontSize: 24,
+    marginLeft: 8,
   },
   nextButton: {
     width: '100%',

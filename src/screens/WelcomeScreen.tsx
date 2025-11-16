@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
+import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 
 type WelcomeScreenNavigationProp = StackNavigationProp<any, 'Welcome'>;
 
@@ -19,23 +20,8 @@ const WelcomeScreen: React.FC = () => {
   const navigation = useNavigation<WelcomeScreenNavigationProp>();
   const { theme } = useTheme();
 
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(30)).current;
-
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [fadeAnim, slideAnim]);
+  // Use custom animation hook
+  const { fadeAnim, slideAnim } = useScreenAnimation();
 
   const handleStartFree = () => {
     // Navigate to Home screen with anonymous user
