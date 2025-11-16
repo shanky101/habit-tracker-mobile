@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker - Design System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Primary Colors */
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            --primary-500: #6366f1;
+            --primary-600: #4f46e5;
+            --primary-700: #4338ca;
+
+            /* Accent Colors */
+            --accent-orange: #f97316;
+            --accent-pink: #ec4899;
+            --accent-green: #22c55e;
+            --accent-blue: #3b82f6;
+            --accent-yellow: #eab308;
+            --accent-teal: #14b8a6;
+
+            /* Neutrals */
+            --neutral-50: #fafafa;
+            --neutral-100: #f5f5f5;
+            --neutral-200: #e5e5e5;
+            --neutral-300: #d4d4d4;
+            --neutral-400: #a3a3a3;
+            --neutral-500: #737373;
+            --neutral-600: #525252;
+            --neutral-700: #404040;
+            --neutral-800: #262626;
+            --neutral-900: #171717;
+
+            /* Semantic Colors */
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --info: #3b82f6;
+
+            /* Typography */
+            --font-display: 'Syne', sans-serif;
+            --font-body: 'DM Sans', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+
+            /* Spacing Scale */
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-2xl: 48px;
+            --space-3xl: 64px;
+
+            /* Border Radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --radius-full: 9999px;
+
+            /* Shadows */
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+            --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--neutral-50);
+            color: var(--neutral-900);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+            padding: var(--space-3xl) var(--space-lg);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: moveGrid 20s linear infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes moveGrid {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(40px, 40px); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 800;
+            color: white;
+            margin-bottom: var(--space-md);
+            letter-spacing: -0.04em;
+            animation: fadeInUp 0.8s ease-out;
+            line-height: 1.1;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: var(--space-lg);
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+            font-weight: 500;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: var(--radius-full);
+            color: white;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space-2xl) var(--space-lg);
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: var(--space-3xl);
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .section-header {
+            margin-bottom: var(--space-xl);
+            display: flex;
+            align-items: baseline;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+        }
+
+        .section-number {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            color: var(--primary-500);
+            font-weight: 700;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            color: var(--neutral-900);
+            letter-spacing: -0.02em;
+            position: relative;
+        }
+
+        .section-description {
+            font-size: 1.1rem;
+            color: var(--neutral-600);
+            max-width: 600px;
+            margin-top: var(--space-sm);
+        }
+
+        /* Color Palette */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-lg);
+            margin-top: var(--space-xl);
+        }
+
+        .color-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .color-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .color-swatch {
+            height: 160px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: height 0.3s ease;
+        }
+
+        .color-card:hover .color-swatch {
+            height: 180px;
+        }
+
+        .color-info {
+            padding: var(--space-lg);
+        }
+
+        .color-name {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: var(--space-xs);
+            color: var(--neutral-900);
+        }
+
+        .color-usage {
+            font-size: 0.9rem;
+            color: var(--neutral-600);
+            margin-bottom: var(--space-sm);
+        }
+
+        .color-codes {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+        }
+
+        .color-code {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--neutral-700);
+            background: var(--neutral-100);
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        /* Typography Section */
+        .type-specimen {
+            background: white;
+            padding: var(--space-2xl);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .font-showcase {
+            margin-bottom: var(--space-2xl);
+            padding-bottom: var(--space-2xl);
+            border-bottom: 2px solid var(--neutral-100);
+        }
+
+        .font-showcase:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .font-family-name {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            color: var(--primary-500);
+            margin-bottom: var(--space-md);
+            font-weight: 700;
+        }
+
+        .font-samples {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+
+        .font-sample {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+        }
+
+        .font-label {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--neutral-500);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .display-xl { font-size: clamp(3rem, 5vw, 4.5rem); line-height: 1.1; }
+        .display-lg { font-size: clamp(2.5rem, 4vw, 3.5rem); line-height: 1.1; }
+        .display-md { font-size: clamp(2rem, 3vw, 2.5rem); line-height: 1.2; }
+        .heading-lg { font-size: 2rem; line-height: 1.3; }
+        .heading-md { font-size: 1.5rem; line-height: 1.4; }
+        .heading-sm { font-size: 1.25rem; line-height: 1.4; }
+        .body-lg { font-size: 1.125rem; line-height: 1.6; }
+        .body-md { font-size: 1rem; line-height: 1.6; }
+        .body-sm { font-size: 0.875rem; line-height: 1.5; }
+        .caption { font-size: 0.75rem; line-height: 1.4; }
+
+        /* Spacing System */
+        .spacing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: var(--space-lg);
+            background: white;
+            padding: var(--space-2xl);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+        }
+
+        .spacing-item {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .spacing-label {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--neutral-600);
+        }
+
+        .spacing-value {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            color: var(--primary-500);
+            font-size: 0.9rem;
+        }
+
+        .spacing-visual {
+            background: var(--primary-gradient);
+            border-radius: 4px;
+            transition: transform 0.3s ease;
+        }
+
+        .spacing-item:hover .spacing-visual {
+            transform: scaleX(1.1);
+        }
+
+        /* Gestures Section */
+        .gestures-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-xl);
+        }
+
+        .gesture-card {
+            background: white;
+            padding: var(--space-xl);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .gesture-card:hover {
+            border-color: var(--primary-500);
+            box-shadow: var(--shadow-glow);
+            transform: translateY(-4px);
+        }
+
+        .gesture-icon {
+            font-size: 3rem;
+            margin-bottom: var(--space-md);
+            display: block;
+        }
+
+        .gesture-name {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: var(--space-sm);
+            color: var(--neutral-900);
+        }
+
+        .gesture-action {
+            color: var(--neutral-600);
+            margin-bottom: var(--space-md);
+            font-size: 0.95rem;
+        }
+
+        .gesture-feedback {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--primary-500);
+            background: rgba(99, 102, 241, 0.1);
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-sm);
+            display: inline-block;
+        }
+
+        /* Components Showcase */
+        .components-grid {
+            display: grid;
+            gap: var(--space-xl);
+        }
+
+        .component-demo {
+            background: white;
+            padding: var(--space-2xl);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+        }
+
+        .component-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: var(--space-lg);
+            color: var(--neutral-900);
+        }
+
+        /* Buttons */
+        .button-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-md);
+        }
+
+        .btn {
+            font-family: var(--font-display);
+            font-weight: 600;
+            padding: 14px 28px;
+            border-radius: var(--radius-full);
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .btn-secondary {
+            background: var(--neutral-900);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: var(--neutral-700);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary-500);
+            border: 2px solid var(--primary-500);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-500);
+            color: white;
+        }
+
+        /* Habit Card */
+        .habit-card {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            background: white;
+            padding: var(--space-lg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--primary-500);
+        }
+
+        .habit-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateX(4px);
+        }
+
+        .habit-checkbox {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 3px solid var(--primary-500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .habit-checkbox:hover {
+            background: var(--primary-gradient);
+            transform: scale(1.1);
+        }
+
+        .habit-checkbox.checked {
+            background: var(--primary-gradient);
+        }
+
+        .habit-checkbox svg {
+            width: 24px;
+            height: 24px;
+            stroke: white;
+            stroke-width: 3;
+            fill: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .habit-checkbox.checked svg {
+            opacity: 1;
+        }
+
+        .habit-info {
+            flex: 1;
+        }
+
+        .habit-name {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--neutral-900);
+            margin-bottom: 4px;
+        }
+
+        .habit-streak {
+            font-size: 0.9rem;
+            color: var(--neutral-600);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Progress Ring */
+        .progress-ring-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+
+        .progress-ring {
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+
+        .progress-ring svg {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-circle {
+            fill: none;
+            stroke-width: 12;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+        .progress-ring-bg {
+            stroke: var(--neutral-200);
+        }
+
+        .progress-ring-progress {
+            stroke: url(#progressGradient);
+            stroke-linecap: round;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .progress-number {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--neutral-900);
+            line-height: 1;
+        }
+
+        .progress-label {
+            font-size: 0.9rem;
+            color: var(--neutral-600);
+            margin-top: 4px;
+        }
+
+        /* Motion Principles */
+        .motion-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-xl);
+        }
+
+        .motion-card {
+            background: white;
+            padding: var(--space-xl);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+        }
+
+        .motion-title {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 1.3rem;
+            margin-bottom: var(--space-md);
+            color: var(--neutral-900);
+        }
+
+        .motion-description {
+            color: var(--neutral-600);
+            margin-bottom: var(--space-lg);
+            font-size: 0.95rem;
+        }
+
+        .motion-example {
+            background: var(--neutral-100);
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--neutral-700);
+            overflow-x: auto;
+        }
+
+        .demo-box {
+            width: 60px;
+            height: 60px;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-md);
+            margin: var(--space-md) auto;
+        }
+
+        .demo-bounce { animation: bounce 2s ease-in-out infinite; }
+        .demo-fade { animation: fadeInOut 2s ease-in-out infinite; }
+        .demo-slide { animation: slideInOut 2s ease-in-out infinite; }
+        .demo-scale { animation: scaleInOut 2s ease-in-out infinite; }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        @keyframes slideInOut {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(30px); }
+        }
+
+        @keyframes scaleInOut {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* UX Principles */
+        .principle-grid {
+            display: grid;
+            gap: var(--space-lg);
+        }
+
+        .principle-card {
+            background: white;
+            padding: var(--space-xl);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            border-left: 4px solid var(--primary-500);
+            transition: all 0.3s ease;
+        }
+
+        .principle-card:hover {
+            transform: translateX(8px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .principle-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+
+        .principle-emoji {
+            font-size: 2.5rem;
+        }
+
+        .principle-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--neutral-900);
+        }
+
+        .principle-description {
+            color: var(--neutral-600);
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--neutral-900);
+            color: white;
+            padding: var(--space-2xl) var(--space-lg);
+            text-align: center;
+            margin-top: var(--space-3xl);
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .footer h3 {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            margin-bottom: var(--space-md);
+        }
+
+        .footer p {
+            color: var(--neutral-400);
+            font-size: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--space-lg) var(--space-md);
+            }
+
+            .hero {
+                padding: var(--space-2xl) var(--space-md);
+            }
+
+            .color-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .gestures-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-grid {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Utility Classes */
+        .gradient-text {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Habit Tracker<br>Design System</h1>
+            <p class="hero-subtitle">Playful yet minimal. Snappy yet colorful.</p>
+            <span class="hero-tag">v1.0 — Mobile App Reference</span>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container">
+
+        <!-- Colors Section -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">01</span>
+                <div>
+                    <h2 class="section-title gradient-text">Color Palette</h2>
+                    <p class="section-description">Vibrant, meaningful colors that create emotional connections and guide user actions</p>
+                </div>
+            </div>
+
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">
+                        <span style="color: white; font-size: 2rem;">✨</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Primary Gradient</div>
+                        <div class="color-usage">Main CTAs, active states, progress</div>
+                        <div class="color-codes">
+                            <code class="color-code">Indigo → Purple</code>
+                            <code class="color-code">#6366f1 → #8b5cf6</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #f97316;">
+                        <span style="color: white; font-size: 2rem;">🔥</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Streak Orange</div>
+                        <div class="color-usage">Streaks, energy, momentum</div>
+                        <div class="color-codes">
+                            <code class="color-code">#f97316</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #22c55e;">
+                        <span style="color: white; font-size: 2rem;">✓</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Success Green</div>
+                        <div class="color-usage">Completions, achievements, positive feedback</div>
+                        <div class="color-codes">
+                            <code class="color-code">#22c55e</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #ec4899;">
+                        <span style="color: white; font-size: 2rem;">🎉</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Celebration Pink</div>
+                        <div class="color-usage">Milestones, celebrations, special moments</div>
+                        <div class="color-codes">
+                            <code class="color-code">#ec4899</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #3b82f6;">
+                        <span style="color: white; font-size: 2rem;">📊</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Info Blue</div>
+                        <div class="color-usage">Analytics, insights, information</div>
+                        <div class="color-codes">
+                            <code class="color-code">#3b82f6</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #eab308;">
+                        <span style="color: white; font-size: 2rem;">⚡</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Energy Yellow</div>
+                        <div class="color-usage">Highlights, attention, warnings</div>
+                        <div class="color-codes">
+                            <code class="color-code">#eab308</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #14b8a6;">
+                        <span style="color: white; font-size: 2rem;">🧘</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Calm Teal</div>
+                        <div class="color-usage">Mindfulness, health, balance</div>
+                        <div class="color-codes">
+                            <code class="color-code">#14b8a6</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: linear-gradient(135deg, #fafafa 0%, #e5e5e5 100%);">
+                        <span style="color: #404040; font-size: 2rem;">□</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Neutral Light</div>
+                        <div class="color-usage">Backgrounds, cards, surfaces</div>
+                        <div class="color-codes">
+                            <code class="color-code">#fafafa → #e5e5e5</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Typography Section -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">02</span>
+                <div>
+                    <h2 class="section-title gradient-text">Typography</h2>
+                    <p class="section-description">Bold, distinctive type that's legible, playful, and creates hierarchy</p>
+                </div>
+            </div>
+
+            <div class="type-specimen">
+                <div class="font-showcase">
+                    <div class="font-family-name">PRIMARY: Syne (Display & Headings)</div>
+                    <div class="font-samples">
+                        <div class="font-sample">
+                            <span class="font-label">Display XL / 800 Weight</span>
+                            <div class="display-xl" style="font-family: var(--font-display); font-weight: 800;">Build Better Habits</div>
+                        </div>
+                        <div class="font-sample">
+                            <span class="font-label">Display LG / 700 Weight</span>
+                            <div class="display-lg" style="font-family: var(--font-display); font-weight: 700;">Your 24-day streak 🔥</div>
+                        </div>
+                        <div class="font-sample">
+                            <span class="font-label">Heading LG / 600 Weight</span>
+                            <div class="heading-lg" style="font-family: var(--font-display); font-weight: 600;">Amazing! All done for today</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="font-showcase">
+                    <div class="font-family-name">SECONDARY: DM Sans (Body & UI)</div>
+                    <div class="font-samples">
+                        <div class="font-sample">
+                            <span class="font-label">Body LG / 500 Weight</span>
+                            <div class="body-lg" style="font-family: var(--font-body); font-weight: 500;">Track your daily habits, build streaks, and transform your life one day at a time</div>
+                        </div>
+                        <div class="font-sample">
+                            <span class="font-label">Body MD / 400 Weight</span>
+                            <div class="body-md" style="font-family: var(--font-body); font-weight: 400;">Complete your habits each day to build momentum and create lasting change. The app makes it easy with simple check-ins and visual progress tracking.</div>
+                        </div>
+                        <div class="font-sample">
+                            <span class="font-label">Body SM / 400 Weight</span>
+                            <div class="body-sm" style="font-family: var(--font-body); font-weight: 400;">You're 3x more likely to meditate when you complete your morning routine first</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="font-showcase">
+                    <div class="font-family-name">ACCENT: Space Mono (Code & Tags)</div>
+                    <div class="font-samples">
+                        <div class="font-sample">
+                            <span class="font-label">Mono Regular / 400 Weight</span>
+                            <div class="body-md" style="font-family: var(--font-mono); font-weight: 400;">STREAK: 24 DAYS • 86% COMPLETE</div>
+                        </div>
+                        <div class="font-sample">
+                            <span class="font-label">Mono Bold / 700 Weight</span>
+                            <div class="body-md" style="font-family: var(--font-mono); font-weight: 700;">PREMIUM • UNLOCK NOW</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Spacing Section -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">03</span>
+                <div>
+                    <h2 class="section-title gradient-text">Spacing System</h2>
+                    <p class="section-description">Consistent, harmonious spacing based on an 8px scale</p>
+                </div>
+            </div>
+
+            <div class="spacing-grid">
+                <div class="spacing-item">
+                    <div class="spacing-label">XS</div>
+                    <div class="spacing-value">4px</div>
+                    <div class="spacing-visual" style="height: 4px; width: 100%;"></div>
+                </div>
+                <div class="spacing-item">
+                    <div class="spacing-label">SM</div>
+                    <div class="spacing-value">8px</div>
+                    <div class="spacing-visual" style="height: 8px; width: 100%;"></div>
+                </div>
+                <div class="spacing-item">
+                    <div class="spacing-label">MD</div>
+                    <div class="spacing-value">16px</div>
+                    <div class="spacing-visual" style="height: 16px; width: 100%;"></div>
+                </div>
+                <div class="spacing-item">
+                    <div class="spacing-label">LG</div>
+                    <div class="spacing-value">24px</div>
+                    <div class="spacing-visual" style="height: 24px; width: 100%;"></div>
+                </div>
+                <div class="spacing-item">
+                    <div class="spacing-label">XL</div>
+                    <div class="spacing-value">32px</div>
+                    <div class="spacing-visual" style="height: 32px; width: 100%;"></div>
+                </div>
+                <div class="spacing-item">
+                    <div class="spacing-label">2XL</div>
+                    <div class="spacing-value">48px</div>
+                    <div class="spacing-visual" style="height: 48px; width: 100%;"></div>
+                </div>
+                <div class="spacing-item">
+                    <div class="spacing-label">3XL</div>
+                    <div class="spacing-value">64px</div>
+                    <div class="spacing-visual" style="height: 64px; width: 100%;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gestures Section -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">04</span>
+                <div>
+                    <h2 class="section-title gradient-text">Gesture System</h2>
+                    <p class="section-description">Intuitive touch interactions that make the app feel natural and responsive</p>
+                </div>
+            </div>
+
+            <div class="gestures-grid">
+                <div class="gesture-card">
+                    <span class="gesture-icon">👆</span>
+                    <h3 class="gesture-name">Tap</h3>
+                    <p class="gesture-action">Check in habit, select item, trigger action</p>
+                    <span class="gesture-feedback">Haptic: Light</span>
+                </div>
+
+                <div class="gesture-card">
+                    <span class="gesture-icon">👉</span>
+                    <h3 class="gesture-name">Swipe Right</h3>
+                    <p class="gesture-action">Quick check-in on habit card</p>
+                    <span class="gesture-feedback">Haptic: Medium + Animation</span>
+                </div>
+
+                <div class="gesture-card">
+                    <span class="gesture-icon">👈</span>
+                    <h3 class="gesture-name">Swipe Left</h3>
+                    <p class="gesture-action">Reveal options menu (edit, delete)</p>
+                    <span class="gesture-feedback">Haptic: Light</span>
+                </div>
+
+                <div class="gesture-card">
+                    <span class="gesture-icon">✊</span>
+                    <h3 class="gesture-name">Long Press</h3>
+                    <p class="gesture-action">Activate drag-to-reorder mode</p>
+                    <span class="gesture-feedback">Haptic: Heavy + Visual lift</span>
+                </div>
+
+                <div class="gesture-card">
+                    <span class="gesture-icon">👇</span>
+                    <h3 class="gesture-name">Pull Down</h3>
+                    <p class="gesture-action">Refresh and sync from cloud</p>
+                    <span class="gesture-feedback">Spinner + Success pulse</span>
+                </div>
+
+                <div class="gesture-card">
+                    <span class="gesture-icon">🤏</span>
+                    <h3 class="gesture-name">Pinch</h3>
+                    <p class="gesture-action">Zoom calendar view (month ↔ year)</p>
+                    <span class="gesture-feedback">Smooth scale animation</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Components Section -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">05</span>
+                <div>
+                    <h2 class="section-title gradient-text">Core Components</h2>
+                    <p class="section-description">Reusable UI elements with consistent styling and behavior</p>
+                </div>
+            </div>
+
+            <div class="components-grid">
+                <!-- Buttons -->
+                <div class="component-demo">
+                    <h3 class="component-title">Buttons</h3>
+                    <div class="button-grid">
+                        <button class="btn btn-primary">
+                            <span>Start Free Trial</span>
+                        </button>
+                        <button class="btn btn-secondary">
+                            <span>Create Habit</span>
+                        </button>
+                        <button class="btn btn-outline">
+                            <span>Maybe Later</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Habit Card -->
+                <div class="component-demo">
+                    <h3 class="component-title">Habit Card</h3>
+                    <div class="habit-card">
+                        <div class="habit-checkbox" onclick="this.classList.toggle('checked')">
+                            <svg viewBox="0 0 24 24">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </div>
+                        <div class="habit-info">
+                            <div class="habit-name">Meditate for 10 minutes</div>
+                            <div class="habit-streak">🔥 24 days streak</div>
+                        </div>
+                        <div style="color: var(--neutral-400); font-size: 1.5rem;">›</div>
+                    </div>
+                </div>
+
+                <!-- Progress Ring -->
+                <div class="component-demo">
+                    <h3 class="component-title">Progress Ring</h3>
+                    <div class="progress-ring-container">
+                        <div class="progress-ring">
+                            <svg width="200" height="200">
+                                <defs>
+                                    <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                                    </linearGradient>
+                                </defs>
+                                <circle class="progress-ring-circle progress-ring-bg"
+                                        cx="100" cy="100" r="85"></circle>
+                                <circle class="progress-ring-circle progress-ring-progress"
+                                        cx="100" cy="100" r="85"
+                                        stroke-dasharray="534.07"
+                                        stroke-dashoffset="160.22"></circle>
+                            </svg>
+                            <div class="progress-text">
+                                <div class="progress-number">3/5</div>
+                                <div class="progress-label">completed</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Motion Section -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">06</span>
+                <div>
+                    <h2 class="section-title gradient-text">Motion & Animation</h2>
+                    <p class="section-description">Delightful animations that provide feedback and create personality</p>
+                </div>
+            </div>
+
+            <div class="motion-grid">
+                <div class="motion-card">
+                    <h3 class="motion-title">Check-in Bounce</h3>
+                    <p class="motion-description">Celebratory bounce when checking in a habit</p>
+                    <div class="demo-box demo-bounce"></div>
+                    <div class="motion-example">cubic-bezier(0.68, -0.55, 0.265, 1.55)<br>0.6s duration</div>
+                </div>
+
+                <div class="motion-card">
+                    <h3 class="motion-title">Fade In/Out</h3>
+                    <p class="motion-description">Smooth transitions for modals and overlays</p>
+                    <div class="demo-box demo-fade"></div>
+                    <div class="motion-example">ease-in-out<br>0.3s duration</div>
+                </div>
+
+                <div class="motion-card">
+                    <h3 class="motion-title">Slide Transition</h3>
+                    <p class="motion-description">Page navigation and carousel movement</p>
+                    <div class="demo-box demo-slide"></div>
+                    <div class="motion-example">cubic-bezier(0.4, 0, 0.2, 1)<br>0.4s duration</div>
+                </div>
+
+                <div class="motion-card">
+                    <h3 class="motion-title">Scale Pulse</h3>
+                    <p class="motion-description">Attention-grabbing for new features or CTAs</p>
+                    <div class="demo-box demo-scale"></div>
+                    <div class="motion-example">ease-in-out<br>1s duration, infinite</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- UX Principles Section -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">07</span>
+                <div>
+                    <h2 class="section-title gradient-text">UX Principles</h2>
+                    <p class="section-description">Core design philosophy guiding every interaction</p>
+                </div>
+            </div>
+
+            <div class="principle-grid">
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <span class="principle-emoji">⚡</span>
+                        <h3 class="principle-title">Instant Feedback</h3>
+                    </div>
+                    <p class="principle-description">
+                        Every action gets immediate visual and haptic response. Check-ins animate instantly with optimistic UI. Users never wait or wonder if their action registered. Animations complete in under 300ms to feel snappy.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <span class="principle-emoji">🎯</span>
+                        <h3 class="principle-title">3-Tap Rule</h3>
+                    </div>
+                    <p class="principle-description">
+                        Any core action is achievable within 3 taps. Opening the app → checking in a habit is 1 tap. Adding a new habit is 3 taps. No buried menus or complex navigation. Direct access to what matters.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <span class="principle-emoji">🎉</span>
+                        <h3 class="principle-title">Celebration-Driven</h3>
+                    </div>
+                    <p class="principle-description">
+                        Progress is rewarded with delight. Streaks get fire emojis. Milestones trigger confetti. Completions animate with satisfaction. The app celebrates users' wins, big and small, creating positive reinforcement loops.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <span class="principle-emoji">🌱</span>
+                        <h3 class="principle-title">Progressive Disclosure</h3>
+                    </div>
+                    <p class="principle-description">
+                        Advanced features reveal themselves when needed. New users see simple interfaces. Power users discover analytics, AI insights, and customization gradually. Complexity scales with user expertise.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <span class="principle-emoji">🎨</span>
+                        <h3 class="principle-title">Joyful Minimalism</h3>
+                    </div>
+                    <p class="principle-description">
+                        Clean layouts with personality. Generous white space lets content breathe. Color is purposeful, not decorative. Every element earns its place. The design is minimal but never boring or sterile.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <span class="principle-emoji">♿</span>
+                        <h3 class="principle-title">Accessible by Default</h3>
+                    </div>
+                    <p class="principle-description">
+                        Large touch targets (44×44pt minimum). High contrast ratios (4.5:1+). Dynamic type support. Screen reader labels. Color isn't the only indicator - we use shapes, icons, and text too. Everyone can build better habits.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Border Radius & Shadows -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">08</span>
+                <div>
+                    <h2 class="section-title gradient-text">Borders & Shadows</h2>
+                    <p class="section-description">Consistent rounded corners and elevation system</p>
+                </div>
+            </div>
+
+            <div class="components-grid">
+                <div class="component-demo">
+                    <h3 class="component-title">Border Radius Scale</h3>
+                    <div style="display: flex; flex-wrap: wrap; gap: var(--space-lg); margin-top: var(--space-lg);">
+                        <div style="flex: 1; min-width: 120px;">
+                            <div style="background: var(--primary-gradient); height: 80px; border-radius: var(--radius-sm); margin-bottom: var(--space-sm);"></div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--neutral-600);">SM: 8px</div>
+                        </div>
+                        <div style="flex: 1; min-width: 120px;">
+                            <div style="background: var(--primary-gradient); height: 80px; border-radius: var(--radius-md); margin-bottom: var(--space-sm);"></div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--neutral-600);">MD: 12px</div>
+                        </div>
+                        <div style="flex: 1; min-width: 120px;">
+                            <div style="background: var(--primary-gradient); height: 80px; border-radius: var(--radius-lg); margin-bottom: var(--space-sm);"></div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--neutral-600);">LG: 16px</div>
+                        </div>
+                        <div style="flex: 1; min-width: 120px;">
+                            <div style="background: var(--primary-gradient); height: 80px; border-radius: var(--radius-xl); margin-bottom: var(--space-sm);"></div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--neutral-600);">XL: 24px</div>
+                        </div>
+                        <div style="flex: 1; min-width: 120px;">
+                            <div style="background: var(--primary-gradient); height: 80px; border-radius: var(--radius-full); margin-bottom: var(--space-sm);"></div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--neutral-600);">FULL: ∞</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="component-demo">
+                    <h3 class="component-title">Shadow Elevation System</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-xl); margin-top: var(--space-lg);">
+                        <div>
+                            <div style="background: white; height: 100px; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: center; margin-bottom: var(--space-sm);">
+                                <span style="font-family: var(--font-display); font-weight: 600; color: var(--neutral-900);">SM</span>
+                            </div>
+                            <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--neutral-600);">Subtle</div>
+                        </div>
+                        <div>
+                            <div style="background: white; height: 100px; border-radius: var(--radius-md); box-shadow: var(--shadow-md); display: flex; align-items: center; justify-content: center; margin-bottom: var(--space-sm);">
+                                <span style="font-family: var(--font-display); font-weight: 600; color: var(--neutral-900);">MD</span>
+                            </div>
+                            <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--neutral-600);">Card</div>
+                        </div>
+                        <div>
+                            <div style="background: white; height: 100px; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); display: flex; align-items: center; justify-content: center; margin-bottom: var(--space-sm);">
+                                <span style="font-family: var(--font-display); font-weight: 600; color: var(--neutral-900);">LG</span>
+                            </div>
+                            <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--neutral-600);">Hover</div>
+                        </div>
+                        <div>
+                            <div style="background: white; height: 100px; border-radius: var(--radius-md); box-shadow: var(--shadow-xl); display: flex; align-items: center; justify-content: center; margin-bottom: var(--space-sm);">
+                                <span style="font-family: var(--font-display); font-weight: 600; color: var(--neutral-900);">XL</span>
+                            </div>
+                            <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--neutral-600);">Modal</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Icons & Emojis -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">09</span>
+                <div>
+                    <h2 class="section-title gradient-text">Icons & Emojis</h2>
+                    <p class="section-description">Expressive visual language using Lucide icons and meaningful emojis</p>
+                </div>
+            </div>
+
+            <div class="component-demo">
+                <h3 class="component-title">Icon System</h3>
+                <div style="margin-bottom: var(--space-lg);">
+                    <p style="color: var(--neutral-600); margin-bottom: var(--space-md);">
+                        <strong>Library:</strong> Lucide Icons (clean, consistent, customizable)<br>
+                        <strong>Sizes:</strong> 16px (small), 24px (default), 32px (large), 48px (hero)<br>
+                        <strong>Stroke Width:</strong> 2px (default), 2.5px (bold emphasis)
+                    </p>
+                </div>
+
+                <h3 class="component-title" style="margin-top: var(--space-xl);">Emoji Usage</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-md); margin-top: var(--space-md);">
+                    <div style="padding: var(--space-md); background: var(--neutral-100); border-radius: var(--radius-md);">
+                        <div style="font-size: 2rem; margin-bottom: var(--space-xs);">🔥</div>
+                        <div style="font-family: var(--font-display); font-weight: 600; margin-bottom: 4px;">Streaks</div>
+                        <div style="font-size: 0.85rem; color: var(--neutral-600);">Active momentum</div>
+                    </div>
+                    <div style="padding: var(--space-md); background: var(--neutral-100); border-radius: var(--radius-md);">
+                        <div style="font-size: 2rem; margin-bottom: var(--space-xs);">🎯</div>
+                        <div style="font-family: var(--font-display); font-weight: 600; margin-bottom: 4px;">Goals</div>
+                        <div style="font-size: 0.85rem; color: var(--neutral-600);">Target achievement</div>
+                    </div>
+                    <div style="padding: var(--space-md); background: var(--neutral-100); border-radius: var(--radius-md);">
+                        <div style="font-size: 2rem; margin-bottom: var(--space-xs);">🎉</div>
+                        <div style="font-family: var(--font-display); font-weight: 600; margin-bottom: 4px;">Celebrations</div>
+                        <div style="font-size: 0.85rem; color: var(--neutral-600);">Milestones reached</div>
+                    </div>
+                    <div style="padding: var(--space-md); background: var(--neutral-100); border-radius: var(--radius-md);">
+                        <div style="font-size: 2rem; margin-bottom: var(--space-xs);">🏆</div>
+                        <div style="font-family: var(--font-display); font-weight: 600; margin-bottom: 4px;">Achievements</div>
+                        <div style="font-size: 0.85rem; color: var(--neutral-600);">Records & bests</div>
+                    </div>
+                    <div style="padding: var(--space-md); background: var(--neutral-100); border-radius: var(--radius-md);">
+                        <div style="font-size: 2rem; margin-bottom: var(--space-xs);">✨</div>
+                        <div style="font-family: var(--font-display); font-weight: 600; margin-bottom: 4px;">Premium</div>
+                        <div style="font-size: 0.85rem; color: var(--neutral-600);">Special features</div>
+                    </div>
+                    <div style="padding: var(--space-md); background: var(--neutral-100); border-radius: var(--radius-md);">
+                        <div style="font-size: 2rem; margin-bottom: var(--space-xs);">📊</div>
+                        <div style="font-family: var(--font-display); font-weight: 600; margin-bottom: 4px;">Analytics</div>
+                        <div style="font-size: 0.85rem; color: var(--neutral-600);">Data & insights</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <h3>Build Better Habits, One Day at a Time</h3>
+            <p style="margin-top: var(--space-md);">
+                This design system is your north star for creating a habit tracker that people will love to use every day.
+            </p>
+            <p style="margin-top: var(--space-lg); font-family: var(--font-mono); font-size: 0.9rem;">
+                v1.0 • Design System Reference • 2024
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Add smooth scroll behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Intersection Observer for fade-in animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.section').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(30px)';
+            section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(section);
+        });
+
+        // Add interactive demo for habit checkbox
+        document.querySelectorAll('.habit-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('click', function() {
+                this.classList.toggle('checked');
+
+                // Add haptic feedback simulation (visual pulse)
+                this.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+            });
+        });
+    </script>
+</body>
+</html>

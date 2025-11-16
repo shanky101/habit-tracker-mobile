@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker - Design System Variants</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            color: white;
+            font-weight: 700;
+            margin-bottom: 16px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 400;
+        }
+
+        .variant-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+            margin-bottom: 40px;
+        }
+
+        .variant-card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px 32px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .variant-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            transition: height 0.4s ease;
+        }
+
+        .variant-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
+        }
+
+        .variant-card:hover::before {
+            height: 100%;
+            opacity: 0.05;
+        }
+
+        /* Variant-specific colors */
+        .variant-1::before {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        }
+
+        .variant-2::before {
+            background: linear-gradient(135deg, #FF6183 0%, #E91E63 50%, #9C27B0 100%);
+        }
+
+        .variant-3::before {
+            background: linear-gradient(135deg, #B85C38 0%, #D4A574 50%, #B5C99A 100%);
+        }
+
+        .variant-4::before {
+            background: linear-gradient(135deg, #1A1714 0%, #4D4539 100%);
+        }
+
+        .variant-number {
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            opacity: 0.6;
+        }
+
+        .variant-1 .variant-number { color: #6366f1; }
+        .variant-2 .variant-number { color: #FF6183; }
+        .variant-3 .variant-number { color: #B85C38; }
+        .variant-4 .variant-number { color: #2B2621; }
+
+        .variant-name {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #1a1a1a;
+        }
+
+        .variant-description {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #666;
+            margin-bottom: 24px;
+        }
+
+        .variant-features {
+            list-style: none;
+            margin-bottom: 24px;
+        }
+
+        .variant-features li {
+            font-size: 0.9rem;
+            color: #888;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .variant-features li:last-child {
+            border-bottom: none;
+        }
+
+        .variant-features li::before {
+            content: '→';
+            font-weight: 600;
+        }
+
+        .variant-1 .variant-features li::before { color: #6366f1; }
+        .variant-2 .variant-features li::before { color: #FF6183; }
+        .variant-3 .variant-features li::before { color: #B85C38; }
+        .variant-4 .variant-features li::before { color: #4D4539; }
+
+        .view-button {
+            display: inline-block;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .variant-1 .view-button {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        }
+
+        .variant-2 .view-button {
+            background: linear-gradient(135deg, #FF6183 0%, #E91E63 100%);
+        }
+
+        .variant-3 .view-button {
+            background: linear-gradient(135deg, #B85C38 0%, #D4A574 100%);
+        }
+
+        .variant-4 .view-button {
+            background: linear-gradient(135deg, #2B2621 0%, #4D4539 100%);
+        }
+
+        .view-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .color-preview {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 20px;
+        }
+
+        .color-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            color: white;
+        }
+
+        .footer p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .variant-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Design System Variants</h1>
+            <p class="subtitle">Choose your aesthetic for the Habit Tracker mobile app</p>
+        </div>
+
+        <div class="variant-grid">
+            <!-- Variant 1 -->
+            <a href="variant-1.html" class="variant-card variant-1">
+                <div class="variant-number">Variant 01</div>
+                <h2 class="variant-name">Momentum & Joy</h2>
+                <div class="color-preview">
+                    <div class="color-dot" style="background: #6366f1;"></div>
+                    <div class="color-dot" style="background: #8b5cf6;"></div>
+                    <div class="color-dot" style="background: #ec4899;"></div>
+                    <div class="color-dot" style="background: #22c55e;"></div>
+                </div>
+                <p class="variant-description">Playful modernism with vibrant gradients and smooth animations. Bold typography meets kinetic energy.</p>
+                <ul class="variant-features">
+                    <li>Vibrant purple & pink gradients</li>
+                    <li>Syne + DM Sans typefaces</li>
+                    <li>Bouncy, delightful animations</li>
+                    <li>Swiss design meets app culture</li>
+                </ul>
+                <span class="view-button">View Design System</span>
+            </a>
+
+            <!-- Variant 2 -->
+            <a href="variant-2.html" class="variant-card variant-2">
+                <div class="variant-number">Variant 02</div>
+                <h2 class="variant-name">Retro Futurism</h2>
+                <div class="color-preview">
+                    <div class="color-dot" style="background: #FF6183;"></div>
+                    <div class="color-dot" style="background: #00E5FF;"></div>
+                    <div class="color-dot" style="background: #C6FF00;"></div>
+                    <div class="color-dot" style="background: #9C27B0;"></div>
+                </div>
+                <p class="variant-description">80s computing meets Y2K with neon glows and terminal aesthetics. Cyberpunk meets nostalgia.</p>
+                <ul class="variant-features">
+                    <li>Hot pink & electric cyan palette</li>
+                    <li>Monospace terminal fonts</li>
+                    <li>Glitch & neon glow effects</li>
+                    <li>Glassmorphism & scanlines</li>
+                </ul>
+                <span class="view-button">View Design System</span>
+            </a>
+
+            <!-- Variant 3 -->
+            <a href="variant-3.html" class="variant-card variant-3">
+                <div class="variant-number">Variant 03</div>
+                <h2 class="variant-name">Earthy Zen</h2>
+                <div class="color-preview">
+                    <div class="color-dot" style="background: #B85C38;"></div>
+                    <div class="color-dot" style="background: #2C5F2D;"></div>
+                    <div class="color-dot" style="background: #D4A574;"></div>
+                    <div class="color-dot" style="background: #B5C99A;"></div>
+                </div>
+                <p class="variant-description">Natural tones and organic forms inspired by growth and mindfulness. Zen-like calm with botanical energy.</p>
+                <ul class="variant-features">
+                    <li>Earth clay & forest green palette</li>
+                    <li>Elegant serif typography</li>
+                    <li>Organic growth animations</li>
+                    <li>Warm, grounding aesthetic</li>
+                </ul>
+                <span class="view-button">View Design System</span>
+            </a>
+
+            <!-- Variant 4 -->
+            <a href="variant-4.html" class="variant-card variant-4">
+                <div class="variant-number">Variant 04</div>
+                <h2 class="variant-name">Minimal Refinement</h2>
+                <div class="color-preview">
+                    <div class="color-dot" style="background: #FFFFFF; border-color: #e0e0e0;"></div>
+                    <div class="color-dot" style="background: #FAF8F5;"></div>
+                    <div class="color-dot" style="background: #C4BAAB;"></div>
+                    <div class="color-dot" style="background: #1A1714;"></div>
+                </div>
+                <p class="variant-description">Luxury through restraint. Black, white, cream, and beige create timeless sophistication. Hey Tea café vibes.</p>
+                <ul class="variant-features">
+                    <li>Monochromatic cream & black</li>
+                    <li>Refined serif + geometric sans</li>
+                    <li>Subtle, elegant animations</li>
+                    <li>Ultra-minimal, luxurious feel</li>
+                </ul>
+                <span class="view-button">View Design System</span>
+            </a>
+        </div>
+
+        <div class="footer">
+            <p>Each variant includes complete color palettes, typography, spacing, gestures, motion, and UX principles</p>
+        </div>
+    </div>
+</body>
+</html>

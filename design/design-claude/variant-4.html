@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker - Design System (Variant 4: Minimal Refinement)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Quicksand:wght@300;400;500;600;700&family=Assistant:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Minimal Palette - Hey Tea Inspired */
+            --pure-white: #FFFFFF;
+            --cream-50: #FDFCFA;
+            --cream-100: #FAF8F5;
+            --cream-200: #F5F2ED;
+            --cream-300: #EDE9E3;
+
+            --beige-100: #E8E3DA;
+            --beige-200: #DFD9CE;
+            --beige-300: #D4CCC0;
+            --beige-400: #C4BAAB;
+
+            --warm-gray: #A39889;
+            --medium-gray: #7A7265;
+            --charcoal: #4D4539;
+            --deep-black: #2B2621;
+            --pure-black: #1A1714;
+
+            /* Subtle Accents */
+            --accent-warm: #B8A593;
+            --accent-cool: #9DA5A8;
+            --accent-gold: #C9B896;
+            --accent-shadow: rgba(42, 38, 33, 0.08);
+
+            /* Gradients */
+            --gradient-subtle: linear-gradient(180deg, #FDFCFA 0%, #F5F2ED 100%);
+            --gradient-warm: linear-gradient(135deg, #FAF8F5 0%, #E8E3DA 100%);
+            --gradient-deep: linear-gradient(180deg, #4D4539 0%, #1A1714 100%);
+
+            /* Typography */
+            --font-display: 'Cormorant Garamond', serif;
+            --font-body: 'Quicksand', sans-serif;
+            --font-accent: 'Assistant', sans-serif;
+
+            /* Spacing - Precise and intentional */
+            --space-2xs: 2px;
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 40px;
+            --space-2xl: 64px;
+            --space-3xl: 96px;
+            --space-4xl: 128px;
+
+            /* Border Radius - Refined curves */
+            --radius-sm: 2px;
+            --radius-md: 4px;
+            --radius-lg: 8px;
+            --radius-xl: 16px;
+            --radius-2xl: 24px;
+            --radius-full: 9999px;
+
+            /* Shadows - Ultra subtle */
+            --shadow-xs: 0 1px 2px rgba(26, 23, 20, 0.03);
+            --shadow-sm: 0 2px 4px rgba(26, 23, 20, 0.04);
+            --shadow-md: 0 4px 8px rgba(26, 23, 20, 0.05);
+            --shadow-lg: 0 8px 16px rgba(26, 23, 20, 0.06);
+            --shadow-xl: 0 16px 32px rgba(26, 23, 20, 0.08);
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--cream-50);
+            color: var(--deep-black);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Subtle grain texture */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.015'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: multiply;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: var(--gradient-subtle);
+            padding: var(--space-4xl) var(--space-lg);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 1px solid var(--beige-100);
+        }
+
+        /* Subtle circle decorations */
+        .hero::before,
+        .hero::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(232, 227, 218, 0.4) 0%, transparent 70%);
+        }
+
+        .hero::before {
+            width: 600px;
+            height: 600px;
+            top: -300px;
+            right: -200px;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .hero::after {
+            width: 400px;
+            height: 400px;
+            bottom: -150px;
+            left: -100px;
+            animation: float 15s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(30px, -30px); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(4rem, 10vw, 8rem);
+            font-weight: 400;
+            color: var(--pure-black);
+            margin-bottom: var(--space-xl);
+            letter-spacing: -0.03em;
+            animation: fadeIn 1.5s ease-out;
+            line-height: 0.95;
+        }
+
+        .hero-subtitle {
+            font-family: var(--font-accent);
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            color: var(--charcoal);
+            margin-bottom: var(--space-2xl);
+            animation: fadeIn 1.5s ease-out 0.3s both;
+            font-weight: 300;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            background: var(--pure-white);
+            padding: var(--space-md) var(--space-xl);
+            border-radius: var(--radius-full);
+            color: var(--charcoal);
+            font-family: var(--font-accent);
+            font-size: 0.75rem;
+            animation: fadeIn 1.5s ease-out 0.6s both;
+            border: 1px solid var(--beige-200);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-weight: 500;
+            box-shadow: var(--shadow-sm);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-4xl) var(--space-lg);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: var(--space-4xl);
+        }
+
+        .section-header {
+            margin-bottom: var(--space-2xl);
+            text-align: center;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .section-number {
+            font-family: var(--font-accent);
+            font-size: 0.7rem;
+            color: var(--warm-gray);
+            font-weight: 300;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            margin-bottom: var(--space-sm);
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 400;
+            color: var(--pure-black);
+            letter-spacing: -0.02em;
+            margin-bottom: var(--space-md);
+            line-height: 1;
+        }
+
+        .section-description {
+            font-size: 1rem;
+            color: var(--medium-gray);
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 300;
+            line-height: 1.8;
+        }
+
+        /* Refined Card */
+        .refined-card {
+            background: var(--pure-white);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--beige-100);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .refined-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-4px);
+        }
+
+        /* Color Grid */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-xl);
+        }
+
+        .color-card {
+            background: var(--pure-white);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-xs);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--beige-100);
+        }
+
+        .color-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .color-swatch {
+            height: 220px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.5s ease;
+        }
+
+        .color-info {
+            padding: var(--space-xl);
+        }
+
+        .color-name {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 400;
+            margin-bottom: var(--space-sm);
+            color: var(--pure-black);
+        }
+
+        .color-usage {
+            font-size: 0.9rem;
+            color: var(--medium-gray);
+            margin-bottom: var(--space-lg);
+            line-height: 1.7;
+            font-weight: 300;
+        }
+
+        .color-code {
+            font-family: var(--font-accent);
+            font-size: 0.75rem;
+            color: var(--charcoal);
+            background: var(--cream-100);
+            padding: 6px 12px;
+            border-radius: var(--radius-full);
+            display: inline-block;
+            margin: 3px;
+            font-weight: 400;
+            letter-spacing: 0.05em;
+        }
+
+        /* Typography */
+        .type-specimen {
+            margin-bottom: var(--space-2xl);
+        }
+
+        .font-showcase {
+            background: var(--pure-white);
+            padding: var(--space-2xl) var(--space-xl);
+            border-radius: var(--radius-xl);
+            margin-bottom: var(--space-xl);
+            box-shadow: var(--shadow-xs);
+            border: 1px solid var(--beige-100);
+        }
+
+        .font-family-name {
+            font-family: var(--font-accent);
+            font-size: 0.7rem;
+            color: var(--warm-gray);
+            margin-bottom: var(--space-xl);
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+        }
+
+        /* Buttons */
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: var(--space-lg);
+        }
+
+        .btn {
+            font-family: var(--font-accent);
+            font-weight: 500;
+            padding: 20px 40px;
+            border-radius: var(--radius-full);
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: var(--pure-black);
+            color: var(--pure-white);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: var(--beige-300);
+            color: var(--deep-black);
+            box-shadow: var(--shadow-xs);
+        }
+
+        .btn-secondary:hover {
+            background: var(--beige-400);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--pure-black);
+            border: 1px solid var(--beige-300);
+        }
+
+        .btn-outline:hover {
+            background: var(--cream-100);
+            border-color: var(--charcoal);
+        }
+
+        /* Habit Card */
+        .habit-card {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+            background: var(--pure-white);
+            padding: var(--space-xl);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xs);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--beige-100);
+        }
+
+        .habit-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateX(8px);
+        }
+
+        .habit-checkbox {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 2px solid var(--charcoal);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
+            background: var(--pure-white);
+        }
+
+        .habit-checkbox:hover {
+            background: var(--cream-100);
+            transform: scale(1.1);
+            border-color: var(--pure-black);
+        }
+
+        .habit-checkbox.checked {
+            background: var(--pure-black);
+            border-color: var(--pure-black);
+        }
+
+        .habit-checkbox svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--pure-white);
+            stroke-width: 3;
+            fill: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .habit-checkbox.checked svg {
+            opacity: 1;
+        }
+
+        .habit-info {
+            flex: 1;
+        }
+
+        .habit-name {
+            font-family: var(--font-display);
+            font-weight: 400;
+            font-size: 1.5rem;
+            color: var(--pure-black);
+            margin-bottom: 6px;
+        }
+
+        .habit-streak {
+            font-size: 0.85rem;
+            color: var(--medium-gray);
+            font-family: var(--font-accent);
+            font-weight: 300;
+            letter-spacing: 0.05em;
+        }
+
+        /* Gestures */
+        .gestures-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-2xl);
+        }
+
+        .gesture-card {
+            background: var(--pure-white);
+            padding: var(--space-2xl);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xs);
+            transition: all 0.4s ease;
+            border: 1px solid var(--beige-100);
+            text-align: center;
+        }
+
+        .gesture-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-6px);
+        }
+
+        .gesture-icon {
+            font-size: 4rem;
+            margin-bottom: var(--space-lg);
+            display: block;
+            opacity: 0.8;
+        }
+
+        .gesture-name {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 400;
+            margin-bottom: var(--space-md);
+            color: var(--pure-black);
+        }
+
+        .gesture-action {
+            color: var(--medium-gray);
+            margin-bottom: var(--space-lg);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            font-weight: 300;
+        }
+
+        .gesture-feedback {
+            font-family: var(--font-accent);
+            font-size: 0.75rem;
+            color: var(--charcoal);
+            background: var(--cream-100);
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: var(--radius-full);
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 400;
+        }
+
+        /* Motion */
+        .motion-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-2xl);
+        }
+
+        .motion-card {
+            background: var(--pure-white);
+            padding: var(--space-2xl);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xs);
+            border: 1px solid var(--beige-100);
+            text-align: center;
+        }
+
+        .demo-box {
+            width: 80px;
+            height: 80px;
+            background: var(--pure-black);
+            border-radius: var(--radius-md);
+            margin: var(--space-xl) auto;
+        }
+
+        .demo-fade-elegant { animation: fadeElegant 3s ease-in-out infinite; }
+        .demo-slide-minimal { animation: slideMinimal 3s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+        .demo-scale-refined { animation: scaleRefined 3s ease-in-out infinite; }
+        .demo-rotate-subtle { animation: rotateSubtle 4s ease-in-out infinite; }
+
+        @keyframes fadeElegant {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+
+        @keyframes slideMinimal {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(40px); }
+        }
+
+        @keyframes scaleRefined {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(0.85); }
+        }
+
+        @keyframes rotateSubtle {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+        }
+
+        /* UX Principles */
+        .principle-grid {
+            display: grid;
+            gap: var(--space-2xl);
+        }
+
+        .principle-card {
+            background: var(--pure-white);
+            padding: var(--space-2xl);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xs);
+            border: 1px solid var(--beige-100);
+            transition: all 0.4s ease;
+        }
+
+        .principle-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-4px);
+        }
+
+        .principle-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+            margin-bottom: var(--space-lg);
+        }
+
+        .principle-emoji {
+            font-size: 3rem;
+            opacity: 0.7;
+        }
+
+        .principle-title {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 400;
+            color: var(--pure-black);
+        }
+
+        .principle-description {
+            color: var(--medium-gray);
+            line-height: 1.9;
+            font-size: 1rem;
+            font-weight: 300;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--gradient-deep);
+            color: var(--cream-100);
+            padding: var(--space-4xl) var(--space-lg);
+            text-align: center;
+            margin-top: var(--space-4xl);
+            border-top: 1px solid var(--beige-400);
+        }
+
+        .footer-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .footer h3 {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            margin-bottom: var(--space-lg);
+            font-weight: 300;
+        }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--beige-200), transparent);
+            margin: var(--space-3xl) 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--space-2xl) var(--space-md);
+            }
+
+            .color-grid,
+            .button-grid,
+            .gestures-grid,
+            .motion-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Habit<br>Tracker</h1>
+            <p class="hero-subtitle">Minimal Refinement</p>
+            <span class="hero-tag">Variant Four</span>
+        </div>
+    </section>
+
+    <div class="container">
+        <!-- Colors Section -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-number">01</div>
+                <h2 class="section-title">Color Palette</h2>
+                <p class="section-description">A restrained palette of blacks, whites, creams, and beiges — where less speaks volumes</p>
+            </div>
+
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #FFFFFF; border-bottom: 1px solid #EDE9E3;">
+                        <span style="color: #1A1714; font-size: 3rem; font-family: var(--font-display);">○</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Pure White</div>
+                        <div class="color-usage">Primary surfaces, cards, clean canvas for content</div>
+                        <code class="color-code">#FFFFFF</code>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: linear-gradient(180deg, #FDFCFA 0%, #F5F2ED 100%);">
+                        <span style="color: #4D4539; font-size: 3rem; font-family: var(--font-display);">◇</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Warm Cream</div>
+                        <div class="color-usage">Backgrounds, gentle contrast, breathing space</div>
+                        <code class="color-code">#FDFCFA</code>
+                        <code class="color-code">#F5F2ED</code>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: linear-gradient(135deg, #E8E3DA 0%, #D4CCC0 100%);">
+                        <span style="color: #2B2621; font-size: 3rem; font-family: var(--font-display);">◆</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Soft Beige</div>
+                        <div class="color-usage">Secondary elements, subtle emphasis, warm neutrals</div>
+                        <code class="color-code">#E8E3DA</code>
+                        <code class="color-code">#D4CCC0</code>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #A39889;">
+                        <span style="color: #FFFFFF; font-size: 3rem; font-family: var(--font-display);">●</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Warm Gray</div>
+                        <div class="color-usage">Supporting text, secondary information, subtle details</div>
+                        <code class="color-code">#A39889</code>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #4D4539;">
+                        <span style="color: #FDFCFA; font-size: 3rem; font-family: var(--font-display);">■</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Charcoal</div>
+                        <div class="color-usage">Body text, readable content, grounded presence</div>
+                        <code class="color-code">#4D4539</code>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: linear-gradient(180deg, #2B2621 0%, #1A1714 100%);">
+                        <span style="color: #FAF8F5; font-size: 3rem; font-family: var(--font-display);">◼</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Deep Black</div>
+                        <div class="color-usage">Primary actions, bold headlines, maximum contrast</div>
+                        <code class="color-code">#2B2621</code>
+                        <code class="color-code">#1A1714</code>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #C9B896;">
+                        <span style="color: #2B2621; font-size: 3rem; font-family: var(--font-display);">✦</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Accent Gold</div>
+                        <div class="color-usage">Premium touches, achievements, refined highlights</div>
+                        <code class="color-code">#C9B896</code>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #9DA5A8;">
+                        <span style="color: #FFFFFF; font-size: 3rem; font-family: var(--font-display);">◎</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Cool Gray</div>
+                        <div class="color-usage">Data visualization, calm analytics, balanced tone</div>
+                        <code class="color-code">#9DA5A8</code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- Typography -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-number">02</div>
+                <h2 class="section-title">Typography</h2>
+                <p class="section-description">Refined letterforms that whisper rather than shout, creating hierarchy through subtlety</p>
+            </div>
+
+            <div class="type-specimen">
+                <div class="font-showcase">
+                    <div class="font-family-name">Display — Cormorant Garamond</div>
+                    <div style="font-family: var(--font-display); font-size: clamp(3.5rem, 7vw, 6rem); color: var(--pure-black); margin: var(--space-xl) 0; line-height: 1; font-weight: 300;">
+                        Build Better<br>Habits
+                    </div>
+                    <p style="color: var(--medium-gray); font-size: 0.95rem; line-height: 1.7; font-weight: 300;">Elegant high-contrast serif for display headlines. Refined and sophisticated, commanding attention through grace rather than volume.</p>
+                </div>
+
+                <div class="font-showcase">
+                    <div class="font-family-name">Body — Quicksand</div>
+                    <div style="font-family: var(--font-body); font-size: 1.4rem; color: var(--charcoal); margin: var(--space-lg) 0; font-weight: 400;">
+                        Your 24-day streak continues
+                    </div>
+                    <div style="font-family: var(--font-body); font-size: 1rem; color: var(--medium-gray); margin: var(--space-lg) 0; line-height: 1.9; font-weight: 300;">
+                        Track your habits with intention. Every check-in is a quiet commitment to growth. Progress unfolds naturally when consistency becomes effortless.
+                    </div>
+                    <p style="color: var(--medium-gray); font-size: 0.95rem; line-height: 1.7; font-weight: 300;">Geometric sans-serif with rounded terminals. Friendly yet refined, perfect for extended reading without fatigue.</p>
+                </div>
+
+                <div class="font-showcase">
+                    <div class="font-family-name">Accent — Assistant</div>
+                    <div style="font-family: var(--font-accent); font-size: 0.8rem; color: var(--warm-gray); margin: var(--space-md) 0; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 400;">
+                        PREMIUM FEATURE • ANALYTICS • INSIGHTS
+                    </div>
+                    <p style="color: var(--medium-gray); font-size: 0.95rem; line-height: 1.7; font-weight: 300;">Clean sans-serif for UI labels, buttons, and metadata. Unobtrusive and highly legible at small sizes.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- Components -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-number">03</div>
+                <h2 class="section-title">Components</h2>
+                <p class="section-description">Essential elements designed with restraint, where every detail serves a purpose</p>
+            </div>
+
+            <div class="refined-card">
+                <h3 style="font-family: var(--font-display); font-size: 2rem; color: var(--pure-black); margin-bottom: var(--space-xl); font-weight: 400;">Buttons</h3>
+                <div class="button-grid">
+                    <button class="btn btn-primary">Begin</button>
+                    <button class="btn btn-secondary">Continue</button>
+                    <button class="btn btn-outline">Explore</button>
+                </div>
+            </div>
+
+            <div class="refined-card" style="margin-top: var(--space-2xl);">
+                <h3 style="font-family: var(--font-display); font-size: 2rem; color: var(--pure-black); margin-bottom: var(--space-xl); font-weight: 400;">Habit Card</h3>
+                <div class="habit-card">
+                    <div class="habit-checkbox" onclick="this.classList.toggle('checked')">
+                        <svg viewBox="0 0 24 24">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                    <div class="habit-info">
+                        <div class="habit-name">Morning Meditation</div>
+                        <div class="habit-streak">24 days of consistency</div>
+                    </div>
+                    <div style="color: var(--beige-400); font-size: 1.2rem;">→</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- Gestures -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-number">04</div>
+                <h2 class="section-title">Gestures</h2>
+                <p class="section-description">Refined interactions that feel natural and effortless, never demanding attention</p>
+            </div>
+
+            <div class="gestures-grid">
+                <div class="gesture-card">
+                    <span class="gesture-icon">○</span>
+                    <h3 class="gesture-name">Tap</h3>
+                    <p class="gesture-action">A gentle press to mark progress with subtle confirmation</p>
+                    <span class="gesture-feedback">Minimal Haptic</span>
+                </div>
+
+                <div class="gesture-card">
+                    <span class="gesture-icon">→</span>
+                    <h3 class="gesture-name">Swipe Right</h3>
+                    <p class="gesture-action">Smooth gesture to complete with elegant transition</p>
+                    <span class="gesture-feedback">Fluid Motion</span>
+                </div>
+
+                <div class="gesture-card">
+                    <span class="gesture-icon">←</span>
+                    <h3 class="gesture-name">Swipe Left</h3>
+                    <p class="gesture-action">Reveal actions quietly, without disruption</p>
+                    <span class="gesture-feedback">Soft Slide</span>
+                </div>
+
+                <div class="gesture-card">
+                    <span class="gesture-icon">⊙</span>
+                    <h3 class="gesture-name">Long Press</h3>
+                    <p class="gesture-action">Hold to activate reorder with refined feedback</p>
+                    <span class="gesture-feedback">Gentle Pulse</span>
+                </div>
+
+                <div class="gesture-card">
+                    <span class="gesture-icon">↓</span>
+                    <h3 class="gesture-name">Pull Down</h3>
+                    <p class="gesture-action">Refresh content with minimal visual noise</p>
+                    <span class="gesture-feedback">Quiet Sync</span>
+                </div>
+
+                <div class="gesture-card">
+                    <span class="gesture-icon">◇</span>
+                    <h3 class="gesture-name">Pinch</h3>
+                    <p class="gesture-action">Scale calendar smoothly between views</p>
+                    <span class="gesture-feedback">Smooth Scale</span>
+                </div>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- Motion -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-number">05</div>
+                <h2 class="section-title">Motion</h2>
+                <p class="section-description">Subtle animations that enhance without distraction, felt more than seen</p>
+            </div>
+
+            <div class="motion-grid">
+                <div class="motion-card">
+                    <h3 style="font-family: var(--font-display); color: var(--pure-black); margin-bottom: var(--space-md); font-size: 1.6rem; font-weight: 400;">Elegant Fade</h3>
+                    <p style="color: var(--medium-gray); margin-bottom: var(--space-lg); font-weight: 300; line-height: 1.7;">Gentle opacity transitions for refinement</p>
+                    <div class="demo-box demo-fade-elegant"></div>
+                    <div style="font-family: var(--font-accent); font-size: 0.75rem; color: var(--warm-gray); text-align: center; margin-top: var(--space-md); letter-spacing: 0.1em;">EASE IN OUT</div>
+                </div>
+
+                <div class="motion-card">
+                    <h3 style="font-family: var(--font-display); color: var(--pure-black); margin-bottom: var(--space-md); font-size: 1.6rem; font-weight: 400;">Minimal Slide</h3>
+                    <p style="color: var(--medium-gray); margin-bottom: var(--space-lg); font-weight: 300; line-height: 1.7;">Precise movement without excess</p>
+                    <div class="demo-box demo-slide-minimal"></div>
+                    <div style="font-family: var(--font-accent); font-size: 0.75rem; color: var(--warm-gray); text-align: center; margin-top: var(--space-md); letter-spacing: 0.1em;">CUBIC BEZIER</div>
+                </div>
+
+                <div class="motion-card">
+                    <h3 style="font-family: var(--font-display); color: var(--pure-black); margin-bottom: var(--space-md); font-size: 1.6rem; font-weight: 400;">Refined Scale</h3>
+                    <p style="color: var(--medium-gray); margin-bottom: var(--space-lg); font-weight: 300; line-height: 1.7;">Subtle size changes for emphasis</p>
+                    <div class="demo-box demo-scale-refined"></div>
+                    <div style="font-family: var(--font-accent); font-size: 0.75rem; color: var(--warm-gray); text-align: center; margin-top: var(--space-md); letter-spacing: 0.1em;">SMOOTH TRANSFORM</div>
+                </div>
+
+                <div class="motion-card">
+                    <h3 style="font-family: var(--font-display); color: var(--pure-black); margin-bottom: var(--space-md); font-size: 1.6rem; font-weight: 400;">Subtle Rotate</h3>
+                    <p style="color: var(--medium-gray); margin-bottom: var(--space-lg); font-weight: 300; line-height: 1.7;">Quiet rotation for state changes</p>
+                    <div class="demo-box demo-rotate-subtle"></div>
+                    <div style="font-family: var(--font-accent); font-size: 0.75rem; color: var(--warm-gray); text-align: center; margin-top: var(--space-md); letter-spacing: 0.1em;">CONTINUOUS FLOW</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- UX Principles -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-number">06</div>
+                <h2 class="section-title">Design Philosophy</h2>
+                <p class="section-description">Core principles that guide every decision, creating coherence through restraint</p>
+            </div>
+
+            <div class="principle-grid">
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <span class="principle-emoji">○</span>
+                        <h3 class="principle-title">Essential Clarity</h3>
+                    </div>
+                    <p class="principle-description">
+                        Every element justifies its presence. Hierarchy emerges from careful spacing and typography, not decoration. The interface guides without directing, allowing users to find their own path through intuitive structure.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <span class="principle-emoji">◇</span>
+                        <h3 class="principle-title">Refined Restraint</h3>
+                    </div>
+                    <p class="principle-description">
+                        Luxury lives in what's removed, not added. Generous whitespace creates breathing room. Muted tones let content speak. Subtle shadows provide depth without drama. Elegance through simplification.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <span class="principle-emoji">—</span>
+                        <h3 class="principle-title">Invisible Interaction</h3>
+                    </div>
+                    <p class="principle-description">
+                        The best interfaces fade into the background. Interactions feel inevitable, requiring no instruction. Feedback is present but never intrusive. Users achieve their goals without conscious awareness of the system.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <span class="principle-emoji">◆</span>
+                        <h3 class="principle-title">Timeless Quality</h3>
+                    </div>
+                    <p class="principle-description">
+                        Design that transcends trends. Classic typography, restrained color, and geometric simplicity create longevity. Like fine architecture, the interface ages gracefully, feeling fresh years after creation.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <span class="principle-emoji">⊙</span>
+                        <h3 class="principle-title">Purposeful Motion</h3>
+                    </div>
+                    <p class="principle-description">
+                        Animation serves understanding, not decoration. Every transition has intention. Movement is precise and measured, never frivolous. Timing feels natural — quick enough to feel responsive, slow enough to follow.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <span class="principle-emoji">✦</span>
+                        <h3 class="principle-title">Quiet Confidence</h3>
+                    </div>
+                    <p class="principle-description">
+                        Excellence doesn't announce itself. Quality reveals through careful details — perfect alignment, balanced proportions, harmonious spacing. The design whispers competence rather than shouting capability.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <h3>Habit Tracker</h3>
+            <p style="margin-top: var(--space-lg); font-size: 0.95rem; line-height: 1.8; color: var(--beige-300); font-weight: 300;">
+                Refined simplicity for intentional living
+            </p>
+            <p style="margin-top: var(--space-xl); font-family: var(--font-accent); font-size: 0.7rem; color: var(--beige-400); letter-spacing: 0.2em; text-transform: uppercase;">
+                Variant Four — Minimal Refinement — 2024
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scroll reveal with refined timing
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.05 });
+
+        document.querySelectorAll('.section').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(30px)';
+            section.style.transition = 'opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s cubic-bezier(0.4, 0, 0.2, 1)';
+            observer.observe(section);
+        });
+
+        // Interactive checkbox with refined animation
+        document.querySelectorAll('.habit-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('click', function() {
+                this.classList.toggle('checked');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker - Design System (Variant 3: Earthy Zen)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Source+Serif+4:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Earthy Natural Palette */
+            --earth-clay: #A0522D;
+            --earth-terracotta: #C8553D;
+            --earth-rust: #B85C38;
+            --earth-amber: #D4A574;
+            --earth-sand: #E8D5B7;
+
+            /* Botanical Greens */
+            --forest-deep: #2C5F2D;
+            --forest-moss: #4A7C59;
+            --forest-sage: #7D8F69;
+            --forest-mint: #B5C99A;
+            --forest-celery: #D4E09B;
+
+            /* Natural Browns */
+            --wood-dark: #3E2723;
+            --wood-walnut: #5D4037;
+            --wood-cedar: #795548;
+            --wood-oak: #8D6E63;
+            --wood-birch: #A1887F;
+
+            /* Soft Neutrals */
+            --cream-light: #FAF8F3;
+            --cream-warm: #F5F1E8;
+            --cream-beige: #E8DCC7;
+            --stone-light: #D9D3C7;
+            --stone-gray: #B4AFA4;
+            --charcoal: #4A4A42;
+
+            /* Accent Colors */
+            --sunset-coral: #E07A5F;
+            --sunrise-peach: #F2A490;
+            --earth-gold: #C9A961;
+            --sky-blue: #88B2CC;
+
+            /* Gradients */
+            --gradient-earth: linear-gradient(135deg, #B85C38 0%, #D4A574 100%);
+            --gradient-forest: linear-gradient(135deg, #2C5F2D 0%, #B5C99A 100%);
+            --gradient-sunset: linear-gradient(180deg, #E07A5F 0%, #F2A490 100%);
+            --gradient-natural: linear-gradient(135deg, #FAF8F3 0%, #E8DCC7 100%);
+
+            /* Typography */
+            --font-display: 'Playfair Display', serif;
+            --font-body: 'Source Serif 4', serif;
+            --font-accent: 'Lora', serif;
+
+            /* Spacing - Organic scale */
+            --space-xs: 6px;
+            --space-sm: 12px;
+            --space-md: 20px;
+            --space-lg: 32px;
+            --space-xl: 48px;
+            --space-2xl: 64px;
+            --space-3xl: 96px;
+
+            /* Border Radius - Organic curves */
+            --radius-sm: 12px;
+            --radius-md: 20px;
+            --radius-lg: 32px;
+            --radius-xl: 48px;
+            --radius-organic: 40% 60% 70% 30% / 40% 50% 60% 50%;
+
+            /* Shadows - Soft and natural */
+            --shadow-soft: 0 4px 12px rgba(62, 39, 35, 0.08);
+            --shadow-medium: 0 8px 24px rgba(62, 39, 35, 0.12);
+            --shadow-deep: 0 16px 48px rgba(62, 39, 35, 0.16);
+            --shadow-organic: 0 10px 30px rgba(44, 95, 45, 0.15);
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--cream-light);
+            color: var(--wood-dark);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* Organic texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(circle at 20% 80%, rgba(181, 201, 154, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(184, 92, 56, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Floating leaf decorations */
+        .leaf-decoration {
+            position: fixed;
+            font-size: 2rem;
+            opacity: 0.15;
+            animation: floatLeaf 15s ease-in-out infinite;
+            z-index: 1;
+            filter: blur(1px);
+        }
+
+        @keyframes floatLeaf {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.1;
+            }
+            50% {
+                transform: translateY(-40px) rotate(180deg);
+                opacity: 0.2;
+            }
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #B85C38 0%, #D4A574 40%, #B5C99A 100%);
+            padding: var(--space-3xl) var(--space-lg);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 75vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Organic shapes background */
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -10%;
+            left: -5%;
+            width: 60%;
+            height: 60%;
+            background: radial-gradient(circle, rgba(250, 248, 243, 0.3) 0%, transparent 70%);
+            border-radius: var(--radius-organic);
+            animation: breathe 8s ease-in-out infinite;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -10%;
+            right: -5%;
+            width: 50%;
+            height: 50%;
+            background: radial-gradient(circle, rgba(44, 95, 45, 0.2) 0%, transparent 70%);
+            border-radius: var(--radius-organic);
+            animation: breathe 10s ease-in-out infinite reverse;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(5deg); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 600;
+            color: var(--cream-light);
+            margin-bottom: var(--space-lg);
+            letter-spacing: -0.02em;
+            animation: fadeInUp 1.2s ease-out;
+            line-height: 1.1;
+            text-shadow: 0 4px 20px rgba(62, 39, 35, 0.3);
+        }
+
+        .hero-subtitle {
+            font-family: var(--font-accent);
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            color: var(--cream-warm);
+            margin-bottom: var(--space-xl);
+            animation: fadeInUp 1.2s ease-out 0.3s both;
+            font-weight: 400;
+            font-style: italic;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            background: rgba(250, 248, 243, 0.25);
+            backdrop-filter: blur(10px);
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: var(--radius-xl);
+            color: var(--cream-light);
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            animation: fadeInUp 1.2s ease-out 0.6s both;
+            border: 1px solid rgba(250, 248, 243, 0.4);
+            letter-spacing: 0.05em;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Container */
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: var(--space-3xl) var(--space-lg);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: var(--space-3xl);
+        }
+
+        .section-header {
+            margin-bottom: var(--space-xl);
+            display: flex;
+            align-items: baseline;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+        }
+
+        .section-number {
+            font-family: var(--font-accent);
+            font-size: 1rem;
+            color: var(--forest-moss);
+            font-weight: 600;
+            font-style: italic;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 600;
+            color: var(--earth-clay);
+            letter-spacing: -0.01em;
+        }
+
+        .section-description {
+            font-size: 1.1rem;
+            color: var(--charcoal);
+            max-width: 650px;
+            margin-top: var(--space-sm);
+            line-height: 1.8;
+        }
+
+        /* Organic card container */
+        .organic-card {
+            background: linear-gradient(135deg, #FAF8F3 0%, #F5F1E8 100%);
+            border-radius: var(--radius-lg);
+            padding: var(--space-2xl);
+            box-shadow: var(--shadow-soft);
+            border: 1px solid rgba(160, 82, 45, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .organic-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(181, 201, 154, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        /* Color Grid */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: var(--space-xl);
+        }
+
+        .color-card {
+            background: var(--cream-warm);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+        }
+
+        .color-card:hover {
+            transform: translateY(-12px);
+            box-shadow: var(--shadow-deep);
+            border-color: var(--forest-moss);
+        }
+
+        .color-swatch {
+            height: 200px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: height 0.4s ease;
+        }
+
+        .color-card:hover .color-swatch {
+            height: 220px;
+        }
+
+        .color-info {
+            padding: var(--space-lg);
+            position: relative;
+        }
+
+        .color-name {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: var(--space-sm);
+            color: var(--wood-dark);
+        }
+
+        .color-usage {
+            font-size: 0.95rem;
+            color: var(--charcoal);
+            margin-bottom: var(--space-md);
+            line-height: 1.6;
+        }
+
+        .color-code {
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            color: var(--forest-deep);
+            background: rgba(181, 201, 154, 0.15);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            display: inline-block;
+            margin: 3px;
+            font-weight: 500;
+        }
+
+        /* Typography */
+        .type-specimen {
+            margin-bottom: var(--space-2xl);
+        }
+
+        .font-showcase {
+            background: var(--cream-warm);
+            padding: var(--space-2xl);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-xl);
+            box-shadow: var(--shadow-soft);
+            border-left: 6px solid var(--forest-moss);
+        }
+
+        .font-family-name {
+            font-family: var(--font-accent);
+            font-size: 0.9rem;
+            color: var(--forest-deep);
+            margin-bottom: var(--space-lg);
+            font-weight: 600;
+            font-style: italic;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Buttons */
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: var(--space-lg);
+        }
+
+        .btn {
+            font-family: var(--font-body);
+            font-weight: 500;
+            padding: 18px 36px;
+            border-radius: var(--radius-xl);
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.02em;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::after {
+            width: 400px;
+            height: 400px;
+        }
+
+        .btn-earth {
+            background: var(--gradient-earth);
+            color: var(--cream-light);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .btn-earth:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-organic);
+        }
+
+        .btn-forest {
+            background: var(--gradient-forest);
+            color: var(--cream-light);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .btn-forest:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-organic);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--earth-clay);
+            border: 2px solid var(--earth-clay);
+        }
+
+        .btn-outline:hover {
+            background: var(--earth-clay);
+            color: var(--cream-light);
+        }
+
+        /* Habit Card */
+        .habit-card {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+            background: var(--cream-warm);
+            padding: var(--space-xl);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 5px solid var(--forest-moss);
+        }
+
+        .habit-card:hover {
+            box-shadow: var(--shadow-deep);
+            transform: translateX(12px);
+        }
+
+        .habit-checkbox {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: 4px solid var(--forest-moss);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
+            background: var(--cream-light);
+        }
+
+        .habit-checkbox:hover {
+            background: var(--gradient-forest);
+            transform: scale(1.15) rotate(15deg);
+            box-shadow: var(--shadow-organic);
+        }
+
+        .habit-checkbox.checked {
+            background: var(--gradient-forest);
+            border-color: var(--forest-deep);
+            box-shadow: var(--shadow-organic);
+        }
+
+        .habit-checkbox svg {
+            width: 32px;
+            height: 32px;
+            stroke: var(--cream-light);
+            stroke-width: 3;
+            fill: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .habit-checkbox.checked svg {
+            opacity: 1;
+        }
+
+        .habit-info {
+            flex: 1;
+        }
+
+        .habit-name {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 1.3rem;
+            color: var(--wood-dark);
+            margin-bottom: 8px;
+        }
+
+        .habit-streak {
+            font-size: 0.95rem;
+            color: var(--forest-moss);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--font-accent);
+            font-style: italic;
+        }
+
+        /* Gestures */
+        .gestures-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--space-xl);
+        }
+
+        .gesture-card {
+            background: var(--cream-warm);
+            padding: var(--space-xl);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft);
+            transition: all 0.4s ease;
+            border: 2px solid transparent;
+        }
+
+        .gesture-card:hover {
+            border-color: var(--earth-terracotta);
+            box-shadow: var(--shadow-deep);
+            transform: translateY(-8px);
+        }
+
+        .gesture-icon {
+            font-size: 4rem;
+            margin-bottom: var(--space-md);
+            display: block;
+        }
+
+        .gesture-name {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: var(--space-sm);
+            color: var(--earth-clay);
+        }
+
+        .gesture-action {
+            color: var(--charcoal);
+            margin-bottom: var(--space-md);
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        .gesture-feedback {
+            font-family: var(--font-accent);
+            font-size: 0.9rem;
+            color: var(--forest-deep);
+            background: rgba(181, 201, 154, 0.2);
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-xl);
+            display: inline-block;
+            font-style: italic;
+        }
+
+        /* Motion */
+        .motion-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-xl);
+        }
+
+        .motion-card {
+            background: var(--cream-warm);
+            padding: var(--space-xl);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .demo-box {
+            width: 100px;
+            height: 100px;
+            background: var(--gradient-forest);
+            border-radius: var(--radius-md);
+            margin: var(--space-lg) auto;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .demo-grow { animation: organicGrow 3s ease-in-out infinite; }
+        .demo-sway { animation: sway 4s ease-in-out infinite; }
+        .demo-bloom { animation: bloom 3s ease-in-out infinite; }
+        .demo-wave { animation: wave 3s ease-in-out infinite; }
+
+        @keyframes organicGrow {
+            0%, 100% { transform: scale(1); border-radius: var(--radius-md); }
+            50% { transform: scale(1.2); border-radius: var(--radius-xl); }
+        }
+
+        @keyframes sway {
+            0%, 100% { transform: rotate(0deg) translateX(0); }
+            25% { transform: rotate(-8deg) translateX(-10px); }
+            75% { transform: rotate(8deg) translateX(10px); }
+        }
+
+        @keyframes bloom {
+            0%, 100% {
+                transform: scale(1);
+                border-radius: 50%;
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.3);
+                border-radius: var(--radius-organic);
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes wave {
+            0%, 100% { border-radius: 20% 80% 30% 70% / 80% 30% 70% 20%; }
+            25% { border-radius: 70% 30% 80% 20% / 30% 80% 20% 70%; }
+            50% { border-radius: 30% 70% 20% 80% / 70% 20% 80% 30%; }
+            75% { border-radius: 80% 20% 70% 30% / 20% 70% 30% 80%; }
+        }
+
+        /* UX Principles */
+        .principle-grid {
+            display: grid;
+            gap: var(--space-xl);
+        }
+
+        .principle-card {
+            background: var(--cream-warm);
+            padding: var(--space-2xl);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft);
+            border-left: 6px solid var(--earth-terracotta);
+            transition: all 0.4s ease;
+        }
+
+        .principle-card:hover {
+            transform: translateX(16px);
+            box-shadow: var(--shadow-deep);
+        }
+
+        .principle-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+            margin-bottom: var(--space-md);
+        }
+
+        .principle-emoji {
+            font-size: 3rem;
+        }
+
+        .principle-title {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--earth-clay);
+        }
+
+        .principle-description {
+            color: var(--charcoal);
+            line-height: 1.9;
+            font-size: 1.05rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #2C5F2D 0%, #4A7C59 100%);
+            color: var(--cream-light);
+            padding: var(--space-3xl) var(--space-lg);
+            text-align: center;
+            margin-top: var(--space-3xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            left: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(181, 201, 154, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer h3 {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            margin-bottom: var(--space-md);
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--space-xl) var(--space-md);
+            }
+
+            .color-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating leaf decorations -->
+    <div class="leaf-decoration" style="top: 10%; left: 8%;">🍃</div>
+    <div class="leaf-decoration" style="top: 30%; right: 12%; animation-delay: 2s;">🌿</div>
+    <div class="leaf-decoration" style="top: 60%; left: 18%; animation-delay: 4s;">🍂</div>
+    <div class="leaf-decoration" style="top: 80%; right: 25%; animation-delay: 6s;">🌱</div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Habit Tracker</h1>
+            <p class="hero-subtitle">Grow Naturally, Live Intentionally</p>
+            <span class="hero-tag">Variant 3 — Earthy Zen Edition</span>
+        </div>
+    </section>
+
+    <div class="container">
+        <!-- Colors Section -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">Chapter One</span>
+                <div>
+                    <h2 class="section-title">Natural Palette</h2>
+                    <p class="section-description">Earth tones and botanical hues that ground us in nature while energizing growth</p>
+                </div>
+            </div>
+
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch" style="background: linear-gradient(135deg, #B85C38 0%, #D4A574 100%);">
+                        <span style="color: white; font-size: 3rem;">🌾</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Earth Clay</div>
+                        <div class="color-usage">Primary actions, grounding elements, stability and strength</div>
+                        <code class="color-code">Clay #B85C38</code>
+                        <code class="color-code">Amber #D4A574</code>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: linear-gradient(135deg, #2C5F2D 0%, #B5C99A 100%);">
+                        <span style="color: white; font-size: 3rem;">🌿</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Forest Moss</div>
+                        <div class="color-usage">Growth, success, vitality - the heart of habit building</div>
+                        <code class="color-code">Deep #2C5F2D</code>
+                        <code class="color-code">Mint #B5C99A</code>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #E07A5F;">
+                        <span style="color: white; font-size: 3rem;">🌅</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Sunset Coral</div>
+                        <div class="color-usage">Celebrations, achievements, warm encouragement</div>
+                        <code class="color-code">#E07A5F</code>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #C9A961;">
+                        <span style="color: white; font-size: 3rem;">✨</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Earth Gold</div>
+                        <div class="color-usage">Premium features, milestones, special moments</div>
+                        <code class="color-code">#C9A961</code>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #88B2CC;">
+                        <span style="color: white; font-size: 3rem;">💧</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Sky Blue</div>
+                        <div class="color-usage">Calm insights, analytics, peaceful data views</div>
+                        <code class="color-code">#88B2CC</code>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #7D8F69;">
+                        <span style="color: white; font-size: 3rem;">🌱</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Sage Green</div>
+                        <div class="color-usage">Balance, mindfulness, neutral states</div>
+                        <code class="color-code">#7D8F69</code>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: linear-gradient(135deg, #795548 0%, #A1887F 100%);">
+                        <span style="color: white; font-size: 3rem;">🪵</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Natural Wood</div>
+                        <div class="color-usage">Structure, foundation, supporting elements</div>
+                        <code class="color-code">Cedar #795548</code>
+                        <code class="color-code">Birch #A1887F</code>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: linear-gradient(135deg, #FAF8F3 0%, #E8DCC7 100%);">
+                        <span style="color: #795548; font-size: 3rem;">☁️</span>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">Warm Cream</div>
+                        <div class="color-usage">Backgrounds, breathing space, gentle surfaces</div>
+                        <code class="color-code">Light #FAF8F3</code>
+                        <code class="color-code">Beige #E8DCC7</code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Typography -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">Chapter Two</span>
+                <div>
+                    <h2 class="section-title">Typography</h2>
+                    <p class="section-description">Elegant serifs that honor tradition while embracing organic flow</p>
+                </div>
+            </div>
+
+            <div class="type-specimen">
+                <div class="font-showcase">
+                    <div class="font-family-name">Display: Playfair Display</div>
+                    <div style="font-family: var(--font-display); font-size: clamp(3rem, 6vw, 5rem); color: var(--earth-clay); margin: var(--space-lg) 0; line-height: 1.1;">
+                        Build Better Habits
+                    </div>
+                    <p style="color: var(--charcoal); font-size: 1rem; line-height: 1.7;">Elegant serif for headlines and moments of emphasis. The high contrast and refined letterforms create a sense of timeless wisdom.</p>
+                </div>
+
+                <div class="font-showcase">
+                    <div class="font-family-name">Body: Source Serif 4</div>
+                    <div style="font-family: var(--font-body); font-size: 1.5rem; color: var(--forest-deep); margin: var(--space-md) 0; font-weight: 500;">
+                        Your 24-day streak is growing strong 🌱
+                    </div>
+                    <div style="font-family: var(--font-body); font-size: 1.1rem; color: var(--wood-dark); margin: var(--space-md) 0; line-height: 1.8;">
+                        Track your daily habits with intention and care. Each check-in is a seed planted, each streak a garden grown. Transform your life naturally, one mindful action at a time.
+                    </div>
+                    <p style="color: var(--charcoal); font-size: 1rem; line-height: 1.7;">Highly legible serif for body text. Warm and approachable, perfect for extended reading.</p>
+                </div>
+
+                <div class="font-showcase">
+                    <div class="font-family-name">Accent: Lora (Italic)</div>
+                    <div style="font-family: var(--font-accent); font-size: 1.3rem; color: var(--forest-moss); margin: var(--space-md) 0; font-style: italic; line-height: 1.6;">
+                        "Small steps, taken daily, create the path to transformation."
+                    </div>
+                    <p style="color: var(--charcoal); font-size: 1rem; line-height: 1.7;">Italic serif for quotes, captions, and gentle emphasis. Adds personality and warmth.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Components -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">Chapter Three</span>
+                <div>
+                    <h2 class="section-title">Core Elements</h2>
+                    <p class="section-description">Organic shapes and soft interactions that feel natural to the touch</p>
+                </div>
+            </div>
+
+            <div class="organic-card">
+                <h3 style="font-family: var(--font-display); font-size: 1.8rem; color: var(--earth-clay); margin-bottom: var(--space-lg);">Buttons</h3>
+                <div class="button-grid">
+                    <button class="btn btn-earth">Begin Your Journey</button>
+                    <button class="btn btn-forest">Complete Habit</button>
+                    <button class="btn btn-outline">Explore More</button>
+                </div>
+            </div>
+
+            <div class="organic-card" style="margin-top: var(--space-xl);">
+                <h3 style="font-family: var(--font-display); font-size: 1.8rem; color: var(--earth-clay); margin-bottom: var(--space-lg);">Habit Card</h3>
+                <div class="habit-card">
+                    <div class="habit-checkbox" onclick="this.classList.toggle('checked')">
+                        <svg viewBox="0 0 24 24">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                    <div class="habit-info">
+                        <div class="habit-name">Morning Meditation</div>
+                        <div class="habit-streak">🌱 Growing for 24 days</div>
+                    </div>
+                    <div style="color: var(--forest-moss); font-size: 1.8rem;">→</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gestures -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">Chapter Four</span>
+                <div>
+                    <h2 class="section-title">Touch Gestures</h2>
+                    <p class="section-description">Intuitive interactions that flow like water, respond like earth</p>
+                </div>
+            </div>
+
+            <div class="gestures-grid">
+                <div class="gesture-card">
+                    <span class="gesture-icon">☝️</span>
+                    <h3 class="gesture-name">Gentle Tap</h3>
+                    <p class="gesture-action">A mindful touch to mark your progress, like planting a seed in fertile soil</p>
+                    <span class="gesture-feedback">Soft haptic bloom</span>
+                </div>
+
+                <div class="gesture-card">
+                    <span class="gesture-icon">👉</span>
+                    <h3 class="gesture-name">Swipe to Grow</h3>
+                    <p class="gesture-action">Glide right to complete a habit, watching it flourish with organic animation</p>
+                    <span class="gesture-feedback">Growing wave pulse</span>
+                </div>
+
+                <div class="gesture-card">
+                    <span class="gesture-icon">👈</span>
+                    <h3 class="gesture-name">Reveal Options</h3>
+                    <p class="gesture-action">Swipe left to gently uncover actions, like turning leaves to find hidden paths</p>
+                    <span class="gesture-feedback">Soft rustle feedback</span>
+                </div>
+
+                <div class="gesture-card">
+                    <span class="gesture-icon">✊</span>
+                    <h3 class="gesture-name">Hold & Nurture</h3>
+                    <p class="gesture-action">Press and hold to reorganize, rearranging your garden with care</p>
+                    <span class="gesture-feedback">Deep earth rumble</span>
+                </div>
+
+                <div class="gesture-card">
+                    <span class="gesture-icon">👇</span>
+                    <h3 class="gesture-name">Pull to Refresh</h3>
+                    <p class="gesture-action">Draw down like drawing water from a well, syncing your progress</p>
+                    <span class="gesture-feedback">Flowing water animation</span>
+                </div>
+
+                <div class="gesture-card">
+                    <span class="gesture-icon">🤏</span>
+                    <h3 class="gesture-name">Pinch to Expand</h3>
+                    <p class="gesture-action">Zoom your calendar view like focusing through a naturalist's lens</p>
+                    <span class="gesture-feedback">Organic scale morph</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Motion -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">Chapter Five</span>
+                <div>
+                    <h2 class="section-title">Natural Motion</h2>
+                    <p class="section-description">Animations inspired by growth, breath, and the rhythms of nature</p>
+                </div>
+            </div>
+
+            <div class="motion-grid">
+                <div class="motion-card">
+                    <h3 style="font-family: var(--font-display); color: var(--earth-clay); margin-bottom: var(--space-md); font-size: 1.5rem;">Organic Growth</h3>
+                    <p style="color: var(--charcoal); margin-bottom: var(--space-md); line-height: 1.7;">Like a plant unfurling, elements expand with natural rhythm</p>
+                    <div class="demo-box demo-grow"></div>
+                    <div style="font-family: var(--font-accent); font-size: 0.9rem; color: var(--forest-moss); text-align: center; font-style: italic;">ease-in-out growth</div>
+                </div>
+
+                <div class="motion-card">
+                    <h3 style="font-family: var(--font-display); color: var(--earth-clay); margin-bottom: var(--space-md); font-size: 1.5rem;">Gentle Sway</h3>
+                    <p style="color: var(--charcoal); margin-bottom: var(--space-md); line-height: 1.7;">Movements sway like trees in a breeze, never harsh or jarring</p>
+                    <div class="demo-box demo-sway"></div>
+                    <div style="font-family: var(--font-accent); font-size: 0.9rem; color: var(--forest-moss); text-align: center; font-style: italic;">pendulum motion</div>
+                </div>
+
+                <div class="motion-card">
+                    <h3 style="font-family: var(--font-display); color: var(--earth-clay); margin-bottom: var(--space-md); font-size: 1.5rem;">Blooming</h3>
+                    <p style="color: var(--charcoal); margin-bottom: var(--space-md); line-height: 1.7;">Achievements bloom open like flowers greeting the morning sun</p>
+                    <div class="demo-box demo-bloom"></div>
+                    <div style="font-family: var(--font-accent); font-size: 0.9rem; color: var(--forest-moss); text-align: center; font-style: italic;">petal unfurl</div>
+                </div>
+
+                <div class="motion-card">
+                    <h3 style="font-family: var(--font-display); color: var(--earth-clay); margin-bottom: var(--space-md); font-size: 1.5rem;">Water Wave</h3>
+                    <p style="color: var(--charcoal); margin-bottom: var(--space-md); line-height: 1.7;">Fluid transformations ripple like water over smooth stones</p>
+                    <div class="demo-box demo-wave"></div>
+                    <div style="font-family: var(--font-accent); font-size: 0.9rem; color: var(--forest-moss); text-align: center; font-style: italic;">liquid morphing</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- UX Principles -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-number">Chapter Six</span>
+                <div>
+                    <h2 class="section-title">Design Philosophy</h2>
+                    <p class="section-description">Rooted in nature, growing with intention, flourishing with care</p>
+                </div>
+            </div>
+
+            <div class="principle-grid">
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <span class="principle-emoji">🌱</span>
+                        <h3 class="principle-title">Growth-Oriented</h3>
+                    </div>
+                    <p class="principle-description">
+                        Every interaction celebrates growth, not perfection. Progress is organic - sometimes fast, sometimes slow, but always moving forward. We honor the natural pace of habit formation with patience and gentle encouragement.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <span class="principle-emoji">🍃</span>
+                        <h3 class="principle-title">Mindful Simplicity</h3>
+                    </div>
+                    <p class="principle-description">
+                        Like a zen garden, we remove everything unnecessary. Each element serves a purpose. Generous whitespace lets content breathe. The interface feels calm, never cluttered, allowing users to focus on what truly matters.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <span class="principle-emoji">🌿</span>
+                        <h3 class="principle-title">Natural Feedback</h3>
+                    </div>
+                    <p class="principle-description">
+                        Interactions respond with organic animations - growing, blooming, swaying. Haptic feedback mimics natural sensations. Colors shift like seasons. The app feels alive, responsive to touch like soil responding to rain.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <span class="principle-emoji">🌾</span>
+                        <h3 class="principle-title">Grounded & Warm</h3>
+                    </div>
+                    <p class="principle-description">
+                        Earth tones create a sense of stability and safety. Warm beiges and creams feel welcoming. Forest greens energize without overwhelming. The palette grounds users while inspiring growth - like a morning walk in nature.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <span class="principle-emoji">🌸</span>
+                        <h3 class="principle-title">Seasonal Rhythm</h3>
+                    </div>
+                    <p class="principle-description">
+                        We acknowledge cycles - not every day is perfect. Streaks may break, but roots grow deeper. The design celebrates consistency over intensity, encouraging users to return like seasons, each time bringing renewal.
+                    </p>
+                </div>
+
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <span class="principle-emoji">☀️</span>
+                        <h3 class="principle-title">Sustainable Joy</h3>
+                    </div>
+                    <p class="principle-description">
+                        Delight comes from subtle beauty - the curve of a button, the texture of a card, the flow of an animation. Joy is sustainable, not flashy. Like a well-tended garden, the beauty reveals itself slowly, deepening with time.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <h3>Grow Naturally, Live Intentionally</h3>
+            <p style="margin-top: var(--space-md); font-size: 1.1rem; line-height: 1.7;">
+                Like seeds planted in fertile soil, habits grow strong with patience and care.
+            </p>
+            <p style="margin-top: var(--space-lg); font-family: var(--font-accent); font-size: 0.95rem; font-style: italic;">
+                Variant 3 — Earthy Zen — 2024
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scroll reveal
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.section').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(50px)';
+            section.style.transition = 'opacity 1s ease, transform 1s cubic-bezier(0.4, 0, 0.2, 1)';
+            observer.observe(section);
+        });
+
+        // Interactive checkbox
+        document.querySelectorAll('.habit-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('click', function() {
+                this.classList.toggle('checked');
+            });
+        });
+
+        // Create more floating leaves
+        for (let i = 0; i < 6; i++) {
+            const leaf = document.createElement('div');
+            leaf.className = 'leaf-decoration';
+            const emojis = ['🍃', '🌿', '🍂', '🌱', '🌾'];
+            leaf.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            leaf.style.top = Math.random() * 100 + '%';
+            leaf.style.left = Math.random() * 100 + '%';
+            leaf.style.animationDelay = Math.random() * 10 + 's';
+            document.body.appendChild(leaf);
+        }
+    </script>
+</body>
+</html>
