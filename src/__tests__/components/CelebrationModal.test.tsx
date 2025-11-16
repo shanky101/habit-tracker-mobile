@@ -97,13 +97,64 @@ describe('CelebrationModal', () => {
         <CelebrationModal
           visible={true}
           type="allComplete"
+          completedCount={5}
+          totalCount={5}
+          activeStreaks={3}
           onDismiss={mockOnDismiss}
         />
       );
 
       expect(getAllByText('🎉').length).toBeGreaterThan(0);
-      expect(getByText('All Done!')).toBeTruthy();
-      expect(getByText('Amazing! You completed all habits today')).toBeTruthy();
+      expect(getByText('All Habits Complete!')).toBeTruthy();
+      expect(getByText('5/5 habits • 3 active streaks')).toBeTruthy();
+    });
+
+    it('should display motivational quote for allComplete', () => {
+      const { getByText } = renderWithTheme(
+        <CelebrationModal
+          visible={true}
+          type="allComplete"
+          completedCount={3}
+          totalCount={5}
+          activeStreaks={2}
+          onDismiss={mockOnDismiss}
+        />
+      );
+
+      // Check that a motivational quote is rendered (any of the possible quotes)
+      const quotes = [
+        'Success is the sum of small efforts repeated day in and day out.',
+        'The secret of getting ahead is getting started.',
+        "You don't have to be great to start, but you have to start to be great.",
+        'Small daily improvements are the key to staggering long-term results.',
+        'The only way to do great work is to love what you do.',
+      ];
+
+      const foundQuote = quotes.some((quote) => {
+        try {
+          getByText(`"${quote}"`);
+          return true;
+        } catch {
+          return false;
+        }
+      });
+
+      expect(foundQuote).toBe(true);
+    });
+
+    it('should display correct stats for partial completion', () => {
+      const { getByText } = renderWithTheme(
+        <CelebrationModal
+          visible={true}
+          type="allComplete"
+          completedCount={3}
+          totalCount={7}
+          activeStreaks={1}
+          onDismiss={mockOnDismiss}
+        />
+      );
+
+      expect(getByText('3/7 habits • 1 active streaks')).toBeTruthy();
     });
 
     it('should show confetti for allComplete', () => {
@@ -111,6 +162,9 @@ describe('CelebrationModal', () => {
         <CelebrationModal
           visible={true}
           type="allComplete"
+          completedCount={5}
+          totalCount={5}
+          activeStreaks={2}
           onDismiss={mockOnDismiss}
         />
       );

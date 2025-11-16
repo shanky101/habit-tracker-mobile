@@ -142,6 +142,51 @@ describe('HabitsContext', () => {
 
       expect(result.current.habits).toEqual(habitsBefore);
     });
+
+    it('should update habit notes', () => {
+      const { result } = renderHook(() => useHabits(), { wrapper });
+
+      const testNotes = 'Remember to meditate for at least 10 minutes';
+
+      act(() => {
+        result.current.updateHabit('1', { notes: testNotes });
+      });
+
+      const updatedHabit = result.current.habits.find((h) => h.id === '1');
+      expect(updatedHabit?.notes).toBe(testNotes);
+    });
+
+    it('should add notes to habit without notes', () => {
+      const { result } = renderHook(() => useHabits(), { wrapper });
+
+      const newHabit: Habit = {
+        id: '100',
+        name: 'Test Habit',
+        emoji: '🎯',
+        completed: false,
+        streak: 0,
+        category: 'test',
+        color: 'blue',
+        frequency: 'daily',
+        selectedDays: [0, 1, 2, 3, 4, 5, 6],
+        reminderEnabled: false,
+        reminderTime: null,
+      };
+
+      act(() => {
+        result.current.addHabit(newHabit);
+      });
+
+      const addedHabit = result.current.habits.find((h) => h.id === '100');
+      expect(addedHabit?.notes).toBeUndefined();
+
+      act(() => {
+        result.current.updateHabit('100', { notes: 'New notes added' });
+      });
+
+      const updatedHabit = result.current.habits.find((h) => h.id === '100');
+      expect(updatedHabit?.notes).toBe('New notes added');
+    });
   });
 
   describe('deleteHabit', () => {
