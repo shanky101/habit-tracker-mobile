@@ -1,38 +1,32 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
+import { Playfair_Display, Lora } from "next/font/google";
 import "./globals.css";
 
-// Display font - bold, expressive headlines
-const spaceGrotesk = Space_Grotesk({
+// Display font - elegant serif for headlines
+const playfairDisplay = Playfair_Display({
   variable: "--font-display",
   subsets: ["latin"],
   display: "swap",
   weight: ["400", "500", "600", "700"],
 });
 
-// Body font - clean, readable
-const inter = Inter({
-  variable: "--font-body",
+// Accent font - italic serif for quotes and emphasis
+const lora = Lora({
+  variable: "--font-accent",
   subsets: ["latin"],
   display: "swap",
-});
-
-// Mono font - code and special elements
-const jetBrainsMono = JetBrains_Mono({
-  variable: "--font-mono",
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["400", "500"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://habitflow.app'),
   title: {
-    default: "HabitFlow - Build Better Habits, One Day at a Time",
+    default: "HabitFlow - Grow Naturally, Live Intentionally",
     template: "%s | HabitFlow"
   },
-  description: "The habit tracker that celebrates your wins. Build streaks, track progress, and transform your life with AI-powered insights. Start building better habits today.",
-  keywords: ["habit tracker", "habits", "productivity", "streaks", "self improvement", "goal tracking", "daily habits", "routine tracker"],
+  description: "Transform your life through mindful habit building. Track your daily rituals, celebrate growth, and cultivate lasting change - one intentional step at a time.",
+  keywords: ["habit tracker", "mindfulness", "personal growth", "daily rituals", "self improvement", "habit formation", "wellness app", "intentional living"],
   authors: [{ name: "HabitFlow" }],
   creator: "HabitFlow",
   publisher: "HabitFlow",
@@ -45,22 +39,22 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://habitflow.app",
-    title: "HabitFlow - Build Better Habits, One Day at a Time",
-    description: "The habit tracker that celebrates your wins. Build streaks, track progress, and transform your life.",
+    title: "HabitFlow - Grow Naturally, Live Intentionally",
+    description: "Transform your life through mindful habit building. Cultivate lasting change, one intentional step at a time.",
     siteName: "HabitFlow",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "HabitFlow - Habit Tracker App",
+        alt: "HabitFlow - Mindful Habit Tracker",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "HabitFlow - Build Better Habits, One Day at a Time",
-    description: "The habit tracker that celebrates your wins. Build streaks, track progress, and transform your life.",
+    title: "HabitFlow - Grow Naturally, Live Intentionally",
+    description: "Transform your life through mindful habit building. Cultivate lasting change, one intentional step at a time.",
     images: ["/og-image.png"],
     creator: "@habitflow",
   },
@@ -90,7 +84,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body
-        className={`${spaceGrotesk.variable} ${inter.variable} ${jetBrainsMono.variable} antialiased`}
+        className={`${playfairDisplay.variable} ${lora.variable} antialiased`}
       >
         {children}
       </body>

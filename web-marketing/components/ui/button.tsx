@@ -3,29 +3,30 @@ import { cn } from "@/lib/utils"
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "default" | "secondary" | "outline" | "ghost"
+  variant?: "earth" | "forest" | "outline" | "ghost"
   size?: "default" | "sm" | "lg"
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = "default", size = "default", ...props }, ref) => {
+  ({ className, variant = "earth", size = "default", ...props }, ref) => {
     return (
       <button
         className={cn(
-          "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+          "inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-all duration-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A7C59] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 relative overflow-hidden",
+          "after:content-[''] after:absolute after:top-1/2 after:left-1/2 after:w-0 after:h-0 after:rounded-full after:bg-white/40 after:transform after:-translate-x-1/2 after:-translate-y-1/2 after:transition-all after:duration-600 hover:after:w-[400px] hover:after:h-[400px]",
           {
-            "bg-gradient-purple text-white hover:opacity-90 hover:scale-105 active:scale-95 shadow-lg shadow-purple-500/30":
-              variant === "default",
-            "bg-muted text-foreground hover:bg-muted/80":
-              variant === "secondary",
-            "border-2 border-foreground/20 bg-background hover:bg-muted":
+            "bg-gradient-earth text-[#FAF8F3] hover:-translate-y-1 shadow-[0_4px_12px_rgba(62,39,35,0.08)] hover:shadow-[0_10px_30px_rgba(44,95,45,0.15)]":
+              variant === "earth",
+            "bg-gradient-forest text-[#FAF8F3] hover:-translate-y-1 shadow-[0_4px_12px_rgba(62,39,35,0.08)] hover:shadow-[0_10px_30px_rgba(44,95,45,0.15)]":
+              variant === "forest",
+            "border-2 border-[#B85C38] bg-transparent text-[#B85C38] hover:bg-[#B85C38] hover:text-[#FAF8F3]":
               variant === "outline",
-            "hover:bg-muted/50": variant === "ghost",
+            "hover:bg-[#F5F1E8]": variant === "ghost",
           },
           {
-            "h-11 px-8 text-base": size === "default",
-            "h-9 px-6 text-sm": size === "sm",
-            "h-14 px-10 text-lg": size === "lg",
+            "h-auto py-[18px] px-9 text-base rounded-[48px]": size === "default",
+            "h-auto py-3 px-6 text-sm rounded-[48px]": size === "sm",
+            "h-auto py-5 px-11 text-lg rounded-[48px]": size === "lg",
           },
           className
         )}
