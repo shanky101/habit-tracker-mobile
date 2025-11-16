@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { CATEGORIES } from './AddHabitStep2Screen';
+import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 
 type AddHabitStep3ScreenNavigationProp = StackNavigationProp<any, 'AddHabitStep3'>;
 type AddHabitStep3ScreenRouteProp = RouteProp<
@@ -43,23 +44,8 @@ const AddHabitStep3Screen: React.FC = () => {
   const [reminderTime, setReminderTime] = useState('09:00');
   const [isLoading, setIsLoading] = useState(false);
 
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(30)).current;
-
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [fadeAnim, slideAnim]);
+  // Use custom animation hook
+  const { fadeAnim, slideAnim } = useScreenAnimation();
 
   const handleBack = () => {
     navigation.goBack();

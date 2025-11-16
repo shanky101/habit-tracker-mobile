@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
+import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 
 type AddHabitStep2ScreenNavigationProp = StackNavigationProp<any, 'AddHabitStep2'>;
 type AddHabitStep2ScreenRouteProp = RouteProp<{ AddHabitStep2: { habitName: string } }, 'AddHabitStep2'>;
@@ -47,24 +48,9 @@ const AddHabitStep2Screen: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('other');
   const [selectedColor, setSelectedColor] = useState('blue');
 
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(30)).current;
+  // Use custom animation hook
+  const { fadeAnim, slideAnim } = useScreenAnimation();
   const scrollViewRef = useRef<ScrollView>(null);
-
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [fadeAnim, slideAnim]);
 
   const handleCategorySelect = (categoryId: string) => {
     setSelectedCategory(categoryId);
