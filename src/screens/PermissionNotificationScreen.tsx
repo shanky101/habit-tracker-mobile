@@ -7,7 +7,6 @@ import {
   Animated,
   Dimensions,
   Platform,
-  Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -27,16 +26,18 @@ const PermissionNotificationScreen: React.FC = () => {
 
   const handleEnableNotifications = () => {
     // TODO: Request actual notification permissions
-    Alert.alert('Success', 'Notifications enabled! Proceeding to the app...');
-    // For now, just show completion message
+    // For now, navigate to Welcome screen
+    navigation.navigate('Welcome');
   };
 
   const handleMaybeLater = () => {
-    Alert.alert('Noted', 'You can enable notifications later in Settings.');
+    // Navigate to Welcome screen
+    navigation.navigate('Welcome');
   };
 
   const handleSkip = () => {
-    Alert.alert('Onboarding Complete', 'Welcome to Habit Tracker!');
+    // Navigate to Welcome screen
+    navigation.navigate('Welcome');
   };
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const bellAnim = useRef(new Animated.Value(0)).current;

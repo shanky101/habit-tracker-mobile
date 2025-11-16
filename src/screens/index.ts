@@ -3,3 +3,8 @@ export { default as OnboardingWelcomeScreen } from './OnboardingWelcomeScreen';
 export { default as OnboardingTrackScreen } from './OnboardingTrackScreen';
 export { default as OnboardingStreaksScreen } from './OnboardingStreaksScreen';
 export { default as PermissionNotificationScreen } from './PermissionNotificationScreen';
+export { default as WelcomeScreen } from './WelcomeScreen';
+export { default as SignUpScreen } from './SignUpScreen';
+export { default as LoginScreen } from './LoginScreen';
+export { default as PasswordResetScreen } from './PasswordResetScreen';
+export { default as HomeScreen } from './HomeScreen';
