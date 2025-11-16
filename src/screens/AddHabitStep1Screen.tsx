@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import {
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
+import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 
 type AddHabitStep1ScreenNavigationProp = StackNavigationProp<any, 'AddHabitStep1'>;
 type AddHabitStep1ScreenRouteProp = RouteProp<any, 'AddHabitStep1'>;
@@ -35,28 +36,8 @@ const AddHabitStep1Screen: React.FC = () => {
   const [error, setError] = useState('');
   const textInputRef = useRef<TextInput>(null);
 
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(30)).current;
-
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-    ]).start();
-
-    // Auto-focus the input
-    setTimeout(() => {
-      textInputRef.current?.focus();
-    }, 300);
-  }, [fadeAnim, slideAnim]);
+  // Use custom animation hook
+  const { fadeAnim, slideAnim } = useScreenAnimation();
 
   const handleNext = () => {
     // Validation
@@ -169,6 +150,7 @@ const AddHabitStep1Screen: React.FC = () => {
           <View style={styles.inputContainer}>
             <TextInput
               ref={textInputRef}
+              autoFocus
               style={[
                 styles.input,
                 {
