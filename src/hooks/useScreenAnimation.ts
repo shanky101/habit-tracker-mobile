@@ -11,7 +11,7 @@ interface UseScreenAnimationOptions {
 interface UseScreenAnimationReturn {
   fadeAnim: Animated.Value;
   slideAnim: Animated.Value;
-  fabScale?: Animated.Value;
+  fabScale: Animated.Value;
 }
 
 /**
@@ -59,5 +59,5 @@ export const useScreenAnimation = ({
     }
   }, []); // Empty dependency array - refs never change
 
-  return enableFAB ? { fadeAnim, slideAnim, fabScale } : { fadeAnim, slideAnim };
+  return { fadeAnim, slideAnim, fabScale };
 };

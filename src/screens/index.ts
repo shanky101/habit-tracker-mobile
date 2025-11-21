@@ -15,3 +15,5 @@ export { default as EditHabitScreen } from './EditHabitScreen';
 export { default as HabitDetailScreen } from './HabitDetailScreen';
 export { default as CalendarViewScreen } from './CalendarViewScreen';
 export { default as HabitTemplatesScreen } from './HabitTemplatesScreen';
+export { default as AnalyticsDashboardScreen } from './AnalyticsDashboardScreen';
+export { default as HabitDeepDiveScreen } from './HabitDeepDiveScreen';

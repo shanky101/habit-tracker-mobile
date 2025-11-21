@@ -10,13 +10,13 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 
 type AddHabitStep1ScreenNavigationProp = StackNavigationProp<any, 'AddHabitStep1'>;
-type AddHabitStep1ScreenRouteProp = RouteProp<any, 'AddHabitStep1'>;
 
 const HABIT_SUGGESTIONS = [
   'Read 20 pages',
@@ -29,7 +29,6 @@ const HABIT_SUGGESTIONS = [
 
 const AddHabitStep1Screen: React.FC = () => {
   const navigation = useNavigation<AddHabitStep1ScreenNavigationProp>();
-  const route = useRoute<AddHabitStep1ScreenRouteProp>();
   const { theme } = useTheme();
 
   const [habitName, setHabitName] = useState('');
@@ -94,15 +93,16 @@ const AddHabitStep1Screen: React.FC = () => {
   const characterLimit = 100;
 
   return (
-    <KeyboardAvoidingView
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <KeyboardAvoidingView
+        style={styles.keyboardView}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
         <Animated.View
           style={[
             styles.content,
@@ -343,8 +343,9 @@ const AddHabitStep1Screen: React.FC = () => {
             </Text>
           </TouchableOpacity>
         </Animated.View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
@@ -352,12 +353,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  keyboardView: {
+    flex: 1,
+  },
   scrollContent: {
     flexGrow: 1,
   },
   content: {
     paddingHorizontal: 24,
-    paddingTop: 60,
+    paddingTop: 20,
     paddingBottom: 40,
   },
   header: {

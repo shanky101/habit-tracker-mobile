@@ -18,6 +18,8 @@ import {
   HabitDetailScreen,
   CalendarViewScreen,
   HabitTemplatesScreen,
+  AnalyticsDashboardScreen,
+  HabitDeepDiveScreen,
 } from '@/screens';
 
 export type OnboardingStackParamList = {
@@ -38,6 +40,11 @@ export type OnboardingStackParamList = {
   HabitDetail: { habitId: string; habitData: any };
   CalendarView: undefined;
   HabitTemplates: undefined;
+  AnalyticsDashboard: undefined;
+  HabitDeepDive: { habitId: string; habitData: any };
+  AIInsights: undefined;
+  ExportData: undefined;
+  Subscription: undefined;
 };
 
 const Stack = createStackNavigator<OnboardingStackParamList>();
@@ -67,6 +74,8 @@ const OnboardingNavigator: React.FC = () => {
       <Stack.Screen name="HabitDetail" component={HabitDetailScreen} />
       <Stack.Screen name="CalendarView" component={CalendarViewScreen} />
       <Stack.Screen name="HabitTemplates" component={HabitTemplatesScreen} />
+      <Stack.Screen name="AnalyticsDashboard" component={AnalyticsDashboardScreen} />
+      <Stack.Screen name="HabitDeepDive" component={HabitDeepDiveScreen} />
     </Stack.Navigator>
   );
 };
