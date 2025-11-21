@@ -249,28 +249,19 @@ const AnalyticsDashboardScreen: React.FC = () => {
           },
         ]}
       >
-        <View style={styles.headerLeft}>
-          <TouchableOpacity
-            style={[styles.backButton, { backgroundColor: theme.colors.backgroundSecondary }]}
-            onPress={() => navigation.goBack()}
-            activeOpacity={0.7}
-          >
-            <Text style={{ fontSize: 20 }}>←</Text>
-          </TouchableOpacity>
-          <Text
-            style={[
-              styles.title,
-              {
-                color: theme.colors.text,
-                fontFamily: theme.typography.fontFamilyDisplay,
-                fontSize: theme.typography.fontSizeXL,
-                fontWeight: theme.typography.fontWeightBold,
-              },
-            ]}
-          >
-            Analytics
-          </Text>
-        </View>
+        <Text
+          style={[
+            styles.title,
+            {
+              color: theme.colors.text,
+              fontFamily: theme.typography.fontFamilyDisplay,
+              fontSize: theme.typography.fontSizeXL,
+              fontWeight: theme.typography.fontWeightBold,
+            },
+          ]}
+        >
+          Analytics
+        </Text>
         <TouchableOpacity
           style={[styles.exportButton, { backgroundColor: theme.colors.backgroundSecondary }]}
           onPress={() => navigation.navigate('ExportData')}

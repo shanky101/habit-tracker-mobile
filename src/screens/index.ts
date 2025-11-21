@@ -17,3 +17,5 @@ export { default as CalendarViewScreen } from './CalendarViewScreen';
 export { default as HabitTemplatesScreen } from './HabitTemplatesScreen';
 export { default as AnalyticsDashboardScreen } from './AnalyticsDashboardScreen';
 export { default as HabitDeepDiveScreen } from './HabitDeepDiveScreen';
+export { default as SettingsScreen } from './SettingsScreen';
+export { default as ThemePickerScreen } from './ThemePickerScreen';

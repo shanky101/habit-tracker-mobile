@@ -117,7 +117,7 @@ const EditHabitScreen: React.FC = () => {
           style: 'destructive',
           onPress: () => {
             deleteHabit(habitId);
-            navigation.navigate('Home');
+            navigation.navigate('HomeMain');
           },
         },
       ]

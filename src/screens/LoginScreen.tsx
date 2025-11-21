@@ -80,8 +80,8 @@ const LoginScreen: React.FC = () => {
       // In a real app, this would be an API call
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      // Navigate to Home screen after successful login
-      navigation.navigate('Home');
+      // Navigate to Main App after successful login
+      navigation.navigate('MainApp');
     } catch (error) {
       setErrors({
         ...newErrors,

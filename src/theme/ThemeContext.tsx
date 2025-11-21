@@ -1,12 +1,21 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { ThemeVariant, ThemeTokens, themes, defaultTheme } from './tokens';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useColorScheme } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ThemeVariant, ThemeTokens, themes } from './tokens';
+
+const THEME_STORAGE_KEY = '@habit_tracker_theme';
+const AUTO_THEME_KEY = '@habit_tracker_auto_theme';
+
+type ThemeMode = ThemeVariant | 'auto';
 
 interface ThemeContextType {
   theme: ThemeTokens;
   themeVariant: ThemeVariant;
-  setTheme: (variant: ThemeVariant) => void;
-  isPremiumUnlocked: boolean;
-  unlockPremium: () => void;
+  themeMode: ThemeMode;
+  setTheme: (mode: ThemeMode) => void;
+  availableThemes: ThemeVariant[];
+  isAutoMode: boolean;
+  isLoading: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -16,31 +25,72 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [themeVariant, setThemeVariant] = useState<ThemeVariant>('momentum');
-  const [isPremiumUnlocked, setIsPremiumUnlocked] = useState(false);
+  const systemColorScheme = useColorScheme();
+  const [themeMode, setThemeMode] = useState<ThemeMode>('default');
+  const [isLoading, setIsLoading] = useState(true);
 
-  const setTheme = (variant: ThemeVariant) => {
-    const selectedTheme = themes[variant];
+  // Load saved theme on mount
+  useEffect(() => {
+    loadSavedTheme();
+  }, []);
 
-    // Check if theme is premium and user has access
-    if (selectedTheme.isPremium && !isPremiumUnlocked) {
-      console.warn('This is a premium theme. Please unlock premium to use it.');
-      return;
+  const loadSavedTheme = async () => {
+    try {
+      const [savedTheme, isAuto] = await Promise.all([
+        AsyncStorage.getItem(THEME_STORAGE_KEY),
+        AsyncStorage.getItem(AUTO_THEME_KEY),
+      ]);
+
+      if (isAuto === 'true') {
+        setThemeMode('auto');
+      } else if (savedTheme && isValidTheme(savedTheme)) {
+        setThemeMode(savedTheme as ThemeVariant);
+      }
+    } catch (error) {
+      console.error('Error loading theme:', error);
+    } finally {
+      setIsLoading(false);
     }
-
-    setThemeVariant(variant);
   };
 
-  const unlockPremium = () => {
-    setIsPremiumUnlocked(true);
+  const isValidTheme = (theme: string): boolean => {
+    return Object.keys(themes).includes(theme);
   };
+
+  const setTheme = async (mode: ThemeMode) => {
+    try {
+      setThemeMode(mode);
+
+      if (mode === 'auto') {
+        await AsyncStorage.setItem(AUTO_THEME_KEY, 'true');
+        await AsyncStorage.removeItem(THEME_STORAGE_KEY);
+      } else {
+        await AsyncStorage.setItem(AUTO_THEME_KEY, 'false');
+        await AsyncStorage.setItem(THEME_STORAGE_KEY, mode);
+      }
+    } catch (error) {
+      console.error('Error saving theme:', error);
+    }
+  };
+
+  // Determine the actual theme variant based on mode and system preference
+  const getActiveThemeVariant = (): ThemeVariant => {
+    if (themeMode === 'auto') {
+      return systemColorScheme === 'dark' ? 'dark' : 'default';
+    }
+    return themeMode;
+  };
+
+  const activeVariant = getActiveThemeVariant();
 
   const value: ThemeContextType = {
-    theme: themes[themeVariant],
-    themeVariant,
+    theme: themes[activeVariant],
+    themeVariant: activeVariant,
+    themeMode,
     setTheme,
-    isPremiumUnlocked,
-    unlockPremium,
+    availableThemes: Object.keys(themes) as ThemeVariant[],
+    isAutoMode: themeMode === 'auto',
+    isLoading,
   };
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

@@ -115,8 +115,8 @@ const SignUpScreen: React.FC = () => {
       // In a real app, this would be an API call
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      // Navigate to Home screen after successful sign up
-      navigation.navigate('Home');
+      // Navigate to Main App after successful sign up
+      navigation.navigate('MainApp');
     } catch (error) {
       setErrors({
         ...newErrors,

@@ -96,7 +96,7 @@ const AddHabitStep3Screen: React.FC = () => {
     setIsLoading(false);
 
     // Navigate back to Home with the new habit
-    navigation.navigate('Home', { newHabit });
+    navigation.navigate('HomeMain', { newHabit });
   };
 
   const getCategoryLabel = () => {

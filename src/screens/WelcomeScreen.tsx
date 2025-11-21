@@ -24,8 +24,8 @@ const WelcomeScreen: React.FC = () => {
   const { fadeAnim, slideAnim } = useScreenAnimation();
 
   const handleStartFree = () => {
-    // Navigate to Home screen with anonymous user
-    navigation.navigate('Home');
+    // Navigate to Main App with anonymous user
+    navigation.navigate('MainApp');
   };
 
   const handleSignUp = () => {

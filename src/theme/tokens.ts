@@ -1,6 +1,6 @@
 // Design Tokens for all theme variants
 
-export type ThemeVariant = 'momentum' | 'retro' | 'earthy' | 'minimal' | 'professional';
+export type ThemeVariant = 'default' | 'dark' | 'zen' | 'neon' | 'retro' | 'minimalist';
 
 export interface ColorTokens {
   primary: string;
@@ -178,8 +178,8 @@ const baseTypography: TypographyTokens = {
   lineHeightRelaxed: 1.75,
 };
 
-// Variant 1: Momentum & Joy (Default)
-const momentumColors: ColorTokens = {
+// Default Theme (Light, colorful)
+const defaultColors: ColorTokens = {
   primary: '#6366f1',
   primaryDark: '#4f46e5',
   primaryLight: '#818cf8',
@@ -204,107 +204,133 @@ const momentumColors: ColorTokens = {
   black: '#000000',
 };
 
-// Variant 2: Retro Futurism
-const retroColors: ColorTokens = {
-  primary: '#FF6183',
-  primaryDark: '#E91E63',
-  primaryLight: '#FFB4C5',
-  secondary: '#00E5FF',
-  secondaryLight: '#80F2FF',
-  accent1: '#C6FF00',
-  accent2: '#9C27B0',
-  accent3: '#00E5FF',
-  background: '#0A0A0F',
-  backgroundSecondary: '#1A1A2E',
-  surface: '#16161F',
-  surfaceSecondary: '#1F1F2E',
-  text: '#FFFFFF',
-  textSecondary: '#B0B0C0',
+// Dark Mode
+const darkColors: ColorTokens = {
+  primary: '#818cf8',
+  primaryDark: '#6366f1',
+  primaryLight: '#a5b4fc',
+  secondary: '#a78bfa',
+  secondaryLight: '#c4b5fd',
+  accent1: '#fb923c',
+  accent2: '#f472b6',
+  accent3: '#4ade80',
+  background: '#0f0f0f',
+  backgroundSecondary: '#1a1a1a',
+  surface: '#262626',
+  surfaceSecondary: '#2a2a2a',
+  text: '#f5f5f5',
+  textSecondary: '#a3a3a3',
+  textTertiary: '#737373',
+  success: '#4ade80',
+  warning: '#fb923c',
+  error: '#f87171',
+  border: '#404040',
+  borderLight: '#333333',
+  white: '#ffffff',
+  black: '#000000',
+};
+
+// Zen Theme (Soft, muted earth tones)
+const zenColors: ColorTokens = {
+  primary: '#7c9a92',
+  primaryDark: '#5f7a72',
+  primaryLight: '#a3c4b8',
+  secondary: '#c9b99a',
+  secondaryLight: '#ddd0b8',
+  accent1: '#d4a574',
+  accent2: '#b5c99a',
+  accent3: '#8fbc8f',
+  background: '#f5f2ed',
+  backgroundSecondary: '#ebe6de',
+  surface: '#fdfcfa',
+  surfaceSecondary: '#f9f7f4',
+  text: '#3d3d3d',
+  textSecondary: '#6b6b6b',
+  textTertiary: '#9a9a9a',
+  success: '#8fbc8f',
+  warning: '#d4a574',
+  error: '#cd5c5c',
+  border: '#ddd5c9',
+  borderLight: '#e8e2d8',
+  white: '#ffffff',
+  black: '#000000',
+};
+
+// Neon Theme (Dark with vibrant neon accents)
+const neonColors: ColorTokens = {
+  primary: '#00ffff',
+  primaryDark: '#00cccc',
+  primaryLight: '#66ffff',
+  secondary: '#ff00ff',
+  secondaryLight: '#ff66ff',
+  accent1: '#39ff14',
+  accent2: '#ff6b6b',
+  accent3: '#ffd700',
+  background: '#0a0a0f',
+  backgroundSecondary: '#12121a',
+  surface: '#1a1a25',
+  surfaceSecondary: '#22222f',
+  text: '#ffffff',
+  textSecondary: '#b0b0c0',
   textTertiary: '#707080',
-  success: '#C6FF00',
-  warning: '#FF6183',
-  error: '#FF1744',
-  border: '#2A2A3E',
-  borderLight: '#1F1F2E',
-  white: '#FFFFFF',
+  success: '#39ff14',
+  warning: '#ffd700',
+  error: '#ff4444',
+  border: '#2a2a3e',
+  borderLight: '#1f1f2e',
+  white: '#ffffff',
   black: '#000000',
 };
 
-// Variant 3: Earthy Zen
-const earthyColors: ColorTokens = {
-  primary: '#B85C38',
-  primaryDark: '#A0522D',
-  primaryLight: '#D4A574',
-  secondary: '#2C5F2D',
-  secondaryLight: '#4A7C59',
-  accent1: '#D4A574',
-  accent2: '#B5C99A',
-  accent3: '#2C5F2D',
-  background: '#FAF8F5',
-  backgroundSecondary: '#F5F1E8',
-  surface: '#FFFFFF',
-  surfaceSecondary: '#FDFCFA',
-  text: '#2B2621',
-  textSecondary: '#5A5550',
-  textTertiary: '#8A8580',
-  success: '#4A7C59',
-  warning: '#D4A574',
-  error: '#C44536',
-  border: '#E8E4DC',
-  borderLight: '#F0EDE5',
-  white: '#FFFFFF',
+// Retro Theme (Vintage palette)
+const retroColors: ColorTokens = {
+  primary: '#e07b39',
+  primaryDark: '#c46a2f',
+  primaryLight: '#f0a060',
+  secondary: '#2d4a3e',
+  secondaryLight: '#4a7264',
+  accent1: '#f4d03f',
+  accent2: '#c0392b',
+  accent3: '#16a085',
+  background: '#fdf6e3',
+  backgroundSecondary: '#f5edd6',
+  surface: '#fffef5',
+  surfaceSecondary: '#fcfaf0',
+  text: '#2c1810',
+  textSecondary: '#5c4030',
+  textTertiary: '#8c7060',
+  success: '#27ae60',
+  warning: '#f39c12',
+  error: '#c0392b',
+  border: '#e8d5b7',
+  borderLight: '#f0e5d0',
+  white: '#ffffff',
   black: '#000000',
 };
 
-// Variant 4: Minimal Refinement
-const minimalColors: ColorTokens = {
-  primary: '#1A1714',
-  primaryDark: '#0A0908',
-  primaryLight: '#4D4539',
-  secondary: '#C4BAAB',
-  secondaryLight: '#D4CCC0',
-  accent1: '#8A8074',
-  accent2: '#C4BAAB',
-  accent3: '#1A1714',
-  background: '#FDFCFA',
-  backgroundSecondary: '#FAF8F5',
-  surface: '#FFFFFF',
-  surfaceSecondary: '#FDFCFA',
-  text: '#1A1714',
-  textSecondary: '#5A5550',
-  textTertiary: '#8A8580',
-  success: '#4D4539',
-  warning: '#8A8074',
-  error: '#5A5550',
-  border: '#E8E4DC',
-  borderLight: '#F0EDE5',
-  white: '#FFFFFF',
-  black: '#1A1714',
-};
-
-// Variant 5: Professional Polish
-const professionalColors: ColorTokens = {
-  primary: '#1B1B1B',
-  primaryDark: '#0A0A0A',
-  primaryLight: '#3A3A3A',
-  secondary: '#B1D8FC',
-  secondaryLight: '#D6EBFF',
-  accent1: '#FFCF25',
-  accent2: '#D6C9FD',
-  accent3: '#B1D8FC',
-  background: '#FFFFFF',
-  backgroundSecondary: '#F8F9FA',
-  surface: '#FFFFFF',
-  surfaceSecondary: '#FAFBFC',
-  text: '#1B1B1B',
-  textSecondary: '#6B6B6B',
-  textTertiary: '#9B9B9B',
-  success: '#10B981',
-  warning: '#FFCF25',
-  error: '#EF4444',
-  border: '#E5E7EB',
-  borderLight: '#F3F4F6',
-  white: '#FFFFFF',
+// Minimalist Theme (High contrast black & white)
+const minimalistColors: ColorTokens = {
+  primary: '#000000',
+  primaryDark: '#000000',
+  primaryLight: '#333333',
+  secondary: '#666666',
+  secondaryLight: '#999999',
+  accent1: '#000000',
+  accent2: '#333333',
+  accent3: '#666666',
+  background: '#ffffff',
+  backgroundSecondary: '#fafafa',
+  surface: '#ffffff',
+  surfaceSecondary: '#f5f5f5',
+  text: '#000000',
+  textSecondary: '#4a4a4a',
+  textTertiary: '#8a8a8a',
+  success: '#000000',
+  warning: '#4a4a4a',
+  error: '#333333',
+  border: '#e0e0e0',
+  borderLight: '#f0f0f0',
+  white: '#ffffff',
   black: '#000000',
 };
 
@@ -352,10 +378,40 @@ const baseAnimation: AnimationTokens = {
 
 // Theme exports
 export const themes: Record<ThemeVariant, ThemeTokens> = {
-  momentum: {
-    name: 'Momentum & Joy',
+  default: {
+    name: 'Default',
     isPremium: false,
-    colors: momentumColors,
+    colors: defaultColors,
+    typography: baseTypography,
+    spacing: baseSpacing,
+    radius: baseRadius,
+    shadows: baseShadows,
+    animation: baseAnimation,
+  },
+  dark: {
+    name: 'Dark Mode',
+    isPremium: false,
+    colors: darkColors,
+    typography: baseTypography,
+    spacing: baseSpacing,
+    radius: baseRadius,
+    shadows: baseShadows,
+    animation: baseAnimation,
+  },
+  zen: {
+    name: 'Zen',
+    isPremium: false,
+    colors: zenColors,
+    typography: baseTypography,
+    spacing: baseSpacing,
+    radius: baseRadius,
+    shadows: baseShadows,
+    animation: baseAnimation,
+  },
+  neon: {
+    name: 'Neon',
+    isPremium: false,
+    colors: neonColors,
     typography: baseTypography,
     spacing: baseSpacing,
     radius: baseRadius,
@@ -363,8 +419,8 @@ export const themes: Record<ThemeVariant, ThemeTokens> = {
     animation: baseAnimation,
   },
   retro: {
-    name: 'Retro Futurism',
-    isPremium: true,
+    name: 'Retro',
+    isPremium: false,
     colors: retroColors,
     typography: baseTypography,
     spacing: baseSpacing,
@@ -372,30 +428,10 @@ export const themes: Record<ThemeVariant, ThemeTokens> = {
     shadows: baseShadows,
     animation: baseAnimation,
   },
-  earthy: {
-    name: 'Earthy Zen',
-    isPremium: true,
-    colors: earthyColors,
-    typography: baseTypography,
-    spacing: baseSpacing,
-    radius: baseRadius,
-    shadows: baseShadows,
-    animation: baseAnimation,
-  },
-  minimal: {
-    name: 'Minimal Refinement',
-    isPremium: true,
-    colors: minimalColors,
-    typography: baseTypography,
-    spacing: baseSpacing,
-    radius: baseRadius,
-    shadows: baseShadows,
-    animation: baseAnimation,
-  },
-  professional: {
-    name: 'Professional Polish',
-    isPremium: true,
-    colors: professionalColors,
+  minimalist: {
+    name: 'Minimalist',
+    isPremium: false,
+    colors: minimalistColors,
     typography: baseTypography,
     spacing: baseSpacing,
     radius: baseRadius,
@@ -404,4 +440,32 @@ export const themes: Record<ThemeVariant, ThemeTokens> = {
   },
 };
 
-export const defaultTheme = themes.momentum;
+// Theme metadata for UI display
+export const themeMetadata: Record<ThemeVariant, { description: string; previewColors: string[] }> = {
+  default: {
+    description: 'Bright and modern with purple accents',
+    previewColors: ['#6366f1', '#8b5cf6', '#fafafa', '#22c55e'],
+  },
+  dark: {
+    description: 'Easy on the eyes, perfect for night',
+    previewColors: ['#818cf8', '#0f0f0f', '#262626', '#4ade80'],
+  },
+  zen: {
+    description: 'Soft, calming earth tones',
+    previewColors: ['#7c9a92', '#f5f2ed', '#c9b99a', '#8fbc8f'],
+  },
+  neon: {
+    description: 'Vibrant cyberpunk aesthetic',
+    previewColors: ['#00ffff', '#ff00ff', '#0a0a0f', '#39ff14'],
+  },
+  retro: {
+    description: 'Warm vintage palette',
+    previewColors: ['#e07b39', '#fdf6e3', '#2d4a3e', '#f4d03f'],
+  },
+  minimalist: {
+    description: 'Clean black and white simplicity',
+    previewColors: ['#000000', '#ffffff', '#666666', '#e0e0e0'],
+  },
+};
+
+export const defaultTheme = themes.default;

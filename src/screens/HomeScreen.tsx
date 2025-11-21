@@ -179,21 +179,12 @@ const HomeScreen: React.FC = () => {
             <Text style={{ fontSize: 16, marginLeft: 8 }}>📅</Text>
           </View>
         </TouchableOpacity>
-        <View style={styles.headerButtons}>
-          <TouchableOpacity
-            style={[styles.headerButton, { backgroundColor: theme.colors.backgroundSecondary }]}
-            onPress={() => navigation.navigate('AnalyticsDashboard')}
-            activeOpacity={0.7}
-          >
-            <Text style={{ fontSize: 20 }}>📊</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.profileButton, { backgroundColor: theme.colors.backgroundSecondary }]}
-            activeOpacity={0.7}
-          >
-            <Text style={{ fontSize: 24 }}>👤</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={[styles.profileButton, { backgroundColor: theme.colors.backgroundSecondary }]}
+          activeOpacity={0.7}
+        >
+          <Text style={{ fontSize: 24 }}>👤</Text>
+        </TouchableOpacity>
       </Animated.View>
 
       <ScrollView
@@ -391,18 +382,6 @@ const styles = StyleSheet.create({
   },
   date: {
     // styles from theme
-  },
-  headerButtons: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  headerButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   profileButton: {
     width: 48,
