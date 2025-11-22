@@ -82,9 +82,8 @@ const SettingsScreen: React.FC = () => {
             styles.title,
             {
               color: theme.colors.text,
-              fontFamily: theme.typography.fontFamilyDisplay,
+              fontFamily: theme.typography.fontFamilyDisplayBold,
               fontSize: theme.typography.fontSizeXL,
-              fontWeight: theme.typography.fontWeightBold,
             },
           ]}
         >
@@ -113,9 +112,8 @@ const SettingsScreen: React.FC = () => {
               styles.sectionTitle,
               {
                 color: theme.colors.textSecondary,
-                fontFamily: theme.typography.fontFamilyBody,
+                fontFamily: theme.typography.fontFamilyBodySemibold,
                 fontSize: theme.typography.fontSizeXS,
-                fontWeight: theme.typography.fontWeightSemibold,
               },
             ]}
           >
@@ -170,9 +168,8 @@ const SettingsScreen: React.FC = () => {
                       styles.settingLabel,
                       {
                         color: theme.colors.text,
-                        fontFamily: theme.typography.fontFamilyBody,
+                        fontFamily: theme.typography.fontFamilyBodyMedium,
                         fontSize: theme.typography.fontSizeMD,
-                        fontWeight: theme.typography.fontWeightMedium,
                       },
                     ]}
                   >
@@ -213,9 +210,8 @@ const SettingsScreen: React.FC = () => {
               styles.sectionTitle,
               {
                 color: theme.colors.textSecondary,
-                fontFamily: theme.typography.fontFamilyBody,
+                fontFamily: theme.typography.fontFamilyBodySemibold,
                 fontSize: theme.typography.fontSizeXS,
-                fontWeight: theme.typography.fontWeightSemibold,
               },
             ]}
           >
@@ -235,9 +231,8 @@ const SettingsScreen: React.FC = () => {
                     styles.settingLabel,
                     {
                       color: theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBody,
+                      fontFamily: theme.typography.fontFamilyBodyMedium,
                       fontSize: theme.typography.fontSizeMD,
-                      fontWeight: theme.typography.fontWeightMedium,
                     },
                   ]}
                 >
@@ -288,9 +283,8 @@ const SettingsScreen: React.FC = () => {
               styles.sectionTitle,
               {
                 color: theme.colors.textSecondary,
-                fontFamily: theme.typography.fontFamilyBody,
+                fontFamily: theme.typography.fontFamilyBodySemibold,
                 fontSize: theme.typography.fontSizeXS,
-                fontWeight: theme.typography.fontWeightSemibold,
               },
             ]}
           >
@@ -306,9 +300,8 @@ const SettingsScreen: React.FC = () => {
                     styles.settingLabel,
                     {
                       color: theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBody,
+                      fontFamily: theme.typography.fontFamilyBodyMedium,
                       fontSize: theme.typography.fontSizeMD,
-                      fontWeight: theme.typography.fontWeightMedium,
                     },
                   ]}
                 >
@@ -342,9 +335,8 @@ const SettingsScreen: React.FC = () => {
                     styles.settingLabel,
                     {
                       color: theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBody,
+                      fontFamily: theme.typography.fontFamilyBodyMedium,
                       fontSize: theme.typography.fontSizeMD,
-                      fontWeight: theme.typography.fontWeightMedium,
                     },
                   ]}
                 >

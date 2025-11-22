@@ -120,7 +120,7 @@ const AddHabitStep2Screen: React.FC = () => {
               style={styles.backButton}
               activeOpacity={0.7}
             >
-              <Text style={[styles.backButtonText, { color: theme.colors.primary }]}>
+              <Text style={[styles.backButtonText, { color: theme.colors.primary, fontFamily: theme.typography.fontFamilyBodySemibold }]}>
                 ← Back
               </Text>
             </TouchableOpacity>
@@ -159,9 +159,8 @@ const AddHabitStep2Screen: React.FC = () => {
               styles.title,
               {
                 color: theme.colors.text,
-                fontFamily: theme.typography.fontFamilyDisplay,
+                fontFamily: theme.typography.fontFamilyDisplayBold,
                 fontSize: theme.typography.fontSize2XL,
-                fontWeight: theme.typography.fontWeightBold,
               },
             ]}
           >
@@ -175,9 +174,8 @@ const AddHabitStep2Screen: React.FC = () => {
                 styles.sectionTitle,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplay,
+                  fontFamily: theme.typography.fontFamilyDisplayBold,
                   fontSize: theme.typography.fontSizeLG,
-                  fontWeight: theme.typography.fontWeightBold,
                 },
               ]}
             >
@@ -207,9 +205,8 @@ const AddHabitStep2Screen: React.FC = () => {
                           styles.categoryLabel,
                           {
                             color: theme.colors.text,
-                            fontFamily: theme.typography.fontFamilyBody,
                             fontSize: theme.typography.fontSizeXS,
-                            fontWeight: isSelected ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
+                            fontFamily: isSelected ? theme.typography.fontFamilyBodyBold : theme.typography.fontFamilyBodyMedium,
                           },
                         ]}
                       >
@@ -234,9 +231,8 @@ const AddHabitStep2Screen: React.FC = () => {
                 styles.sectionTitle,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplay,
+                  fontFamily: theme.typography.fontFamilyDisplayBold,
                   fontSize: theme.typography.fontSizeLG,
-                  fontWeight: theme.typography.fontWeightBold,
                 },
               ]}
             >
@@ -270,9 +266,8 @@ const AddHabitStep2Screen: React.FC = () => {
                         styles.colorName,
                         {
                           color: isSelected ? theme.colors.text : theme.colors.textSecondary,
-                          fontFamily: theme.typography.fontFamilyBody,
                           fontSize: theme.typography.fontSizeXS,
-                          fontWeight: isSelected ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
+                          fontFamily: isSelected ? theme.typography.fontFamilyBodyBold : theme.typography.fontFamilyBodyMedium,
                         },
                       ]}
                     >
@@ -291,9 +286,8 @@ const AddHabitStep2Screen: React.FC = () => {
                 styles.sectionTitle,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplay,
+                  fontFamily: theme.typography.fontFamilyDisplayBold,
                   fontSize: theme.typography.fontSizeLG,
-                  fontWeight: theme.typography.fontWeightBold,
                 },
               ]}
             >
@@ -317,9 +311,8 @@ const AddHabitStep2Screen: React.FC = () => {
                       styles.previewName,
                       {
                         color: theme.colors.text,
-                        fontFamily: theme.typography.fontFamilyBody,
+                        fontFamily: theme.typography.fontFamilyBodySemibold,
                         fontSize: theme.typography.fontSizeLG,
-                        fontWeight: theme.typography.fontWeightSemibold,
                       },
                     ]}
                   >
@@ -339,9 +332,8 @@ const AddHabitStep2Screen: React.FC = () => {
                           styles.categoryBadgeText,
                           {
                             color: getSelectedColor(),
-                            fontFamily: theme.typography.fontFamilyBody,
+                            fontFamily: theme.typography.fontFamilyBodySemibold,
                             fontSize: theme.typography.fontSizeXS,
-                            fontWeight: theme.typography.fontWeightSemibold,
                           },
                         ]}
                       >
@@ -375,9 +367,8 @@ const AddHabitStep2Screen: React.FC = () => {
                 styles.nextButtonText,
                 {
                   color: theme.colors.white,
-                  fontFamily: theme.typography.fontFamilyBody,
+                  fontFamily: theme.typography.fontFamilyBodySemibold,
                   fontSize: theme.typography.fontSizeMD,
-                  fontWeight: theme.typography.fontWeightSemibold,
                 },
               ]}
             >
@@ -412,7 +403,6 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontSize: 16,
-    fontWeight: '600',
   },
   progressContainer: {
     marginBottom: 32,
@@ -478,7 +468,6 @@ const styles = StyleSheet.create({
   selectedBadgeText: {
     color: '#FFFFFF',
     fontSize: 12,
-    fontWeight: 'bold',
   },
   colorPalette: {
     flexDirection: 'row',
@@ -501,7 +490,6 @@ const styles = StyleSheet.create({
   colorCheck: {
     color: '#FFFFFF',
     fontSize: 20,
-    fontWeight: 'bold',
     textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
@@ -542,7 +530,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
   },
   categoryBadgeText: {
-    fontWeight: '600',
+    // fontFamily from theme
   },
   nextButton: {
     width: '100%',

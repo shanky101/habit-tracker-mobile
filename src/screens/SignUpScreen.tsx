@@ -161,7 +161,7 @@ const SignUpScreen: React.FC = () => {
               style={styles.backButton}
               activeOpacity={0.7}
             >
-              <Text style={[styles.backButtonText, { color: theme.colors.primary }]}>
+              <Text style={[styles.backButtonText, { color: theme.colors.primary, fontFamily: theme.typography.fontFamilyBodySemibold }]}>
                 ← Back
               </Text>
             </TouchableOpacity>
@@ -170,9 +170,8 @@ const SignUpScreen: React.FC = () => {
                 styles.title,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplay,
+                  fontFamily: theme.typography.fontFamilyDisplayBold,
                   fontSize: theme.typography.fontSize2XL,
-                  fontWeight: theme.typography.fontWeightBold,
                 },
               ]}
             >
@@ -201,9 +200,8 @@ const SignUpScreen: React.FC = () => {
                   styles.label,
                   {
                     color: theme.colors.text,
-                    fontFamily: theme.typography.fontFamilyBody,
+                    fontFamily: theme.typography.fontFamilyBodyMedium,
                     fontSize: theme.typography.fontSizeSM,
-                    fontWeight: theme.typography.fontWeightMedium,
                   },
                 ]}
               >
@@ -248,9 +246,8 @@ const SignUpScreen: React.FC = () => {
                   styles.label,
                   {
                     color: theme.colors.text,
-                    fontFamily: theme.typography.fontFamilyBody,
+                    fontFamily: theme.typography.fontFamilyBodyMedium,
                     fontSize: theme.typography.fontSizeSM,
-                    fontWeight: theme.typography.fontWeightMedium,
                   },
                 ]}
               >
@@ -295,9 +292,8 @@ const SignUpScreen: React.FC = () => {
                   styles.label,
                   {
                     color: theme.colors.text,
-                    fontFamily: theme.typography.fontFamilyBody,
+                    fontFamily: theme.typography.fontFamilyBodyMedium,
                     fontSize: theme.typography.fontSizeSM,
-                    fontWeight: theme.typography.fontWeightMedium,
                   },
                 ]}
               >
@@ -377,9 +373,8 @@ const SignUpScreen: React.FC = () => {
                     styles.signUpButtonText,
                     {
                       color: theme.colors.white,
-                      fontFamily: theme.typography.fontFamilyBody,
+                      fontFamily: theme.typography.fontFamilyBodySemibold,
                       fontSize: theme.typography.fontSizeMD,
-                      fontWeight: theme.typography.fontWeightSemibold,
                     },
                   ]}
                 >
@@ -439,7 +434,6 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontSize: 16,
-    fontWeight: '600',
   },
   title: {
     marginBottom: 8,
@@ -497,7 +491,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   footerLink: {
-    fontWeight: '600',
     textDecorationLine: 'underline',
   },
 });

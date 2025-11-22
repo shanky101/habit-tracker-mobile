@@ -57,7 +57,7 @@ const OnboardingWelcomeScreen: React.FC = () => {
             styles.skipText,
             {
               color: theme.colors.textSecondary,
-              fontWeight: theme.typography.fontWeightMedium,
+              fontFamily: theme.typography.fontFamilyBodyMedium,
             },
           ]}
         >
@@ -102,7 +102,7 @@ const OnboardingWelcomeScreen: React.FC = () => {
               styles.headline,
               {
                 color: theme.colors.text,
-                fontWeight: theme.typography.fontWeightBold,
+                fontFamily: theme.typography.fontFamilyDisplayBold,
               },
             ]}
           >
@@ -114,7 +114,7 @@ const OnboardingWelcomeScreen: React.FC = () => {
               styles.subheading,
               {
                 color: theme.colors.textSecondary,
-                fontWeight: theme.typography.fontWeightRegular,
+                fontFamily: theme.typography.fontFamilyBody,
                 lineHeight: theme.typography.lineHeightRelaxed * theme.typography.fontSizeLG,
               },
             ]}
@@ -163,7 +163,7 @@ const OnboardingWelcomeScreen: React.FC = () => {
               styles.primaryButtonText,
               {
                 color: theme.colors.white,
-                fontWeight: theme.typography.fontWeightSemibold,
+                fontFamily: theme.typography.fontFamilyBodySemibold,
               },
             ]}
           >

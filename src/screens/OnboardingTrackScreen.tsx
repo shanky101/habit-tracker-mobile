@@ -79,7 +79,7 @@ const OnboardingTrackScreen: React.FC = () => {
               styles.navText,
               {
                 color: theme.colors.textSecondary,
-                fontWeight: theme.typography.fontWeightMedium,
+                fontFamily: theme.typography.fontFamilyBodyMedium,
               },
             ]}
           >
@@ -93,7 +93,7 @@ const OnboardingTrackScreen: React.FC = () => {
               styles.navText,
               {
                 color: theme.colors.textSecondary,
-                fontWeight: theme.typography.fontWeightMedium,
+                fontFamily: theme.typography.fontFamilyBodyMedium,
               },
             ]}
           >
@@ -127,7 +127,7 @@ const OnboardingTrackScreen: React.FC = () => {
                     styles.habitName,
                     {
                       color: theme.colors.text,
-                      fontWeight: theme.typography.fontWeightSemibold,
+                      fontFamily: theme.typography.fontFamilyBodySemibold,
                     },
                   ]}
                 >
@@ -138,7 +138,7 @@ const OnboardingTrackScreen: React.FC = () => {
                     styles.habitTime,
                     {
                       color: theme.colors.textSecondary,
-                      fontWeight: theme.typography.fontWeightRegular,
+                      fontFamily: theme.typography.fontFamilyBody,
                     },
                   ]}
                 >
@@ -178,7 +178,7 @@ const OnboardingTrackScreen: React.FC = () => {
                     styles.habitName,
                     {
                       color: theme.colors.text,
-                      fontWeight: theme.typography.fontWeightSemibold,
+                      fontFamily: theme.typography.fontFamilyBodySemibold,
                     },
                   ]}
                 >
@@ -189,7 +189,7 @@ const OnboardingTrackScreen: React.FC = () => {
                     styles.habitTime,
                     {
                       color: theme.colors.textSecondary,
-                      fontWeight: theme.typography.fontWeightRegular,
+                      fontFamily: theme.typography.fontFamilyBody,
                     },
                   ]}
                 >
@@ -217,7 +217,7 @@ const OnboardingTrackScreen: React.FC = () => {
               styles.headline,
               {
                 color: theme.colors.text,
-                fontWeight: theme.typography.fontWeightBold,
+                fontFamily: theme.typography.fontFamilyDisplayBold,
               },
             ]}
           >
@@ -229,7 +229,7 @@ const OnboardingTrackScreen: React.FC = () => {
               styles.subheading,
               {
                 color: theme.colors.textSecondary,
-                fontWeight: theme.typography.fontWeightRegular,
+                fontFamily: theme.typography.fontFamilyBody,
                 lineHeight: theme.typography.lineHeightRelaxed * theme.typography.fontSizeMD,
               },
             ]}
@@ -253,7 +253,7 @@ const OnboardingTrackScreen: React.FC = () => {
                   styles.featureText,
                   {
                     color: theme.colors.textSecondary,
-                    fontWeight: theme.typography.fontWeightRegular,
+                    fontFamily: theme.typography.fontFamilyBody,
                   },
                 ]}
               >
@@ -275,7 +275,7 @@ const OnboardingTrackScreen: React.FC = () => {
                   styles.featureText,
                   {
                     color: theme.colors.textSecondary,
-                    fontWeight: theme.typography.fontWeightRegular,
+                    fontFamily: theme.typography.fontFamilyBody,
                   },
                 ]}
               >
@@ -297,7 +297,7 @@ const OnboardingTrackScreen: React.FC = () => {
                   styles.featureText,
                   {
                     color: theme.colors.textSecondary,
-                    fontWeight: theme.typography.fontWeightRegular,
+                    fontFamily: theme.typography.fontFamilyBody,
                   },
                 ]}
               >
@@ -346,7 +346,7 @@ const OnboardingTrackScreen: React.FC = () => {
               styles.primaryButtonText,
               {
                 color: theme.colors.white,
-                fontWeight: theme.typography.fontWeightSemibold,
+                fontFamily: theme.typography.fontFamilyBodySemibold,
               },
             ]}
           >

@@ -113,9 +113,8 @@ const HabitDetailScreen: React.FC = () => {
           styles.statValue,
           {
             color: theme.colors.text,
-            fontFamily: theme.typography.fontFamilyDisplay,
+            fontFamily: theme.typography.fontFamilyDisplayBold,
             fontSize: 32,
-            fontWeight: theme.typography.fontWeightBold,
           },
         ]}
       >
@@ -156,9 +155,8 @@ const HabitDetailScreen: React.FC = () => {
             styles.sectionTitle,
             {
               color: theme.colors.text,
-              fontFamily: theme.typography.fontFamilyBody,
+              fontFamily: theme.typography.fontFamilyBodySemibold,
               fontSize: theme.typography.fontSizeMD,
-              fontWeight: theme.typography.fontWeightSemibold,
             },
           ]}
         >
@@ -237,9 +235,8 @@ const HabitDetailScreen: React.FC = () => {
           styles.sectionTitle,
           {
             color: theme.colors.text,
-            fontFamily: theme.typography.fontFamilyBody,
+            fontFamily: theme.typography.fontFamilyBodySemibold,
             fontSize: theme.typography.fontSizeMD,
-            fontWeight: theme.typography.fontWeightSemibold,
           },
         ]}
       >
@@ -293,9 +290,8 @@ const HabitDetailScreen: React.FC = () => {
                   styles.activityDate,
                   {
                     color: theme.colors.text,
-                    fontFamily: theme.typography.fontFamilyBody,
+                    fontFamily: theme.typography.fontFamilyBodyMedium,
                     fontSize: theme.typography.fontSizeSM,
-                    fontWeight: theme.typography.fontWeightMedium,
                   },
                 ]}
               >
@@ -350,9 +346,8 @@ const HabitDetailScreen: React.FC = () => {
                   styles.habitName,
                   {
                     color: theme.colors.text,
-                    fontFamily: theme.typography.fontFamilyDisplay,
+                    fontFamily: theme.typography.fontFamilyDisplayBold,
                     fontSize: theme.typography.fontSizeLG,
-                    fontWeight: theme.typography.fontWeightBold,
                   },
                 ]}
               >
@@ -369,9 +364,8 @@ const HabitDetailScreen: React.FC = () => {
                     styles.categoryText,
                     {
                       color: getCategoryColor(habitData.category),
-                      fontFamily: theme.typography.fontFamilyBody,
+                      fontFamily: theme.typography.fontFamilyBodyMedium,
                       fontSize: theme.typography.fontSizeXS,
-                      fontWeight: theme.typography.fontWeightMedium,
                     },
                   ]}
                 >
@@ -433,9 +427,8 @@ const HabitDetailScreen: React.FC = () => {
                 styles.actionText,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyBody,
                   fontSize: theme.typography.fontSizeSM,
-                  fontWeight: theme.typography.fontWeightMedium,
+                  fontFamily: theme.typography.fontFamilyBodyMedium,
                 },
               ]}
             >
@@ -459,9 +452,8 @@ const HabitDetailScreen: React.FC = () => {
                 styles.actionText,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyBody,
                   fontSize: theme.typography.fontSizeSM,
-                  fontWeight: theme.typography.fontWeightMedium,
+                  fontFamily: theme.typography.fontFamilyBodyMedium,
                 },
               ]}
             >

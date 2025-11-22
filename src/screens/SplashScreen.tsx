@@ -73,7 +73,7 @@ const SplashScreen: React.FC = () => {
             },
           ]}
         >
-          <Text style={[styles.logoText, { color: theme.colors.white }]}>
+          <Text style={[styles.logoText, { color: theme.colors.white, fontFamily: theme.typography.fontFamilyDisplayBold }]}>
             H
           </Text>
         </View>
@@ -84,7 +84,7 @@ const SplashScreen: React.FC = () => {
             styles.appName,
             {
               color: theme.colors.text,
-              fontWeight: theme.typography.fontWeightBold,
+              fontFamily: theme.typography.fontFamilyDisplayBold,
             },
           ]}
         >
@@ -97,7 +97,7 @@ const SplashScreen: React.FC = () => {
             styles.tagline,
             {
               color: theme.colors.textSecondary,
-              fontWeight: theme.typography.fontWeightRegular,
+              fontFamily: theme.typography.fontFamilyBody,
             },
           ]}
         >
@@ -127,7 +127,6 @@ const styles = StyleSheet.create({
   },
   logoText: {
     fontSize: 56,
-    fontWeight: '700',
   },
   appName: {
     fontSize: 32,

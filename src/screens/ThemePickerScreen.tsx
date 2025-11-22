@@ -104,9 +104,8 @@ const ThemePickerScreen: React.FC = () => {
                 styles.themeName,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyBody,
+                  fontFamily: theme.typography.fontFamilyBodySemibold,
                   fontSize: theme.typography.fontSizeMD,
-                  fontWeight: theme.typography.fontWeightSemibold,
                 },
               ]}
             >
@@ -171,9 +170,8 @@ const ThemePickerScreen: React.FC = () => {
             styles.title,
             {
               color: theme.colors.text,
-              fontFamily: theme.typography.fontFamilyDisplay,
+              fontFamily: theme.typography.fontFamilyDisplayBold,
               fontSize: theme.typography.fontSizeXL,
-              fontWeight: theme.typography.fontWeightBold,
             },
           ]}
         >
@@ -209,9 +207,8 @@ const ThemePickerScreen: React.FC = () => {
                     styles.autoTitle,
                     {
                       color: theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBody,
+                      fontFamily: theme.typography.fontFamilyBodySemibold,
                       fontSize: theme.typography.fontSizeMD,
-                      fontWeight: theme.typography.fontWeightSemibold,
                     },
                   ]}
                 >
@@ -250,9 +247,8 @@ const ThemePickerScreen: React.FC = () => {
             styles.sectionTitle,
             {
               color: theme.colors.textSecondary,
-              fontFamily: theme.typography.fontFamilyBody,
+              fontFamily: theme.typography.fontFamilyBodySemibold,
               fontSize: theme.typography.fontSizeXS,
-              fontWeight: theme.typography.fontWeightSemibold,
             },
           ]}
         >

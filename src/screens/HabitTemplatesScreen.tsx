@@ -238,9 +238,8 @@ const HabitTemplatesScreen: React.FC = () => {
                   styles.modalTitle,
                   {
                     color: theme.colors.text,
-                    fontFamily: theme.typography.fontFamilyDisplay,
                     fontSize: theme.typography.fontSizeXL,
-                    fontWeight: theme.typography.fontWeightBold,
+                    fontFamily: theme.typography.fontFamilyDisplayBold,
                   },
                 ]}
               >
@@ -279,9 +278,8 @@ const HabitTemplatesScreen: React.FC = () => {
                   styles.modalSectionTitle,
                   {
                     color: theme.colors.text,
-                    fontFamily: theme.typography.fontFamilyBody,
                     fontSize: theme.typography.fontSizeMD,
-                    fontWeight: theme.typography.fontWeightSemibold,
+                    fontFamily: theme.typography.fontFamilyBodySemibold,
                   },
                 ]}
               >
@@ -313,9 +311,8 @@ const HabitTemplatesScreen: React.FC = () => {
                   styles.modalSectionTitle,
                   {
                     color: theme.colors.text,
-                    fontFamily: theme.typography.fontFamilyBody,
                     fontSize: theme.typography.fontSizeMD,
-                    fontWeight: theme.typography.fontWeightSemibold,
+                    fontFamily: theme.typography.fontFamilyBodySemibold,
                   },
                 ]}
               >
@@ -354,9 +351,8 @@ const HabitTemplatesScreen: React.FC = () => {
                   styles.addButtonText,
                   {
                     color: theme.colors.white,
-                    fontFamily: theme.typography.fontFamilyBody,
                     fontSize: theme.typography.fontSizeMD,
-                    fontWeight: theme.typography.fontWeightSemibold,
+                    fontFamily: theme.typography.fontFamilyBodySemibold,
                   },
                 ]}
               >
@@ -396,9 +392,8 @@ const HabitTemplatesScreen: React.FC = () => {
               styles.headerTitle,
               {
                 color: theme.colors.text,
-                fontFamily: theme.typography.fontFamilyDisplay,
                 fontSize: theme.typography.fontSizeXL,
-                fontWeight: theme.typography.fontWeightBold,
+                fontFamily: theme.typography.fontFamilyDisplayBold,
               },
             ]}
           >
@@ -474,12 +469,11 @@ const HabitTemplatesScreen: React.FC = () => {
                     selectedCategory === category
                       ? theme.colors.white
                       : theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyBody,
                   fontSize: theme.typography.fontSizeSM,
-                  fontWeight:
+                  fontFamily:
                     selectedCategory === category
-                      ? theme.typography.fontWeightSemibold
-                      : theme.typography.fontWeightMedium,
+                      ? theme.typography.fontFamilyBodySemibold
+                      : theme.typography.fontFamilyBodyMedium,
                 },
               ]}
             >
@@ -522,9 +516,8 @@ const HabitTemplatesScreen: React.FC = () => {
                     styles.templateName,
                     {
                       color: theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBody,
                       fontSize: theme.typography.fontSizeMD,
-                      fontWeight: theme.typography.fontWeightSemibold,
+                      fontFamily: theme.typography.fontFamilyBodySemibold,
                     },
                   ]}
                 >
@@ -585,9 +578,8 @@ const HabitTemplatesScreen: React.FC = () => {
                 styles.emptyTitle,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplay,
                   fontSize: theme.typography.fontSizeLG,
-                  fontWeight: theme.typography.fontWeightBold,
+                  fontFamily: theme.typography.fontFamilyDisplayBold,
                 },
               ]}
             >

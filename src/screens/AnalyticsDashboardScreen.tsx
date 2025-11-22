@@ -166,9 +166,8 @@ const AnalyticsDashboardScreen: React.FC = () => {
                 styles.gateTitle,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplay,
+                  fontFamily: theme.typography.fontFamilyDisplayBold,
                   fontSize: theme.typography.fontSize2XL,
-                  fontWeight: theme.typography.fontWeightBold,
                 },
               ]}
             >
@@ -205,9 +204,8 @@ const AnalyticsDashboardScreen: React.FC = () => {
                   styles.upgradeButtonText,
                   {
                     color: theme.colors.white,
-                    fontFamily: theme.typography.fontFamilyBody,
+                    fontFamily: theme.typography.fontFamilyBodySemibold,
                     fontSize: theme.typography.fontSizeMD,
-                    fontWeight: theme.typography.fontWeightSemibold,
                   },
                 ]}
               >
@@ -254,9 +252,8 @@ const AnalyticsDashboardScreen: React.FC = () => {
             styles.title,
             {
               color: theme.colors.text,
-              fontFamily: theme.typography.fontFamilyDisplay,
+              fontFamily: theme.typography.fontFamilyDisplayBold,
               fontSize: theme.typography.fontSizeXL,
-              fontWeight: theme.typography.fontWeightBold,
             },
           ]}
         >
@@ -350,9 +347,8 @@ const AnalyticsDashboardScreen: React.FC = () => {
                 styles.summaryValue,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplay,
+                  fontFamily: theme.typography.fontFamilyDisplayBold,
                   fontSize: theme.typography.fontSize2XL,
-                  fontWeight: theme.typography.fontWeightBold,
                 },
               ]}
             >
@@ -403,9 +399,8 @@ const AnalyticsDashboardScreen: React.FC = () => {
                 styles.summaryValue,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplay,
+                  fontFamily: theme.typography.fontFamilyDisplayBold,
                   fontSize: theme.typography.fontSize2XL,
-                  fontWeight: theme.typography.fontWeightBold,
                 },
               ]}
             >
@@ -441,9 +436,8 @@ const AnalyticsDashboardScreen: React.FC = () => {
                 styles.summaryValue,
                 {
                   color: analyticsData.consistencyScore >= 80 ? theme.colors.success : theme.colors.warning,
-                  fontFamily: theme.typography.fontFamilyDisplay,
+                  fontFamily: theme.typography.fontFamilyDisplayBold,
                   fontSize: theme.typography.fontSize2XL,
-                  fontWeight: theme.typography.fontWeightBold,
                 },
               ]}
             >
@@ -479,9 +473,8 @@ const AnalyticsDashboardScreen: React.FC = () => {
                 styles.summaryValue,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplay,
+                  fontFamily: theme.typography.fontFamilyDisplayBold,
                   fontSize: theme.typography.fontSize2XL,
-                  fontWeight: theme.typography.fontWeightBold,
                 },
               ]}
             >
@@ -532,9 +525,8 @@ const AnalyticsDashboardScreen: React.FC = () => {
               styles.chartTitle,
               {
                 color: theme.colors.text,
-                fontFamily: theme.typography.fontFamilyBody,
+                fontFamily: theme.typography.fontFamilyBodySemibold,
                 fontSize: theme.typography.fontSizeMD,
-                fontWeight: theme.typography.fontWeightSemibold,
               },
             ]}
           >
@@ -634,9 +626,8 @@ const AnalyticsDashboardScreen: React.FC = () => {
               styles.chartTitle,
               {
                 color: theme.colors.text,
-                fontFamily: theme.typography.fontFamilyBody,
+                fontFamily: theme.typography.fontFamilyBodySemibold,
                 fontSize: theme.typography.fontSizeMD,
-                fontWeight: theme.typography.fontWeightSemibold,
               },
             ]}
           >
@@ -658,9 +649,8 @@ const AnalyticsDashboardScreen: React.FC = () => {
                     styles.habitName,
                     {
                       color: theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBody,
+                      fontFamily: theme.typography.fontFamilyBodyMedium,
                       fontSize: theme.typography.fontSizeSM,
-                      fontWeight: theme.typography.fontWeightMedium,
                     },
                   ]}
                   numberOfLines={1}
@@ -689,9 +679,8 @@ const AnalyticsDashboardScreen: React.FC = () => {
                     styles.completionRate,
                     {
                       color: theme.colors.success,
-                      fontFamily: theme.typography.fontFamilyBody,
+                      fontFamily: theme.typography.fontFamilyBodySemibold,
                       fontSize: theme.typography.fontSizeSM,
-                      fontWeight: theme.typography.fontWeightSemibold,
                     },
                   ]}
                 >
@@ -721,9 +710,8 @@ const AnalyticsDashboardScreen: React.FC = () => {
                 styles.aiTitle,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyBody,
+                  fontFamily: theme.typography.fontFamilyBodySemibold,
                   fontSize: theme.typography.fontSizeMD,
-                  fontWeight: theme.typography.fontWeightSemibold,
                 },
               ]}
             >
@@ -735,9 +723,8 @@ const AnalyticsDashboardScreen: React.FC = () => {
               <Text
                 style={{
                   color: theme.colors.white,
-                  fontFamily: theme.typography.fontFamilyBody,
                   fontSize: 10,
-                  fontWeight: theme.typography.fontWeightSemibold,
+                  fontFamily: theme.typography.fontFamilyBodySemibold,
                 }}
               >
                 PREMIUM
@@ -771,9 +758,8 @@ const AnalyticsDashboardScreen: React.FC = () => {
                 styles.refreshButtonText,
                 {
                   color: theme.colors.primary,
-                  fontFamily: theme.typography.fontFamilyBody,
+                  fontFamily: theme.typography.fontFamilyBodyMedium,
                   fontSize: theme.typography.fontSizeSM,
-                  fontWeight: theme.typography.fontWeightMedium,
                 },
               ]}
             >

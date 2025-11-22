@@ -125,7 +125,7 @@ const PermissionNotificationScreen: React.FC = () => {
               styles.headline,
               {
                 color: theme.colors.text,
-                fontWeight: theme.typography.fontWeightBold,
+                fontFamily: theme.typography.fontFamilyDisplayBold,
               },
             ]}
           >
@@ -137,7 +137,7 @@ const PermissionNotificationScreen: React.FC = () => {
               styles.subheading,
               {
                 color: theme.colors.textSecondary,
-                fontWeight: theme.typography.fontWeightRegular,
+                fontFamily: theme.typography.fontFamilyBody,
                 lineHeight: theme.typography.lineHeightRelaxed * theme.typography.fontSizeMD,
               },
             ]}
@@ -173,7 +173,7 @@ const PermissionNotificationScreen: React.FC = () => {
                     styles.notificationAppName,
                     {
                       color: theme.colors.text,
-                      fontWeight: theme.typography.fontWeightSemibold,
+                      fontFamily: theme.typography.fontFamilyBodySemibold,
                     },
                   ]}
                 >
@@ -184,7 +184,7 @@ const PermissionNotificationScreen: React.FC = () => {
                     styles.notificationTime,
                     {
                       color: theme.colors.textTertiary,
-                      fontWeight: theme.typography.fontWeightRegular,
+                      fontFamily: theme.typography.fontFamilyBody,
                     },
                   ]}
                 >
@@ -197,7 +197,7 @@ const PermissionNotificationScreen: React.FC = () => {
                 styles.notificationMessage,
                 {
                   color: theme.colors.text,
-                  fontWeight: theme.typography.fontWeightRegular,
+                  fontFamily: theme.typography.fontFamilyBody,
                 },
               ]}
             >
@@ -211,7 +211,7 @@ const PermissionNotificationScreen: React.FC = () => {
               styles.trustText,
               {
                 color: theme.colors.textTertiary,
-                fontWeight: theme.typography.fontWeightRegular,
+                fontFamily: theme.typography.fontFamilyBody,
               },
             ]}
           >
@@ -237,7 +237,7 @@ const PermissionNotificationScreen: React.FC = () => {
                 styles.primaryButtonText,
                 {
                   color: theme.colors.white,
-                  fontWeight: theme.typography.fontWeightSemibold,
+                  fontFamily: theme.typography.fontFamilyBodySemibold,
                 },
               ]}
             >
@@ -262,7 +262,7 @@ const PermissionNotificationScreen: React.FC = () => {
                 styles.secondaryButtonText,
                 {
                   color: theme.colors.text,
-                  fontWeight: theme.typography.fontWeightSemibold,
+                  fontFamily: theme.typography.fontFamilyBodySemibold,
                 },
               ]}
             >
@@ -280,7 +280,7 @@ const PermissionNotificationScreen: React.FC = () => {
                 styles.skipText,
                 {
                   color: theme.colors.textSecondary,
-                  fontWeight: theme.typography.fontWeightMedium,
+                  fontFamily: theme.typography.fontFamilyBodyMedium,
                 },
               ]}
             >
@@ -356,7 +356,6 @@ const styles = StyleSheet.create({
   },
   appIconText: {
     fontSize: 14,
-    fontWeight: '700',
     color: 'white',
   },
   notificationHeaderText: {

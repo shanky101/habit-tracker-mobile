@@ -19,3 +19,8 @@ export { default as AnalyticsDashboardScreen } from './AnalyticsDashboardScreen'
 export { default as HabitDeepDiveScreen } from './HabitDeepDiveScreen';
 export { default as SettingsScreen } from './SettingsScreen';
 export { default as ThemePickerScreen } from './ThemePickerScreen';
+export { default as ProfileScreen } from './ProfileScreen';
+export { default as AIInsightsScreen } from './AIInsightsScreen';
+export { default as ExportDataScreen } from './ExportDataScreen';
+export { default as NotificationsSettingsScreen } from './NotificationsSettingsScreen';
+export { default as AccountSettingsScreen } from './AccountSettingsScreen';

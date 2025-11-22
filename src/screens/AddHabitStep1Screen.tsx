@@ -119,7 +119,7 @@ const AddHabitStep1Screen: React.FC = () => {
               style={styles.cancelButton}
               activeOpacity={0.7}
             >
-              <Text style={[styles.cancelButtonText, { color: theme.colors.textSecondary }]}>
+              <Text style={[styles.cancelButtonText, { color: theme.colors.textSecondary, fontFamily: theme.typography.fontFamilyBodyMedium }]}>
                 Cancel
               </Text>
             </TouchableOpacity>
@@ -158,9 +158,8 @@ const AddHabitStep1Screen: React.FC = () => {
               styles.title,
               {
                 color: theme.colors.text,
-                fontFamily: theme.typography.fontFamilyDisplay,
+                fontFamily: theme.typography.fontFamilyDisplayBold,
                 fontSize: theme.typography.fontSize2XL,
-                fontWeight: theme.typography.fontWeightBold,
               },
             ]}
           >
@@ -222,9 +221,8 @@ const AddHabitStep1Screen: React.FC = () => {
                 styles.suggestionsLabel,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyBody,
+                  fontFamily: theme.typography.fontFamilyBodyMedium,
                   fontSize: theme.typography.fontSizeSM,
-                  fontWeight: theme.typography.fontWeightMedium,
                 },
               ]}
             >
@@ -285,9 +283,8 @@ const AddHabitStep1Screen: React.FC = () => {
                       styles.browseTemplatesText,
                       {
                         color: theme.colors.primary,
-                        fontFamily: theme.typography.fontFamilyBody,
+                        fontFamily: theme.typography.fontFamilyBodyBold,
                         fontSize: theme.typography.fontSizeMD,
-                        fontWeight: theme.typography.fontWeightBold,
                       },
                     ]}
                   >
@@ -333,9 +330,8 @@ const AddHabitStep1Screen: React.FC = () => {
                 styles.nextButtonText,
                 {
                   color: habitName.trim().length >= 3 ? theme.colors.white : theme.colors.textSecondary,
-                  fontFamily: theme.typography.fontFamilyBody,
+                  fontFamily: theme.typography.fontFamilyBodySemibold,
                   fontSize: theme.typography.fontSizeMD,
-                  fontWeight: theme.typography.fontWeightSemibold,
                 },
               ]}
             >

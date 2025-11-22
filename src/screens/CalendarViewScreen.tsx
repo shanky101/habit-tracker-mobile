@@ -179,9 +179,8 @@ const CalendarViewScreen: React.FC = () => {
                 styles.modalDate,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplay,
                   fontSize: theme.typography.fontSizeLG,
-                  fontWeight: theme.typography.fontWeightBold,
+                  fontFamily: theme.typography.fontFamilyDisplayBold,
                 },
               ]}
             >
@@ -264,9 +263,8 @@ const CalendarViewScreen: React.FC = () => {
                   styles.closeButtonText,
                   {
                     color: theme.colors.white,
-                    fontFamily: theme.typography.fontFamilyBody,
                     fontSize: theme.typography.fontSizeMD,
-                    fontWeight: theme.typography.fontWeightSemibold,
+                    fontFamily: theme.typography.fontFamilyBodySemibold,
                   },
                 ]}
               >
@@ -315,9 +313,8 @@ const CalendarViewScreen: React.FC = () => {
               styles.monthYear,
               {
                 color: theme.colors.text,
-                fontFamily: theme.typography.fontFamilyDisplay,
                 fontSize: theme.typography.fontSizeLG,
-                fontWeight: theme.typography.fontWeightBold,
+                fontFamily: theme.typography.fontFamilyDisplayBold,
               },
             ]}
           >
@@ -346,9 +343,8 @@ const CalendarViewScreen: React.FC = () => {
               styles.todayText,
               {
                 color: theme.colors.primary,
-                fontFamily: theme.typography.fontFamilyBody,
                 fontSize: theme.typography.fontSizeXS,
-                fontWeight: theme.typography.fontWeightSemibold,
+                fontFamily: theme.typography.fontFamilyBodySemibold,
               },
             ]}
           >
@@ -372,9 +368,8 @@ const CalendarViewScreen: React.FC = () => {
                   styles.dayHeaderText,
                   {
                     color: theme.colors.textSecondary,
-                    fontFamily: theme.typography.fontFamilyBody,
                     fontSize: theme.typography.fontSizeXS,
-                    fontWeight: theme.typography.fontWeightSemibold,
+                    fontFamily: theme.typography.fontFamilyBodySemibold,
                   },
                 ]}
               >
@@ -417,11 +412,10 @@ const CalendarViewScreen: React.FC = () => {
                     styles.dayNumber,
                     {
                       color: today ? theme.colors.primary : theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBody,
                       fontSize: theme.typography.fontSizeSM,
-                      fontWeight: today
-                        ? theme.typography.fontWeightBold
-                        : theme.typography.fontWeightMedium,
+                      fontFamily: today
+                        ? theme.typography.fontFamilyBodyBold
+                        : theme.typography.fontFamilyBodyMedium,
                     },
                   ]}
                 >
@@ -457,9 +451,8 @@ const CalendarViewScreen: React.FC = () => {
               styles.legendTitle,
               {
                 color: theme.colors.textSecondary,
-                fontFamily: theme.typography.fontFamilyBody,
                 fontSize: theme.typography.fontSizeXS,
-                fontWeight: theme.typography.fontWeightSemibold,
+                fontFamily: theme.typography.fontFamilyBodySemibold,
               },
             ]}
           >
@@ -617,7 +610,6 @@ const styles = StyleSheet.create({
   },
   completionText: {
     fontSize: 9,
-    fontWeight: 'bold',
     color: '#000',
   },
   legend: {

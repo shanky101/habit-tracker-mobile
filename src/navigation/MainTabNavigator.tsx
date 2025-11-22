@@ -14,8 +14,13 @@ import {
   HabitTemplatesScreen,
   AnalyticsDashboardScreen,
   HabitDeepDiveScreen,
+  AIInsightsScreen,
+  ExportDataScreen,
   SettingsScreen,
   ThemePickerScreen,
+  ProfileScreen,
+  NotificationsSettingsScreen,
+  AccountSettingsScreen,
 } from '@/screens';
 
 export type HomeStackParamList = {
@@ -42,10 +47,21 @@ export type SettingsStackParamList = {
   Subscription: undefined;
 };
 
+export type ProfileStackParamList = {
+  ProfileMain: undefined;
+  Settings: undefined;
+  ThemePicker: undefined;
+  NotificationsSettings: undefined;
+  AccountSettings: undefined;
+  ExportData: undefined;
+  About: undefined;
+};
+
 const Tab = createBottomTabNavigator();
 const HomeStack = createStackNavigator<HomeStackParamList>();
 const AnalyticsStack = createStackNavigator<AnalyticsStackParamList>();
 const SettingsStack = createStackNavigator<SettingsStackParamList>();
+const ProfileStack = createStackNavigator<ProfileStackParamList>();
 
 // Tab Icon Component
 const TabIcon: React.FC<{ icon: string; focused: boolean; color: string }> = ({
@@ -90,6 +106,8 @@ const AnalyticsStackNavigator: React.FC = () => {
     >
       <AnalyticsStack.Screen name="AnalyticsMain" component={AnalyticsDashboardScreen} />
       <AnalyticsStack.Screen name="HabitDeepDive" component={HabitDeepDiveScreen} />
+      <AnalyticsStack.Screen name="AIInsights" component={AIInsightsScreen} />
+      <AnalyticsStack.Screen name="ExportData" component={ExportDataScreen} />
     </AnalyticsStack.Navigator>
   );
 };
@@ -106,6 +124,25 @@ const SettingsStackNavigator: React.FC = () => {
       <SettingsStack.Screen name="SettingsMain" component={SettingsScreen} />
       <SettingsStack.Screen name="ThemePicker" component={ThemePickerScreen} />
     </SettingsStack.Navigator>
+  );
+};
+
+// Profile Stack Navigator
+const ProfileStackNavigator: React.FC = () => {
+  return (
+    <ProfileStack.Navigator
+      screenOptions={{
+        headerShown: false,
+        cardStyle: { backgroundColor: 'transparent' },
+      }}
+    >
+      <ProfileStack.Screen name="ProfileMain" component={ProfileScreen} />
+      <ProfileStack.Screen name="Settings" component={SettingsScreen} />
+      <ProfileStack.Screen name="ThemePicker" component={ThemePickerScreen} />
+      <ProfileStack.Screen name="NotificationsSettings" component={NotificationsSettingsScreen} />
+      <ProfileStack.Screen name="AccountSettings" component={AccountSettingsScreen} />
+      <ProfileStack.Screen name="ExportData" component={ExportDataScreen} />
+    </ProfileStack.Navigator>
   );
 };
 
@@ -153,11 +190,11 @@ const MainTabNavigator: React.FC = () => {
         }}
       />
       <Tab.Screen
-        name="Settings"
-        component={SettingsStackNavigator}
+        name="Profile"
+        component={ProfileStackNavigator}
         options={{
           tabBarIcon: ({ focused, color }) => (
-            <TabIcon icon="⚙️" focused={focused} color={color} />
+            <TabIcon icon="👤" focused={focused} color={color} />
           ),
         }}
       />

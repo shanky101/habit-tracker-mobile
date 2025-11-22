@@ -156,7 +156,7 @@ const EditHabitScreen: React.FC = () => {
           {/* Header */}
           <View style={styles.header}>
             <TouchableOpacity onPress={handleCancel} style={styles.headerButton} activeOpacity={0.7}>
-              <Text style={[styles.headerButtonText, { color: theme.colors.textSecondary }]}>
+              <Text style={[styles.headerButtonText, { color: theme.colors.textSecondary, fontFamily: theme.typography.fontFamilyBodySemibold }]}>
                 Cancel
               </Text>
             </TouchableOpacity>
@@ -165,16 +165,15 @@ const EditHabitScreen: React.FC = () => {
                 styles.headerTitle,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplay,
+                  fontFamily: theme.typography.fontFamilyDisplayBold,
                   fontSize: theme.typography.fontSizeLG,
-                  fontWeight: theme.typography.fontWeightBold,
                 },
               ]}
             >
               Edit Habit
             </Text>
             <TouchableOpacity onPress={handleSave} style={styles.headerButton} activeOpacity={0.7}>
-              <Text style={[styles.headerButtonText, { color: theme.colors.primary }]}>
+              <Text style={[styles.headerButtonText, { color: theme.colors.primary, fontFamily: theme.typography.fontFamilyBodySemibold }]}>
                 Save
               </Text>
             </TouchableOpacity>
@@ -187,9 +186,8 @@ const EditHabitScreen: React.FC = () => {
                 styles.sectionLabel,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyBody,
                   fontSize: theme.typography.fontSizeSM,
-                  fontWeight: theme.typography.fontWeightSemibold,
+                  fontFamily: theme.typography.fontFamilyBodySemibold,
                 },
               ]}
             >
@@ -220,9 +218,8 @@ const EditHabitScreen: React.FC = () => {
                 styles.sectionLabel,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyBody,
                   fontSize: theme.typography.fontSizeSM,
-                  fontWeight: theme.typography.fontWeightSemibold,
+                  fontFamily: theme.typography.fontFamilyBodySemibold,
                 },
               ]}
             >
@@ -269,9 +266,8 @@ const EditHabitScreen: React.FC = () => {
                 styles.sectionLabel,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyBody,
                   fontSize: theme.typography.fontSizeSM,
-                  fontWeight: theme.typography.fontWeightSemibold,
+                  fontFamily: theme.typography.fontFamilyBodySemibold,
                 },
               ]}
             >
@@ -307,9 +303,8 @@ const EditHabitScreen: React.FC = () => {
                 styles.sectionLabel,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyBody,
                   fontSize: theme.typography.fontSizeSM,
-                  fontWeight: theme.typography.fontWeightSemibold,
+                  fontFamily: theme.typography.fontFamilyBodySemibold,
                 },
               ]}
             >
@@ -395,9 +390,8 @@ const EditHabitScreen: React.FC = () => {
                         styles.dayText,
                         {
                           color: selectedDays.includes(index) ? theme.colors.white : theme.colors.text,
-                          fontFamily: theme.typography.fontFamilyBody,
                           fontSize: theme.typography.fontSizeSM,
-                          fontWeight: theme.typography.fontWeightSemibold,
+                          fontFamily: theme.typography.fontFamilyBodySemibold,
                         },
                       ]}
                     >
@@ -417,9 +411,8 @@ const EditHabitScreen: React.FC = () => {
                   styles.sectionLabel,
                   {
                     color: theme.colors.text,
-                    fontFamily: theme.typography.fontFamilyBody,
                     fontSize: theme.typography.fontSizeSM,
-                    fontWeight: theme.typography.fontWeightSemibold,
+                    fontFamily: theme.typography.fontFamilyBodySemibold,
                   },
                 ]}
               >
@@ -442,9 +435,8 @@ const EditHabitScreen: React.FC = () => {
                   styles.reminderTimeText,
                   {
                     color: theme.colors.primary,
-                    fontFamily: theme.typography.fontFamilyDisplay,
+                    fontFamily: theme.typography.fontFamilyDisplayBold,
                     fontSize: theme.typography.fontSizeXL,
-                    fontWeight: theme.typography.fontWeightBold,
                   },
                 ]}
               >
@@ -470,9 +462,8 @@ const EditHabitScreen: React.FC = () => {
                   styles.archiveButtonText,
                   {
                     color: theme.colors.white,
-                    fontFamily: theme.typography.fontFamilyBody,
                     fontSize: theme.typography.fontSizeMD,
-                    fontWeight: theme.typography.fontWeightSemibold,
+                    fontFamily: theme.typography.fontFamilyBodySemibold,
                   },
                 ]}
               >
@@ -495,9 +486,8 @@ const EditHabitScreen: React.FC = () => {
                   styles.deleteButtonText,
                   {
                     color: theme.colors.white,
-                    fontFamily: theme.typography.fontFamilyBody,
                     fontSize: theme.typography.fontSizeMD,
-                    fontWeight: theme.typography.fontWeightSemibold,
+                    fontFamily: theme.typography.fontFamilyBodySemibold,
                   },
                 ]}
               >
@@ -536,7 +526,6 @@ const styles = StyleSheet.create({
   },
   headerButtonText: {
     fontSize: 16,
-    fontWeight: '600',
   },
   headerTitle: {
     // styles from theme
@@ -592,7 +581,6 @@ const styles = StyleSheet.create({
   colorCheckmark: {
     color: '#FFFFFF',
     fontSize: 24,
-    fontWeight: 'bold',
   },
   radioOption: {
     borderRadius: 12,

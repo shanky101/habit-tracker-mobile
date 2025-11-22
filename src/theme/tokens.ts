@@ -19,8 +19,10 @@ export interface ColorTokens {
   textSecondary: string;
   textTertiary: string;
   success: string;
+  successLight: string;
   warning: string;
   error: string;
+  errorLight: string;
   border: string;
   borderLight: string;
   white: string;
@@ -28,8 +30,18 @@ export interface ColorTokens {
 }
 
 export interface TypographyTokens {
+  // Display font (Outfit) - for headings
   fontFamilyDisplay: string;
+  fontFamilyDisplayMedium: string;
+  fontFamilyDisplaySemibold: string;
+  fontFamilyDisplayBold: string;
+
+  // Body font (Plus Jakarta Sans) - for body text
   fontFamilyBody: string;
+  fontFamilyBodyMedium: string;
+  fontFamilyBodySemibold: string;
+  fontFamilyBodyBold: string;
+
   fontFamilyMono: string;
 
   // Font sizes
@@ -41,7 +53,7 @@ export interface TypographyTokens {
   fontSizeSM: number;
   fontSizeXS: number;
 
-  // Font weights
+  // Font weights (for reference, actual weight comes from font family)
   fontWeightLight: '300';
   fontWeightRegular: '400';
   fontWeightMedium: '500';
@@ -153,19 +165,32 @@ const baseRadius: RadiusTokens = {
   radiusFull: 9999,
 };
 
-// Base typography
+// Base typography following design guidelines
+// Display/Headings: Outfit
+// Body/Caption: Plus Jakarta Sans
 const baseTypography: TypographyTokens = {
-  fontFamilyDisplay: 'System',
-  fontFamilyBody: 'System',
+  // Display font (Outfit) - for headings
+  fontFamilyDisplay: 'Outfit_400Regular',
+  fontFamilyDisplayMedium: 'Outfit_500Medium',
+  fontFamilyDisplaySemibold: 'Outfit_600SemiBold',
+  fontFamilyDisplayBold: 'Outfit_700Bold',
+
+  // Body font (Plus Jakarta Sans) - for body text
+  fontFamilyBody: 'PlusJakartaSans_400Regular',
+  fontFamilyBodyMedium: 'PlusJakartaSans_500Medium',
+  fontFamilyBodySemibold: 'PlusJakartaSans_600SemiBold',
+  fontFamilyBodyBold: 'PlusJakartaSans_700Bold',
+
   fontFamilyMono: 'Courier',
 
-  fontSize3XL: 40,
-  fontSize2XL: 32,
-  fontSizeXL: 24,
-  fontSizeLG: 20,
-  fontSizeMD: 16,
-  fontSizeSM: 14,
-  fontSizeXS: 12,
+  // Font sizes from design guidelines
+  fontSize3XL: 48,  // Display Heading (H1)
+  fontSize2XL: 28,  // Section Heading (H2)
+  fontSizeXL: 20,   // Card Title (H3)
+  fontSizeLG: 18,   // Large body text
+  fontSizeMD: 16,   // Body Text
+  fontSizeSM: 14,   // Small text
+  fontSizeXS: 13,   // Caption / Meta
 
   fontWeightLight: '300',
   fontWeightRegular: '400',
@@ -173,9 +198,10 @@ const baseTypography: TypographyTokens = {
   fontWeightSemibold: '600',
   fontWeightBold: '700',
 
-  lineHeightTight: 1.2,
-  lineHeightNormal: 1.5,
-  lineHeightRelaxed: 1.75,
+  // Line heights from design guidelines
+  lineHeightTight: 1.1,    // Display Heading
+  lineHeightNormal: 1.4,   // Section Heading, Caption
+  lineHeightRelaxed: 1.6,  // Body Text
 };
 
 // Default Theme (Light, colorful)
@@ -196,8 +222,10 @@ const defaultColors: ColorTokens = {
   textSecondary: '#666666',
   textTertiary: '#999999',
   success: '#22c55e',
+  successLight: '#dcfce7',
   warning: '#f97316',
   error: '#ef4444',
+  errorLight: '#fee2e2',
   border: '#e5e5e5',
   borderLight: '#f0f0f0',
   white: '#ffffff',
@@ -222,8 +250,10 @@ const darkColors: ColorTokens = {
   textSecondary: '#a3a3a3',
   textTertiary: '#737373',
   success: '#4ade80',
+  successLight: '#166534',
   warning: '#fb923c',
   error: '#f87171',
+  errorLight: '#7f1d1d',
   border: '#404040',
   borderLight: '#333333',
   white: '#ffffff',
@@ -248,8 +278,10 @@ const zenColors: ColorTokens = {
   textSecondary: '#6b6b6b',
   textTertiary: '#9a9a9a',
   success: '#8fbc8f',
+  successLight: '#e8f5e9',
   warning: '#d4a574',
   error: '#cd5c5c',
+  errorLight: '#fce4e4',
   border: '#ddd5c9',
   borderLight: '#e8e2d8',
   white: '#ffffff',
@@ -274,8 +306,10 @@ const neonColors: ColorTokens = {
   textSecondary: '#b0b0c0',
   textTertiary: '#707080',
   success: '#39ff14',
+  successLight: '#0a3d0a',
   warning: '#ffd700',
   error: '#ff4444',
+  errorLight: '#4a0f0f',
   border: '#2a2a3e',
   borderLight: '#1f1f2e',
   white: '#ffffff',
@@ -300,8 +334,10 @@ const retroColors: ColorTokens = {
   textSecondary: '#5c4030',
   textTertiary: '#8c7060',
   success: '#27ae60',
+  successLight: '#d5f5e3',
   warning: '#f39c12',
   error: '#c0392b',
+  errorLight: '#fadbd8',
   border: '#e8d5b7',
   borderLight: '#f0e5d0',
   white: '#ffffff',
@@ -326,8 +362,10 @@ const minimalistColors: ColorTokens = {
   textSecondary: '#4a4a4a',
   textTertiary: '#8a8a8a',
   success: '#000000',
+  successLight: '#f0f0f0',
   warning: '#4a4a4a',
   error: '#333333',
+  errorLight: '#f5f5f5',
   border: '#e0e0e0',
   borderLight: '#f0f0f0',
   white: '#ffffff',

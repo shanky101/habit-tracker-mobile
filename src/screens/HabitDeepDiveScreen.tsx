@@ -113,9 +113,8 @@ const HabitDeepDiveScreen: React.FC = () => {
                   styles.habitName,
                   {
                     color: theme.colors.text,
-                    fontFamily: theme.typography.fontFamilyDisplay,
+                    fontFamily: theme.typography.fontFamilyDisplayBold,
                     fontSize: theme.typography.fontSizeLG,
-                    fontWeight: theme.typography.fontWeightBold,
                   },
                 ]}
                 numberOfLines={1}
@@ -182,12 +181,11 @@ const HabitDeepDiveScreen: React.FC = () => {
                     {
                       color:
                         selectedRange === range ? theme.colors.white : theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBody,
                       fontSize: theme.typography.fontSizeSM,
-                      fontWeight:
+                      fontFamily:
                         selectedRange === range
-                          ? theme.typography.fontWeightSemibold
-                          : theme.typography.fontWeightMedium,
+                          ? theme.typography.fontFamilyBodySemibold
+                          : theme.typography.fontFamilyBodyMedium,
                     },
                   ]}
                 >
@@ -222,9 +220,8 @@ const HabitDeepDiveScreen: React.FC = () => {
                 styles.heroValue,
                 {
                   color: theme.colors.primary,
-                  fontFamily: theme.typography.fontFamilyDisplay,
+                  fontFamily: theme.typography.fontFamilyDisplayBold,
                   fontSize: 48,
-                  fontWeight: theme.typography.fontWeightBold,
                 },
               ]}
             >
@@ -235,9 +232,8 @@ const HabitDeepDiveScreen: React.FC = () => {
                 styles.heroLabel,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyBody,
+                  fontFamily: theme.typography.fontFamilyBodyMedium,
                   fontSize: theme.typography.fontSizeSM,
-                  fontWeight: theme.typography.fontWeightMedium,
                 },
               ]}
             >
@@ -262,9 +258,8 @@ const HabitDeepDiveScreen: React.FC = () => {
                   styles.heroValueSmall,
                   {
                     color: theme.colors.text,
-                    fontFamily: theme.typography.fontFamilyDisplay,
+                    fontFamily: theme.typography.fontFamilyDisplayBold,
                     fontSize: theme.typography.fontSize2XL,
-                    fontWeight: theme.typography.fontWeightBold,
                   },
                 ]}
               >
@@ -300,9 +295,8 @@ const HabitDeepDiveScreen: React.FC = () => {
                   styles.heroValueSmall,
                   {
                     color: theme.colors.text,
-                    fontFamily: theme.typography.fontFamilyDisplay,
+                    fontFamily: theme.typography.fontFamilyDisplayBold,
                     fontSize: theme.typography.fontSize2XL,
-                    fontWeight: theme.typography.fontWeightBold,
                   },
                 ]}
               >
@@ -338,9 +332,8 @@ const HabitDeepDiveScreen: React.FC = () => {
                   styles.heroValueSmall,
                   {
                     color: theme.colors.success,
-                    fontFamily: theme.typography.fontFamilyDisplay,
+                    fontFamily: theme.typography.fontFamilyDisplayBold,
                     fontSize: theme.typography.fontSize2XL,
-                    fontWeight: theme.typography.fontWeightBold,
                   },
                 ]}
               >
@@ -378,9 +371,8 @@ const HabitDeepDiveScreen: React.FC = () => {
               styles.chartTitle,
               {
                 color: theme.colors.text,
-                fontFamily: theme.typography.fontFamilyBody,
+                fontFamily: theme.typography.fontFamilyBodySemibold,
                 fontSize: theme.typography.fontSizeMD,
-                fontWeight: theme.typography.fontWeightSemibold,
               },
             ]}
           >
@@ -428,12 +420,11 @@ const HabitDeepDiveScreen: React.FC = () => {
                         item.value === maxHourValue
                           ? theme.colors.primary
                           : theme.colors.textSecondary,
-                      fontFamily: theme.typography.fontFamilyBody,
                       fontSize: 10,
-                      fontWeight:
+                      fontFamily:
                         item.value === maxHourValue
-                          ? theme.typography.fontWeightSemibold
-                          : theme.typography.fontWeightMedium,
+                          ? theme.typography.fontFamilyBodySemibold
+                          : theme.typography.fontFamilyBodyMedium,
                     },
                   ]}
                 >
@@ -482,9 +473,8 @@ const HabitDeepDiveScreen: React.FC = () => {
                 styles.sectionTitle,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyBody,
+                  fontFamily: theme.typography.fontFamilyBodySemibold,
                   fontSize: theme.typography.fontSizeMD,
-                  fontWeight: theme.typography.fontWeightSemibold,
                 },
               ]}
             >
@@ -526,9 +516,8 @@ const HabitDeepDiveScreen: React.FC = () => {
               styles.chartTitle,
               {
                 color: theme.colors.text,
-                fontFamily: theme.typography.fontFamilyBody,
+                fontFamily: theme.typography.fontFamilyBodySemibold,
                 fontSize: theme.typography.fontSizeMD,
-                fontWeight: theme.typography.fontWeightSemibold,
               },
             ]}
           >
@@ -560,9 +549,8 @@ const HabitDeepDiveScreen: React.FC = () => {
                       styles.milestoneEvent,
                       {
                         color: theme.colors.text,
-                        fontFamily: theme.typography.fontFamilyBody,
                         fontSize: theme.typography.fontSizeSM,
-                        fontWeight: theme.typography.fontWeightMedium,
+                        fontFamily: theme.typography.fontFamilyBodyMedium,
                       },
                     ]}
                   >
@@ -603,9 +591,8 @@ const HabitDeepDiveScreen: React.FC = () => {
                 styles.chartTitle,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyBody,
+                  fontFamily: theme.typography.fontFamilyBodySemibold,
                   fontSize: theme.typography.fontSizeMD,
-                  fontWeight: theme.typography.fontWeightSemibold,
                 },
               ]}
             >

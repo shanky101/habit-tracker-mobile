@@ -152,9 +152,8 @@ const PasswordResetScreen: React.FC = () => {
               styles.successTitle,
               {
                 color: theme.colors.text,
-                fontFamily: theme.typography.fontFamilyDisplay,
+                fontFamily: theme.typography.fontFamilyDisplayBold,
                 fontSize: theme.typography.fontSize2XL,
-                fontWeight: theme.typography.fontWeightBold,
               },
             ]}
           >
@@ -196,9 +195,8 @@ const PasswordResetScreen: React.FC = () => {
                 styles.backToLoginButtonText,
                 {
                   color: theme.colors.white,
-                  fontFamily: theme.typography.fontFamilyBody,
+                  fontFamily: theme.typography.fontFamilyBodySemibold,
                   fontSize: theme.typography.fontSizeMD,
-                  fontWeight: theme.typography.fontWeightSemibold,
                 },
               ]}
             >
@@ -259,7 +257,7 @@ const PasswordResetScreen: React.FC = () => {
               style={styles.backButton}
               activeOpacity={0.7}
             >
-              <Text style={[styles.backButtonText, { color: theme.colors.primary }]}>
+              <Text style={[styles.backButtonText, { color: theme.colors.primary, fontFamily: theme.typography.fontFamilyBodySemibold }]}>
                 ← Back
               </Text>
             </TouchableOpacity>
@@ -268,9 +266,8 @@ const PasswordResetScreen: React.FC = () => {
                 styles.title,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplay,
+                  fontFamily: theme.typography.fontFamilyDisplayBold,
                   fontSize: theme.typography.fontSize2XL,
-                  fontWeight: theme.typography.fontWeightBold,
                 },
               ]}
             >
@@ -300,9 +297,8 @@ const PasswordResetScreen: React.FC = () => {
                   styles.label,
                   {
                     color: theme.colors.text,
-                    fontFamily: theme.typography.fontFamilyBody,
+                    fontFamily: theme.typography.fontFamilyBodyMedium,
                     fontSize: theme.typography.fontSizeSM,
-                    fontWeight: theme.typography.fontWeightMedium,
                   },
                 ]}
               >
@@ -380,9 +376,8 @@ const PasswordResetScreen: React.FC = () => {
                     styles.resetButtonText,
                     {
                       color: theme.colors.white,
-                      fontFamily: theme.typography.fontFamilyBody,
+                      fontFamily: theme.typography.fontFamilyBodySemibold,
                       fontSize: theme.typography.fontSizeMD,
-                      fontWeight: theme.typography.fontWeightSemibold,
                     },
                   ]}
                 >
@@ -442,7 +437,6 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontSize: 16,
-    fontWeight: '600',
   },
   title: {
     marginBottom: 8,
@@ -500,7 +494,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   footerLink: {
-    fontWeight: '600',
     textDecorationLine: 'underline',
   },
   successContainer: {
@@ -520,7 +513,6 @@ const styles = StyleSheet.create({
   },
   successIconText: {
     fontSize: 48,
-    fontWeight: 'bold',
   },
   successTitle: {
     marginBottom: 12,
@@ -532,7 +524,7 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   emailHighlight: {
-    fontWeight: '600',
+    // fontFamily from theme
   },
   backToLoginButton: {
     width: '100%',
@@ -550,7 +542,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   resendLink: {
-    fontWeight: '600',
     textDecorationLine: 'underline',
   },
 });

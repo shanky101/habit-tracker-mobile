@@ -60,13 +60,12 @@ const WelcomeScreen: React.FC = () => {
         {/* Logo Section */}
         <View style={styles.logoSection}>
           <View style={[styles.logoCircle, { backgroundColor: theme.colors.primary }]}>
-            <Text style={[styles.logoText, { color: theme.colors.white }]}>H</Text>
+            <Text style={[styles.logoText, { color: theme.colors.white, fontFamily: theme.typography.fontFamilyDisplayBold }]}>H</Text>
           </View>
           <Text style={[styles.appName, {
             color: theme.colors.text,
-            fontFamily: theme.typography.fontFamilyDisplay,
+            fontFamily: theme.typography.fontFamilyDisplayBold,
             fontSize: theme.typography.fontSize2XL,
-            fontWeight: theme.typography.fontWeightBold,
           }]}>
             Habit Tracker
           </Text>
@@ -97,9 +96,8 @@ const WelcomeScreen: React.FC = () => {
           >
             <Text style={[styles.primaryButtonText, {
               color: theme.colors.white,
-              fontFamily: theme.typography.fontFamilyBody,
+              fontFamily: theme.typography.fontFamilyBodySemibold,
               fontSize: theme.typography.fontSizeLG,
-              fontWeight: theme.typography.fontWeightSemibold,
             }]}>
               Start Free
             </Text>
@@ -136,9 +134,8 @@ const WelcomeScreen: React.FC = () => {
           >
             <Text style={[styles.secondaryButtonText, {
               color: theme.colors.text,
-              fontFamily: theme.typography.fontFamilyBody,
+              fontFamily: theme.typography.fontFamilyBodyMedium,
               fontSize: theme.typography.fontSizeMD,
-              fontWeight: theme.typography.fontWeightMedium,
             }]}>
               Sign Up with Email
             </Text>
@@ -152,9 +149,8 @@ const WelcomeScreen: React.FC = () => {
           >
             <Text style={[styles.tertiaryButtonText, {
               color: theme.colors.primary,
-              fontFamily: theme.typography.fontFamilyBody,
+              fontFamily: theme.typography.fontFamilyBodyMedium,
               fontSize: theme.typography.fontSizeMD,
-              fontWeight: theme.typography.fontWeightMedium,
             }]}>
               Log In
             </Text>
@@ -214,7 +210,6 @@ const styles = StyleSheet.create({
   },
   logoText: {
     fontSize: 48,
-    fontWeight: '700',
   },
   appName: {
     marginBottom: 8,

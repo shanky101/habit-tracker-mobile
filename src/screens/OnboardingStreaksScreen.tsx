@@ -81,7 +81,7 @@ const OnboardingStreaksScreen: React.FC = () => {
               styles.navText,
               {
                 color: theme.colors.textSecondary,
-                fontWeight: theme.typography.fontWeightMedium,
+                fontFamily: theme.typography.fontFamilyBodyMedium,
               },
             ]}
           >
@@ -117,7 +117,7 @@ const OnboardingStreaksScreen: React.FC = () => {
                 styles.streakNumber,
                 {
                   color: theme.colors.primary,
-                  fontWeight: theme.typography.fontWeightBold,
+                  fontFamily: theme.typography.fontFamilyDisplayBold,
                 },
               ]}
             >
@@ -128,7 +128,7 @@ const OnboardingStreaksScreen: React.FC = () => {
                 styles.streakLabel,
                 {
                   color: theme.colors.textSecondary,
-                  fontWeight: theme.typography.fontWeightMedium,
+                  fontFamily: theme.typography.fontFamilyBodyMedium,
                 },
               ]}
             >
@@ -162,7 +162,7 @@ const OnboardingStreaksScreen: React.FC = () => {
               styles.headline,
               {
                 color: theme.colors.text,
-                fontWeight: theme.typography.fontWeightBold,
+                fontFamily: theme.typography.fontFamilyDisplayBold,
               },
             ]}
           >
@@ -174,7 +174,7 @@ const OnboardingStreaksScreen: React.FC = () => {
               styles.subheading,
               {
                 color: theme.colors.textSecondary,
-                fontWeight: theme.typography.fontWeightRegular,
+                fontFamily: theme.typography.fontFamilyBody,
                 lineHeight: theme.typography.lineHeightRelaxed * theme.typography.fontSizeMD,
               },
             ]}
@@ -191,7 +191,7 @@ const OnboardingStreaksScreen: React.FC = () => {
                   styles.benefitText,
                   {
                     color: theme.colors.text,
-                    fontWeight: theme.typography.fontWeightMedium,
+                    fontFamily: theme.typography.fontFamilyBodyMedium,
                   },
                 ]}
               >
@@ -206,7 +206,7 @@ const OnboardingStreaksScreen: React.FC = () => {
                   styles.benefitText,
                   {
                     color: theme.colors.text,
-                    fontWeight: theme.typography.fontWeightMedium,
+                    fontFamily: theme.typography.fontFamilyBodyMedium,
                   },
                 ]}
               >
@@ -221,7 +221,7 @@ const OnboardingStreaksScreen: React.FC = () => {
                   styles.benefitText,
                   {
                     color: theme.colors.text,
-                    fontWeight: theme.typography.fontWeightMedium,
+                    fontFamily: theme.typography.fontFamilyBodyMedium,
                   },
                 ]}
               >
@@ -236,7 +236,7 @@ const OnboardingStreaksScreen: React.FC = () => {
               styles.socialProof,
               {
                 color: theme.colors.textTertiary,
-                fontWeight: theme.typography.fontWeightRegular,
+                fontFamily: theme.typography.fontFamilyBody,
               },
             ]}
           >
@@ -283,7 +283,7 @@ const OnboardingStreaksScreen: React.FC = () => {
               styles.primaryButtonText,
               {
                 color: theme.colors.white,
-                fontWeight: theme.typography.fontWeightSemibold,
+                fontFamily: theme.typography.fontFamilyBodySemibold,
               },
             ]}
           >

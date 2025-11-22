@@ -125,7 +125,7 @@ const AddHabitStep3Screen: React.FC = () => {
               style={styles.backButton}
               activeOpacity={0.7}
             >
-              <Text style={[styles.backButtonText, { color: theme.colors.primary }]}>
+              <Text style={[styles.backButtonText, { color: theme.colors.primary, fontFamily: theme.typography.fontFamilyBodySemibold }]}>
                 ← Back
               </Text>
             </TouchableOpacity>
@@ -164,9 +164,8 @@ const AddHabitStep3Screen: React.FC = () => {
               styles.title,
               {
                 color: theme.colors.text,
-                fontFamily: theme.typography.fontFamilyDisplay,
+                fontFamily: theme.typography.fontFamilyDisplayBold,
                 fontSize: theme.typography.fontSize2XL,
-                fontWeight: theme.typography.fontWeightBold,
               },
             ]}
           >
@@ -180,9 +179,8 @@ const AddHabitStep3Screen: React.FC = () => {
                 styles.sectionTitle,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplay,
+                  fontFamily: theme.typography.fontFamilyDisplayBold,
                   fontSize: theme.typography.fontSizeLG,
-                  fontWeight: theme.typography.fontWeightBold,
                 },
               ]}
             >
@@ -222,9 +220,8 @@ const AddHabitStep3Screen: React.FC = () => {
                     styles.radioLabel,
                     {
                       color: theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBody,
+                      fontFamily: theme.typography.fontFamilyBodyMedium,
                       fontSize: theme.typography.fontSizeMD,
-                      fontWeight: theme.typography.fontWeightMedium,
                     },
                   ]}
                 >
@@ -263,9 +260,8 @@ const AddHabitStep3Screen: React.FC = () => {
                     styles.radioLabel,
                     {
                       color: theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBody,
+                      fontFamily: theme.typography.fontFamilyBodyMedium,
                       fontSize: theme.typography.fontSizeMD,
-                      fontWeight: theme.typography.fontWeightMedium,
                     },
                   ]}
                 >
@@ -301,9 +297,8 @@ const AddHabitStep3Screen: React.FC = () => {
                           color: selectedDays.includes(index)
                             ? theme.colors.white
                             : theme.colors.text,
-                          fontFamily: theme.typography.fontFamilyBody,
+                          fontFamily: theme.typography.fontFamilyBodySemibold,
                           fontSize: theme.typography.fontSizeSM,
-                          fontWeight: theme.typography.fontWeightSemibold,
                         },
                       ]}
                     >
@@ -323,9 +318,8 @@ const AddHabitStep3Screen: React.FC = () => {
                   styles.sectionTitle,
                   {
                     color: theme.colors.text,
-                    fontFamily: theme.typography.fontFamilyDisplay,
+                    fontFamily: theme.typography.fontFamilyDisplayBold,
                     fontSize: theme.typography.fontSizeLG,
-                    fontWeight: theme.typography.fontWeightBold,
                   },
                 ]}
               >
@@ -369,9 +363,8 @@ const AddHabitStep3Screen: React.FC = () => {
                     styles.reminderTimeText,
                     {
                       color: theme.colors.primary,
-                      fontFamily: theme.typography.fontFamilyDisplay,
+                      fontFamily: theme.typography.fontFamilyDisplayBold,
                       fontSize: theme.typography.fontSizeXL,
-                      fontWeight: theme.typography.fontWeightBold,
                     },
                   ]}
                 >
@@ -400,9 +393,8 @@ const AddHabitStep3Screen: React.FC = () => {
                 styles.sectionTitle,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplay,
+                  fontFamily: theme.typography.fontFamilyDisplayBold,
                   fontSize: theme.typography.fontSizeLG,
-                  fontWeight: theme.typography.fontWeightBold,
                 },
               ]}
             >
@@ -461,9 +453,8 @@ const AddHabitStep3Screen: React.FC = () => {
                 styles.sectionTitle,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplay,
+                  fontFamily: theme.typography.fontFamilyDisplayBold,
                   fontSize: theme.typography.fontSizeLG,
-                  fontWeight: theme.typography.fontWeightBold,
                 },
               ]}
             >
@@ -488,7 +479,7 @@ const AddHabitStep3Screen: React.FC = () => {
                   },
                 ]}
               >
-                <Text style={{ fontWeight: theme.typography.fontWeightBold, fontSize: 18 }}>
+                <Text style={{ fontFamily: theme.typography.fontFamilyBodyBold, fontSize: 18 }}>
                   {habitName}
                 </Text>
                 {'\n\n'}
@@ -535,9 +526,8 @@ const AddHabitStep3Screen: React.FC = () => {
                   styles.createButtonText,
                   {
                     color: theme.colors.white,
-                    fontFamily: theme.typography.fontFamilyBody,
+                    fontFamily: theme.typography.fontFamilyBodySemibold,
                     fontSize: theme.typography.fontSizeMD,
-                    fontWeight: theme.typography.fontWeightSemibold,
                   },
                 ]}
               >
@@ -573,7 +563,6 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontSize: 16,
-    fontWeight: '600',
   },
   progressContainer: {
     marginBottom: 32,

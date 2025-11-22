@@ -86,9 +86,8 @@ const HomeScreen: React.FC = () => {
           styles.emptyTitle,
           {
             color: theme.colors.text,
-            fontFamily: theme.typography.fontFamilyDisplay,
-            fontSize: theme.typography.fontSizeLG,
-            fontWeight: theme.typography.fontWeightBold,
+            fontFamily: theme.typography.fontFamilyDisplayBold,
+            fontSize: theme.typography.fontSizeXL,
           },
         ]}
       >
@@ -101,7 +100,7 @@ const HomeScreen: React.FC = () => {
             color: theme.colors.textSecondary,
             fontFamily: theme.typography.fontFamilyBody,
             fontSize: theme.typography.fontSizeMD,
-            lineHeight: theme.typography.lineHeightRelaxed,
+            lineHeight: 16 * theme.typography.lineHeightRelaxed,
           },
         ]}
       >
@@ -122,9 +121,8 @@ const HomeScreen: React.FC = () => {
             styles.emptyButtonText,
             {
               color: theme.colors.white,
-              fontFamily: theme.typography.fontFamilyBody,
+              fontFamily: theme.typography.fontFamilyBodySemibold,
               fontSize: theme.typography.fontSizeMD,
-              fontWeight: theme.typography.fontWeightSemibold,
             },
           ]}
         >
@@ -168,9 +166,8 @@ const HomeScreen: React.FC = () => {
                 styles.date,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplay,
+                  fontFamily: theme.typography.fontFamilyDisplayBold,
                   fontSize: theme.typography.fontSizeXL,
-                  fontWeight: theme.typography.fontWeightBold,
                 },
               ]}
             >
@@ -226,9 +223,8 @@ const HomeScreen: React.FC = () => {
                 styles.sectionTitle,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyBody,
+                  fontFamily: theme.typography.fontFamilyBodySemibold,
                   fontSize: theme.typography.fontSizeSM,
-                  fontWeight: theme.typography.fontWeightSemibold,
                 },
               ]}
             >
@@ -267,9 +263,8 @@ const HomeScreen: React.FC = () => {
                         styles.habitName,
                         {
                           color: theme.colors.text,
-                          fontFamily: theme.typography.fontFamilyBody,
+                          fontFamily: theme.typography.fontFamilyBodyMedium,
                           fontSize: theme.typography.fontSizeMD,
-                          fontWeight: theme.typography.fontWeightMedium,
                         },
                       ]}
                     >
