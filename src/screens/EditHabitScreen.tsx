@@ -26,12 +26,16 @@ type EditHabitScreenRouteProp = RouteProp<
       habitId: string;
       habitData: {
         name: string;
+        emoji: string;
         category: string;
         color: string;
         frequency: 'daily' | 'weekly';
         selectedDays: number[];
         reminderEnabled: boolean;
         reminderTime: string | null;
+        notes?: string;
+        streak?: number;
+        completed?: boolean;
       };
     };
   },
@@ -55,6 +59,7 @@ const EditHabitScreen: React.FC = () => {
   const [selectedDays, setSelectedDays] = useState(habitData.selectedDays);
   const [reminderEnabled, setReminderEnabled] = useState(habitData.reminderEnabled);
   const [reminderTime, setReminderTime] = useState(habitData.reminderTime || '09:00');
+  const [notes, setNotes] = useState(habitData.notes || '');
 
   // Use custom animation hook
   const { fadeAnim, slideAnim } = useScreenAnimation();
@@ -77,6 +82,7 @@ const EditHabitScreen: React.FC = () => {
       selectedDays: frequency === 'daily' ? [0, 1, 2, 3, 4, 5, 6] : selectedDays,
       reminderEnabled,
       reminderTime: reminderEnabled ? reminderTime : null,
+      notes: notes.trim() || undefined,
     };
 
     updateHabit(habitId, updates);
@@ -445,6 +451,67 @@ const EditHabitScreen: React.FC = () => {
             )}
           </View>
 
+          {/* Notes Section */}
+          <View style={styles.section}>
+            <Text
+              style={[
+                styles.sectionLabel,
+                {
+                  color: theme.colors.text,
+                  fontSize: theme.typography.fontSizeSM,
+                  fontFamily: theme.typography.fontFamilyBodySemibold,
+                },
+              ]}
+            >
+              Notes
+            </Text>
+            <Text
+              style={[
+                styles.notesSubtitle,
+                {
+                  color: theme.colors.textSecondary,
+                  fontFamily: theme.typography.fontFamilyBody,
+                  fontSize: theme.typography.fontSizeXS,
+                  marginBottom: 12,
+                },
+              ]}
+            >
+              Add motivation or tips for this habit (optional)
+            </Text>
+            <TextInput
+              style={[
+                styles.notesInput,
+                {
+                  backgroundColor: theme.colors.backgroundSecondary,
+                  borderColor: theme.colors.border,
+                  color: theme.colors.text,
+                  fontFamily: theme.typography.fontFamilyBody,
+                  fontSize: theme.typography.fontSizeMD,
+                },
+              ]}
+              placeholder="e.g., Why this habit matters to me..."
+              placeholderTextColor={theme.colors.textSecondary}
+              value={notes}
+              onChangeText={setNotes}
+              multiline
+              numberOfLines={3}
+              maxLength={200}
+              textAlignVertical="top"
+            />
+            <Text
+              style={[
+                styles.characterCount,
+                {
+                  color: theme.colors.textSecondary,
+                  fontFamily: theme.typography.fontFamilyBody,
+                  fontSize: theme.typography.fontSizeXS,
+                },
+              ]}
+            >
+              {notes.length}/200
+            </Text>
+          </View>
+
           {/* Destructive Actions */}
           <View style={styles.destructiveSection}>
             <TouchableOpacity
@@ -613,6 +680,19 @@ const styles = StyleSheet.create({
   },
   reminderTimeText: {
     marginTop: 16,
+  },
+  notesSubtitle: {
+    // styles from theme
+  },
+  notesInput: {
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 16,
+    minHeight: 100,
+  },
+  characterCount: {
+    textAlign: 'right',
+    marginTop: 6,
   },
   destructiveSection: {
     marginTop: 24,

@@ -6,32 +6,39 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
+  Share,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
+import { useHabits, Habit } from '@/contexts/HabitsContext';
 
 type HabitDetailRouteProp = RouteProp<
-  { HabitDetail: { habitId: string; habitData: any } },
+  { HabitDetail: { habitId: string; habitData: Habit } },
   'HabitDetail'
 >;
 
 const { width } = Dimensions.get('window');
-const CALENDAR_CELL_SIZE = (width - 48) / 12; // 12 months
+const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 const HabitDetailScreen: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<any>>();
   const route = useRoute<HabitDetailRouteProp>();
   const { theme } = useTheme();
+  const { habits, toggleHabit } = useHabits();
 
-  const { habitData } = route.params;
+  const { habitId } = route.params;
+
+  // Get the latest habit data from context (in case it was updated)
+  const habitData = habits.find(h => h.id === habitId) || route.params.habitData;
 
   // Mock data for stats - in production, this would come from stored history
   const stats = {
     currentStreak: habitData.streak || 0,
-    longestStreak: habitData.streak + 10 || 24,
-    totalCompletions: Math.floor(habitData.streak * 1.5) || 42,
+    longestStreak: (habitData.streak || 0) + 10,
+    totalCompletions: Math.floor((habitData.streak || 0) * 1.5) || 42,
     completionRate: 86,
   };
 
@@ -72,6 +79,29 @@ const HabitDetailScreen: React.FC = () => {
     });
   };
 
+  const handleToggleComplete = () => {
+    toggleHabit(habitId);
+  };
+
+  const handleShareStreak = async () => {
+    try {
+      await Share.share({
+        message: `I'm on a ${habitData.streak} day streak with "${habitData.name}" in Habit Tracker! 🔥`,
+        title: 'Share My Streak',
+      });
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  };
+
+  const handleExportData = () => {
+    Alert.alert(
+      'Export Habit Data',
+      'This will export your habit history. Coming soon!',
+      [{ text: 'OK' }]
+    );
+  };
+
   const getCategoryColor = (category: string) => {
     const colors: { [key: string]: string } = {
       health: '#EF4444',
@@ -84,6 +114,17 @@ const HabitDetailScreen: React.FC = () => {
       creativity: '#F97316',
     };
     return colors[category.toLowerCase()] || theme.colors.primary;
+  };
+
+  const getScheduleText = () => {
+    if (habitData.frequency === 'daily') {
+      return 'Every day';
+    }
+    const days = habitData.selectedDays
+      .sort((a, b) => a - b)
+      .map(d => DAY_NAMES[d])
+      .join(', ');
+    return days;
   };
 
   const renderStatCard = (
@@ -114,7 +155,7 @@ const HabitDetailScreen: React.FC = () => {
           {
             color: theme.colors.text,
             fontFamily: theme.typography.fontFamilyDisplayBold,
-            fontSize: 32,
+            fontSize: 28,
           },
         ]}
       >
@@ -132,6 +173,178 @@ const HabitDetailScreen: React.FC = () => {
       >
         {label}
       </Text>
+    </View>
+  );
+
+  const renderHabitDetails = () => (
+    <View style={styles.detailsContainer}>
+      <Text
+        style={[
+          styles.sectionTitle,
+          {
+            color: theme.colors.text,
+            fontFamily: theme.typography.fontFamilyBodySemibold,
+            fontSize: theme.typography.fontSizeMD,
+          },
+        ]}
+      >
+        Habit Details
+      </Text>
+      <View
+        style={[
+          styles.detailsCard,
+          {
+            backgroundColor: theme.colors.surface,
+            borderColor: theme.colors.border,
+          },
+        ]}
+      >
+        {/* Schedule */}
+        <View style={styles.detailRow}>
+          <View style={styles.detailIcon}>
+            <Text style={styles.detailEmoji}>📅</Text>
+          </View>
+          <View style={styles.detailContent}>
+            <Text
+              style={[
+                styles.detailLabel,
+                {
+                  color: theme.colors.textSecondary,
+                  fontFamily: theme.typography.fontFamilyBody,
+                  fontSize: theme.typography.fontSizeXS,
+                },
+              ]}
+            >
+              Schedule
+            </Text>
+            <Text
+              style={[
+                styles.detailValue,
+                {
+                  color: theme.colors.text,
+                  fontFamily: theme.typography.fontFamilyBodyMedium,
+                  fontSize: theme.typography.fontSizeSM,
+                },
+              ]}
+            >
+              {getScheduleText()}
+            </Text>
+          </View>
+        </View>
+
+        {/* Reminder */}
+        <View style={[styles.detailRow, { borderTopWidth: 1, borderTopColor: theme.colors.border }]}>
+          <View style={styles.detailIcon}>
+            <Text style={styles.detailEmoji}>⏰</Text>
+          </View>
+          <View style={styles.detailContent}>
+            <Text
+              style={[
+                styles.detailLabel,
+                {
+                  color: theme.colors.textSecondary,
+                  fontFamily: theme.typography.fontFamilyBody,
+                  fontSize: theme.typography.fontSizeXS,
+                },
+              ]}
+            >
+              Reminder
+            </Text>
+            <Text
+              style={[
+                styles.detailValue,
+                {
+                  color: theme.colors.text,
+                  fontFamily: theme.typography.fontFamilyBodyMedium,
+                  fontSize: theme.typography.fontSizeSM,
+                },
+              ]}
+            >
+              {habitData.reminderEnabled && habitData.reminderTime
+                ? `Daily at ${habitData.reminderTime}`
+                : 'No reminder set'}
+            </Text>
+          </View>
+        </View>
+
+        {/* Color */}
+        <View style={[styles.detailRow, { borderTopWidth: 1, borderTopColor: theme.colors.border }]}>
+          <View style={styles.detailIcon}>
+            <Text style={styles.detailEmoji}>🎨</Text>
+          </View>
+          <View style={styles.detailContent}>
+            <Text
+              style={[
+                styles.detailLabel,
+                {
+                  color: theme.colors.textSecondary,
+                  fontFamily: theme.typography.fontFamilyBody,
+                  fontSize: theme.typography.fontSizeXS,
+                },
+              ]}
+            >
+              Color Theme
+            </Text>
+            <View style={styles.colorDisplay}>
+              <View
+                style={[
+                  styles.colorCircle,
+                  { backgroundColor: getCategoryColor(habitData.category) },
+                ]}
+              />
+              <Text
+                style={[
+                  styles.detailValue,
+                  {
+                    color: theme.colors.text,
+                    fontFamily: theme.typography.fontFamilyBodyMedium,
+                    fontSize: theme.typography.fontSizeSM,
+                    textTransform: 'capitalize',
+                  },
+                ]}
+              >
+                {habitData.color || 'Default'}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Notes - only show if notes exist */}
+        {habitData.notes && (
+          <View style={[styles.detailRow, { borderTopWidth: 1, borderTopColor: theme.colors.border }]}>
+            <View style={styles.detailIcon}>
+              <Text style={styles.detailEmoji}>📝</Text>
+            </View>
+            <View style={styles.detailContent}>
+              <Text
+                style={[
+                  styles.detailLabel,
+                  {
+                    color: theme.colors.textSecondary,
+                    fontFamily: theme.typography.fontFamilyBody,
+                    fontSize: theme.typography.fontSizeXS,
+                  },
+                ]}
+              >
+                Notes
+              </Text>
+              <Text
+                style={[
+                  styles.notesText,
+                  {
+                    color: theme.colors.text,
+                    fontFamily: theme.typography.fontFamilyBody,
+                    fontSize: theme.typography.fontSizeSM,
+                    lineHeight: theme.typography.fontSizeSM * theme.typography.lineHeightRelaxed,
+                  },
+                ]}
+              >
+                {habitData.notes}
+              </Text>
+            </View>
+          </View>
+        )}
+      </View>
     </View>
   );
 
@@ -242,7 +455,7 @@ const HabitDetailScreen: React.FC = () => {
       >
         Recent Activity
       </Text>
-      {recentActivity.map((activity, index) => {
+      {recentActivity.slice(0, 5).map((activity, index) => {
         const date = new Date(activity.date);
         const today = new Date();
         const yesterday = new Date(today);
@@ -340,7 +553,7 @@ const HabitDetailScreen: React.FC = () => {
         <View style={styles.headerCenter}>
           <View style={styles.habitHeader}>
             <Text style={styles.habitEmoji}>{habitData.emoji}</Text>
-            <View>
+            <View style={styles.habitTitleContainer}>
               <Text
                 style={[
                   styles.habitName,
@@ -390,6 +603,61 @@ const HabitDetailScreen: React.FC = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        {/* Today's Status */}
+        <View style={styles.todayStatusContainer}>
+          <TouchableOpacity
+            style={[
+              styles.todayStatusCard,
+              {
+                backgroundColor: habitData.completed ? theme.colors.success + '20' : theme.colors.surface,
+                borderColor: habitData.completed ? theme.colors.success : theme.colors.border,
+              },
+            ]}
+            onPress={handleToggleComplete}
+            activeOpacity={0.7}
+          >
+            <View
+              style={[
+                styles.todayCheckbox,
+                {
+                  backgroundColor: habitData.completed ? theme.colors.success : 'transparent',
+                  borderColor: habitData.completed ? theme.colors.success : theme.colors.border,
+                },
+              ]}
+            >
+              {habitData.completed && (
+                <Text style={[styles.todayCheckmark, { color: theme.colors.white }]}>✓</Text>
+              )}
+            </View>
+            <View style={styles.todayInfo}>
+              <Text
+                style={[
+                  styles.todayLabel,
+                  {
+                    color: theme.colors.text,
+                    fontFamily: theme.typography.fontFamilyBodySemibold,
+                    fontSize: theme.typography.fontSizeMD,
+                  },
+                ]}
+              >
+                {habitData.completed ? 'Completed Today!' : "Today's Check-in"}
+              </Text>
+              <Text
+                style={[
+                  styles.todayHint,
+                  {
+                    color: theme.colors.textSecondary,
+                    fontFamily: theme.typography.fontFamilyBody,
+                    fontSize: theme.typography.fontSizeXS,
+                  },
+                ]}
+              >
+                {habitData.completed ? 'Tap to undo' : 'Tap to mark as complete'}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+
         {/* Stats Cards */}
         <ScrollView
           horizontal
@@ -402,6 +670,9 @@ const HabitDetailScreen: React.FC = () => {
           {renderStatCard('✓', stats.totalCompletions, 'Total Completions', 2)}
           {renderStatCard('📈', `${stats.completionRate}%`, 'Completion Rate', 3)}
         </ScrollView>
+
+        {/* Habit Details Section */}
+        {renderHabitDetails()}
 
         {/* Calendar Heatmap */}
         {renderCalendarHeatmap()}
@@ -419,6 +690,7 @@ const HabitDetailScreen: React.FC = () => {
                 borderColor: theme.colors.border,
               },
             ]}
+            onPress={handleExportData}
             activeOpacity={0.7}
           >
             <Text style={styles.actionEmoji}>📤</Text>
@@ -444,6 +716,7 @@ const HabitDetailScreen: React.FC = () => {
                 borderColor: theme.colors.border,
               },
             ]}
+            onPress={handleShareStreak}
             activeOpacity={0.7}
           >
             <Text style={styles.actionEmoji}>🎉</Text>
@@ -496,8 +769,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   habitEmoji: {
-    fontSize: 40,
+    fontSize: 36,
     marginRight: 12,
+  },
+  habitTitleContainer: {
+    flex: 1,
   },
   habitName: {
     marginBottom: 4,
@@ -527,6 +803,37 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 32,
   },
+  todayStatusContainer: {
+    paddingHorizontal: 24,
+    paddingTop: 16,
+  },
+  todayStatusCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 2,
+  },
+  todayCheckbox: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 14,
+  },
+  todayCheckmark: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  todayInfo: {
+    flex: 1,
+  },
+  todayLabel: {
+    marginBottom: 2,
+  },
+  todayHint: {},
   statsScroll: {
     marginTop: 16,
   },
@@ -535,14 +842,14 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   statCard: {
-    width: 140,
+    width: 130,
     padding: 16,
     borderRadius: 16,
     borderWidth: 1,
     alignItems: 'center',
   },
   statIcon: {
-    fontSize: 32,
+    fontSize: 28,
     marginBottom: 8,
   },
   statValue: {
@@ -553,11 +860,54 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
+  detailsContainer: {
+    marginTop: 24,
+    paddingHorizontal: 24,
+  },
+  detailsCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  detailRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    padding: 16,
+  },
+  detailIcon: {
+    width: 36,
+    marginRight: 12,
+  },
+  detailEmoji: {
+    fontSize: 20,
+  },
+  detailContent: {
+    flex: 1,
+  },
+  detailLabel: {
+    marginBottom: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  detailValue: {},
+  colorDisplay: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  colorCircle: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    marginRight: 8,
+  },
+  notesText: {
+    marginTop: 2,
+  },
   sectionTitle: {
     marginBottom: 16,
   },
   calendarContainer: {
-    marginTop: 32,
+    marginTop: 24,
     paddingHorizontal: 24,
   },
   calendarScroll: {
@@ -590,7 +940,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   activityContainer: {
-    marginTop: 32,
+    marginTop: 24,
     paddingHorizontal: 24,
   },
   activityItem: {
@@ -618,7 +968,7 @@ const styles = StyleSheet.create({
   },
   activityTime: {},
   actionsContainer: {
-    marginTop: 32,
+    marginTop: 24,
     paddingHorizontal: 24,
     gap: 12,
   },
