@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -11,27 +11,98 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '@/theme';
 import { useHabits } from '@/contexts/HabitsContext';
 import CelebrationModal from '@/components/CelebrationModal';
-import { ProgressRing } from '@/components/ProgressRing';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 
 type HomeScreenNavigationProp = StackNavigationProp<any, 'Home'>;
 type HomeScreenRouteProp = RouteProp<{ Home: { newHabit?: any } }, 'Home'>;
 
 const { width } = Dimensions.get('window');
+const USER_NAME_KEY = '@habit_tracker_user_name';
+
+// Generate dates for the horizontal date picker
+const generateDates = (daysCount: number = 14) => {
+  const dates = [];
+  const today = new Date();
+
+  // Start from 7 days ago
+  for (let i = -7; i < daysCount - 7; i++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() + i);
+    dates.push(date);
+  }
+  return dates;
+};
+
+const formatDayName = (date: Date) => {
+  const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+  return days[date.getDay()];
+};
+
+const isToday = (date: Date) => {
+  const today = new Date();
+  return (
+    date.getDate() === today.getDate() &&
+    date.getMonth() === today.getMonth() &&
+    date.getFullYear() === today.getFullYear()
+  );
+};
+
+const isSameDay = (date1: Date, date2: Date) => {
+  return (
+    date1.getDate() === date2.getDate() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getFullYear() === date2.getFullYear()
+  );
+};
 
 const HomeScreen: React.FC = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const route = useRoute<HomeScreenRouteProp>();
   const { theme } = useTheme();
   const { habits, addHabit, toggleHabit: toggleHabitContext } = useHabits();
+  const dateScrollRef = useRef<ScrollView>(null);
 
-  // Use custom animation hook to reduce boilerplate
   const { fadeAnim, slideAnim, fabScale } = useScreenAnimation({ enableFAB: true });
 
-  // Handle new habit creation - optimized to avoid unnecessary re-renders
+  const [userName, setUserName] = useState('');
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [dates] = useState(generateDates(14));
+
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [celebrationType, setCelebrationType] = useState<'firstCheckin' | 'allComplete' | 'streak'>('firstCheckin');
+  const [celebrationHabit, setCelebrationHabit] = useState('');
+
+  // Load user name
+  useEffect(() => {
+    const loadUserName = async () => {
+      try {
+        const name = await AsyncStorage.getItem(USER_NAME_KEY);
+        if (name) setUserName(name);
+      } catch (error) {
+        console.error('Error loading user name:', error);
+      }
+    };
+    loadUserName();
+  }, []);
+
+  // Scroll to today on mount
+  useEffect(() => {
+    setTimeout(() => {
+      const todayIndex = dates.findIndex(d => isToday(d));
+      if (todayIndex !== -1 && dateScrollRef.current) {
+        dateScrollRef.current.scrollTo({
+          x: Math.max(0, (todayIndex - 2) * 72),
+          animated: true,
+        });
+      }
+    }, 100);
+  }, [dates]);
+
+  // Handle new habit creation
   const newHabit = route.params?.newHabit;
   useEffect(() => {
     if (newHabit) {
@@ -44,39 +115,92 @@ const HomeScreen: React.FC = () => {
   const activeHabits = habits.filter((h) => !h.archived);
   const completedCount = activeHabits.filter((h) => h.completed).length;
   const totalCount = activeHabits.length;
-  const progressPercentage = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
-
-  const [showCelebration, setShowCelebration] = useState(false);
-  const [celebrationType, setCelebrationType] = useState<'firstCheckin' | 'allComplete' | 'streak'>('firstCheckin');
-  const [celebrationHabit, setCelebrationHabit] = useState('');
+  const progressPercentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
   const handleAddHabit = () => {
     navigation.navigate('AddHabitStep1');
   };
 
-  const getCurrentDate = () => {
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
-    const now = new Date();
-    const dayName = days[now.getDay()];
-    const monthName = months[now.getMonth()];
-    const date = now.getDate();
-    return `${dayName}, ${monthName} ${date}`;
+  const handleProfilePress = () => {
+    navigation.navigate('Profile', { screen: 'ProfileMain' });
   };
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+  };
+
+  const getFormattedDate = () => {
+    const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+    const now = selectedDate;
+    return `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
+  };
+
+  const getInitials = () => {
+    if (!userName) return '?';
+    const names = userName.split(' ');
+    if (names.length >= 2) {
+      return `${names[0][0]}${names[1][0]}`.toUpperCase();
+    }
+    return userName[0].toUpperCase();
+  };
+
+  const getMotivationalMessage = () => {
+    if (totalCount === 0) return 'Add habits to get started!';
+    if (completedCount === totalCount) return 'Amazing! All done for today! 🎉';
+    if (progressPercentage >= 60) return "Keep it up! You're on fire 🔥";
+    if (progressPercentage >= 30) return "Good progress! Keep going 💪";
+    return "Let's build some habits! 🌟";
+  };
+
+  const renderDateItem = (date: Date, index: number) => {
+    const isSelected = isSameDay(date, selectedDate);
+    const isTodayDate = isToday(date);
+
+    return (
+      <TouchableOpacity
+        key={index}
+        style={[
+          styles.dateItem,
+          {
+            backgroundColor: isSelected ? theme.colors.primary : theme.colors.surface,
+            borderColor: isTodayDate && !isSelected ? theme.colors.primary : 'transparent',
+            borderWidth: isTodayDate && !isSelected ? 2 : 0,
+          },
+        ]}
+        onPress={() => setSelectedDate(date)}
+        activeOpacity={0.7}
+      >
+        <Text
+          style={[
+            styles.dateDayName,
+            {
+              color: isSelected ? theme.colors.white : theme.colors.textSecondary,
+              fontFamily: theme.typography.fontFamilyBodyMedium,
+              fontSize: theme.typography.fontSizeXS,
+            },
+          ]}
+        >
+          {formatDayName(date)}
+        </Text>
+        <Text
+          style={[
+            styles.dateNumber,
+            {
+              color: isSelected ? theme.colors.white : theme.colors.text,
+              fontFamily: theme.typography.fontFamilyDisplayBold,
+              fontSize: theme.typography.fontSizeLG,
+            },
+          ]}
+        >
+          {date.getDate()}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
 
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
@@ -109,9 +233,7 @@ const HomeScreen: React.FC = () => {
       <TouchableOpacity
         style={[
           styles.emptyButton,
-          {
-            backgroundColor: theme.colors.primary,
-          },
+          { backgroundColor: theme.colors.primary },
         ]}
         onPress={handleAddHabit}
         activeOpacity={0.8}
@@ -144,43 +266,56 @@ const HomeScreen: React.FC = () => {
           },
         ]}
       >
-        <TouchableOpacity
-          onPress={() => navigation.navigate('CalendarView')}
-          activeOpacity={0.7}
-        >
+        <View style={styles.headerLeft}>
+          <Text
+            style={[
+              styles.dateText,
+              {
+                color: theme.colors.textSecondary,
+                fontFamily: theme.typography.fontFamilyBody,
+                fontSize: theme.typography.fontSizeXS,
+                letterSpacing: 1,
+              },
+            ]}
+          >
+            {getFormattedDate()}
+          </Text>
           <Text
             style={[
               styles.greeting,
               {
-                color: theme.colors.textSecondary,
-                fontFamily: theme.typography.fontFamilyBody,
-                fontSize: theme.typography.fontSizeSM,
+                color: theme.colors.text,
+                fontFamily: theme.typography.fontFamilyDisplayBold,
+                fontSize: theme.typography.fontSize2XL,
               },
             ]}
           >
-            Today
+            Hi, {userName || 'there'} 👋
           </Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Text
-              style={[
-                styles.date,
-                {
-                  color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplayBold,
-                  fontSize: theme.typography.fontSizeXL,
-                },
-              ]}
-            >
-              {getCurrentDate()}
-            </Text>
-            <Text style={{ fontSize: 16, marginLeft: 8 }}>📅</Text>
-          </View>
-        </TouchableOpacity>
+        </View>
         <TouchableOpacity
-          style={[styles.profileButton, { backgroundColor: theme.colors.backgroundSecondary }]}
+          style={[
+            styles.profileButton,
+            {
+              backgroundColor: theme.colors.primary + '30',
+              borderColor: theme.colors.primary,
+            },
+          ]}
+          onPress={handleProfilePress}
           activeOpacity={0.7}
         >
-          <Text style={{ fontSize: 24 }}>👤</Text>
+          <Text
+            style={[
+              styles.profileInitials,
+              {
+                color: theme.colors.primary,
+                fontFamily: theme.typography.fontFamilyDisplayBold,
+                fontSize: theme.typography.fontSizeMD,
+              },
+            ]}
+          >
+            {getInitials()}
+          </Text>
         </TouchableOpacity>
       </Animated.View>
 
@@ -190,21 +325,109 @@ const HomeScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
         bounces={true}
       >
-        {/* Progress Ring */}
+        {/* Date Picker */}
+        <Animated.View
+          style={[
+            styles.datePickerContainer,
+            {
+              backgroundColor: theme.colors.surface,
+              borderColor: theme.colors.border,
+              opacity: fadeAnim,
+            },
+          ]}
+        >
+          <ScrollView
+            ref={dateScrollRef}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.datePickerContent}
+          >
+            {dates.map((date, index) => renderDateItem(date, index))}
+          </ScrollView>
+        </Animated.View>
+
+        {/* Progress Card */}
         {activeHabits.length > 0 && (
           <Animated.View
             style={[
+              styles.progressCard,
               {
+                backgroundColor: theme.colors.surface,
+                borderColor: theme.colors.border,
                 opacity: fadeAnim,
-                transform: [{ translateY: slideAnim }],
               },
             ]}
           >
-            <ProgressRing
-              progress={progressPercentage}
-              completedCount={completedCount}
-              totalCount={totalCount}
-            />
+            <View style={styles.progressInfo}>
+              <Text
+                style={[
+                  styles.progressTitle,
+                  {
+                    color: theme.colors.text,
+                    fontFamily: theme.typography.fontFamilyDisplayBold,
+                    fontSize: theme.typography.fontSize2XL,
+                  },
+                ]}
+              >
+                {completedCount}/{totalCount} Done
+              </Text>
+              <Text
+                style={[
+                  styles.progressSubtitle,
+                  {
+                    color: theme.colors.textSecondary,
+                    fontFamily: theme.typography.fontFamilyBody,
+                    fontSize: theme.typography.fontSizeSM,
+                  },
+                ]}
+              >
+                {getMotivationalMessage()}
+              </Text>
+            </View>
+            <View style={styles.progressRingContainer}>
+              <View
+                style={[
+                  styles.progressRingOuter,
+                  {
+                    borderColor: theme.colors.border,
+                  },
+                ]}
+              >
+                <View
+                  style={[
+                    styles.progressRingInner,
+                    {
+                      backgroundColor: theme.colors.surface,
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.progressPercentage,
+                      {
+                        color: theme.colors.primary,
+                        fontFamily: theme.typography.fontFamilyDisplayBold,
+                        fontSize: theme.typography.fontSizeLG,
+                      },
+                    ]}
+                  >
+                    {progressPercentage}%
+                  </Text>
+                </View>
+              </View>
+              {/* Progress arc overlay */}
+              <View
+                style={[
+                  styles.progressArc,
+                  {
+                    borderColor: theme.colors.primary,
+                    borderRightColor: 'transparent',
+                    borderBottomColor: progressPercentage > 50 ? theme.colors.primary : 'transparent',
+                    transform: [{ rotate: `${(progressPercentage / 100) * 360}deg` }],
+                  },
+                ]}
+              />
+            </View>
           </Animated.View>
         )}
 
@@ -213,9 +436,7 @@ const HomeScreen: React.FC = () => {
           <Animated.View
             style={[
               styles.habitsSection,
-              {
-                opacity: fadeAnim,
-              },
+              { opacity: fadeAnim },
             ]}
           >
             <Text
@@ -223,53 +444,82 @@ const HomeScreen: React.FC = () => {
                 styles.sectionTitle,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyBodySemibold,
-                  fontSize: theme.typography.fontSizeSM,
+                  fontFamily: theme.typography.fontFamilyDisplayBold,
+                  fontSize: theme.typography.fontSizeLG,
                 },
               ]}
             >
-              YOUR HABITS
+              Today's Habits
             </Text>
-            {activeHabits.map((habit, index) => (
-              <Animated.View
+            {activeHabits.map((habit) => (
+              <TouchableOpacity
                 key={habit.id}
                 style={[
                   styles.habitCard,
                   {
-                    backgroundColor: theme.colors.backgroundSecondary,
-                    borderColor: theme.colors.border,
-                    shadowColor: theme.shadows.shadowSM.shadowColor,
-                    shadowOffset: theme.shadows.shadowSM.shadowOffset,
-                    shadowOpacity: theme.shadows.shadowSM.shadowOpacity,
-                    shadowRadius: theme.shadows.shadowSM.shadowRadius,
-                    elevation: theme.shadows.shadowSM.elevation,
+                    backgroundColor: theme.colors.surface,
+                    borderColor: habit.completed ? theme.colors.primary : theme.colors.border,
+                    borderWidth: habit.completed ? 2 : 1,
                   },
                 ]}
+                onPress={() =>
+                  navigation.navigate('HabitDetail', {
+                    habitId: habit.id,
+                    habitData: habit,
+                  })
+                }
+                activeOpacity={0.7}
               >
                 <TouchableOpacity
-                  style={styles.habitInfo}
-                  onPress={() =>
-                    navigation.navigate('HabitDetail', {
-                      habitId: habit.id,
-                      habitData: habit,
-                    })
-                  }
+                  style={[
+                    styles.checkbox,
+                    {
+                      backgroundColor: habit.completed ? theme.colors.primary : 'transparent',
+                      borderColor: habit.completed ? theme.colors.primary : theme.colors.border,
+                    },
+                  ]}
+                  onPress={() => toggleHabitContext(habit.id)}
                   activeOpacity={0.7}
                 >
-                  <Text style={styles.habitEmoji}>{habit.emoji}</Text>
-                  <View style={styles.habitDetails}>
-                    <Text
+                  {habit.completed && (
+                    <Text style={[styles.checkmark, { color: theme.colors.white }]}>✓</Text>
+                  )}
+                </TouchableOpacity>
+                <View style={styles.habitInfo}>
+                  <Text
+                    style={[
+                      styles.habitName,
+                      {
+                        color: theme.colors.text,
+                        fontFamily: theme.typography.fontFamilyBodySemibold,
+                        fontSize: theme.typography.fontSizeMD,
+                        textDecorationLine: habit.completed ? 'line-through' : 'none',
+                        opacity: habit.completed ? 0.7 : 1,
+                      },
+                    ]}
+                  >
+                    {habit.name}
+                  </Text>
+                  <View style={styles.habitMeta}>
+                    <View
                       style={[
-                        styles.habitName,
-                        {
-                          color: theme.colors.text,
-                          fontFamily: theme.typography.fontFamilyBodyMedium,
-                          fontSize: theme.typography.fontSizeMD,
-                        },
+                        styles.categoryTag,
+                        { backgroundColor: theme.colors.primary + '20' },
                       ]}
                     >
-                      {habit.name}
-                    </Text>
+                      <Text
+                        style={[
+                          styles.categoryText,
+                          {
+                            color: theme.colors.primary,
+                            fontFamily: theme.typography.fontFamilyBodyMedium,
+                            fontSize: theme.typography.fontSizeXS,
+                          },
+                        ]}
+                      >
+                        {habit.category || 'General'}
+                      </Text>
+                    </View>
                     <View style={styles.streakContainer}>
                       <Text style={styles.streakEmoji}>🔥</Text>
                       <Text
@@ -282,31 +532,12 @@ const HomeScreen: React.FC = () => {
                           },
                         ]}
                       >
-                        {habit.streak} day streak
+                        {habit.streak} days
                       </Text>
                     </View>
                   </View>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.checkbox,
-                    {
-                      borderColor: habit.completed
-                        ? theme.colors.primary
-                        : theme.colors.border,
-                      backgroundColor: habit.completed
-                        ? theme.colors.primary
-                        : 'transparent',
-                    },
-                  ]}
-                  onPress={() => toggleHabitContext(habit.id)}
-                  activeOpacity={0.7}
-                >
-                  {habit.completed && (
-                    <Text style={[styles.checkmark, { color: theme.colors.white }]}>✓</Text>
-                  )}
-                </TouchableOpacity>
-              </Animated.View>
+                </View>
+              </TouchableOpacity>
             ))}
           </Animated.View>
         ) : (
@@ -318,9 +549,7 @@ const HomeScreen: React.FC = () => {
       <Animated.View
         style={[
           styles.fabContainer,
-          {
-            transform: [{ scale: fabScale }],
-          },
+          { transform: [{ scale: fabScale }] },
         ]}
       >
         <TouchableOpacity
@@ -367,15 +596,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 24,
-    paddingTop: 20,
-    paddingBottom: 20,
+    paddingTop: 16,
+    paddingBottom: 16,
   },
-  greeting: {
+  headerLeft: {
+    flex: 1,
+  },
+  dateText: {
     marginBottom: 4,
     textTransform: 'uppercase',
-    letterSpacing: 1,
   },
-  date: {
+  greeting: {
     // styles from theme
   },
   profileButton: {
@@ -384,6 +615,10 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 2,
+  },
+  profileInitials: {
+    // styles from theme
   },
   scrollView: {
     flex: 1,
@@ -392,37 +627,125 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingBottom: 100,
   },
+  datePickerContainer: {
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 12,
+    marginBottom: 16,
+  },
+  datePickerContent: {
+    gap: 8,
+  },
+  dateItem: {
+    width: 64,
+    height: 72,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  dateDayName: {
+    marginBottom: 4,
+  },
+  dateNumber: {
+    // styles from theme
+  },
+  progressCard: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 20,
+    marginBottom: 24,
+  },
+  progressInfo: {
+    flex: 1,
+  },
+  progressTitle: {
+    marginBottom: 4,
+  },
+  progressSubtitle: {
+    // styles from theme
+  },
+  progressRingContainer: {
+    width: 70,
+    height: 70,
+    position: 'relative',
+  },
+  progressRingOuter: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    borderWidth: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  progressRingInner: {
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  progressPercentage: {
+    // styles from theme
+  },
+  progressArc: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    borderWidth: 4,
+    borderLeftColor: 'transparent',
+    borderTopColor: 'transparent',
+  },
   habitsSection: {
     marginTop: 8,
   },
   sectionTitle: {
     marginBottom: 16,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
   },
   habitCard: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
     borderRadius: 16,
-    borderWidth: 1,
     marginBottom: 12,
   },
-  habitInfo: {
-    flexDirection: 'row',
+  checkbox: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 2,
+    justifyContent: 'center',
     alignItems: 'center',
-    flex: 1,
+    marginRight: 14,
   },
-  habitEmoji: {
-    fontSize: 32,
-    marginRight: 16,
+  checkmark: {
+    fontSize: 18,
+    fontWeight: 'bold',
   },
-  habitDetails: {
+  habitInfo: {
     flex: 1,
   },
   habitName: {
-    marginBottom: 4,
+    marginBottom: 6,
+  },
+  habitMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  categoryTag: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  categoryText: {
+    // styles from theme
   },
   streakContainer: {
     flexDirection: 'row',
@@ -435,21 +758,9 @@ const styles = StyleSheet.create({
   streakText: {
     // styles from theme
   },
-  checkbox: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    borderWidth: 2,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkmark: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
   emptyState: {
     alignItems: 'center',
-    paddingTop: 80,
+    paddingTop: 60,
     paddingHorizontal: 40,
   },
   emptyEmoji: {
