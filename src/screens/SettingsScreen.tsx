@@ -7,6 +7,8 @@ import {
   ScrollView,
   TextInput,
   Animated,
+  Linking,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -65,6 +67,27 @@ const SettingsScreen: React.FC = () => {
 
   const currentThemeName = themes[themeVariant].name;
   const displayThemeMode = themeMode === 'auto' ? 'Auto (System)' : currentThemeName;
+
+  const handleSendFeedback = async () => {
+    const feedbackEmail = 'feedback@habittracker.app';
+    const subject = 'Habit Tracker Feedback';
+    const url = `mailto:${feedbackEmail}?subject=${encodeURIComponent(subject)}`;
+
+    try {
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        Alert.alert(
+          'Send Feedback',
+          `Email us at ${feedbackEmail}`,
+          [{ text: 'OK' }]
+        );
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Could not open email app');
+    }
+  };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
@@ -325,6 +348,7 @@ const SettingsScreen: React.FC = () => {
 
           <TouchableOpacity
             style={[styles.settingRow, { borderBottomWidth: 0 }]}
+            onPress={handleSendFeedback}
             activeOpacity={0.7}
           >
             <View style={styles.settingInfo}>

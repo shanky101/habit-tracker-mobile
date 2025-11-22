@@ -24,3 +24,6 @@ export { default as AIInsightsScreen } from './AIInsightsScreen';
 export { default as ExportDataScreen } from './ExportDataScreen';
 export { default as NotificationsSettingsScreen } from './NotificationsSettingsScreen';
 export { default as AccountSettingsScreen } from './AccountSettingsScreen';
+export { default as SubscriptionScreen } from './SubscriptionScreen';
+export { default as PaywallScreen } from './PaywallScreen';
+export { default as AboutScreen } from './AboutScreen';

@@ -6,7 +6,9 @@ import {
   TouchableOpacity,
   ScrollView,
   Animated,
-  Image,
+  Linking,
+  Alert,
+  Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -14,6 +16,7 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
+import { useSubscription, formatPlanName } from '@/context/SubscriptionContext';
 
 type ProfileNavigationProp = StackNavigationProp<any, 'Profile'>;
 
@@ -24,10 +27,11 @@ const ProfileScreen: React.FC = () => {
   const navigation = useNavigation<ProfileNavigationProp>();
   const { theme } = useTheme();
   const { fadeAnim, slideAnim } = useScreenAnimation();
+  const { subscription } = useSubscription();
 
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
-  const [isPremium] = useState(false); // Mock premium status
+  const isPremium = subscription.isPremium;
 
   // Mock stats data
   const stats = {
@@ -50,6 +54,61 @@ const ProfileScreen: React.FC = () => {
       if (email) setUserEmail(email);
     } catch (error) {
       console.error('Error loading user data:', error);
+    }
+  };
+
+  const handleHelpSupport = async () => {
+    const supportEmail = 'support@habittracker.app';
+    const subject = 'Habit Tracker Support Request';
+    const url = `mailto:${supportEmail}?subject=${encodeURIComponent(subject)}`;
+
+    try {
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        Alert.alert(
+          'Contact Support',
+          `Email us at ${supportEmail}`,
+          [{ text: 'OK' }]
+        );
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Could not open email app');
+    }
+  };
+
+  const handleRateApp = () => {
+    Alert.alert(
+      'Rate Habit Tracker',
+      'Would you like to rate us on the App Store?',
+      [
+        { text: 'Not Now', style: 'cancel' },
+        {
+          text: 'Rate Now',
+          onPress: async () => {
+            // iOS: itms-apps://itunes.apple.com/app/idXXXXXXXXX?action=write-review
+            // Android: market://details?id=com.yourapp.package
+            const url = 'https://apps.apple.com';
+            try {
+              await Linking.openURL(url);
+            } catch (error) {
+              Alert.alert('Error', 'Could not open App Store');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleShareApp = async () => {
+    try {
+      await Share.share({
+        message: 'Check out Habit Tracker - the best app for building better habits! Download it now: https://habittracker.app',
+        title: 'Share Habit Tracker',
+      });
+    } catch (error) {
+      console.error('Error sharing:', error);
     }
   };
 
@@ -280,12 +339,17 @@ const ProfileScreen: React.FC = () => {
                         },
                       ]}
                     >
-                      Next billing: December 1, 2024
+                      {subscription.plan === 'lifetime'
+                        ? 'Lifetime access'
+                        : subscription.expiresAt
+                        ? `Renews: ${new Date(subscription.expiresAt).toLocaleDateString()}`
+                        : formatPlanName(subscription.plan)}
                     </Text>
                   </View>
                 </View>
                 <TouchableOpacity
                   style={[styles.manageButton, { borderColor: theme.colors.primary }]}
+                  onPress={() => navigation.navigate('Subscription')}
                   activeOpacity={0.7}
                 >
                   <Text
@@ -357,6 +421,7 @@ const ProfileScreen: React.FC = () => {
                     styles.upgradeButton,
                     { backgroundColor: theme.colors.primary },
                   ]}
+                  onPress={() => navigation.navigate('Paywall')}
                   activeOpacity={0.8}
                 >
                   <Text
@@ -425,9 +490,9 @@ const ProfileScreen: React.FC = () => {
             >
               SUPPORT
             </Text>
-            {renderMenuItem('❓', 'Help & Support', () => {})}
-            {renderMenuItem('⭐', 'Rate the App', () => {})}
-            {renderMenuItem('📢', 'Share App', () => {})}
+            {renderMenuItem('❓', 'Help & Support', handleHelpSupport)}
+            {renderMenuItem('⭐', 'Rate the App', handleRateApp)}
+            {renderMenuItem('📢', 'Share App', handleShareApp)}
             {renderMenuItem('ℹ️', 'About', () => navigation.navigate('About'), false)}
           </View>
 

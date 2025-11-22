@@ -19,6 +19,7 @@ import {
 } from '@expo-google-fonts/plus-jakarta-sans';
 import { ThemeProvider } from './src/theme';
 import { HabitsProvider } from './src/contexts/HabitsContext';
+import { SubscriptionProvider } from './src/context/SubscriptionContext';
 import OnboardingNavigator from './src/navigation/OnboardingNavigator';
 
 export default function App() {
@@ -44,12 +45,14 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <ThemeProvider>
-        <HabitsProvider>
-          <NavigationContainer>
-            <StatusBar style="auto" />
-            <OnboardingNavigator />
-          </NavigationContainer>
-        </HabitsProvider>
+        <SubscriptionProvider>
+          <HabitsProvider>
+            <NavigationContainer>
+              <StatusBar style="auto" />
+              <OnboardingNavigator />
+            </NavigationContainer>
+          </HabitsProvider>
+        </SubscriptionProvider>
       </ThemeProvider>
     </SafeAreaProvider>
   );

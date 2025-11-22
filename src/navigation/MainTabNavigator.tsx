@@ -21,6 +21,9 @@ import {
   ProfileScreen,
   NotificationsSettingsScreen,
   AccountSettingsScreen,
+  SubscriptionScreen,
+  PaywallScreen,
+  AboutScreen,
 } from '@/screens';
 
 export type HomeStackParamList = {
@@ -55,6 +58,8 @@ export type ProfileStackParamList = {
   AccountSettings: undefined;
   ExportData: undefined;
   About: undefined;
+  Subscription: undefined;
+  Paywall: undefined;
 };
 
 const Tab = createBottomTabNavigator();
@@ -142,6 +147,9 @@ const ProfileStackNavigator: React.FC = () => {
       <ProfileStack.Screen name="NotificationsSettings" component={NotificationsSettingsScreen} />
       <ProfileStack.Screen name="AccountSettings" component={AccountSettingsScreen} />
       <ProfileStack.Screen name="ExportData" component={ExportDataScreen} />
+      <ProfileStack.Screen name="About" component={AboutScreen} />
+      <ProfileStack.Screen name="Subscription" component={SubscriptionScreen} />
+      <ProfileStack.Screen name="Paywall" component={PaywallScreen} />
     </ProfileStack.Navigator>
   );
 };
