@@ -72,14 +72,7 @@ const AccountSettingsScreen: React.FC = () => {
   };
 
   const handleChangePassword = () => {
-    Alert.alert(
-      'Change Password',
-      'You will need to enter your current password.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Continue', onPress: () => {} },
-      ]
-    );
+    navigation.navigate('ChangePassword');
   };
 
   const handleDeleteData = () => {

@@ -7,12 +7,14 @@ import {
   ScrollView,
   Dimensions,
   Modal,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { useHabits } from '@/contexts/HabitsContext';
+import { useSubscription } from '@/context/SubscriptionContext';
 
 const { width } = Dimensions.get('window');
 const CALENDAR_PADDING = 24;
@@ -21,13 +23,48 @@ const DAY_SIZE = (width - CALENDAR_PADDING * 2) / 7;
 const CalendarViewScreen: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<any>>();
   const { theme } = useTheme();
-  const { habits } = useHabits();
+  const { habits, toggleHabit } = useHabits();
+  const { subscription } = useSubscription();
 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const [selectedHabitFilter, setSelectedHabitFilter] = useState<string | null>(null);
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
 
   const activeHabits = habits.filter((h) => !h.archived);
+  const filteredHabits = selectedHabitFilter
+    ? activeHabits.filter((h) => h.id === selectedHabitFilter)
+    : activeHabits;
+
+  // Check if date is in the past (for retroactive check-in)
+  const isPastDate = (date: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const checkDate = new Date(date);
+    checkDate.setHours(0, 0, 0, 0);
+    return checkDate < today;
+  };
+
+  // Handle retroactive check-in (Premium only)
+  const handleRetroactiveCheckIn = (habitId: string, date: Date) => {
+    if (!subscription.isPremium) {
+      Alert.alert(
+        'Premium Feature',
+        'Retroactive check-ins are available for Premium users. Upgrade to mark past habits as complete.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Upgrade',
+            onPress: () => navigation.navigate('Profile', { screen: 'Paywall' }),
+          },
+        ]
+      );
+      return;
+    }
+    // Toggle habit for the past date
+    toggleHabit(habitId);
+    Alert.alert('Check-in Updated', `Habit marked for ${date.toLocaleDateString()}`);
+  };
 
   // Get days in month
   const getDaysInMonth = (date: Date) => {
@@ -143,6 +180,7 @@ const CalendarViewScreen: React.FC = () => {
       month: 'long',
       day: 'numeric',
     });
+    const isPast = isPastDate(selectedDay);
 
     return (
       <Modal
@@ -201,21 +239,62 @@ const CalendarViewScreen: React.FC = () => {
               {completionData.completed} of {completionData.total} habits completed
             </Text>
 
+            {/* Retroactive Notice for Past Dates */}
+            {isPast && (
+              <View
+                style={[
+                  styles.retroactiveNotice,
+                  {
+                    backgroundColor: subscription.isPremium
+                      ? theme.colors.primaryLight + '20'
+                      : theme.colors.warning + '20',
+                    borderColor: subscription.isPremium
+                      ? theme.colors.primary + '40'
+                      : theme.colors.warning + '40',
+                  },
+                ]}
+              >
+                <Text style={styles.retroactiveIcon}>
+                  {subscription.isPremium ? '✏️' : '🔒'}
+                </Text>
+                <Text
+                  style={[
+                    styles.retroactiveText,
+                    {
+                      color: theme.colors.text,
+                      fontFamily: theme.typography.fontFamilyBody,
+                      fontSize: theme.typography.fontSizeXS,
+                    },
+                  ]}
+                >
+                  {subscription.isPremium
+                    ? 'Tap a habit to update past check-in'
+                    : 'Upgrade to Premium for retroactive check-ins'}
+                </Text>
+              </View>
+            )}
+
             {/* Habit List */}
-            <View style={styles.habitsList}>
-              {activeHabits.map((habit, index) => {
+            <ScrollView style={styles.habitsList} showsVerticalScrollIndicator={false}>
+              {filteredHabits.map((habit, index) => {
                 const completed = Math.random() > 0.3; // Mock completion
 
                 return (
-                  <View
+                  <TouchableOpacity
                     key={habit.id}
                     style={[
                       styles.habitItem,
                       {
                         borderBottomColor: theme.colors.border,
-                        borderBottomWidth: index < activeHabits.length - 1 ? 1 : 0,
+                        borderBottomWidth: index < filteredHabits.length - 1 ? 1 : 0,
                       },
                     ]}
+                    onPress={() => {
+                      if (isPast) {
+                        handleRetroactiveCheckIn(habit.id, selectedDay);
+                      }
+                    }}
+                    activeOpacity={isPast ? 0.7 : 1}
                   >
                     <View style={styles.habitItemLeft}>
                       <Text style={styles.habitItemEmoji}>{habit.emoji}</Text>
@@ -244,10 +323,10 @@ const CalendarViewScreen: React.FC = () => {
                         {completed ? '✓' : '✕'}
                       </Text>
                     </View>
-                  </View>
+                  </TouchableOpacity>
                 );
               })}
-            </View>
+            </ScrollView>
 
             {/* Close Button */}
             <TouchableOpacity
@@ -351,6 +430,121 @@ const CalendarViewScreen: React.FC = () => {
             Today
           </Text>
         </TouchableOpacity>
+      </View>
+
+      {/* Habit Filter Dropdown */}
+      <View style={styles.filterContainer}>
+        <TouchableOpacity
+          style={[
+            styles.filterButton,
+            {
+              backgroundColor: theme.colors.backgroundSecondary,
+              borderColor: theme.colors.border,
+            },
+          ]}
+          onPress={() => setShowFilterDropdown(!showFilterDropdown)}
+          activeOpacity={0.7}
+        >
+          <Text
+            style={[
+              styles.filterButtonText,
+              {
+                color: theme.colors.text,
+                fontFamily: theme.typography.fontFamilyBody,
+                fontSize: theme.typography.fontSizeSM,
+              },
+            ]}
+          >
+            {selectedHabitFilter
+              ? activeHabits.find((h) => h.id === selectedHabitFilter)?.name || 'All Habits'
+              : 'All Habits'}
+          </Text>
+          <Text style={[styles.filterChevron, { color: theme.colors.textSecondary }]}>
+            {showFilterDropdown ? '▲' : '▼'}
+          </Text>
+        </TouchableOpacity>
+
+        {showFilterDropdown && (
+          <View
+            style={[
+              styles.filterDropdown,
+              {
+                backgroundColor: theme.colors.background,
+                borderColor: theme.colors.border,
+                shadowColor: theme.shadows.shadowLG.shadowColor,
+                shadowOffset: theme.shadows.shadowLG.shadowOffset,
+                shadowOpacity: theme.shadows.shadowLG.shadowOpacity,
+                shadowRadius: theme.shadows.shadowLG.shadowRadius,
+                elevation: theme.shadows.shadowLG.elevation,
+              },
+            ]}
+          >
+            <TouchableOpacity
+              style={[
+                styles.filterOption,
+                { borderBottomColor: theme.colors.border },
+              ]}
+              onPress={() => {
+                setSelectedHabitFilter(null);
+                setShowFilterDropdown(false);
+              }}
+              activeOpacity={0.7}
+            >
+              <Text
+                style={[
+                  styles.filterOptionText,
+                  {
+                    color: !selectedHabitFilter ? theme.colors.primary : theme.colors.text,
+                    fontFamily: !selectedHabitFilter
+                      ? theme.typography.fontFamilyBodySemibold
+                      : theme.typography.fontFamilyBody,
+                    fontSize: theme.typography.fontSizeSM,
+                  },
+                ]}
+              >
+                All Habits
+              </Text>
+              {!selectedHabitFilter && (
+                <Text style={[styles.filterCheck, { color: theme.colors.primary }]}>✓</Text>
+              )}
+            </TouchableOpacity>
+            {activeHabits.map((habit) => (
+              <TouchableOpacity
+                key={habit.id}
+                style={[
+                  styles.filterOption,
+                  { borderBottomColor: theme.colors.border },
+                ]}
+                onPress={() => {
+                  setSelectedHabitFilter(habit.id);
+                  setShowFilterDropdown(false);
+                }}
+                activeOpacity={0.7}
+              >
+                <View style={styles.filterOptionContent}>
+                  <Text style={styles.filterOptionEmoji}>{habit.emoji}</Text>
+                  <Text
+                    style={[
+                      styles.filterOptionText,
+                      {
+                        color: selectedHabitFilter === habit.id ? theme.colors.primary : theme.colors.text,
+                        fontFamily: selectedHabitFilter === habit.id
+                          ? theme.typography.fontFamilyBodySemibold
+                          : theme.typography.fontFamilyBody,
+                        fontSize: theme.typography.fontSizeSM,
+                      },
+                    ]}
+                  >
+                    {habit.name}
+                  </Text>
+                </View>
+                {selectedHabitFilter === habit.id && (
+                  <Text style={[styles.filterCheck, { color: theme.colors.primary }]}>✓</Text>
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
       </View>
 
       {/* Calendar Content */}
@@ -695,6 +889,71 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   closeButtonText: {},
+  filterContainer: {
+    paddingHorizontal: CALENDAR_PADDING,
+    paddingVertical: 12,
+    zIndex: 100,
+  },
+  filterButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  filterButtonText: {},
+  filterChevron: {
+    fontSize: 10,
+    marginLeft: 8,
+  },
+  filterDropdown: {
+    position: 'absolute',
+    top: 60,
+    left: CALENDAR_PADDING,
+    right: CALENDAR_PADDING,
+    borderRadius: 12,
+    borderWidth: 1,
+    zIndex: 101,
+    overflow: 'hidden',
+  },
+  filterOption: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+  },
+  filterOptionContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  filterOptionEmoji: {
+    fontSize: 18,
+    marginRight: 10,
+  },
+  filterOptionText: {},
+  filterCheck: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  retroactiveNotice: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    marginBottom: 16,
+    gap: 10,
+  },
+  retroactiveIcon: {
+    fontSize: 18,
+  },
+  retroactiveText: {
+    flex: 1,
+  },
 });
 
 export default CalendarViewScreen;

@@ -466,6 +466,7 @@ const ProfileScreen: React.FC = () => {
             {renderMenuItem('⚙️', 'Settings', () => navigation.navigate('Settings'))}
             {renderMenuItem('🔔', 'Notifications', () => navigation.navigate('NotificationsSettings'))}
             {renderMenuItem('🔒', 'Account', () => navigation.navigate('AccountSettings'))}
+            {renderMenuItem('🛡️', 'Data & Privacy', () => navigation.navigate('DataPrivacy'))}
             {renderMenuItem('📤', 'Export Data', () => navigation.navigate('ExportData'), false)}
           </View>
 

@@ -9,3 +9,9 @@ export {
   ConnectionError,
   PermissionDenied,
 } from './StateComponents';
+export {
+  StreakBrokenModal,
+  AllHabitsCompleteModal,
+  QuickNoteModal,
+  ConfirmationDialog,
+} from './HabitModals';

@@ -7,15 +7,26 @@ import {
   ScrollView,
   Animated,
   Dimensions,
+  Alert,
+  RefreshControl,
+  PanResponder,
+  Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '@/theme';
-import { useHabits } from '@/contexts/HabitsContext';
+import { useHabits, Habit } from '@/contexts/HabitsContext';
 import CelebrationModal from '@/components/CelebrationModal';
+import {
+  AllHabitsCompleteModal,
+  QuickNoteModal,
+  StreakBrokenModal,
+  ConfirmationDialog,
+} from '@/components/HabitModals';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
+import { useSubscription } from '@/context/SubscriptionContext';
 
 type HomeScreenNavigationProp = StackNavigationProp<any, 'Home'>;
 type HomeScreenRouteProp = RouteProp<{ Home: { newHabit?: any } }, 'Home'>;
@@ -59,11 +70,14 @@ const isSameDay = (date1: Date, date2: Date) => {
   );
 };
 
+const FREE_HABIT_LIMIT = 5;
+
 const HomeScreen: React.FC = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const route = useRoute<HomeScreenRouteProp>();
   const { theme } = useTheme();
-  const { habits, addHabit, toggleHabit: toggleHabitContext } = useHabits();
+  const { habits, addHabit, toggleHabit: toggleHabitContext, deleteHabit } = useHabits();
+  const { subscription } = useSubscription();
   const dateScrollRef = useRef<ScrollView>(null);
 
   const { fadeAnim, slideAnim, fabScale } = useScreenAnimation({ enableFAB: true });
@@ -71,10 +85,18 @@ const HomeScreen: React.FC = () => {
   const [userName, setUserName] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [dates] = useState(generateDates(14));
+  const [refreshing, setRefreshing] = useState(false);
+  const [swipedHabitId, setSwipedHabitId] = useState<string | null>(null);
 
+  // Modal states
   const [showCelebration, setShowCelebration] = useState(false);
   const [celebrationType, setCelebrationType] = useState<'firstCheckin' | 'allComplete' | 'streak'>('firstCheckin');
   const [celebrationHabit, setCelebrationHabit] = useState('');
+  const [showAllCompleteModal, setShowAllCompleteModal] = useState(false);
+  const [showQuickNoteModal, setShowQuickNoteModal] = useState(false);
+  const [quickNoteHabitId, setQuickNoteHabitId] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [habitToDelete, setHabitToDelete] = useState<Habit | null>(null);
 
   // Load user name
   useEffect(() => {
@@ -118,7 +140,86 @@ const HomeScreen: React.FC = () => {
   const progressPercentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
   const handleAddHabit = () => {
+    // Check free tier limit
+    if (!subscription.isPremium && activeHabits.length >= FREE_HABIT_LIMIT) {
+      navigation.navigate('Profile', { screen: 'Paywall' });
+      return;
+    }
     navigation.navigate('AddHabitStep1');
+  };
+
+  // Pull to refresh handler
+  const onRefresh = async () => {
+    setRefreshing(true);
+    // Simulate sync - in real app this would sync with cloud
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setRefreshing(false);
+  };
+
+  // Handle habit check-in with celebrations
+  const handleToggleHabit = (habitId: string) => {
+    const habit = activeHabits.find(h => h.id === habitId);
+    if (!habit) return;
+
+    const wasCompleted = habit.completed;
+    toggleHabitContext(habitId);
+
+    // If completing (not uncompleting)
+    if (!wasCompleted) {
+      // Show quick note modal occasionally (first time or every 5th check-in)
+      const shouldShowNote = Math.random() < 0.2; // 20% chance
+      if (shouldShowNote) {
+        setQuickNoteHabitId(habitId);
+        setShowQuickNoteModal(true);
+      }
+
+      // Check if all habits will be complete
+      const willAllBeComplete = completedCount + 1 === totalCount;
+      if (willAllBeComplete) {
+        setTimeout(() => setShowAllCompleteModal(true), 500);
+      }
+
+      // Check for streak milestones
+      if (habit.streak === 6 || habit.streak === 29 || habit.streak === 99) {
+        setCelebrationHabit(habit.name);
+        setCelebrationType('streak');
+        setTimeout(() => setShowCelebration(true), 300);
+      }
+    }
+  };
+
+  // Handle habit deletion
+  const handleDeleteHabit = (habit: Habit) => {
+    setHabitToDelete(habit);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDeleteHabit = () => {
+    if (habitToDelete) {
+      deleteHabit(habitToDelete.id);
+      setHabitToDelete(null);
+      setShowDeleteConfirm(false);
+    }
+  };
+
+  // Handle share all complete
+  const handleShareAllComplete = async () => {
+    try {
+      await Share.share({
+        message: `I just completed all ${totalCount} habits today! 🎉 Building better habits one day at a time with Habit Tracker.`,
+      });
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+    setShowAllCompleteModal(false);
+  };
+
+  // Handle quick note save
+  const handleSaveQuickNote = (note: string, mood?: string) => {
+    console.log('Saved note:', note, 'mood:', mood, 'for habit:', quickNoteHabitId);
+    // In real app, save this to the habit's history
+    setShowQuickNoteModal(false);
+    setQuickNoteHabitId(null);
   };
 
   const handleProfilePress = () => {
@@ -324,6 +425,14 @@ const HomeScreen: React.FC = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         bounces={true}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={theme.colors.primary}
+            colors={[theme.colors.primary]}
+          />
+        }
       >
         {/* Date Picker */}
         <Animated.View
@@ -478,7 +587,7 @@ const HomeScreen: React.FC = () => {
                       borderColor: habit.completed ? theme.colors.primary : theme.colors.border,
                     },
                   ]}
-                  onPress={() => toggleHabitContext(habit.id)}
+                  onPress={() => handleToggleHabit(habit.id)}
                   activeOpacity={0.7}
                 >
                   {habit.completed && (
@@ -543,6 +652,52 @@ const HomeScreen: React.FC = () => {
         ) : (
           renderEmptyState()
         )}
+
+        {/* Free Tier Limit Indicator */}
+        {!subscription.isPremium && activeHabits.length > 0 && (
+          <TouchableOpacity
+            style={[
+              styles.limitBanner,
+              {
+                backgroundColor: theme.colors.primaryLight + '20',
+                borderColor: theme.colors.primary + '40',
+              },
+            ]}
+            onPress={() => navigation.navigate('Profile', { screen: 'Paywall' })}
+            activeOpacity={0.8}
+          >
+            <View style={styles.limitBannerLeft}>
+              <Text style={styles.limitBannerIcon}>✨</Text>
+              <View>
+                <Text
+                  style={[
+                    styles.limitBannerText,
+                    {
+                      color: theme.colors.text,
+                      fontFamily: theme.typography.fontFamilyBodyMedium,
+                      fontSize: theme.typography.fontSizeSM,
+                    },
+                  ]}
+                >
+                  {activeHabits.length}/{FREE_HABIT_LIMIT} free habits used
+                </Text>
+                <Text
+                  style={[
+                    styles.limitBannerSubtext,
+                    {
+                      color: theme.colors.primary,
+                      fontFamily: theme.typography.fontFamilyBody,
+                      fontSize: theme.typography.fontSizeXS,
+                    },
+                  ]}
+                >
+                  Upgrade for unlimited
+                </Text>
+              </View>
+            </View>
+            <Text style={[styles.limitBannerChevron, { color: theme.colors.primary }]}>→</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
 
       {/* Floating Action Button */}
@@ -581,6 +736,41 @@ const HomeScreen: React.FC = () => {
         onShare={() => {
           console.log('Share achievement');
           setShowCelebration(false);
+        }}
+      />
+
+      {/* All Habits Complete Modal */}
+      <AllHabitsCompleteModal
+        visible={showAllCompleteModal}
+        completedCount={totalCount}
+        activeStreaks={activeHabits.filter(h => h.streak > 0).length}
+        onDismiss={() => setShowAllCompleteModal(false)}
+        onShare={handleShareAllComplete}
+      />
+
+      {/* Quick Note Modal */}
+      <QuickNoteModal
+        visible={showQuickNoteModal}
+        habitName={quickNoteHabitId ? activeHabits.find(h => h.id === quickNoteHabitId)?.name || '' : ''}
+        onSave={handleSaveQuickNote}
+        onSkip={() => {
+          setShowQuickNoteModal(false);
+          setQuickNoteHabitId(null);
+        }}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmationDialog
+        visible={showDeleteConfirm}
+        title="Delete Habit"
+        message={`Are you sure you want to delete "${habitToDelete?.name}"? This will delete all history and cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        destructive
+        onConfirm={confirmDeleteHabit}
+        onCancel={() => {
+          setShowDeleteConfirm(false);
+          setHabitToDelete(null);
         }}
       />
     </SafeAreaView>
@@ -797,6 +987,32 @@ const styles = StyleSheet.create({
   fabText: {
     fontSize: 32,
     fontWeight: '300',
+  },
+  limitBanner: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginTop: 16,
+    marginBottom: 16,
+  },
+  limitBannerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  limitBannerIcon: {
+    fontSize: 24,
+  },
+  limitBannerText: {},
+  limitBannerSubtext: {
+    marginTop: 2,
+  },
+  limitBannerChevron: {
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 
