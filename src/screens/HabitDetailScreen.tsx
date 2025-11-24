@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
-import { useHabits, Habit } from '@/contexts/HabitsContext';
+import { useHabits, Habit, HabitEntry } from '@/contexts/HabitsContext';
 
 type HabitDetailRouteProp = RouteProp<
   { HabitDetail: { habitId: string; habitData: Habit } },
@@ -529,6 +529,101 @@ const HabitDetailScreen: React.FC = () => {
     </View>
   );
 
+  const renderMoodNoteHistory = () => {
+    const entries = habitData.entries || [];
+    if (entries.length === 0) return null;
+
+    // Sort entries by timestamp (newest first)
+    const sortedEntries = [...entries].sort((a, b) => b.timestamp - a.timestamp);
+
+    return (
+      <View style={styles.moodNoteContainer}>
+        <Text
+          style={[
+            styles.sectionTitle,
+            {
+              color: theme.colors.text,
+              fontFamily: theme.typography.fontFamilyBodySemibold,
+              fontSize: theme.typography.fontSizeMD,
+            },
+          ]}
+        >
+          Mood & Notes History
+        </Text>
+        {sortedEntries.slice(0, 10).map((entry, index) => {
+          const date = new Date(entry.date);
+          const today = new Date();
+          const yesterday = new Date(today);
+          yesterday.setDate(yesterday.getDate() - 1);
+
+          let dateLabel = entry.date;
+          if (entry.date === today.toISOString().split('T')[0]) {
+            dateLabel = 'Today';
+          } else if (entry.date === yesterday.toISOString().split('T')[0]) {
+            dateLabel = 'Yesterday';
+          } else {
+            const daysAgo = Math.floor(
+              (today.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)
+            );
+            if (daysAgo < 30) {
+              dateLabel = `${daysAgo} days ago`;
+            } else {
+              const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+              dateLabel = `${months[date.getMonth()]} ${date.getDate()}`;
+            }
+          }
+
+          return (
+            <View
+              key={entry.id}
+              style={[
+                styles.moodNoteItem,
+                {
+                  backgroundColor: theme.colors.surface,
+                  borderColor: theme.colors.border,
+                },
+                index === sortedEntries.length - 1 && { borderBottomWidth: 0 },
+              ]}
+            >
+              <View style={styles.moodNoteHeader}>
+                {entry.mood && (
+                  <Text style={styles.moodEmoji}>{entry.mood}</Text>
+                )}
+                <Text
+                  style={[
+                    styles.moodNoteDate,
+                    {
+                      color: theme.colors.textSecondary,
+                      fontFamily: theme.typography.fontFamilyBody,
+                      fontSize: theme.typography.fontSizeXS,
+                    },
+                  ]}
+                >
+                  {dateLabel}
+                </Text>
+              </View>
+              {entry.note && (
+                <Text
+                  style={[
+                    styles.moodNoteText,
+                    {
+                      color: theme.colors.text,
+                      fontFamily: theme.typography.fontFamilyBody,
+                      fontSize: theme.typography.fontSizeSM,
+                      lineHeight: theme.typography.fontSizeSM * theme.typography.lineHeightRelaxed,
+                    },
+                  ]}
+                >
+                  {entry.note}
+                </Text>
+              )}
+            </View>
+          );
+        })}
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: theme.colors.background }]}
@@ -679,6 +774,9 @@ const HabitDetailScreen: React.FC = () => {
 
         {/* Recent Activity */}
         {renderRecentActivity()}
+
+        {/* Mood & Notes History */}
+        {renderMoodNoteHistory()}
 
         {/* Actions Section */}
         <View style={styles.actionsContainer}>
@@ -967,6 +1065,31 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   activityTime: {},
+  moodNoteContainer: {
+    marginTop: 24,
+    paddingHorizontal: 24,
+  },
+  moodNoteItem: {
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginBottom: 12,
+  },
+  moodNoteHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  moodEmoji: {
+    fontSize: 24,
+    marginRight: 10,
+  },
+  moodNoteDate: {
+    flex: 1,
+  },
+  moodNoteText: {
+    marginTop: 4,
+  },
   actionsContainer: {
     marginTop: 24,
     paddingHorizontal: 24,

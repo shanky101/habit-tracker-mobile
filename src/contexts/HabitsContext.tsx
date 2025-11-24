@@ -1,5 +1,13 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
+export interface HabitEntry {
+  id: string;
+  date: string; // ISO date string (YYYY-MM-DD)
+  mood?: string; // emoji representing mood
+  note?: string; // optional text note
+  timestamp: number; // Unix timestamp
+}
+
 export interface Habit {
   id: string;
   name: string;
@@ -9,10 +17,12 @@ export interface Habit {
   category: string;
   color: string;
   frequency: 'daily' | 'weekly';
+  frequencyType?: 'single' | 'multiple'; // single = once per day, multiple = multiple times per day
   selectedDays: number[];
   reminderEnabled: boolean;
   reminderTime: string | null;
   notes?: string; // Optional notes/description for the habit
+  entries?: HabitEntry[]; // History of mood/note entries when completing habit
   isDefault?: boolean; // Track if this is a default habit
   archived?: boolean; // Track if this habit is archived
 }
@@ -24,6 +34,7 @@ interface HabitsContextType {
   deleteHabit: (id: string) => void;
   archiveHabit: (id: string) => void;
   toggleHabit: (id: string) => void;
+  reorderHabits: (fromIndex: number, toIndex: number) => void;
 }
 
 const HabitsContext = createContext<HabitsContextType | undefined>(undefined);
@@ -38,10 +49,12 @@ const DEFAULT_HABITS: Habit[] = [
     category: 'mindfulness',
     color: 'purple',
     frequency: 'daily',
+    frequencyType: 'single',
     selectedDays: [0, 1, 2, 3, 4, 5, 6],
     reminderEnabled: true,
     reminderTime: '07:00',
     isDefault: true,
+    entries: [],
   },
   {
     id: '2',
@@ -52,10 +65,12 @@ const DEFAULT_HABITS: Habit[] = [
     category: 'learning',
     color: 'blue',
     frequency: 'daily',
+    frequencyType: 'multiple',
     selectedDays: [0, 1, 2, 3, 4, 5, 6],
     reminderEnabled: false,
     reminderTime: null,
     isDefault: true,
+    entries: [],
   },
   {
     id: '3',
@@ -66,10 +81,12 @@ const DEFAULT_HABITS: Habit[] = [
     category: 'health',
     color: 'teal',
     frequency: 'daily',
+    frequencyType: 'multiple',
     selectedDays: [0, 1, 2, 3, 4, 5, 6],
     reminderEnabled: true,
     reminderTime: '09:00',
     isDefault: true,
+    entries: [],
   },
   {
     id: '4',
@@ -80,10 +97,12 @@ const DEFAULT_HABITS: Habit[] = [
     category: 'fitness',
     color: 'green',
     frequency: 'weekly',
+    frequencyType: 'single',
     selectedDays: [1, 3, 5],
     reminderEnabled: true,
     reminderTime: '18:00',
     isDefault: true,
+    entries: [],
   },
 ];
 
@@ -122,6 +141,15 @@ export const HabitsProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     );
   };
 
+  const reorderHabits = (fromIndex: number, toIndex: number) => {
+    setHabits((prevHabits) => {
+      const result = [...prevHabits];
+      const [removed] = result.splice(fromIndex, 1);
+      result.splice(toIndex, 0, removed);
+      return result;
+    });
+  };
+
   return (
     <HabitsContext.Provider
       value={{
@@ -131,6 +159,7 @@ export const HabitsProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         deleteHabit,
         archiveHabit,
         toggleHabit,
+        reorderHabits,
       }}
     >
       {children}

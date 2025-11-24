@@ -1,6 +1,7 @@
 import 'react-native-gesture-handler';
 import React from 'react';
 import { View, ActivityIndicator } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -20,6 +21,7 @@ import {
 import { ThemeProvider } from './src/theme';
 import { HabitsProvider } from './src/contexts/HabitsContext';
 import { SubscriptionProvider } from './src/context/SubscriptionContext';
+import { MascotProvider } from './src/context/MascotContext';
 import OnboardingNavigator from './src/navigation/OnboardingNavigator';
 
 export default function App() {
@@ -43,17 +45,21 @@ export default function App() {
   }
 
   return (
-    <SafeAreaProvider>
-      <ThemeProvider>
-        <SubscriptionProvider>
-          <HabitsProvider>
-            <NavigationContainer>
-              <StatusBar style="auto" />
-              <OnboardingNavigator />
-            </NavigationContainer>
-          </HabitsProvider>
-        </SubscriptionProvider>
-      </ThemeProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <SubscriptionProvider>
+            <HabitsProvider>
+              <MascotProvider>
+                <NavigationContainer>
+                  <StatusBar style="auto" />
+                  <OnboardingNavigator />
+                </NavigationContainer>
+              </MascotProvider>
+            </HabitsProvider>
+          </SubscriptionProvider>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }

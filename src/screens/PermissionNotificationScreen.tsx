@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -7,7 +7,10 @@ import {
   Animated,
   Dimensions,
   Platform,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
+import * as Notifications from 'expo-notifications';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
@@ -23,24 +26,63 @@ type PermissionNotificationScreenNavigationProp = StackNavigationProp<
 const PermissionNotificationScreen: React.FC = () => {
   const navigation = useNavigation<PermissionNotificationScreenNavigationProp>();
   const { theme } = useTheme();
+  const [isRequesting, setIsRequesting] = useState(false);
 
-  const handleEnableNotifications = () => {
-    // TODO: Request actual notification permissions
-    // For now, navigate to Welcome screen
-    navigation.navigate('Welcome');
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const bellAnim = useRef(new Animated.Value(0)).current;
+
+  const handleEnableNotifications = async () => {
+    setIsRequesting(true);
+
+    try {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+
+      // Request permission if not already granted
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+
+      if (finalStatus === 'granted') {
+        // Permission granted - configure notification handler
+        Notifications.setNotificationHandler({
+          handleNotification: async () => ({
+            shouldShowAlert: true,
+            shouldPlaySound: true,
+            shouldSetBadge: true,
+          }),
+        });
+
+        // Navigate to Welcome screen
+        navigation.navigate('Welcome');
+      } else {
+        // Permission denied
+        Alert.alert(
+          'Permission Required',
+          'Please enable notifications in your device settings to receive habit reminders.',
+          [
+            { text: 'Continue', onPress: () => navigation.navigate('Welcome'), style: 'cancel' },
+          ]
+        );
+      }
+    } catch (error) {
+      console.error('Error requesting notification permission:', error);
+      Alert.alert('Error', 'Failed to request notification permissions. Please try again.');
+    } finally {
+      setIsRequesting(false);
+    }
   };
 
   const handleMaybeLater = () => {
-    // Navigate to Welcome screen
+    // Navigate to Welcome screen without requesting permissions
     navigation.navigate('Welcome');
   };
 
   const handleSkip = () => {
-    // Navigate to Welcome screen
+    // Navigate to Welcome screen without requesting permissions
     navigation.navigate('Welcome');
   };
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const bellAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -227,22 +269,28 @@ const PermissionNotificationScreen: React.FC = () => {
               styles.primaryButton,
               {
                 backgroundColor: theme.colors.primary,
+                opacity: isRequesting ? 0.7 : 1,
               },
             ]}
             onPress={handleEnableNotifications}
             activeOpacity={0.8}
+            disabled={isRequesting}
           >
-            <Text
-              style={[
-                styles.primaryButtonText,
-                {
-                  color: theme.colors.white,
-                  fontFamily: theme.typography.fontFamilyBodySemibold,
-                },
-              ]}
-            >
-              Enable Notifications
-            </Text>
+            {isRequesting ? (
+              <ActivityIndicator color={theme.colors.white} />
+            ) : (
+              <Text
+                style={[
+                  styles.primaryButtonText,
+                  {
+                    color: theme.colors.white,
+                    fontFamily: theme.typography.fontFamilyBodySemibold,
+                  },
+                ]}
+              >
+                Enable Notifications
+              </Text>
+            )}
           </TouchableOpacity>
 
           {/* Secondary Button */}

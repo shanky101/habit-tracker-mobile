@@ -9,6 +9,7 @@ import {
   Animated,
   Linking,
   Alert,
+  Switch,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -16,6 +17,7 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme, themes, themeMetadata } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
+import { useMascot, MASCOT_NAME } from '@/context/MascotContext';
 
 type SettingsNavigationProp = StackNavigationProp<any, 'Settings'>;
 
@@ -25,6 +27,7 @@ const SettingsScreen: React.FC = () => {
   const navigation = useNavigation<SettingsNavigationProp>();
   const { theme, themeVariant, themeMode } = useTheme();
   const { fadeAnim, slideAnim } = useScreenAnimation();
+  const { settings: mascotSettings, toggleMascot, toggleCelebrations } = useMascot();
 
   const [userName, setUserName] = useState('');
   const [isEditingName, setIsEditingName] = useState(false);
@@ -290,6 +293,108 @@ const SettingsScreen: React.FC = () => {
           </TouchableOpacity>
         </Animated.View>
 
+        {/* Mascot Section */}
+        <Animated.View
+          style={[
+            styles.section,
+            {
+              backgroundColor: theme.colors.backgroundSecondary,
+              borderColor: theme.colors.border,
+              opacity: fadeAnim,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.sectionTitle,
+              {
+                color: theme.colors.textSecondary,
+                fontFamily: theme.typography.fontFamilyBodySemibold,
+                fontSize: theme.typography.fontSizeXS,
+              },
+            ]}
+          >
+            {MASCOT_NAME.toUpperCase()} MASCOT
+          </Text>
+
+          <View style={[styles.settingRow, { borderBottomColor: theme.colors.border }]}>
+            <View style={styles.settingInfo}>
+              <Text style={styles.settingIcon}>🐾</Text>
+              <View style={styles.settingTextContainer}>
+                <Text
+                  style={[
+                    styles.settingLabel,
+                    {
+                      color: theme.colors.text,
+                      fontFamily: theme.typography.fontFamilyBodyMedium,
+                      fontSize: theme.typography.fontSizeMD,
+                    },
+                  ]}
+                >
+                  Show {MASCOT_NAME}
+                </Text>
+                <Text
+                  style={[
+                    styles.settingValue,
+                    {
+                      color: theme.colors.textSecondary,
+                      fontFamily: theme.typography.fontFamilyBody,
+                      fontSize: theme.typography.fontSizeSM,
+                    },
+                  ]}
+                >
+                  Your friendly habit companion
+                </Text>
+              </View>
+            </View>
+            <Switch
+              value={mascotSettings.enabled}
+              onValueChange={toggleMascot}
+              trackColor={{ false: theme.colors.border, true: theme.colors.primary + '60' }}
+              thumbColor={mascotSettings.enabled ? theme.colors.primary : theme.colors.surface}
+            />
+          </View>
+
+          <View style={[styles.settingRow, { borderBottomWidth: 0, opacity: mascotSettings.enabled ? 1 : 0.5 }]}>
+            <View style={styles.settingInfo}>
+              <Text style={styles.settingIcon}>🎉</Text>
+              <View style={styles.settingTextContainer}>
+                <Text
+                  style={[
+                    styles.settingLabel,
+                    {
+                      color: theme.colors.text,
+                      fontFamily: theme.typography.fontFamilyBodyMedium,
+                      fontSize: theme.typography.fontSizeMD,
+                    },
+                  ]}
+                >
+                  Celebrations
+                </Text>
+                <Text
+                  style={[
+                    styles.settingValue,
+                    {
+                      color: theme.colors.textSecondary,
+                      fontFamily: theme.typography.fontFamilyBody,
+                      fontSize: theme.typography.fontSizeSM,
+                    },
+                  ]}
+                >
+                  Show {MASCOT_NAME} when completing all habits
+                </Text>
+              </View>
+            </View>
+            <Switch
+              value={mascotSettings.showCelebrations}
+              onValueChange={toggleCelebrations}
+              disabled={!mascotSettings.enabled}
+              trackColor={{ false: theme.colors.border, true: theme.colors.primary + '60' }}
+              thumbColor={mascotSettings.showCelebrations && mascotSettings.enabled ? theme.colors.primary : theme.colors.surface}
+            />
+          </View>
+        </Animated.View>
+
         {/* About Section */}
         <Animated.View
           style={[
@@ -433,6 +538,9 @@ const styles = StyleSheet.create({
   settingIcon: {
     fontSize: 24,
     marginRight: 14,
+  },
+  settingTextContainer: {
+    flex: 1,
   },
   settingLabel: {},
   settingValue: {

@@ -7,6 +7,7 @@ import {
   Animated,
   Dimensions,
 } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
@@ -43,6 +44,18 @@ const OnboardingWelcomeScreen: React.FC = () => {
     ]).start();
   }, [slideAnim, fadeAnim]);
 
+  // Swipe gesture handler
+  const panGesture = Gesture.Pan()
+    .activeOffsetX([-50, 50])
+    .failOffsetY([-20, 20]) // Allow vertical scrolling
+    .onEnd((event) => {
+      const { translationX } = event;
+      // Swipe left to go to next screen
+      if (translationX < -50) {
+        handleNext();
+      }
+    });
+
   return (
     <View
       style={[
@@ -65,15 +78,16 @@ const OnboardingWelcomeScreen: React.FC = () => {
         </Text>
       </TouchableOpacity>
 
-      <Animated.View
-        style={[
-          styles.content,
-          {
-            opacity: fadeAnim,
-            transform: [{ translateY: slideAnim }],
-          },
-        ]}
-      >
+      <GestureDetector gesture={panGesture}>
+        <Animated.View
+          style={[
+            styles.content,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }],
+            },
+          ]}
+        >
         {/* Hero Illustration */}
         <View
           style={[
@@ -170,7 +184,8 @@ const OnboardingWelcomeScreen: React.FC = () => {
             Get Started
           </Text>
         </TouchableOpacity>
-      </Animated.View>
+        </Animated.View>
+      </GestureDetector>
     </View>
   );
 };

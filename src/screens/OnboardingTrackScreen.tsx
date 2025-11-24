@@ -7,6 +7,7 @@ import {
   Animated,
   Dimensions,
 } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
@@ -53,6 +54,22 @@ const OnboardingTrackScreen: React.FC = () => {
 
     loopAnimation();
   }, [fadeAnim, checkAnim]);
+
+  // Swipe gesture handler
+  const panGesture = Gesture.Pan()
+    .activeOffsetX([-50, 50])
+    .failOffsetY([-20, 20]) // Allow vertical scrolling
+    .onEnd((event) => {
+      const { translationX } = event;
+      // Swipe left to go to next screen
+      if (translationX < -50) {
+        handleNext();
+      }
+      // Swipe right to go to previous screen
+      else if (translationX > 50) {
+        handleBack();
+      }
+    });
 
   const checkScale = checkAnim.interpolate({
     inputRange: [0, 0.5, 1],
@@ -102,12 +119,13 @@ const OnboardingTrackScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      <Animated.View
-        style={[
-          styles.content,
-          { opacity: fadeAnim },
-        ]}
-      >
+      <GestureDetector gesture={panGesture}>
+        <Animated.View
+          style={[
+            styles.content,
+            { opacity: fadeAnim },
+          ]}
+        >
         {/* Interactive Demo */}
         <View style={styles.demoContainer}>
           {/* Mock Habit Cards */}
@@ -353,7 +371,8 @@ const OnboardingTrackScreen: React.FC = () => {
             Next
           </Text>
         </TouchableOpacity>
-      </Animated.View>
+        </Animated.View>
+      </GestureDetector>
     </View>
   );
 };

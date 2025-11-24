@@ -11,6 +11,7 @@ import {
   Platform,
   TextInput,
 } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
@@ -67,6 +68,9 @@ const AddHabitStep3Screen: React.FC = () => {
 
   const handleCreateHabit = async () => {
     setIsLoading(true);
+
+    // Haptic feedback for creating habit
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000));
