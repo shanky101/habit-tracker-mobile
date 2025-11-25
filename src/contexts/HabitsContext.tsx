@@ -45,6 +45,7 @@ interface HabitsContextType {
   reorderHabits: (fromIndex: number, toIndex: number) => void;
   completeHabit: (id: string, date: string, entry?: { mood?: string; note?: string }) => void;
   uncompleteHabit: (id: string, date: string) => void;
+  resetHabitForDate: (id: string, date: string) => void;
   getCompletionForDate: (id: string, date: string) => DailyCompletion | undefined;
   isHabitCompletedForDate: (id: string, date: string) => boolean;
   getCompletionProgress: (id: string, date: string) => { current: number; target: number };
@@ -252,6 +253,20 @@ export const HabitsProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     );
   };
 
+  // Reset habit completion for a specific date (remove all completions)
+  const resetHabitForDate = (id: string, date: string) => {
+    setHabits((prevHabits) =>
+      prevHabits.map((habit) => {
+        if (habit.id !== id) return habit;
+
+        const completions = { ...habit.completions };
+        delete completions[date];
+
+        return { ...habit, completions };
+      })
+    );
+  };
+
   // Get completion record for a specific date
   const getCompletionForDate = (id: string, date: string): DailyCompletion | undefined => {
     const habit = habits.find((h) => h.id === id);
@@ -292,6 +307,7 @@ export const HabitsProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         reorderHabits,
         completeHabit,
         uncompleteHabit,
+        resetHabitForDate,
         getCompletionForDate,
         isHabitCompletedForDate,
         getCompletionProgress,

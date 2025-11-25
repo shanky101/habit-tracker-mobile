@@ -86,6 +86,7 @@ const HomeScreen: React.FC = () => {
     reorderHabits,
     completeHabit,
     uncompleteHabit,
+    resetHabitForDate,
     isHabitCompletedForDate,
     getCompletionProgress,
   } = useHabits();
@@ -222,6 +223,12 @@ const HomeScreen: React.FC = () => {
     const wasCompleted = isHabitCompletedForDate(habitId, selectedDateISO);
     const progress = getCompletionProgress(habitId, selectedDateISO);
 
+    // For multi-completion habits that are fully complete: reset to 0
+    if (habit.targetCompletionsPerDay > 1 && wasCompleted) {
+      resetHabitForDate(habitId, selectedDateISO);
+      return;
+    }
+
     // If completing (add a completion)
     if (!wasCompleted) {
       // Check if we can still add more completions
@@ -229,7 +236,7 @@ const HomeScreen: React.FC = () => {
         completeHabit(habitId, selectedDateISO);
       }
     } else {
-      // Uncompleting (remove last completion)
+      // Uncompleting (remove last completion) - for single completion habits
       uncompleteHabit(habitId, selectedDateISO);
     }
 

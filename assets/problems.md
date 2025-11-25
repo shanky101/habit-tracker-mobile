@@ -33,3 +33,18 @@ Like - 29 Nov - Monday entries
     5. If I complete a habit, a popup comes up which asks "How I feel" with an emoji reaction picker with an optional note. If I do add a note there or select an emoji, where does that go? I cannot see this entry under habit details. This needs to be fixed. I can imagine this as maybe 30 days later, I should see 10 days back I did complete a habit but was annoyed when i completed but other days I was happy to complete the habit. Mood tracking essentially. I as a user need to see the log or whatever entry I have done in the habit detail page. 
     6. Under the Today's habit section, add two small chips - Single and Multiple as chips which when clicked will show habits which are to be done only once per day - Say walking 5000 steps vs Multiple - Say reading morning and evening
     (Refer to the chips used for categorisation of the templates under template selection screen). Same chips can be used for this purpose.
+
+## [TODO] 
+<Add the below chat in claude at 3:30 pm today>
+
+Refer to my codebase in the github repo and the added context to this project and all the stuff you know about me from the other project like Finance and move. 
+Essentially few weeks back and from pretty much beginning of the year I had envisioned building at least one product and a ready to launch app. 
+I now have the app ready - atleast the core features are mostly working. I will be doing a bug bash and add more polish with some features in the coming week. 
+Using claude code, gemini antigravity etc and leveraging all AI tools with my knowledge and experience to bring this to market. 
+
+
+1. Gauge my progress and my journey so far
+2. How is the app and will I be able to have a successful launch? 
+3. I have developed a marketing site now - under the same github repo. This will be my internet face for now for the app
+4. I need to still validate the app by running it on an android device. I also need to do prep work for readying the app for eventual app store and google play store release. 
+
