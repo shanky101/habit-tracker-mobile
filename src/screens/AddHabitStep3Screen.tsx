@@ -42,6 +42,8 @@ const AddHabitStep3Screen: React.FC = () => {
   const { habitName, category, color } = route.params;
 
   const [frequency, setFrequency] = useState<'daily' | 'weekly'>('daily');
+  const [frequencyType, setFrequencyType] = useState<'single' | 'multiple'>('single'); // single = once per day, multiple = multiple times per day
+  const [targetCompletionsPerDay, setTargetCompletionsPerDay] = useState<number>(1); // How many times per day
   const [selectedDays, setSelectedDays] = useState<number[]>([0, 1, 2, 3, 4, 5, 6]);
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [reminderTime, setReminderTime] = useState('09:00');
@@ -86,12 +88,14 @@ const AddHabitStep3Screen: React.FC = () => {
       category,
       color,
       frequency,
+      frequencyType,
+      targetCompletionsPerDay,
       selectedDays: frequency === 'daily' ? [0, 1, 2, 3, 4, 5, 6] : selectedDays,
       reminderEnabled,
       reminderTime: reminderEnabled ? reminderTime : null,
       notes: notes.trim() || undefined,
-      completed: false,
       streak: 0,
+      completions: {},
       createdAt: new Date().toISOString(),
     };
 
@@ -310,6 +314,193 @@ const AddHabitStep3Screen: React.FC = () => {
                     </Text>
                   </TouchableOpacity>
                 ))}
+              </View>
+            )}
+          </View>
+
+          {/* Completion Frequency Section */}
+          <View style={styles.section}>
+            <Text
+              style={[
+                styles.sectionTitle,
+                {
+                  color: theme.colors.text,
+                  fontFamily: theme.typography.fontFamilyDisplayBold,
+                  fontSize: theme.typography.fontSizeLG,
+                },
+              ]}
+            >
+              How often per day? 🔄
+            </Text>
+            <Text
+              style={[
+                styles.sectionSubtitle,
+                {
+                  color: theme.colors.textSecondary,
+                  fontFamily: theme.typography.fontFamilyBody,
+                  fontSize: theme.typography.fontSizeSM,
+                },
+              ]}
+            >
+              Choose if this habit needs to be done once or multiple times per day
+            </Text>
+
+            {/* Single vs Multiple Toggle */}
+            <View style={styles.frequencyTypeContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.radioOption,
+                  {
+                    backgroundColor: theme.colors.backgroundSecondary,
+                    borderColor: frequencyType === 'single' ? theme.colors.primary : theme.colors.border,
+                    borderWidth: frequencyType === 'single' ? 2 : 1,
+                  },
+                ]}
+                onPress={() => {
+                  setFrequencyType('single');
+                  setTargetCompletionsPerDay(1);
+                }}
+                activeOpacity={0.7}
+              >
+                <View style={styles.radioContent}>
+                  <View
+                    style={[
+                      styles.radio,
+                      {
+                        borderColor: frequencyType === 'single' ? theme.colors.primary : theme.colors.border,
+                      },
+                    ]}
+                  >
+                    {frequencyType === 'single' && (
+                      <View style={[styles.radioSelected, { backgroundColor: theme.colors.primary }]} />
+                    )}
+                  </View>
+                  <Text
+                    style={[
+                      styles.radioLabel,
+                      {
+                        color: theme.colors.text,
+                        fontFamily: theme.typography.fontFamilyBodyMedium,
+                        fontSize: theme.typography.fontSizeMD,
+                      },
+                    ]}
+                  >
+                    Once per day
+                  </Text>
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.radioOption,
+                  {
+                    backgroundColor: theme.colors.backgroundSecondary,
+                    borderColor: frequencyType === 'multiple' ? theme.colors.primary : theme.colors.border,
+                    borderWidth: frequencyType === 'multiple' ? 2 : 1,
+                  },
+                ]}
+                onPress={() => setFrequencyType('multiple')}
+                activeOpacity={0.7}
+              >
+                <View style={styles.radioContent}>
+                  <View
+                    style={[
+                      styles.radio,
+                      {
+                        borderColor: frequencyType === 'multiple' ? theme.colors.primary : theme.colors.border,
+                      },
+                    ]}
+                  >
+                    {frequencyType === 'multiple' && (
+                      <View style={[styles.radioSelected, { backgroundColor: theme.colors.primary }]} />
+                    )}
+                  </View>
+                  <Text
+                    style={[
+                      styles.radioLabel,
+                      {
+                        color: theme.colors.text,
+                        fontFamily: theme.typography.fontFamilyBodyMedium,
+                        fontSize: theme.typography.fontSizeMD,
+                      },
+                    ]}
+                  >
+                    Multiple times per day
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+
+            {/* Target Count Input */}
+            {frequencyType === 'multiple' && (
+              <View style={styles.targetCountContainer}>
+                <Text
+                  style={[
+                    styles.targetCountLabel,
+                    {
+                      color: theme.colors.text,
+                      fontFamily: theme.typography.fontFamilyBody,
+                      fontSize: theme.typography.fontSizeSM,
+                    },
+                  ]}
+                >
+                  How many times per day?
+                </Text>
+                <View style={styles.targetCountInputRow}>
+                  <TouchableOpacity
+                    style={[
+                      styles.targetCountButton,
+                      { backgroundColor: theme.colors.backgroundSecondary, borderColor: theme.colors.border },
+                    ]}
+                    onPress={() => setTargetCompletionsPerDay(Math.max(2, targetCompletionsPerDay - 1))}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[styles.targetCountButtonText, { color: theme.colors.text }]}>−</Text>
+                  </TouchableOpacity>
+
+                  <TextInput
+                    style={[
+                      styles.targetCountInput,
+                      {
+                        backgroundColor: theme.colors.backgroundSecondary,
+                        borderColor: theme.colors.primary,
+                        color: theme.colors.primary,
+                        fontFamily: theme.typography.fontFamilyDisplayBold,
+                      },
+                    ]}
+                    value={targetCompletionsPerDay.toString()}
+                    onChangeText={(text) => {
+                      const num = parseInt(text) || 2;
+                      setTargetCompletionsPerDay(Math.max(2, Math.min(20, num)));
+                    }}
+                    keyboardType="number-pad"
+                    maxLength={2}
+                  />
+
+                  <TouchableOpacity
+                    style={[
+                      styles.targetCountButton,
+                      { backgroundColor: theme.colors.backgroundSecondary, borderColor: theme.colors.border },
+                    ]}
+                    onPress={() => setTargetCompletionsPerDay(Math.min(20, targetCompletionsPerDay + 1))}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[styles.targetCountButtonText, { color: theme.colors.text }]}>+</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <Text
+                  style={[
+                    styles.targetCountHint,
+                    {
+                      color: theme.colors.textSecondary,
+                      fontFamily: theme.typography.fontFamilyBody,
+                      fontSize: theme.typography.fontSizeXS,
+                    },
+                  ]}
+                >
+                  You'll track {targetCompletionsPerDay} completions per day
+                </Text>
               </View>
             )}
           </View>
@@ -674,6 +865,47 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   reminderHint: {
+    textAlign: 'center',
+  },
+  frequencyTypeContainer: {
+    marginTop: 16,
+  },
+  targetCountContainer: {
+    marginTop: 16,
+    padding: 16,
+    borderRadius: 12,
+  },
+  targetCountLabel: {
+    marginBottom: 12,
+  },
+  targetCountInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+  },
+  targetCountButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  targetCountButtonText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  targetCountInput: {
+    width: 80,
+    height: 60,
+    borderRadius: 12,
+    borderWidth: 2,
+    textAlign: 'center',
+    fontSize: 28,
+  },
+  targetCountHint: {
+    marginTop: 8,
     textAlign: 'center',
   },
   summaryCard: {

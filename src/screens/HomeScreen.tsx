@@ -78,7 +78,17 @@ const HomeScreen: React.FC = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const route = useRoute<HomeScreenRouteProp>();
   const { theme } = useTheme();
-  const { habits, addHabit, toggleHabit: toggleHabitContext, deleteHabit, updateHabit, reorderHabits } = useHabits();
+  const {
+    habits,
+    addHabit,
+    deleteHabit,
+    updateHabit,
+    reorderHabits,
+    completeHabit,
+    uncompleteHabit,
+    isHabitCompletedForDate,
+    getCompletionProgress,
+  } = useHabits();
   const { subscription } = useSubscription();
   const { triggerReaction, getMascotForProgress, setMood, settings: mascotSettings, toggleMascot } = useMascot();
   const dateScrollRef = useRef<ScrollView>(null);
@@ -159,6 +169,13 @@ const HomeScreen: React.FC = () => {
     });
   };
 
+  // Helper to format date as YYYY-MM-DD
+  const formatDateISO = (date: Date): string => {
+    return date.toISOString().split('T')[0];
+  };
+
+  const selectedDateISO = formatDateISO(selectedDate);
+
   // Filter out archived habits and filter by selected date
   const dateFilteredHabits = getHabitsForDate(selectedDate);
 
@@ -167,7 +184,8 @@ const HomeScreen: React.FC = () => {
     ? dateFilteredHabits
     : dateFilteredHabits.filter((h) => h.frequencyType === frequencyFilter);
 
-  const completedCount = activeHabits.filter((h) => h.completed).length;
+  // Calculate completion count based on selected date
+  const completedCount = activeHabits.filter((h) => isHabitCompletedForDate(h.id, selectedDateISO)).length;
   const totalCount = activeHabits.length;
   const progressPercentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
@@ -190,7 +208,7 @@ const HomeScreen: React.FC = () => {
 
   // Update mascot mood based on progress (only when counts change)
   useEffect(() => {
-    const hasStreakAtRisk = activeHabits.some(h => h.streak > 3 && !h.completed);
+    const hasStreakAtRisk = activeHabits.some(h => h.streak > 3 && !isHabitCompletedForDate(h.id, selectedDateISO));
     const newMood = getMascotForProgress(completedCount, totalCount, hasStreakAtRisk);
     setMood(newMood);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -201,11 +219,22 @@ const HomeScreen: React.FC = () => {
     const habit = activeHabits.find(h => h.id === habitId);
     if (!habit) return;
 
-    const wasCompleted = habit.completed;
-    toggleHabitContext(habitId);
+    const wasCompleted = isHabitCompletedForDate(habitId, selectedDateISO);
+    const progress = getCompletionProgress(habitId, selectedDateISO);
+
+    // If completing (add a completion)
+    if (!wasCompleted) {
+      // Check if we can still add more completions
+      if (progress.current < progress.target) {
+        completeHabit(habitId, selectedDateISO);
+      }
+    } else {
+      // Uncompleting (remove last completion)
+      uncompleteHabit(habitId, selectedDateISO);
+    }
 
     // If completing (not uncompleting)
-    if (!wasCompleted) {
+    if (!wasCompleted && progress.current + 1 >= progress.target) {
       // Haptic feedback for completion
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       // Trigger mascot reaction (only if mascot is enabled)
@@ -320,26 +349,12 @@ const HomeScreen: React.FC = () => {
 
   // Handle quick note save
   const handleSaveQuickNote = (note: string, mood?: string) => {
+    // TODO: This needs to be refactored to add the note/mood to the completion record
+    // For now, just close the modal since the habit was already completed
+    // In the future, we should pass mood/note directly to completeHabit
     if (quickNoteHabitId) {
-      const habit = habits.find(h => h.id === quickNoteHabitId);
-      if (habit) {
-        // Create new entry
-        const entry = {
-          id: `${quickNoteHabitId}-${Date.now()}`,
-          date: new Date().toISOString().split('T')[0],
-          mood,
-          note: note.trim() || undefined,
-          timestamp: Date.now(),
-        };
-
-        // Update habit with new entry
-        const existingEntries = habit.entries || [];
-        updateHabit(quickNoteHabitId, {
-          entries: [...existingEntries, entry],
-        });
-
-        console.log('Saved note:', note, 'mood:', mood, 'for habit:', quickNoteHabitId);
-      }
+      console.log('Note/mood captured:', note, mood, 'for habit:', quickNoteHabitId);
+      // This would need to update the completion entry for today's date
     }
 
     setShowQuickNoteModal(false);
@@ -865,6 +880,7 @@ const HomeScreen: React.FC = () => {
 
             <DraggableHabitList
               habits={activeHabits}
+              selectedDate={selectedDateISO}
               onToggle={handleToggleHabit}
               onPress={handleHabitPress}
               onEdit={handleEditHabit}

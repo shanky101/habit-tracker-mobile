@@ -6,6 +6,7 @@ import SwipeableHabitCard from './SwipeableHabitCard';
 
 interface DraggableHabitListProps {
   habits: Habit[];
+  selectedDate: string; // ISO date string (YYYY-MM-DD)
   onToggle: (id: string) => void;
   onPress: (habit: Habit) => void;
   onEdit: (habit: Habit) => void;
@@ -16,6 +17,7 @@ interface DraggableHabitListProps {
 
 const DraggableHabitList: React.FC<DraggableHabitListProps> = ({
   habits,
+  selectedDate,
   onToggle,
   onPress,
   onEdit,
@@ -40,6 +42,7 @@ const DraggableHabitList: React.FC<DraggableHabitListProps> = ({
         <SwipeableHabitCard
           key={habit.id}
           habit={habit}
+          selectedDate={selectedDate}
           onToggle={onToggle}
           onPress={onPress}
           onEdit={onEdit}

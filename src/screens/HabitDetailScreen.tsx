@@ -530,11 +530,16 @@ const HabitDetailScreen: React.FC = () => {
   );
 
   const renderMoodNoteHistory = () => {
-    const entries = habitData.entries || [];
-    if (entries.length === 0) return null;
+    // Get all entries from all daily completions
+    const allEntries: HabitEntry[] = [];
+    Object.values(habitData.completions || {}).forEach(completion => {
+      allEntries.push(...completion.entries);
+    });
+
+    if (allEntries.length === 0) return null;
 
     // Sort entries by timestamp (newest first)
-    const sortedEntries = [...entries].sort((a, b) => b.timestamp - a.timestamp);
+    const sortedEntries = [...allEntries].sort((a, b) => b.timestamp - a.timestamp);
 
     return (
       <View style={styles.moodNoteContainer}>

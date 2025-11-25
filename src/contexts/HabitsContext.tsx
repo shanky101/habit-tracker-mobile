@@ -8,21 +8,30 @@ export interface HabitEntry {
   timestamp: number; // Unix timestamp
 }
 
+// Daily completion record for a specific date
+export interface DailyCompletion {
+  date: string; // ISO date string (YYYY-MM-DD)
+  completionCount: number; // How many times completed today
+  targetCount: number; // How many times needed today
+  timestamps: number[]; // Unix timestamps for each completion
+  entries: HabitEntry[]; // Mood/note entries for each completion
+}
+
 export interface Habit {
   id: string;
   name: string;
   emoji: string;
-  completed: boolean;
   streak: number;
   category: string;
   color: string;
   frequency: 'daily' | 'weekly';
   frequencyType?: 'single' | 'multiple'; // single = once per day, multiple = multiple times per day
+  targetCompletionsPerDay: number; // How many times per day (1-20), defaults to 1
   selectedDays: number[];
   reminderEnabled: boolean;
   reminderTime: string | null;
   notes?: string; // Optional notes/description for the habit
-  entries?: HabitEntry[]; // History of mood/note entries when completing habit
+  completions: Record<string, DailyCompletion>; // Date-indexed completion records (YYYY-MM-DD)
   isDefault?: boolean; // Track if this is a default habit
   archived?: boolean; // Track if this habit is archived
 }
@@ -33,8 +42,12 @@ interface HabitsContextType {
   updateHabit: (id: string, updates: Partial<Habit>) => void;
   deleteHabit: (id: string) => void;
   archiveHabit: (id: string) => void;
-  toggleHabit: (id: string) => void;
   reorderHabits: (fromIndex: number, toIndex: number) => void;
+  completeHabit: (id: string, date: string, entry?: { mood?: string; note?: string }) => void;
+  uncompleteHabit: (id: string, date: string) => void;
+  getCompletionForDate: (id: string, date: string) => DailyCompletion | undefined;
+  isHabitCompletedForDate: (id: string, date: string) => boolean;
+  getCompletionProgress: (id: string, date: string) => { current: number; target: number };
 }
 
 const HabitsContext = createContext<HabitsContextType | undefined>(undefined);
@@ -44,65 +57,65 @@ const DEFAULT_HABITS: Habit[] = [
     id: '1',
     name: 'Morning Meditation',
     emoji: '🧘',
-    completed: true,
     streak: 7,
     category: 'mindfulness',
     color: 'purple',
     frequency: 'daily',
     frequencyType: 'single',
+    targetCompletionsPerDay: 1,
     selectedDays: [0, 1, 2, 3, 4, 5, 6],
     reminderEnabled: true,
     reminderTime: '07:00',
     isDefault: true,
-    entries: [],
+    completions: {},
   },
   {
     id: '2',
     name: 'Read 30 minutes',
     emoji: '📚',
-    completed: false,
     streak: 12,
     category: 'learning',
     color: 'blue',
     frequency: 'daily',
     frequencyType: 'multiple',
+    targetCompletionsPerDay: 2,
     selectedDays: [0, 1, 2, 3, 4, 5, 6],
     reminderEnabled: false,
     reminderTime: null,
     isDefault: true,
-    entries: [],
+    completions: {},
   },
   {
     id: '3',
     name: 'Drink 8 glasses of water',
     emoji: '💧',
-    completed: true,
     streak: 5,
     category: 'health',
     color: 'teal',
     frequency: 'daily',
     frequencyType: 'multiple',
+    targetCompletionsPerDay: 8,
     selectedDays: [0, 1, 2, 3, 4, 5, 6],
     reminderEnabled: true,
     reminderTime: '09:00',
     isDefault: true,
-    entries: [],
+    completions: {},
   },
   {
     id: '4',
     name: 'Exercise',
     emoji: '🏃',
-    completed: false,
     streak: 3,
     category: 'fitness',
     color: 'green',
     frequency: 'weekly',
     frequencyType: 'single',
+    targetCompletionsPerDay: 1,
     selectedDays: [1, 3, 5],
     reminderEnabled: true,
     reminderTime: '18:00',
     isDefault: true,
-    entries: [],
+    completions: {},
   },
 ];
 
@@ -133,14 +146,6 @@ export const HabitsProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     );
   };
 
-  const toggleHabit = (id: string) => {
-    setHabits((prevHabits) =>
-      prevHabits.map((habit) =>
-        habit.id === id ? { ...habit, completed: !habit.completed } : habit
-      )
-    );
-  };
-
   const reorderHabits = (fromIndex: number, toIndex: number) => {
     setHabits((prevHabits) => {
       const result = [...prevHabits];
@@ -148,6 +153,132 @@ export const HabitsProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       result.splice(toIndex, 0, removed);
       return result;
     });
+  };
+
+  // Helper function to get today's date in YYYY-MM-DD format
+  const formatDate = (date: Date): string => {
+    return date.toISOString().split('T')[0];
+  };
+
+  // Complete a habit for a specific date (increment completion count)
+  const completeHabit = (id: string, date: string, entry?: { mood?: string; note?: string }) => {
+    setHabits((prevHabits) =>
+      prevHabits.map((habit) => {
+        if (habit.id !== id) return habit;
+
+        const completions = { ...habit.completions };
+        const existing = completions[date];
+        const timestamp = Date.now();
+
+        if (existing) {
+          // Increment existing completion
+          if (existing.completionCount < existing.targetCount) {
+            const newEntry: HabitEntry | undefined = entry
+              ? {
+                  id: `${id}-${date}-${timestamp}`,
+                  date,
+                  mood: entry.mood,
+                  note: entry.note,
+                  timestamp,
+                }
+              : undefined;
+
+            completions[date] = {
+              ...existing,
+              completionCount: existing.completionCount + 1,
+              timestamps: [...existing.timestamps, timestamp],
+              entries: newEntry ? [...existing.entries, newEntry] : existing.entries,
+            };
+          }
+        } else {
+          // Create new completion record for this date
+          const newEntry: HabitEntry | undefined = entry
+            ? {
+                id: `${id}-${date}-${timestamp}`,
+                date,
+                mood: entry.mood,
+                note: entry.note,
+                timestamp,
+              }
+            : undefined;
+
+          completions[date] = {
+            date,
+            completionCount: 1,
+            targetCount: habit.targetCompletionsPerDay,
+            timestamps: [timestamp],
+            entries: newEntry ? [newEntry] : [],
+          };
+        }
+
+        return { ...habit, completions };
+      })
+    );
+  };
+
+  // Decrement or remove completion for a specific date
+  const uncompleteHabit = (id: string, date: string) => {
+    setHabits((prevHabits) =>
+      prevHabits.map((habit) => {
+        if (habit.id !== id) return habit;
+
+        const completions = { ...habit.completions };
+        const existing = completions[date];
+
+        if (!existing) return habit;
+
+        if (existing.completionCount <= 1) {
+          // Remove the completion record entirely
+          delete completions[date];
+        } else {
+          // Decrement the count
+          const newTimestamps = [...existing.timestamps];
+          newTimestamps.pop(); // Remove last timestamp
+          const newEntries = [...existing.entries];
+          if (newEntries.length > 0) {
+            newEntries.pop(); // Remove last entry if exists
+          }
+
+          completions[date] = {
+            ...existing,
+            completionCount: existing.completionCount - 1,
+            timestamps: newTimestamps,
+            entries: newEntries,
+          };
+        }
+
+        return { ...habit, completions };
+      })
+    );
+  };
+
+  // Get completion record for a specific date
+  const getCompletionForDate = (id: string, date: string): DailyCompletion | undefined => {
+    const habit = habits.find((h) => h.id === id);
+    return habit?.completions[date];
+  };
+
+  // Check if habit is fully completed for a specific date
+  const isHabitCompletedForDate = (id: string, date: string): boolean => {
+    const completion = getCompletionForDate(id, date);
+    if (!completion) return false;
+    return completion.completionCount >= completion.targetCount;
+  };
+
+  // Get completion progress for a specific date
+  const getCompletionProgress = (id: string, date: string): { current: number; target: number } => {
+    const habit = habits.find((h) => h.id === id);
+    if (!habit) return { current: 0, target: 1 };
+
+    const completion = habit.completions[date];
+    if (!completion) {
+      return { current: 0, target: habit.targetCompletionsPerDay };
+    }
+
+    return {
+      current: completion.completionCount,
+      target: completion.targetCount,
+    };
   };
 
   return (
@@ -158,8 +289,12 @@ export const HabitsProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         updateHabit,
         deleteHabit,
         archiveHabit,
-        toggleHabit,
         reorderHabits,
+        completeHabit,
+        uncompleteHabit,
+        getCompletionForDate,
+        isHabitCompletedForDate,
+        getCompletionProgress,
       }}
     >
       {children}

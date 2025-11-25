@@ -82,13 +82,18 @@ const HabitDeepDiveScreen: React.FC = () => {
     "You tend to skip this habit on weekends",
   ];
 
-  // Get real notes from habit entries
+  // Get real notes from habit completions
   const getRecentNotes = () => {
-    const entries = habitData.entries || [];
-    if (entries.length === 0) return [];
+    // Get all entries from all daily completions
+    const allEntries: HabitEntry[] = [];
+    Object.values(habitData.completions || {}).forEach(completion => {
+      allEntries.push(...completion.entries);
+    });
+
+    if (allEntries.length === 0) return [];
 
     // Sort by timestamp (newest first) and take the 5 most recent with notes
-    const entriesWithNotes = entries
+    const entriesWithNotes = allEntries
       .filter(entry => entry.note || entry.mood)
       .sort((a, b) => b.timestamp - a.timestamp)
       .slice(0, 5);

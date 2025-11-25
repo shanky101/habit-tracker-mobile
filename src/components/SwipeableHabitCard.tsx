@@ -14,7 +14,7 @@ import {
   PanGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
 import { useTheme } from '@/theme';
-import { Habit } from '@/contexts/HabitsContext';
+import { Habit, useHabits } from '@/contexts/HabitsContext';
 
 // Constants matching the design reference
 const RIGHT_ACTIONS_WIDTH = 210; // 70px per action × 3 actions
@@ -24,6 +24,7 @@ const CARD_HEIGHT = 60; // Reduced from 76 to 60 (approx 40% reduction in whites
 
 interface SwipeableHabitCardProps {
   habit: Habit;
+  selectedDate: string; // ISO date string (YYYY-MM-DD)
   onToggle: (id: string) => void;
   onPress: (habit: Habit) => void;
   onEdit: (habit: Habit) => void;
@@ -33,6 +34,7 @@ interface SwipeableHabitCardProps {
 
 const SwipeableHabitCard: React.FC<SwipeableHabitCardProps> = ({
   habit,
+  selectedDate,
   onToggle,
   onPress,
   onEdit,
@@ -40,6 +42,11 @@ const SwipeableHabitCard: React.FC<SwipeableHabitCardProps> = ({
   onDelete,
 }) => {
   const { theme } = useTheme();
+  const { getCompletionProgress, isHabitCompletedForDate } = useHabits();
+
+  // Get completion progress for the selected date
+  const progress = getCompletionProgress(habit.id, selectedDate);
+  const isCompleted = isHabitCompletedForDate(habit.id, selectedDate);
 
   // Animated value for card translation
   const translateX = useRef(new Animated.Value(0)).current;
@@ -234,7 +241,7 @@ const SwipeableHabitCard: React.FC<SwipeableHabitCardProps> = ({
         style={[
           styles.leftAction,
           {
-            backgroundColor: habit.completed ? '#EF4444' : theme.colors.success,
+            backgroundColor: isCompleted ? '#EF4444' : theme.colors.success,
             opacity: checkInOpacity,
           },
         ]}
@@ -246,9 +253,9 @@ const SwipeableHabitCard: React.FC<SwipeableHabitCardProps> = ({
           }}
           activeOpacity={0.8}
         >
-          <Text style={styles.checkInIcon}>{habit.completed ? '↶' : '✓'}</Text>
+          <Text style={styles.checkInIcon}>{isCompleted ? '↶' : '✓'}</Text>
           <Text style={[styles.checkInText, { color: theme.colors.white }]}>
-            {habit.completed ? 'Undo' : 'Done'}
+            {isCompleted ? 'Undo' : 'Done'}
           </Text>
         </TouchableOpacity>
       </Animated.View>
@@ -307,8 +314,8 @@ const SwipeableHabitCard: React.FC<SwipeableHabitCardProps> = ({
             styles.habitCard,
             {
               backgroundColor: theme.colors.surface,
-              borderColor: habit.completed ? theme.colors.primary : theme.colors.border,
-              borderWidth: habit.completed ? 2 : 1,
+              borderColor: isCompleted ? theme.colors.primary : theme.colors.border,
+              borderWidth: isCompleted ? 2 : 1,
               transform: [{ translateX }],
             },
           ]}
@@ -328,8 +335,8 @@ const SwipeableHabitCard: React.FC<SwipeableHabitCardProps> = ({
                     color: theme.colors.text,
                     fontFamily: theme.typography.fontFamilyBodyMedium,
                     fontSize: theme.typography.fontSizeMD,
-                    textDecorationLine: habit.completed ? 'line-through' : 'none',
-                    opacity: habit.completed ? 0.7 : 1,
+                    textDecorationLine: isCompleted ? 'line-through' : 'none',
+                    opacity: isCompleted ? 0.7 : 1,
                   },
                 ]}
                 numberOfLines={1}
@@ -346,7 +353,7 @@ const SwipeableHabitCard: React.FC<SwipeableHabitCardProps> = ({
                   },
                 ]}
               >
-                0 / 1 time
+                {progress.current} / {progress.target} {progress.target === 1 ? 'time' : 'times'}
               </Text>
             </View>
 
@@ -355,15 +362,15 @@ const SwipeableHabitCard: React.FC<SwipeableHabitCardProps> = ({
               style={[
                 styles.checkbox,
                 {
-                  backgroundColor: habit.completed ? theme.colors.primary : 'transparent',
-                  borderColor: habit.completed ? theme.colors.primary : theme.colors.border,
+                  backgroundColor: isCompleted ? theme.colors.primary : 'transparent',
+                  borderColor: isCompleted ? theme.colors.primary : theme.colors.border,
                 },
               ]}
               onPress={handleCheckboxPress}
               activeOpacity={0.7}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              {habit.completed && (
+              {isCompleted && (
                 <Text style={[styles.checkmark, { color: theme.colors.white }]}>✓</Text>
               )}
             </TouchableOpacity>
