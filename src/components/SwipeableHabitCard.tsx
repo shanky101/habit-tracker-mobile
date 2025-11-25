@@ -21,7 +21,7 @@ const RIGHT_ACTIONS_WIDTH = 210; // 70px per action × 3 actions
 const SWIPE_THRESHOLD = 40;
 const VELOCITY_THRESHOLD = 400;
 const CARD_HEIGHT_SINGLE = 60; // Height for single completion habits
-const CARD_HEIGHT_MULTIPLE = 72; // Taller height for multi-completion habits (more breathing room)
+const CARD_HEIGHT_MULTIPLE = 80; // Taller height for multi-completion habits (extra space for progress bars)
 
 interface SwipeableHabitCardProps {
   habit: Habit;
@@ -246,7 +246,7 @@ const SwipeableHabitCard: React.FC<SwipeableHabitCardProps> = ({
         style={[
           styles.leftAction,
           {
-            backgroundColor: isCompleted ? '#EF4444' : theme.colors.success,
+            backgroundColor: isCompleted ? theme.colors.error : theme.colors.success,
             opacity: checkInOpacity,
           },
         ]}
@@ -539,15 +539,16 @@ const styles = StyleSheet.create({
   habitInfo: {
     flex: 1,
     justifyContent: 'center',
+    paddingVertical: 2, // Add small vertical padding to prevent overlap
   },
   habitName: {
-    marginBottom: 4, // Increased from 2 to 4 for better separation
+    marginBottom: 2, // Space between habit name and progress bars/subtext
   },
   progressBarsContainer: {
     flexDirection: 'row',
-    gap: 4, // Increased from 3 to 4 for better visibility
-    marginTop: 6, // Increased from 4 to 6
-    marginBottom: 5, // Increased from 3 to 5
+    gap: 4, // Spacing between progress bars
+    marginTop: 4, // Space above progress bars
+    marginBottom: 4, // Space below progress bars
     alignItems: 'center',
   },
   progressBar: {

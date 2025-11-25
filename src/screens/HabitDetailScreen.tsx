@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,12 +8,14 @@ import {
   Dimensions,
   Share,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { useHabits, Habit, HabitEntry } from '@/contexts/HabitsContext';
+import { ExportManager, ExportFormat } from '@/utils/exportManager';
 
 type HabitDetailRouteProp = RouteProp<
   { HabitDetail: { habitId: string; habitData: Habit } },
@@ -27,12 +29,30 @@ const HabitDetailScreen: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<any>>();
   const route = useRoute<HabitDetailRouteProp>();
   const { theme } = useTheme();
-  const { habits, toggleHabit } = useHabits();
+  const {
+    habits,
+    completeHabit,
+    uncompleteHabit,
+    resetHabitForDate,
+    isHabitCompletedForDate,
+    getCompletionProgress
+  } = useHabits();
 
   const { habitId } = route.params;
 
   // Get the latest habit data from context (in case it was updated)
   const habitData = habits.find(h => h.id === habitId) || route.params.habitData;
+
+  // Export loading state
+  const [isExporting, setIsExporting] = useState(false);
+
+  // Get today's date in YYYY-MM-DD format
+  const getTodayISO = () => new Date().toISOString().split('T')[0];
+  const todayISO = getTodayISO();
+
+  // Check if habit is completed for today
+  const isCompletedToday = isHabitCompletedForDate(habitId, todayISO);
+  const todayProgress = getCompletionProgress(habitId, todayISO);
 
   // Mock data for stats - in production, this would come from stored history
   const stats = {
@@ -80,7 +100,22 @@ const HabitDetailScreen: React.FC = () => {
   };
 
   const handleToggleComplete = () => {
-    toggleHabit(habitId);
+    // For multi-completion habits that are fully complete: reset to 0
+    if (habitData.targetCompletionsPerDay > 1 && isCompletedToday) {
+      resetHabitForDate(habitId, todayISO);
+      return;
+    }
+
+    // If completing (add a completion)
+    if (!isCompletedToday) {
+      // Check if we can still add more completions
+      if (todayProgress.current < todayProgress.target) {
+        completeHabit(habitId, todayISO);
+      }
+    } else {
+      // Uncompleting (remove last completion) - for single completion habits
+      uncompleteHabit(habitId, todayISO);
+    }
   };
 
   const handleShareStreak = async () => {
@@ -97,9 +132,48 @@ const HabitDetailScreen: React.FC = () => {
   const handleExportData = () => {
     Alert.alert(
       'Export Habit Data',
-      'This will export your habit history. Coming soon!',
-      [{ text: 'OK' }]
+      'Choose export format:',
+      [
+        {
+          text: 'CSV',
+          onPress: () => exportHabitData('csv'),
+        },
+        {
+          text: 'JSON',
+          onPress: () => exportHabitData('json'),
+        },
+        {
+          text: 'PDF/HTML',
+          onPress: () => exportHabitData('pdf'),
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+      ]
     );
+  };
+
+  const exportHabitData = async (format: ExportFormat) => {
+    setIsExporting(true);
+    try {
+      const result = await ExportManager.exportData({
+        format,
+        habits: [habitData], // Export only this habit
+        includeArchived: false,
+      });
+
+      if (result.success) {
+        Alert.alert('Success', result.message);
+      } else {
+        Alert.alert('Export Failed', result.message);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to export habit data');
+      console.error('Export error:', error);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const getCategoryColor = (category: string) => {
@@ -709,8 +783,8 @@ const HabitDetailScreen: React.FC = () => {
             style={[
               styles.todayStatusCard,
               {
-                backgroundColor: habitData.completed ? theme.colors.success + '20' : theme.colors.surface,
-                borderColor: habitData.completed ? theme.colors.success : theme.colors.border,
+                backgroundColor: isCompletedToday ? theme.colors.success + '20' : theme.colors.surface,
+                borderColor: isCompletedToday ? theme.colors.success : theme.colors.border,
               },
             ]}
             onPress={handleToggleComplete}
@@ -720,12 +794,12 @@ const HabitDetailScreen: React.FC = () => {
               style={[
                 styles.todayCheckbox,
                 {
-                  backgroundColor: habitData.completed ? theme.colors.success : 'transparent',
-                  borderColor: habitData.completed ? theme.colors.success : theme.colors.border,
+                  backgroundColor: isCompletedToday ? theme.colors.success : 'transparent',
+                  borderColor: isCompletedToday ? theme.colors.success : theme.colors.border,
                 },
               ]}
             >
-              {habitData.completed && (
+              {isCompletedToday && (
                 <Text style={[styles.todayCheckmark, { color: theme.colors.white }]}>✓</Text>
               )}
             </View>
@@ -740,7 +814,7 @@ const HabitDetailScreen: React.FC = () => {
                   },
                 ]}
               >
-                {habitData.completed ? 'Completed Today!' : "Today's Check-in"}
+                {isCompletedToday ? 'Completed Today!' : "Today's Check-in"}
               </Text>
               <Text
                 style={[
@@ -752,7 +826,9 @@ const HabitDetailScreen: React.FC = () => {
                   },
                 ]}
               >
-                {habitData.completed ? 'Tap to undo' : 'Tap to mark as complete'}
+                {habitData.targetCompletionsPerDay > 1
+                  ? `${todayProgress.current} / ${todayProgress.target} times${isCompletedToday ? ' - Tap to reset' : ' - Tap to check in'}`
+                  : isCompletedToday ? 'Tap to undo' : 'Tap to mark as complete'}
               </Text>
             </View>
           </TouchableOpacity>
@@ -791,12 +867,18 @@ const HabitDetailScreen: React.FC = () => {
               {
                 backgroundColor: theme.colors.backgroundSecondary,
                 borderColor: theme.colors.border,
+                opacity: isExporting ? 0.5 : 1,
               },
             ]}
             onPress={handleExportData}
             activeOpacity={0.7}
+            disabled={isExporting}
           >
-            <Text style={styles.actionEmoji}>📤</Text>
+            {isExporting ? (
+              <ActivityIndicator size="small" color={theme.colors.primary} />
+            ) : (
+              <Text style={styles.actionEmoji}>📤</Text>
+            )}
             <Text
               style={[
                 styles.actionText,
@@ -807,7 +889,7 @@ const HabitDetailScreen: React.FC = () => {
                 },
               ]}
             >
-              Export Data
+              {isExporting ? 'Exporting...' : 'Export Data'}
             </Text>
           </TouchableOpacity>
 

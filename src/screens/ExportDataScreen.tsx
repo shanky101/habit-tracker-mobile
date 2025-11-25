@@ -8,12 +8,15 @@ import {
   Animated,
   ActivityIndicator,
   Switch,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
+import { useHabits } from '@/contexts/HabitsContext';
+import { ExportManager, ExportFormat as EMExportFormat } from '@/utils/exportManager';
 
 type ExportDataNavigationProp = StackNavigationProp<any, 'ExportData'>;
 
@@ -31,40 +34,76 @@ const ExportDataScreen: React.FC = () => {
   const navigation = useNavigation<ExportDataNavigationProp>();
   const { theme } = useTheme();
   const { fadeAnim, slideAnim } = useScreenAnimation();
+  const { habits: contextHabits } = useHabits();
 
   const [exportScope, setExportScope] = useState<ExportScope>('all');
   const [exportFormat, setExportFormat] = useState<ExportFormat>('csv');
   const [isExporting, setIsExporting] = useState(false);
   const [removePersonalInfo, setRemovePersonalInfo] = useState(false);
 
-  // Mock habits for selection
-  const [habits, setHabits] = useState<HabitOption[]>([
-    { id: '1', name: 'Morning Meditation', emoji: '🧘', selected: true },
-    { id: '2', name: 'Read 20 Pages', emoji: '📚', selected: true },
-    { id: '3', name: 'Exercise', emoji: '💪', selected: true },
-    { id: '4', name: 'Drink Water', emoji: '💧', selected: true },
-    { id: '5', name: 'Journal', emoji: '✍️', selected: true },
-  ]);
+  // Convert context habits to selectable options
+  const [habitSelections, setHabitSelections] = useState<HabitOption[]>(
+    contextHabits
+      .filter(h => !h.archived)
+      .map(h => ({
+        id: h.id,
+        name: h.name,
+        emoji: h.emoji,
+        selected: true,
+      }))
+  );
 
   const toggleHabitSelection = (id: string) => {
-    setHabits(habits.map(h =>
+    setHabitSelections(habitSelections.map(h =>
       h.id === id ? { ...h, selected: !h.selected } : h
     ));
   };
 
   const handleExport = async () => {
     setIsExporting(true);
-    // Simulate export process
-    setTimeout(() => {
+    try {
+      // Determine which habits to export
+      let habitsToExport = contextHabits;
+
+      if (exportScope === 'selected') {
+        const selectedIds = habitSelections.filter(h => h.selected).map(h => h.id);
+        habitsToExport = contextHabits.filter(h => selectedIds.includes(h.id));
+      } else if (exportScope === 'all') {
+        habitsToExport = contextHabits.filter(h => !h.archived);
+      }
+
+      if (habitsToExport.length === 0) {
+        Alert.alert('No Habits Selected', 'Please select at least one habit to export.');
+        setIsExporting(false);
+        return;
+      }
+
+      // Export data using ExportManager
+      const result = await ExportManager.exportData({
+        format: exportFormat as EMExportFormat,
+        habits: habitsToExport,
+        includeArchived: exportScope === 'all',
+      });
+
+      if (result.success) {
+        Alert.alert('Export Successful', result.message);
+        // Navigate back after successful export
+        setTimeout(() => navigation.goBack(), 1500);
+      } else {
+        Alert.alert('Export Failed', result.message);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to export habit data');
+      console.error('Export error:', error);
+    } finally {
       setIsExporting(false);
-      // In production, this would trigger file download/share
-    }, 2000);
+    }
   };
 
   const formatDescriptions = {
     csv: 'Spreadsheet-compatible format. Works with Excel, Google Sheets.',
     json: 'Developer-friendly format. Machine-readable data.',
-    pdf: 'Human-readable report with charts and summary. (Premium)',
+    pdf: 'Human-readable HTML report with statistics and summary.',
   };
 
   const dataIncluded = [
@@ -355,14 +394,14 @@ const ExportDataScreen: React.FC = () => {
                 >
                   SELECT HABITS
                 </Text>
-                {habits.map((habit, index) => (
+                {habitSelections.map((habit, index) => (
                   <TouchableOpacity
                     key={habit.id}
                     style={[
                       styles.habitRow,
                       {
                         borderBottomColor: theme.colors.border,
-                        borderBottomWidth: index === habits.length - 1 ? 0 : 1,
+                        borderBottomWidth: index === habitSelections.length - 1 ? 0 : 1,
                       },
                     ]}
                     onPress={() => toggleHabitSelection(habit.id)}
@@ -436,8 +475,8 @@ const ExportDataScreen: React.FC = () => {
                         : theme.colors.border,
                     },
                   ]}
-                  onPress={() => format !== 'pdf' && setExportFormat(format)}
-                  activeOpacity={format === 'pdf' ? 1 : 0.7}
+                  onPress={() => setExportFormat(format)}
+                  activeOpacity={0.7}
                 >
                   <Text style={styles.formatIcon}>
                     {format === 'csv' ? '📊' : format === 'json' ? '{ }' : '📄'}
@@ -456,16 +495,6 @@ const ExportDataScreen: React.FC = () => {
                   >
                     {format.toUpperCase()}
                   </Text>
-                  {format === 'pdf' && (
-                    <View
-                      style={[
-                        styles.premiumTag,
-                        { backgroundColor: theme.colors.accent1 },
-                      ]}
-                    >
-                      <Text style={styles.premiumTagText}>PRO</Text>
-                    </View>
-                  )}
                 </TouchableOpacity>
               ))}
             </View>
