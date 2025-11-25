@@ -1156,6 +1156,21 @@ const styles = StyleSheet.create({
   sectionTitle: {
     marginBottom: 16,
   },
+  filterChipsContainer: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 16,
+  },
+  filterChip: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  filterChipText: {
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
   emptyState: {
     alignItems: 'center',
     paddingTop: 60,

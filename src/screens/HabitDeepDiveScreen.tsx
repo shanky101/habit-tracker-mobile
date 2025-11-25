@@ -13,7 +13,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
-import { Habit } from '@/contexts/HabitsContext';
+import { Habit, HabitEntry, useHabits } from '@/contexts/HabitsContext';
 
 type HabitDeepDiveNavigationProp = StackNavigationProp<any, 'HabitDeepDive'>;
 type HabitDeepDiveRouteProp = RouteProp<
@@ -31,9 +31,13 @@ const HabitDeepDiveScreen: React.FC = () => {
   const route = useRoute<HabitDeepDiveRouteProp>();
   const { theme } = useTheme();
   const { fadeAnim, slideAnim } = useScreenAnimation();
+  const { habits } = useHabits();
 
-  const { habitData } = route.params;
+  const { habitId } = route.params;
   const [selectedRange, setSelectedRange] = useState('30 days');
+
+  // Get the latest habit data from context (includes updated entries)
+  const habitData = habits.find(h => h.id === habitId) || route.params.habitData;
 
   // Mock data
   const currentStreak = habitData.streak;
@@ -78,12 +82,50 @@ const HabitDeepDiveScreen: React.FC = () => {
     "You tend to skip this habit on weekends",
   ];
 
-  // Mock recent notes
-  const recentNotes = [
-    { date: 'Today', note: 'Felt really focused today!', mood: '😊' },
-    { date: 'Yesterday', note: 'Quick session but effective', mood: '🙂' },
-    { date: '3 days ago', note: 'Struggled a bit but pushed through', mood: '💪' },
-  ];
+  // Get real notes from habit entries
+  const getRecentNotes = () => {
+    const entries = habitData.entries || [];
+    if (entries.length === 0) return [];
+
+    // Sort by timestamp (newest first) and take the 5 most recent with notes
+    const entriesWithNotes = entries
+      .filter(entry => entry.note || entry.mood)
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, 5);
+
+    // Format dates
+    return entriesWithNotes.map(entry => {
+      const date = new Date(entry.date);
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      let dateLabel = entry.date;
+      if (entry.date === today.toISOString().split('T')[0]) {
+        dateLabel = 'Today';
+      } else if (entry.date === yesterday.toISOString().split('T')[0]) {
+        dateLabel = 'Yesterday';
+      } else {
+        const daysAgo = Math.floor(
+          (today.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)
+        );
+        if (daysAgo < 30) {
+          dateLabel = `${daysAgo} days ago`;
+        } else {
+          const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+          dateLabel = `${months[date.getMonth()]} ${date.getDate()}`;
+        }
+      }
+
+      return {
+        date: dateLabel,
+        note: entry.note || '',
+        mood: entry.mood || '📝',
+      };
+    });
+  };
+
+  const recentNotes = getRecentNotes();
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
@@ -598,58 +640,83 @@ const HabitDeepDiveScreen: React.FC = () => {
             >
               Recent Notes
             </Text>
-            <TouchableOpacity activeOpacity={0.7}>
-              <Text
-                style={[
-                  styles.viewAllText,
-                  {
-                    color: theme.colors.primary,
-                    fontFamily: theme.typography.fontFamilyBody,
-                    fontSize: theme.typography.fontSizeSM,
-                  },
-                ]}
-              >
-                View All
-              </Text>
-            </TouchableOpacity>
-          </View>
-          {recentNotes.map((note, index) => (
-            <View
-              key={index}
-              style={[
-                styles.noteItem,
-                { borderBottomColor: theme.colors.border },
-              ]}
-            >
-              <View style={styles.noteHeader}>
-                <Text style={styles.noteMood}>{note.mood}</Text>
+            {recentNotes.length > 0 && (
+              <TouchableOpacity activeOpacity={0.7}>
                 <Text
                   style={[
-                    styles.noteDate,
+                    styles.viewAllText,
                     {
-                      color: theme.colors.textSecondary,
+                      color: theme.colors.primary,
                       fontFamily: theme.typography.fontFamilyBody,
-                      fontSize: theme.typography.fontSizeXS,
+                      fontSize: theme.typography.fontSizeSM,
                     },
                   ]}
                 >
-                  {note.date}
+                  View All
                 </Text>
-              </View>
+              </TouchableOpacity>
+            )}
+          </View>
+          {recentNotes.length === 0 ? (
+            <View style={styles.emptyNotesContainer}>
+              <Text style={styles.emptyNotesEmoji}>📝</Text>
               <Text
                 style={[
-                  styles.noteText,
+                  styles.emptyNotesText,
                   {
-                    color: theme.colors.text,
+                    color: theme.colors.textSecondary,
                     fontFamily: theme.typography.fontFamilyBody,
                     fontSize: theme.typography.fontSizeSM,
                   },
                 ]}
               >
-                {note.note}
+                No notes yet. Add a note when you complete this habit!
               </Text>
             </View>
-          ))}
+          ) : (
+            recentNotes.map((note, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.noteItem,
+                  {
+                    borderBottomColor: theme.colors.border,
+                    borderBottomWidth: index === recentNotes.length - 1 ? 0 : 1,
+                  },
+                ]}
+              >
+                <View style={styles.noteHeader}>
+                  <Text style={styles.noteMood}>{note.mood}</Text>
+                  <Text
+                    style={[
+                      styles.noteDate,
+                      {
+                        color: theme.colors.textSecondary,
+                        fontFamily: theme.typography.fontFamilyBody,
+                        fontSize: theme.typography.fontSizeXS,
+                      },
+                    ]}
+                  >
+                    {note.date}
+                  </Text>
+                </View>
+                {note.note && (
+                  <Text
+                    style={[
+                      styles.noteText,
+                      {
+                        color: theme.colors.text,
+                        fontFamily: theme.typography.fontFamilyBody,
+                        fontSize: theme.typography.fontSizeSM,
+                      },
+                    ]}
+                  >
+                    {note.note}
+                  </Text>
+                )}
+              </View>
+            ))
+          )}
         </Animated.View>
 
         {/* Export Actions */}
@@ -933,6 +1000,18 @@ const styles = StyleSheet.create({
   },
   noteDate: {},
   noteText: {
+    lineHeight: 22,
+  },
+  emptyNotesContainer: {
+    paddingVertical: 32,
+    alignItems: 'center',
+  },
+  emptyNotesEmoji: {
+    fontSize: 48,
+    marginBottom: 12,
+  },
+  emptyNotesText: {
+    textAlign: 'center',
     lineHeight: 22,
   },
   exportActions: {
