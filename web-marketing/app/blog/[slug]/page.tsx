@@ -193,7 +193,7 @@ export default function BlogPostPage() {
           {/* Back Button */}
           <Link
             href="/blog"
-            className="inline-flex items-center gap-2 text-sm text-[#525252] dark:text-[#A3A3A3] hover:text-[#8B5CF6] transition-colors mb-8"
+            className="inline-flex items-center gap-2 text-sm text-[#4A3E2A] hover:text-[#8B5CF6] transition-colors mb-8"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Blog
@@ -213,7 +213,7 @@ export default function BlogPostPage() {
             <h1 className="font-[family-name:var(--font-display)] font-bold text-4xl sm:text-5xl mb-6">
               {post.title}
             </h1>
-            <div className="flex items-center gap-6 text-sm text-[#525252] dark:text-[#A3A3A3] mb-8">
+            <div className="flex items-center gap-6 text-sm text-[#4A3E2A] mb-8">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
                 {post.date}
@@ -245,7 +245,7 @@ export default function BlogPostPage() {
             </div>
 
             {/* Content */}
-            <div className="prose prose-lg dark:prose-invert max-w-none">
+            <div className="prose prose-lg max-w-none">
               {post.content.map((paragraph, i) => (
                 <div key={i}>
                   {paragraph.startsWith("## ") ? (
@@ -257,7 +257,7 @@ export default function BlogPostPage() {
                       {paragraph.replace("### ", "")}
                     </h3>
                   ) : (
-                    <p className="text-lg leading-relaxed mb-6 text-[#525252] dark:text-[#A3A3A3]">
+                    <p className="text-lg leading-relaxed mb-6 text-[#1A1410]">
                       {paragraph}
                     </p>
                   )}
@@ -286,7 +286,7 @@ export default function BlogPostPage() {
 
       {/* Footer */}
       <footer className="py-12 px-4 sm:px-6 lg:px-8 border-t border-foreground/10">
-        <div className="max-w-7xl mx-auto text-center text-sm text-[#525252] dark:text-[#A3A3A3]">
+        <div className="max-w-7xl mx-auto text-center text-sm text-[#525252]">
           <p>© 2024 HabitFlow. Built with ❤️ for habit builders.</p>
         </div>
       </footer>
