@@ -423,93 +423,158 @@ const HabitDetailScreen: React.FC = () => {
   );
 
   const renderCalendarHeatmap = () => {
-    // Group by weeks
-    const weeks: any[][] = [];
-    let currentWeek: any[] = [];
+    // Group by months for better readability
+    const monthGroups: { [key: string]: any[] } = {};
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-    calendarData.forEach((day, index) => {
-      currentWeek.push(day);
-      if (currentWeek.length === 7 || index === calendarData.length - 1) {
-        weeks.push([...currentWeek]);
-        currentWeek = [];
+    calendarData.forEach((day) => {
+      const date = new Date(day.date);
+      const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
+      if (!monthGroups[monthKey]) {
+        monthGroups[monthKey] = [];
       }
+      monthGroups[monthKey].push(day);
     });
+
+    // Calculate stats
+    const completedDays = calendarData.filter(d => d.completed).length;
+    const completionRate = Math.round((completedDays / calendarData.length) * 100);
 
     return (
       <View style={styles.calendarContainer}>
-        <Text
-          style={[
-            styles.sectionTitle,
-            {
-              color: theme.colors.text,
-              fontFamily: theme.typography.fontFamilyBodySemibold,
-              fontSize: theme.typography.fontSizeMD,
-            },
-          ]}
-        >
-          Activity Heatmap (Last 90 Days)
-        </Text>
+        <View style={styles.calendarHeader}>
+          <Text
+            style={[
+              styles.sectionTitle,
+              {
+                color: theme.colors.text,
+                fontFamily: theme.typography.fontFamilyBodySemibold,
+                fontSize: theme.typography.fontSizeMD,
+              },
+            ]}
+          >
+            Activity Heatmap
+          </Text>
+          <View style={styles.statsRow}>
+            <Text
+              style={[
+                styles.statsText,
+                {
+                  color: theme.colors.textSecondary,
+                  fontFamily: theme.typography.fontFamilyBody,
+                  fontSize: theme.typography.fontSizeXS,
+                },
+              ]}
+            >
+              {completedDays} days • {completionRate}% complete
+            </Text>
+          </View>
+        </View>
+
         <ScrollView
           horizontal
-          showsHorizontalScrollIndicator={false}
+          showsHorizontalScrollIndicator={true}
           style={styles.calendarScroll}
+          contentContainerStyle={styles.calendarScrollContent}
         >
-          <View style={styles.calendarGrid}>
-            {weeks.map((week, weekIndex) => (
-              <View key={weekIndex} style={styles.calendarWeek}>
-                {week.map((day, dayIndex) => {
-                  const isToday =
-                    day.date === new Date().toISOString().split('T')[0];
+          {Object.keys(monthGroups).reverse().map((monthKey) => {
+            const days = monthGroups[monthKey];
+            const date = new Date(days[0].date);
+            const monthLabel = `${monthNames[date.getMonth()]} '${String(date.getFullYear()).slice(2)}`;
 
-                  return (
-                    <View
-                      key={dayIndex}
-                      style={[
-                        styles.calendarDay,
-                        {
-                          backgroundColor: day.completed
-                            ? day.hasNote
-                              ? '#22C55E'
-                              : '#86EFAC'
-                            : theme.colors.border,
-                          borderColor: isToday ? theme.colors.primary : 'transparent',
-                        },
-                      ]}
-                    />
-                  );
-                })}
+            return (
+              <View key={monthKey} style={styles.monthGroup}>
+                <Text
+                  style={[
+                    styles.monthLabel,
+                    {
+                      color: theme.colors.textSecondary,
+                      fontFamily: theme.typography.fontFamilyBodySemibold,
+                      fontSize: theme.typography.fontSizeXS,
+                    },
+                  ]}
+                >
+                  {monthLabel}
+                </Text>
+                <View style={styles.monthGrid}>
+                  {days.map((day, index) => {
+                    const isToday = day.date === new Date().toISOString().split('T')[0];
+                    const dayOfWeek = new Date(day.date).getDay();
+
+                    return (
+                      <View
+                        key={index}
+                        style={[
+                          styles.calendarDay,
+                          {
+                            backgroundColor: day.completed
+                              ? day.hasNote
+                                ? theme.colors.primary
+                                : theme.colors.primary + '60'
+                              : theme.colors.backgroundSecondary,
+                            borderColor: isToday ? theme.colors.primary : theme.colors.border,
+                            borderWidth: isToday ? 2 : 1,
+                          },
+                        ]}
+                      >
+                        {day.completed && (
+                          <Text style={styles.checkMark}>✓</Text>
+                        )}
+                      </View>
+                    );
+                  })}
+                </View>
               </View>
-            ))}
-          </View>
+            );
+          })}
         </ScrollView>
+
         <View style={styles.calendarLegend}>
-          <Text
-            style={[
-              styles.legendText,
-              {
-                color: theme.colors.textSecondary,
-                fontFamily: theme.typography.fontFamilyBody,
-                fontSize: theme.typography.fontSizeXS,
-              },
-            ]}
-          >
-            Less
-          </Text>
-          <View style={[styles.legendBox, { backgroundColor: theme.colors.border }]} />
-          <View style={[styles.legendBox, { backgroundColor: '#86EFAC' }]} />
-          <View style={[styles.legendBox, { backgroundColor: '#22C55E' }]} />
-          <Text
-            style={[
-              styles.legendText,
-              {
-                color: theme.colors.textSecondary,
-                fontFamily: theme.typography.fontFamilyBody,
-                fontSize: theme.typography.fontSizeXS,
-              },
-            ]}
-          >
-            More
-          </Text>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendBox, { backgroundColor: theme.colors.backgroundSecondary, borderWidth: 1, borderColor: theme.colors.border }]} />
+            <Text
+              style={[
+                styles.legendText,
+                {
+                  color: theme.colors.textSecondary,
+                  fontFamily: theme.typography.fontFamilyBody,
+                  fontSize: theme.typography.fontSizeXS,
+                },
+              ]}
+            >
+              Not done
+            </Text>
+          </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendBox, { backgroundColor: theme.colors.primary + '60' }]} />
+            <Text
+              style={[
+                styles.legendText,
+                {
+                  color: theme.colors.textSecondary,
+                  fontFamily: theme.typography.fontFamilyBody,
+                  fontSize: theme.typography.fontSizeXS,
+                },
+              ]}
+            >
+              Done
+            </Text>
+          </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendBox, { backgroundColor: theme.colors.primary }]} />
+            <Text
+              style={[
+                styles.legendText,
+                {
+                  color: theme.colors.textSecondary,
+                  fontFamily: theme.typography.fontFamilyBody,
+                  fontSize: theme.typography.fontSizeXS,
+                },
+              ]}
+            >
+              Done with notes
+            </Text>
+          </View>
         </View>
       </View>
     );
@@ -1093,36 +1158,68 @@ const styles = StyleSheet.create({
   },
   calendarContainer: {
     marginTop: 24,
-    paddingHorizontal: 24,
+  },
+  calendarHeader: {
+    paddingHorizontal: 20,
+    marginBottom: 16,
+  },
+  statsRow: {
+    marginTop: 4,
+  },
+  statsText: {
+    lineHeight: 16,
   },
   calendarScroll: {
-    marginBottom: 12,
+    marginBottom: 16,
   },
-  calendarGrid: {
+  calendarScrollContent: {
+    paddingHorizontal: 20,
+    gap: 16,
+  },
+  monthGroup: {
+    gap: 8,
+  },
+  monthLabel: {
+    marginBottom: 4,
+  },
+  monthGrid: {
     flexDirection: 'row',
-    gap: 3,
-  },
-  calendarWeek: {
-    gap: 3,
+    flexWrap: 'wrap',
+    gap: 4,
+    maxWidth: 200,
   },
   calendarDay: {
-    width: 12,
-    height: 12,
-    borderRadius: 3,
-    borderWidth: 2,
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkMark: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
   calendarLegend: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  legendItem: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
   },
   legendText: {
-    marginHorizontal: 4,
+    lineHeight: 16,
   },
   legendBox: {
-    width: 12,
-    height: 12,
-    borderRadius: 3,
+    width: 16,
+    height: 16,
+    borderRadius: 4,
   },
   activityContainer: {
     marginTop: 24,

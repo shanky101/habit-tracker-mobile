@@ -370,16 +370,32 @@ const TemplatesScreen: React.FC = () => {
         >
           Templates
         </Text>
-        <TouchableOpacity
-          style={[
-            styles.importButton,
-            { backgroundColor: theme.colors.primary }
-          ]}
-          onPress={() => setShowImportModal(true)}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.importButtonText}>Import</Text>
-        </TouchableOpacity>
+        <View style={styles.headerButtons}>
+          <TouchableOpacity
+            style={[
+              styles.headerButton,
+              {
+                backgroundColor: theme.colors.surface,
+                borderColor: theme.colors.border,
+                borderWidth: 1,
+              }
+            ]}
+            onPress={() => setShowImportModal(true)}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.headerButtonText, { color: theme.colors.text }]}>Import</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.headerButton,
+              { backgroundColor: theme.colors.primary }
+            ]}
+            onPress={() => navigation.navigate('CreateTemplate', { mode: 'create' })}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.headerButtonText, { color: theme.colors.white }]}>Create</Text>
+          </TouchableOpacity>
+        </View>
       </Animated.View>
 
       {/* Search */}
@@ -488,21 +504,6 @@ const TemplatesScreen: React.FC = () => {
           )}
         </Animated.View>
       </ScrollView>
-
-      {/* Create Template FAB */}
-      <TouchableOpacity
-        style={[
-          styles.createFAB,
-          {
-            backgroundColor: theme.colors.primary,
-            shadowColor: theme.colors.primary,
-          }
-        ]}
-        onPress={() => navigation.navigate('CreateTemplate', { mode: 'create' })}
-        activeOpacity={0.9}
-      >
-        <Text style={styles.createFABIcon}>+</Text>
-      </TouchableOpacity>
 
       {/* Import Modal */}
       <Modal
@@ -627,13 +628,16 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   headerTitle: {},
-  importButton: {
+  headerButtons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  headerButton: {
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
   },
-  importButtonText: {
-    color: '#fff',
+  headerButtonText: {
     fontSize: 14,
     fontWeight: '600',
   },
@@ -771,25 +775,6 @@ const styles = StyleSheet.create({
   actionButtonText: {
     fontSize: 14,
     fontWeight: '600',
-  },
-  createFAB: {
-    position: 'absolute',
-    bottom: 100,
-    right: 20,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  createFABIcon: {
-    color: '#fff',
-    fontSize: 36,
-    fontWeight: '300',
   },
   emptyState: {
     alignItems: 'center',
