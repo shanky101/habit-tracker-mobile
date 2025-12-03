@@ -13,134 +13,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
+import { useTemplates } from '@/contexts/TemplateContext';
+import { HabitTemplate, HabitTemplateConfig } from '@/types/HabitTemplate';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 48 - 12) / 2; // 2 columns with padding and gap
-
-interface Template {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  category: string;
-  frequency: 'daily' | 'weekly';
-  usageCount: string;
-  benefits: string[];
-  tips: string[];
-}
-
-const POPULAR_TEMPLATES: Template[] = [
-  {
-    id: '1',
-    name: 'Morning Meditation',
-    description: 'Start your day with 10 minutes of calm',
-    icon: '🧘',
-    category: 'mindfulness',
-    frequency: 'daily',
-    usageCount: '15.2K',
-    benefits: ['Reduces stress', 'Improves focus', 'Better mood'],
-    tips: ['Find a quiet space', 'Use a meditation app', 'Start with 5 minutes'],
-  },
-  {
-    id: '2',
-    name: 'Drink Water',
-    description: 'Drink 8 glasses of water daily',
-    icon: '💧',
-    category: 'health',
-    frequency: 'daily',
-    usageCount: '24.5K',
-    benefits: ['Stay hydrated', 'Better skin', 'More energy'],
-    tips: ['Carry a water bottle', 'Set hourly reminders', 'Track your intake'],
-  },
-  {
-    id: '3',
-    name: 'Read Books',
-    description: 'Read 20 pages every day',
-    icon: '📚',
-    category: 'learning',
-    frequency: 'daily',
-    usageCount: '18.7K',
-    benefits: ['Expand knowledge', 'Improve vocabulary', 'Reduce screen time'],
-    tips: ['Read before bed', 'Always have a book ready', 'Join a book club'],
-  },
-  {
-    id: '4',
-    name: 'Exercise',
-    description: 'Work out for 30 minutes',
-    icon: '🏃',
-    category: 'fitness',
-    frequency: 'daily',
-    usageCount: '32.1K',
-    benefits: ['Better health', 'More energy', 'Improved mood'],
-    tips: ['Schedule it', 'Start small', 'Find what you enjoy'],
-  },
-  {
-    id: '5',
-    name: 'Journal',
-    description: 'Write for 5 minutes daily',
-    icon: '📝',
-    category: 'mindfulness',
-    frequency: 'daily',
-    usageCount: '12.3K',
-    benefits: ['Process emotions', 'Track progress', 'Self-reflection'],
-    tips: ['Write freely', 'No judgment', 'Keep it private'],
-  },
-  {
-    id: '6',
-    name: 'Take Vitamins',
-    description: 'Take daily supplements',
-    icon: '💊',
-    category: 'health',
-    frequency: 'daily',
-    usageCount: '9.8K',
-    benefits: ['Fill nutrition gaps', 'Support immunity', 'Better health'],
-    tips: ['Take with food', 'Set a reminder', 'Consult your doctor'],
-  },
-  {
-    id: '7',
-    name: 'Practice Gratitude',
-    description: 'List 3 things you\'re grateful for',
-    icon: '🙏',
-    category: 'mindfulness',
-    frequency: 'daily',
-    usageCount: '14.6K',
-    benefits: ['Positive mindset', 'Better mood', 'Improved relationships'],
-    tips: ['Do it in the morning', 'Be specific', 'Feel the gratitude'],
-  },
-  {
-    id: '8',
-    name: 'No Phone Before Bed',
-    description: 'No screens 1 hour before sleep',
-    icon: '📵',
-    category: 'health',
-    frequency: 'daily',
-    usageCount: '11.2K',
-    benefits: ['Better sleep', 'Reduced eye strain', 'More relaxed'],
-    tips: ['Read instead', 'Charge phone away from bed', 'Use night mode'],
-  },
-  {
-    id: '9',
-    name: 'Learn Something New',
-    description: 'Study a new skill for 15 minutes',
-    icon: '🎓',
-    category: 'learning',
-    frequency: 'daily',
-    usageCount: '8.9K',
-    benefits: ['Personal growth', 'Stay curious', 'Career advancement'],
-    tips: ['Use online courses', 'Stay consistent', 'Track your progress'],
-  },
-  {
-    id: '10',
-    name: 'Clean for 15 Minutes',
-    description: 'Tidy up your space daily',
-    icon: '🧹',
-    category: 'productivity',
-    frequency: 'daily',
-    usageCount: '7.5K',
-    benefits: ['Organized space', 'Reduced stress', 'Productive environment'],
-    tips: ['Set a timer', 'Focus on one area', 'Make it a routine'],
-  },
-];
 
 const CATEGORIES = [
   'all',
@@ -150,30 +27,35 @@ const CATEGORIES = [
   'productivity',
   'mindfulness',
   'learning',
+  'social',
+  'finance',
+  'creativity',
 ];
 
 const HabitTemplatesScreen: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<any>>();
   const { theme } = useTheme();
+  const { templates } = useTemplates();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<HabitTemplate | null>(null);
+  const [selectedHabitIndex, setSelectedHabitIndex] = useState<number | null>(null);
+
+  // Filter to only show default/built-in templates
+  const defaultTemplates = templates.filter(t => t.isDefault);
 
   const getFilteredTemplates = () => {
-    let filtered = POPULAR_TEMPLATES;
+    let filtered = defaultTemplates;
 
     // Filter by category
     if (selectedCategory !== 'all') {
       if (selectedCategory === 'popular') {
-        // Show top 6 most used
-        filtered = [...filtered].sort((a, b) => {
-          const aCount = parseFloat(a.usageCount);
-          const bCount = parseFloat(b.usageCount);
-          return bCount - aCount;
-        }).slice(0, 6);
+        // Show templates with most habits (proxy for popularity)
+        filtered = [...filtered].sort((a, b) => b.habits.length - a.habits.length).slice(0, 6);
       } else {
-        filtered = filtered.filter((t) => t.category === selectedCategory);
+        // Filter by tags
+        filtered = filtered.filter((t) => t.tags.includes(selectedCategory));
       }
     }
 
@@ -191,12 +73,26 @@ const HabitTemplatesScreen: React.FC = () => {
 
   const filteredTemplates = getFilteredTemplates();
 
-  const handleAddTemplate = (template: Template) => {
-    // Navigate to AddHabitStep2 with pre-filled data
+  const handleSelectTemplate = (template: HabitTemplate) => {
+    // If template has only one habit, navigate directly
+    if (template.habits.length === 1) {
+      const habit = template.habits[0];
+      navigation.navigate('AddHabitStep2', {
+        habitName: habit.name,
+      });
+    } else {
+      // Show template details to select which habit
+      setSelectedTemplate(template);
+      setSelectedHabitIndex(null);
+    }
+  };
+
+  const handleAddHabitFromTemplate = (habitConfig: HabitTemplateConfig) => {
     navigation.navigate('AddHabitStep2', {
-      habitName: template.name,
+      habitName: habitConfig.name,
     });
     setSelectedTemplate(null);
+    setSelectedHabitIndex(null);
   };
 
   const renderTemplateDetailModal = () => {
@@ -206,7 +102,7 @@ const HabitTemplatesScreen: React.FC = () => {
       <Modal
         visible={selectedTemplate !== null}
         transparent
-        animationType="none"
+        animationType="slide"
         onRequestClose={() => setSelectedTemplate(null)}
       >
         <View style={styles.modalOverlay}>
@@ -232,7 +128,7 @@ const HabitTemplatesScreen: React.FC = () => {
 
             {/* Template Header */}
             <View style={styles.modalHeader}>
-              <Text style={styles.modalIcon}>{selectedTemplate.icon}</Text>
+              <Text style={styles.modalIcon}>{selectedTemplate.emoji}</Text>
               <Text
                 style={[
                   styles.modalTitle,
@@ -257,6 +153,20 @@ const HabitTemplatesScreen: React.FC = () => {
               >
                 {selectedTemplate.description}
               </Text>
+              {selectedTemplate.notes && (
+                <Text
+                  style={[
+                    styles.modalNotes,
+                    {
+                      color: theme.colors.textSecondary,
+                      fontFamily: theme.typography.fontFamilyBody,
+                      fontSize: theme.typography.fontSizeSM,
+                    },
+                  ]}
+                >
+                  {selectedTemplate.notes}
+                </Text>
+              )}
               <Text
                 style={[
                   styles.modalUsage,
@@ -267,83 +177,101 @@ const HabitTemplatesScreen: React.FC = () => {
                   },
                 ]}
               >
-                {selectedTemplate.usageCount} people use this habit
+                {selectedTemplate.habits.length} habit{selectedTemplate.habits.length > 1 ? 's' : ''} in this template
               </Text>
             </View>
 
-            {/* Benefits */}
-            <View style={styles.modalSection}>
-              <Text
-                style={[
-                  styles.modalSectionTitle,
-                  {
-                    color: theme.colors.text,
-                    fontSize: theme.typography.fontSizeMD,
-                    fontFamily: theme.typography.fontFamilyBodySemibold,
-                  },
-                ]}
-              >
-                Benefits
-              </Text>
-              {selectedTemplate.benefits.map((benefit, index) => (
-                <View key={index} style={styles.listItem}>
-                  <Text style={styles.listBullet}>•</Text>
-                  <Text
+            {/* Habits List */}
+            <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={false}>
+              <View style={styles.modalSection}>
+                <Text
+                  style={[
+                    styles.modalSectionTitle,
+                    {
+                      color: theme.colors.text,
+                      fontSize: theme.typography.fontSizeMD,
+                      fontFamily: theme.typography.fontFamilyBodySemibold,
+                    },
+                  ]}
+                >
+                  Choose a habit to add
+                </Text>
+                {selectedTemplate.habits.map((habit, index) => (
+                  <TouchableOpacity
+                    key={index}
                     style={[
-                      styles.listText,
+                      styles.habitItem,
                       {
-                        color: theme.colors.text,
-                        fontFamily: theme.typography.fontFamilyBody,
-                        fontSize: theme.typography.fontSizeSM,
+                        backgroundColor: theme.colors.backgroundSecondary,
+                        borderColor: selectedHabitIndex === index ? theme.colors.primary : theme.colors.border,
+                        borderWidth: selectedHabitIndex === index ? 2 : 1,
                       },
                     ]}
+                    onPress={() => setSelectedHabitIndex(index)}
+                    activeOpacity={0.7}
                   >
-                    {benefit}
-                  </Text>
-                </View>
-              ))}
-            </View>
-
-            {/* Tips */}
-            <View style={styles.modalSection}>
-              <Text
-                style={[
-                  styles.modalSectionTitle,
-                  {
-                    color: theme.colors.text,
-                    fontSize: theme.typography.fontSizeMD,
-                    fontFamily: theme.typography.fontFamilyBodySemibold,
-                  },
-                ]}
-              >
-                Tips for Success
-              </Text>
-              {selectedTemplate.tips.map((tip, index) => (
-                <View key={index} style={styles.listItem}>
-                  <Text style={styles.listBullet}>✓</Text>
-                  <Text
-                    style={[
-                      styles.listText,
-                      {
-                        color: theme.colors.text,
-                        fontFamily: theme.typography.fontFamilyBody,
-                        fontSize: theme.typography.fontSizeSM,
-                      },
-                    ]}
-                  >
-                    {tip}
-                  </Text>
-                </View>
-              ))}
-            </View>
+                    <View style={styles.habitItemHeader}>
+                      <Text style={styles.habitItemIcon}>{habit.emoji}</Text>
+                      <View style={styles.habitItemInfo}>
+                        <Text
+                          style={[
+                            styles.habitItemName,
+                            {
+                              color: theme.colors.text,
+                              fontFamily: theme.typography.fontFamilyBodySemibold,
+                              fontSize: theme.typography.fontSizeMD,
+                            },
+                          ]}
+                        >
+                          {habit.name}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.habitItemCategory,
+                            {
+                              color: theme.colors.textSecondary,
+                              fontFamily: theme.typography.fontFamilyBody,
+                              fontSize: theme.typography.fontSizeXS,
+                            },
+                          ]}
+                        >
+                          {habit.category.toUpperCase()}
+                        </Text>
+                      </View>
+                    </View>
+                    {habit.notes && (
+                      <Text
+                        style={[
+                          styles.habitItemNotes,
+                          {
+                            color: theme.colors.textSecondary,
+                            fontFamily: theme.typography.fontFamilyBody,
+                            fontSize: theme.typography.fontSizeSM,
+                          },
+                        ]}
+                      >
+                        {habit.notes}
+                      </Text>
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </ScrollView>
 
             {/* Add Button */}
             <TouchableOpacity
               style={[
                 styles.addButton,
-                { backgroundColor: theme.colors.primary },
+                {
+                  backgroundColor: selectedHabitIndex !== null ? theme.colors.primary : theme.colors.border,
+                },
               ]}
-              onPress={() => handleAddTemplate(selectedTemplate)}
+              onPress={() => {
+                if (selectedHabitIndex !== null) {
+                  handleAddHabitFromTemplate(selectedTemplate.habits[selectedHabitIndex]);
+                }
+              }}
+              disabled={selectedHabitIndex === null}
               activeOpacity={0.8}
             >
               <Text
@@ -356,7 +284,7 @@ const HabitTemplatesScreen: React.FC = () => {
                   },
                 ]}
               >
-                Add This Habit
+                {selectedHabitIndex !== null ? 'Add This Habit' : 'Select a habit first'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -507,10 +435,10 @@ const HabitTemplatesScreen: React.FC = () => {
                     elevation: theme.shadows.shadowSM.elevation,
                   },
                 ]}
-                onPress={() => setSelectedTemplate(template)}
+                onPress={() => handleSelectTemplate(template)}
                 activeOpacity={0.7}
               >
-                <Text style={styles.templateIcon}>{template.icon}</Text>
+                <Text style={styles.templateIcon}>{template.emoji}</Text>
                 <Text
                   style={[
                     styles.templateName,
@@ -552,21 +480,27 @@ const HabitTemplatesScreen: React.FC = () => {
                       },
                     ]}
                   >
-                    {template.category.toUpperCase()}
+                    {template.habits.length} HABIT{template.habits.length > 1 ? 'S' : ''}
                   </Text>
                 </View>
-                <Text
-                  style={[
-                    styles.templateUsage,
-                    {
-                      color: theme.colors.textSecondary,
-                      fontFamily: theme.typography.fontFamilyBody,
-                      fontSize: theme.typography.fontSizeXS,
-                    },
-                  ]}
-                >
-                  {template.usageCount} users
-                </Text>
+                <View style={styles.templateTags}>
+                  {template.tags.slice(0, 2).map((tag, index) => (
+                    <View key={index}>
+                      <Text
+                        style={[
+                          styles.templateTag,
+                          {
+                            color: theme.colors.textSecondary,
+                            fontFamily: theme.typography.fontFamilyBody,
+                            fontSize: theme.typography.fontSizeXS,
+                          },
+                        ]}
+                      >
+                        #{tag}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
               </TouchableOpacity>
             ))}
           </View>
@@ -707,7 +641,13 @@ const styles = StyleSheet.create({
     fontSize: 10,
     letterSpacing: 0.5,
   },
-  templateUsage: {},
+  templateTags: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  templateTag: {
+    fontSize: 10,
+  },
   emptyState: {
     alignItems: 'center',
     paddingTop: 80,
@@ -761,8 +701,16 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     textAlign: 'center',
   },
+  modalNotes: {
+    marginBottom: 8,
+    textAlign: 'center',
+    fontStyle: 'italic',
+  },
   modalUsage: {
     textAlign: 'center',
+  },
+  modalScrollView: {
+    maxHeight: 300,
   },
   modalSection: {
     marginBottom: 24,
@@ -770,18 +718,33 @@ const styles = StyleSheet.create({
   modalSectionTitle: {
     marginBottom: 12,
   },
-  listItem: {
-    flexDirection: 'row',
+  habitItem: {
+    padding: 12,
+    borderRadius: 12,
     marginBottom: 8,
   },
-  listBullet: {
-    fontSize: 16,
-    marginRight: 8,
-    width: 20,
+  habitItemHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
   },
-  listText: {
+  habitItemIcon: {
+    fontSize: 32,
+    marginRight: 12,
+  },
+  habitItemInfo: {
     flex: 1,
-    lineHeight: 20,
+  },
+  habitItemName: {
+    marginBottom: 2,
+  },
+  habitItemCategory: {
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  habitItemNotes: {
+    marginTop: 8,
+    lineHeight: 18,
   },
   addButton: {
     paddingVertical: 16,

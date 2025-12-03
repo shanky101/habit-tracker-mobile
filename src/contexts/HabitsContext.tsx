@@ -1,4 +1,9 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import {
+  scheduleHabitNotifications,
+  cancelHabitNotifications,
+  requestNotificationPermissions,
+} from '@/utils/notificationService';
 
 export interface HabitEntry {
   id: string;
@@ -30,6 +35,7 @@ export interface Habit {
   selectedDays: number[];
   reminderEnabled: boolean;
   reminderTime: string | null;
+  notificationIds?: string[]; // IDs of scheduled notifications for this habit
   notes?: string; // Optional notes/description for the habit
   completions: Record<string, DailyCompletion>; // Date-indexed completion records (YYYY-MM-DD)
   isDefault?: boolean; // Track if this is a default habit
@@ -38,9 +44,9 @@ export interface Habit {
 
 interface HabitsContextType {
   habits: Habit[];
-  addHabit: (habit: Habit) => void;
-  updateHabit: (id: string, updates: Partial<Habit>) => void;
-  deleteHabit: (id: string) => void;
+  addHabit: (habit: Habit) => Promise<void>;
+  updateHabit: (id: string, updates: Partial<Habit>) => Promise<void>;
+  deleteHabit: (id: string) => Promise<void>;
   archiveHabit: (id: string) => void;
   reorderHabits: (fromIndex: number, toIndex: number) => void;
   completeHabit: (id: string, date: string, entry?: { mood?: string; note?: string }) => void;
@@ -123,19 +129,62 @@ const DEFAULT_HABITS: Habit[] = [
 export const HabitsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [habits, setHabits] = useState<Habit[]>(DEFAULT_HABITS);
 
-  const addHabit = (habit: Habit) => {
-    setHabits((prevHabits) => [habit, ...prevHabits]);
+  const addHabit = async (habit: Habit) => {
+    // Schedule notifications if enabled
+    let notificationIds: string[] = [];
+    if (habit.reminderEnabled && habit.reminderTime) {
+      const hasPermission = await requestNotificationPermissions();
+      if (hasPermission) {
+        notificationIds = await scheduleHabitNotifications({
+          habitId: habit.id,
+          habitName: habit.name,
+          habitEmoji: habit.emoji,
+          reminderTime: habit.reminderTime,
+          selectedDays: habit.selectedDays,
+        });
+      }
+    }
+
+    setHabits((prevHabits) => [{ ...habit, notificationIds }, ...prevHabits]);
   };
 
-  const updateHabit = (id: string, updates: Partial<Habit>) => {
+  const updateHabit = async (id: string, updates: Partial<Habit>) => {
+    const habit = habits.find(h => h.id === id);
+    if (!habit) return;
+
+    // Cancel old notifications if they exist
+    if (habit.notificationIds && habit.notificationIds.length > 0) {
+      await cancelHabitNotifications(habit.notificationIds);
+    }
+
+    // Schedule new notifications if reminder is enabled
+    let notificationIds: string[] = [];
+    const updatedHabit = { ...habit, ...updates };
+    if (updatedHabit.reminderEnabled && updatedHabit.reminderTime) {
+      const hasPermission = await requestNotificationPermissions();
+      if (hasPermission) {
+        notificationIds = await scheduleHabitNotifications({
+          habitId: updatedHabit.id,
+          habitName: updatedHabit.name,
+          habitEmoji: updatedHabit.emoji,
+          reminderTime: updatedHabit.reminderTime,
+          selectedDays: updatedHabit.selectedDays,
+        });
+      }
+    }
+
     setHabits((prevHabits) =>
-      prevHabits.map((habit) =>
-        habit.id === id ? { ...habit, ...updates } : habit
+      prevHabits.map((h) =>
+        h.id === id ? { ...updatedHabit, notificationIds } : h
       )
     );
   };
 
-  const deleteHabit = (id: string) => {
+  const deleteHabit = async (id: string) => {
+    const habit = habits.find(h => h.id === id);
+    if (habit?.notificationIds && habit.notificationIds.length > 0) {
+      await cancelHabitNotifications(habit.notificationIds);
+    }
     setHabits((prevHabits) => prevHabits.filter((habit) => habit.id !== id));
   };
 

@@ -11,6 +11,7 @@ import {
   Platform,
   TextInput,
 } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Haptics from 'expo-haptics';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -47,6 +48,7 @@ const AddHabitStep3Screen: React.FC = () => {
   const [selectedDays, setSelectedDays] = useState<number[]>([0, 1, 2, 3, 4, 5, 6]);
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [reminderTime, setReminderTime] = useState('09:00');
+  const [showTimePicker, setShowTimePicker] = useState(false);
   const [notes, setNotes] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -66,6 +68,31 @@ const AddHabitStep3Screen: React.FC = () => {
     } else {
       setSelectedDays([...selectedDays, dayIndex].sort());
     }
+  };
+
+  const handleTimeChange = (event: any, selectedDate?: Date) => {
+    // On Android, close picker immediately
+    if (Platform.OS === 'android') {
+      setShowTimePicker(false);
+    }
+
+    if (selectedDate) {
+      const hours = selectedDate.getHours().toString().padStart(2, '0');
+      const minutes = selectedDate.getMinutes().toString().padStart(2, '0');
+      setReminderTime(`${hours}:${minutes}`);
+    }
+  };
+
+  const handleTimePickerDismiss = () => {
+    // For iOS, add a dismiss button
+    if (Platform.OS === 'ios') {
+      setShowTimePicker(false);
+    }
+  };
+
+  const handleTimePickerPress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setShowTimePicker(true);
   };
 
   const handleCreateHabit = async () => {
@@ -532,7 +559,7 @@ const AddHabitStep3Screen: React.FC = () => {
             </View>
 
             {reminderEnabled && (
-              <View
+              <TouchableOpacity
                 style={[
                   styles.reminderTimeContainer,
                   {
@@ -540,6 +567,8 @@ const AddHabitStep3Screen: React.FC = () => {
                     borderColor: theme.colors.border,
                   },
                 ]}
+                onPress={handleTimePickerPress}
+                activeOpacity={0.7}
               >
                 <Text
                   style={[
@@ -575,8 +604,47 @@ const AddHabitStep3Screen: React.FC = () => {
                     },
                   ]}
                 >
-                  Time to check in! Complete your habits 🎯
+                  Tap to change time 🕐
                 </Text>
+              </TouchableOpacity>
+            )}
+
+            {reminderEnabled && showTimePicker && (
+              <View style={styles.timePickerContainer}>
+                <DateTimePicker
+                  value={(() => {
+                    const [hours, minutes] = reminderTime.split(':');
+                    const date = new Date();
+                    date.setHours(parseInt(hours, 10));
+                    date.setMinutes(parseInt(minutes, 10));
+                    return date;
+                  })()}
+                  mode="time"
+                  is24Hour={false}
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  onChange={handleTimeChange}
+                />
+                {Platform.OS === 'ios' && (
+                  <TouchableOpacity
+                    style={[
+                      styles.doneButton,
+                      { backgroundColor: theme.colors.primary }
+                    ]}
+                    onPress={handleTimePickerDismiss}
+                  >
+                    <Text
+                      style={[
+                        styles.doneButtonText,
+                        {
+                          color: theme.colors.white,
+                          fontFamily: theme.typography.fontFamilyBodySemibold,
+                        }
+                      ]}
+                    >
+                      Done
+                    </Text>
+                  </TouchableOpacity>
+                )}
               </View>
             )}
           </View>
@@ -866,6 +934,20 @@ const styles = StyleSheet.create({
   },
   reminderHint: {
     textAlign: 'center',
+  },
+  timePickerContainer: {
+    marginTop: 16,
+    alignItems: 'center',
+  },
+  doneButton: {
+    marginTop: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  doneButtonText: {
+    fontSize: 16,
   },
   frequencyTypeContainer: {
     marginTop: 16,

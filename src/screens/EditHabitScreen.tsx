@@ -11,6 +11,8 @@ import {
   Alert,
   Platform,
 } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import * as Haptics from 'expo-haptics';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
@@ -59,6 +61,7 @@ const EditHabitScreen: React.FC = () => {
   const [selectedDays, setSelectedDays] = useState(habitData.selectedDays);
   const [reminderEnabled, setReminderEnabled] = useState(habitData.reminderEnabled);
   const [reminderTime, setReminderTime] = useState(habitData.reminderTime || '09:00');
+  const [showTimePicker, setShowTimePicker] = useState(false);
   const [notes, setNotes] = useState(habitData.notes || '');
 
   // Use custom animation hook
@@ -66,6 +69,31 @@ const EditHabitScreen: React.FC = () => {
 
   const handleCancel = () => {
     navigation.goBack();
+  };
+
+  const handleTimeChange = (event: any, selectedDate?: Date) => {
+    // On Android, close picker immediately
+    if (Platform.OS === 'android') {
+      setShowTimePicker(false);
+    }
+
+    if (selectedDate) {
+      const hours = selectedDate.getHours().toString().padStart(2, '0');
+      const minutes = selectedDate.getMinutes().toString().padStart(2, '0');
+      setReminderTime(`${hours}:${minutes}`);
+    }
+  };
+
+  const handleTimePickerDismiss = () => {
+    // For iOS, add a dismiss button
+    if (Platform.OS === 'ios') {
+      setShowTimePicker(false);
+    }
+  };
+
+  const handleTimePickerPress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setShowTimePicker(true);
   };
 
   const handleSave = async () => {
@@ -436,18 +464,93 @@ const EditHabitScreen: React.FC = () => {
             </View>
 
             {reminderEnabled && (
-              <Text
+              <TouchableOpacity
                 style={[
-                  styles.reminderTimeText,
+                  styles.reminderTimeContainer,
                   {
-                    color: theme.colors.primary,
-                    fontFamily: theme.typography.fontFamilyDisplayBold,
-                    fontSize: theme.typography.fontSizeXL,
+                    backgroundColor: theme.colors.backgroundSecondary,
+                    borderColor: theme.colors.border,
                   },
                 ]}
+                onPress={handleTimePickerPress}
+                activeOpacity={0.7}
               >
-                {reminderTime}
-              </Text>
+                <Text
+                  style={[
+                    styles.reminderLabel,
+                    {
+                      color: theme.colors.text,
+                      fontFamily: theme.typography.fontFamilyBody,
+                      fontSize: theme.typography.fontSizeSM,
+                    },
+                  ]}
+                >
+                  Remind me at
+                </Text>
+                <Text
+                  style={[
+                    styles.reminderTimeText,
+                    {
+                      color: theme.colors.primary,
+                      fontFamily: theme.typography.fontFamilyDisplayBold,
+                      fontSize: theme.typography.fontSizeXL,
+                    },
+                  ]}
+                >
+                  {reminderTime}
+                </Text>
+                <Text
+                  style={[
+                    styles.reminderHint,
+                    {
+                      color: theme.colors.textSecondary,
+                      fontFamily: theme.typography.fontFamilyBody,
+                      fontSize: theme.typography.fontSizeXS,
+                    },
+                  ]}
+                >
+                  Tap to change time 🕐
+                </Text>
+              </TouchableOpacity>
+            )}
+
+            {reminderEnabled && showTimePicker && (
+              <View style={styles.timePickerContainer}>
+                <DateTimePicker
+                  value={(() => {
+                    const [hours, minutes] = reminderTime.split(':');
+                    const date = new Date();
+                    date.setHours(parseInt(hours, 10));
+                    date.setMinutes(parseInt(minutes, 10));
+                    return date;
+                  })()}
+                  mode="time"
+                  is24Hour={false}
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  onChange={handleTimeChange}
+                />
+                {Platform.OS === 'ios' && (
+                  <TouchableOpacity
+                    style={[
+                      styles.doneButton,
+                      { backgroundColor: theme.colors.primary }
+                    ]}
+                    onPress={handleTimePickerDismiss}
+                  >
+                    <Text
+                      style={[
+                        styles.doneButtonText,
+                        {
+                          color: theme.colors.white,
+                          fontFamily: theme.typography.fontFamilyBodySemibold,
+                        }
+                      ]}
+                    >
+                      Done
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </View>
             )}
           </View>
 
@@ -678,8 +781,35 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  reminderTimeText: {
+  reminderTimeContainer: {
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 20,
     marginTop: 16,
+    alignItems: 'center',
+  },
+  reminderLabel: {
+    marginBottom: 8,
+  },
+  reminderTimeText: {
+    marginBottom: 8,
+  },
+  reminderHint: {
+    textAlign: 'center',
+  },
+  timePickerContainer: {
+    marginTop: 16,
+    alignItems: 'center',
+  },
+  doneButton: {
+    marginTop: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  doneButtonText: {
+    fontSize: 16,
   },
   notesSubtitle: {
     // styles from theme

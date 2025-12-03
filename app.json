@@ -4,13 +4,8 @@
     "slug": "habit-tracker-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#6366f1"
-    },
+    "scheme": "habittracker",
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -19,14 +14,15 @@
       "bundleIdentifier": "com.habittracker.mobile"
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#6366f1"
-      },
       "package": "com.habittracker.mobile"
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
+    "plugins": [
+      "expo-dev-client"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "2d958822-2060-480c-afef-878027bc7692"
+      }
     }
   }
 }

@@ -20,6 +20,7 @@ import {
 } from '@expo-google-fonts/plus-jakarta-sans';
 import { ThemeProvider } from './src/theme';
 import { HabitsProvider } from './src/contexts/HabitsContext';
+import { TemplateProvider } from './src/contexts/TemplateContext';
 import { SubscriptionProvider } from './src/context/SubscriptionContext';
 import { MascotProvider } from './src/context/MascotContext';
 import OnboardingNavigator from './src/navigation/OnboardingNavigator';
@@ -50,12 +51,14 @@ export default function App() {
         <ThemeProvider>
           <SubscriptionProvider>
             <HabitsProvider>
-              <MascotProvider>
-                <NavigationContainer>
-                  <StatusBar style="auto" />
-                  <OnboardingNavigator />
-                </NavigationContainer>
-              </MascotProvider>
+              <TemplateProvider>
+                <MascotProvider>
+                  <NavigationContainer>
+                    <StatusBar style="auto" />
+                    <OnboardingNavigator />
+                  </NavigationContainer>
+                </MascotProvider>
+              </TemplateProvider>
             </HabitsProvider>
           </SubscriptionProvider>
         </ThemeProvider>

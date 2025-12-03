@@ -9,12 +9,15 @@ import {
   Animated,
   Linking,
   Platform,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
+import { sendTestNotification } from '@/utils/notificationService';
 
 type NotificationsSettingsNavigationProp = StackNavigationProp<any, 'NotificationsSettings'>;
 
@@ -42,6 +45,7 @@ const NotificationsSettingsScreen: React.FC = () => {
   const [aiInsightsFrequency, setAIInsightsFrequency] = useState('weekly');
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [badgeEnabled, setBadgeEnabled] = useState(true);
+  const [testingNotification, setTestingNotification] = useState(false);
 
   // Mock habit reminders
   const [habitReminders, setHabitReminders] = useState<HabitReminder[]>([
@@ -63,6 +67,32 @@ const NotificationsSettingsScreen: React.FC = () => {
       Linking.openURL('app-settings:');
     } else {
       Linking.openSettings();
+    }
+  };
+
+  const handleTestNotification = async () => {
+    setTestingNotification(true);
+    const success = await sendTestNotification();
+    setTestingNotification(false);
+
+    if (success) {
+      Alert.alert(
+        'Test Sent! 🎉',
+        'Check your notifications. If you didn\'t receive it, make sure notifications are enabled in your device settings.',
+        [
+          { text: 'OK' },
+          { text: 'Open Settings', onPress: openSystemSettings },
+        ]
+      );
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Please enable notifications in your device settings to receive habit reminders.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Open Settings', onPress: openSystemSettings },
+        ]
+      );
     }
   };
 
@@ -228,6 +258,69 @@ const NotificationsSettingsScreen: React.FC = () => {
               thumbColor={masterToggle ? theme.colors.primary : theme.colors.surface}
             />
           </View>
+
+          {/* Test Notification Button */}
+          <TouchableOpacity
+            style={[
+              styles.testButton,
+              {
+                backgroundColor: theme.colors.surface,
+                borderColor: theme.colors.primary,
+              },
+            ]}
+            onPress={handleTestNotification}
+            disabled={testingNotification}
+            activeOpacity={0.7}
+          >
+            <View style={styles.testButtonContent}>
+              <Text style={styles.testButtonIcon}>🔔</Text>
+              <View style={styles.testButtonText}>
+                <Text
+                  style={[
+                    styles.testButtonLabel,
+                    {
+                      color: theme.colors.text,
+                      fontFamily: theme.typography.fontFamilyBodySemibold,
+                      fontSize: theme.typography.fontSizeMD,
+                    },
+                  ]}
+                >
+                  Test Notifications
+                </Text>
+                <Text
+                  style={[
+                    styles.testButtonDescription,
+                    {
+                      color: theme.colors.textSecondary,
+                      fontFamily: theme.typography.fontFamilyBody,
+                      fontSize: theme.typography.fontSizeXS,
+                    },
+                  ]}
+                >
+                  Send a test notification to verify it works
+                </Text>
+              </View>
+              {testingNotification ? (
+                <ActivityIndicator size="small" color={theme.colors.primary} />
+              ) : (
+                <View
+                  style={[
+                    styles.testButtonArrow,
+                    { backgroundColor: theme.colors.primary + '20' }
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.testButtonArrowText,
+                      { color: theme.colors.primary }
+                    ]}
+                  >
+                    →
+                  </Text>
+                </View>
+              )}
+            </View>
+          </TouchableOpacity>
 
           {/* Daily Reminders Section */}
           <View
@@ -881,6 +974,41 @@ const styles = StyleSheet.create({
   footnote: {
     textAlign: 'center',
     paddingHorizontal: 20,
+  },
+  testButton: {
+    marginHorizontal: 20,
+    marginTop: 16,
+    marginBottom: 8,
+    borderRadius: 16,
+    borderWidth: 2,
+    overflow: 'hidden',
+  },
+  testButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+  },
+  testButtonIcon: {
+    fontSize: 24,
+    marginRight: 12,
+  },
+  testButtonText: {
+    flex: 1,
+  },
+  testButtonLabel: {},
+  testButtonDescription: {
+    marginTop: 2,
+  },
+  testButtonArrow: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  testButtonArrowText: {
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 

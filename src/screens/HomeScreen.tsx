@@ -13,7 +13,7 @@ import {
 import Svg, { Circle } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '@/theme';
@@ -114,18 +114,20 @@ const HomeScreen: React.FC = () => {
   const [pendingAllComplete, setPendingAllComplete] = useState(false); // Track if celebration is pending
   const [frequencyFilter, setFrequencyFilter] = useState<'all' | 'single' | 'multiple'>('all'); // Filter for single vs multiple frequency habits
 
-  // Load user name
-  useEffect(() => {
-    const loadUserName = async () => {
-      try {
-        const name = await AsyncStorage.getItem(USER_NAME_KEY);
-        if (name) setUserName(name);
-      } catch (error) {
-        console.error('Error loading user name:', error);
-      }
-    };
-    loadUserName();
-  }, []);
+  // Load user name - refresh every time screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      const loadUserName = async () => {
+        try {
+          const name = await AsyncStorage.getItem(USER_NAME_KEY);
+          if (name) setUserName(name);
+        } catch (error) {
+          console.error('Error loading user name:', error);
+        }
+      };
+      loadUserName();
+    }, [])
+  );
 
   // Scroll to today on mount
   useEffect(() => {
@@ -594,18 +596,7 @@ const HomeScreen: React.FC = () => {
           onPress={handleProfilePress}
           activeOpacity={0.7}
         >
-          <Text
-            style={[
-              styles.profileInitials,
-              {
-                color: theme.colors.primary,
-                fontFamily: theme.typography.fontFamilyDisplayBold,
-                fontSize: theme.typography.fontSizeMD,
-              },
-            ]}
-          >
-            {getInitials()}
-          </Text>
+          <Text style={styles.profileIcon}>👤</Text>
         </TouchableOpacity>
       </Animated.View>
 
@@ -1063,6 +1054,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
+  },
+  profileIcon: {
+    fontSize: 24,
   },
   profileInitials: {
     // styles from theme

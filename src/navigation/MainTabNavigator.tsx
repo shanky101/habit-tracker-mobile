@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
+import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '@/theme';
 import {
   HomeScreen,
@@ -27,6 +28,9 @@ import {
   DataPrivacyScreen,
   ChangePasswordScreen,
 } from '@/screens';
+import TemplatesScreen from '@/screens/TemplatesScreen';
+import TemplateDetailScreen from '@/screens/TemplateDetailScreen';
+import CreateTemplateScreen from '@/screens/CreateTemplateScreen';
 
 export type HomeStackParamList = {
   HomeMain: { newHabit?: any } | undefined;
@@ -66,8 +70,15 @@ export type ProfileStackParamList = {
   ChangePassword: undefined;
 };
 
+export type TemplatesStackParamList = {
+  TemplatesMain: undefined;
+  TemplateDetail: { templateId: string };
+  CreateTemplate: { mode: 'create' | 'edit' | 'copy'; templateId?: string };
+};
+
 const Tab = createBottomTabNavigator();
 const HomeStack = createStackNavigator<HomeStackParamList>();
+const TemplatesStack = createStackNavigator<TemplatesStackParamList>();
 const AnalyticsStack = createStackNavigator<AnalyticsStackParamList>();
 const SettingsStack = createStackNavigator<SettingsStackParamList>();
 const ProfileStack = createStackNavigator<ProfileStackParamList>();
@@ -136,6 +147,22 @@ const SettingsStackNavigator: React.FC = () => {
   );
 };
 
+// Templates Stack Navigator
+const TemplatesStackNavigator: React.FC = () => {
+  return (
+    <TemplatesStack.Navigator
+      screenOptions={{
+        headerShown: false,
+        cardStyle: { backgroundColor: 'transparent' },
+      }}
+    >
+      <TemplatesStack.Screen name="TemplatesMain" component={TemplatesScreen} />
+      <TemplatesStack.Screen name="TemplateDetail" component={TemplateDetailScreen} />
+      <TemplatesStack.Screen name="CreateTemplate" component={CreateTemplateScreen} />
+    </TemplatesStack.Navigator>
+  );
+};
+
 // Profile Stack Navigator
 const ProfileStackNavigator: React.FC = () => {
   return (
@@ -157,6 +184,28 @@ const ProfileStackNavigator: React.FC = () => {
       <ProfileStack.Screen name="DataPrivacy" component={DataPrivacyScreen} />
       <ProfileStack.Screen name="ChangePassword" component={ChangePasswordScreen} />
     </ProfileStack.Navigator>
+  );
+};
+
+// Create Button Component (center tab)
+const CreateButton: React.FC = () => {
+  const navigation = useNavigation<any>();
+  const { theme } = useTheme();
+
+  return (
+    <TouchableOpacity
+      style={[
+        styles.createButton,
+        {
+          backgroundColor: theme.colors.primary,
+          shadowColor: theme.colors.primary,
+        }
+      ]}
+      onPress={() => navigation.navigate('Home', { screen: 'AddHabitStep1' })}
+      activeOpacity={0.8}
+    >
+      <Text style={styles.createButtonIcon}>+</Text>
+    </TouchableOpacity>
   );
 };
 
@@ -195,7 +244,30 @@ const MainTabNavigator: React.FC = () => {
         }}
       />
       <Tab.Screen
-        name="Analytics"
+        name="Templates"
+        component={TemplatesStackNavigator}
+        options={{
+          tabBarIcon: ({ focused, color }) => (
+            <TabIcon icon="📋" focused={focused} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Create"
+        component={HomeStackNavigator}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            e.preventDefault();
+            navigation.navigate('Home', { screen: 'AddHabitStep1' });
+          },
+        })}
+        options={{
+          tabBarIcon: () => <CreateButton />,
+          tabBarLabel: () => null,
+        }}
+      />
+      <Tab.Screen
+        name="Stats"
         component={AnalyticsStackNavigator}
         options={{
           tabBarIcon: ({ focused, color }) => (
@@ -223,6 +295,27 @@ const styles = StyleSheet.create({
   },
   tabIcon: {
     fontSize: 24,
+  },
+  createButton: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  createButtonIcon: {
+    color: '#fff',
+    fontSize: 32,
+    fontWeight: '300',
+    marginTop: -2,
   },
 });
 
