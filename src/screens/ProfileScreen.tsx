@@ -17,6 +17,25 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 import { useSubscription, formatPlanName } from '@/context/SubscriptionContext';
+import {
+  Settings,
+  Bell,
+  Lock,
+  Shield,
+  Upload,
+  HelpCircle,
+  Star,
+  Megaphone,
+  Info,
+  BarChart3,
+  Check,
+  Trophy,
+  Flame,
+  Crown,
+  X,
+  Cloud,
+  ChevronRight,
+} from 'lucide-react-native';
 
 type ProfileNavigationProp = StackNavigationProp<any, 'Profile'>;
 
@@ -121,7 +140,11 @@ const ProfileScreen: React.FC = () => {
     return userName[0].toUpperCase();
   };
 
-  const renderStatCard = (icon: string, value: string | number, label: string) => (
+  const renderStatCard = (
+    IconComponent: React.ComponentType<any>,
+    value: string | number,
+    label: string
+  ) => (
     <View
       style={[
         styles.statCard,
@@ -131,7 +154,9 @@ const ProfileScreen: React.FC = () => {
         },
       ]}
     >
-      <Text style={styles.statIcon}>{icon}</Text>
+      <View style={styles.statIconContainer}>
+        <IconComponent size={24} color={theme.colors.primary} strokeWidth={2} />
+      </View>
       <Text
         style={[
           styles.statValue,
@@ -160,7 +185,7 @@ const ProfileScreen: React.FC = () => {
   );
 
   const renderMenuItem = (
-    icon: string,
+    IconComponent: React.ComponentType<any>,
     label: string,
     onPress: () => void,
     showBorder: boolean = true
@@ -177,7 +202,9 @@ const ProfileScreen: React.FC = () => {
       activeOpacity={0.7}
     >
       <View style={styles.menuItemLeft}>
-        <Text style={styles.menuIcon}>{icon}</Text>
+        <View style={styles.menuIconContainer}>
+          <IconComponent size={22} color={theme.colors.primary} strokeWidth={2} />
+        </View>
         <Text
           style={[
             styles.menuLabel,
@@ -191,7 +218,7 @@ const ProfileScreen: React.FC = () => {
           {label}
         </Text>
       </View>
-      <Text style={[styles.chevron, { color: theme.colors.textTertiary }]}>›</Text>
+      <ChevronRight size={20} color={theme.colors.textTertiary} strokeWidth={2} />
     </TouchableOpacity>
   );
 
@@ -295,10 +322,10 @@ const ProfileScreen: React.FC = () => {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.statsScroll}
             >
-              {renderStatCard('📊', stats.totalHabits, 'Habits')}
-              {renderStatCard('✓', stats.totalCompletions, 'Completions')}
-              {renderStatCard('🏆', stats.longestStreak, 'Best Streak')}
-              {renderStatCard('🔥', stats.activeStreaks, 'Active')}
+              {renderStatCard(BarChart3, stats.totalHabits, 'Habits')}
+              {renderStatCard(Check, stats.totalCompletions, 'Completions')}
+              {renderStatCard(Trophy, stats.longestStreak, 'Best Streak')}
+              {renderStatCard(Flame, stats.activeStreaks, 'Active')}
             </ScrollView>
           </View>
 
@@ -315,7 +342,9 @@ const ProfileScreen: React.FC = () => {
             {isPremium ? (
               <>
                 <View style={styles.subscriptionHeader}>
-                  <Text style={styles.subscriptionIcon}>👑</Text>
+                  <View style={styles.subscriptionIconContainer}>
+                    <Crown size={32} color={theme.colors.primary} strokeWidth={2} />
+                  </View>
                   <View>
                     <Text
                       style={[
@@ -397,19 +426,19 @@ const ProfileScreen: React.FC = () => {
 
                 <View style={styles.premiumFeatures}>
                   <View style={styles.featureRow}>
-                    <Text style={[styles.featureX, { color: theme.colors.error }]}>✕</Text>
+                    <X size={16} color={theme.colors.error} strokeWidth={2.5} />
                     <Text style={[styles.featureText, { color: theme.colors.textSecondary, fontFamily: theme.typography.fontFamilyBody }]}>
                       Cloud sync
                     </Text>
                   </View>
                   <View style={styles.featureRow}>
-                    <Text style={[styles.featureX, { color: theme.colors.error }]}>✕</Text>
+                    <X size={16} color={theme.colors.error} strokeWidth={2.5} />
                     <Text style={[styles.featureText, { color: theme.colors.textSecondary, fontFamily: theme.typography.fontFamilyBody }]}>
                       Unlimited habits
                     </Text>
                   </View>
                   <View style={styles.featureRow}>
-                    <Text style={[styles.featureX, { color: theme.colors.error }]}>✕</Text>
+                    <X size={16} color={theme.colors.error} strokeWidth={2.5} />
                     <Text style={[styles.featureText, { color: theme.colors.textSecondary, fontFamily: theme.typography.fontFamilyBody }]}>
                       AI insights
                     </Text>
@@ -463,11 +492,11 @@ const ProfileScreen: React.FC = () => {
             >
               ACCOUNT
             </Text>
-            {renderMenuItem('⚙️', 'Settings', () => navigation.navigate('Settings'))}
-            {renderMenuItem('🔔', 'Notifications', () => navigation.navigate('NotificationsSettings'))}
-            {renderMenuItem('🔒', 'Account', () => navigation.navigate('AccountSettings'))}
-            {renderMenuItem('🛡️', 'Data & Privacy', () => navigation.navigate('DataPrivacy'))}
-            {renderMenuItem('📤', 'Export Data', () => navigation.navigate('ExportData'), false)}
+            {renderMenuItem(Settings, 'Settings', () => navigation.navigate('Settings'))}
+            {renderMenuItem(Bell, 'Notifications', () => navigation.navigate('NotificationsSettings'))}
+            {renderMenuItem(Lock, 'Account', () => navigation.navigate('AccountSettings'))}
+            {renderMenuItem(Shield, 'Data & Privacy', () => navigation.navigate('DataPrivacy'))}
+            {renderMenuItem(Upload, 'Export Data', () => navigation.navigate('ExportData'), false)}
           </View>
 
           <View
@@ -491,10 +520,10 @@ const ProfileScreen: React.FC = () => {
             >
               SUPPORT
             </Text>
-            {renderMenuItem('❓', 'Help & Support', handleHelpSupport)}
-            {renderMenuItem('⭐', 'Rate the App', handleRateApp)}
-            {renderMenuItem('📢', 'Share App', handleShareApp)}
-            {renderMenuItem('ℹ️', 'About', () => navigation.navigate('About'), false)}
+            {renderMenuItem(HelpCircle, 'Help & Support', handleHelpSupport)}
+            {renderMenuItem(Star, 'Rate the App', handleRateApp)}
+            {renderMenuItem(Megaphone, 'Share App', handleShareApp)}
+            {renderMenuItem(Info, 'About', () => navigation.navigate('About'), false)}
           </View>
 
           {/* Sign Up Prompt (for anonymous users) */}
@@ -508,7 +537,9 @@ const ProfileScreen: React.FC = () => {
                 },
               ]}
             >
-              <Text style={styles.signUpIcon}>☁️</Text>
+              <View style={styles.signUpIconContainer}>
+                <Cloud size={40} color={theme.colors.primary} strokeWidth={2} />
+              </View>
               <Text
                 style={[
                   styles.signUpTitle,
@@ -664,8 +695,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     minWidth: 100,
   },
-  statIcon: {
-    fontSize: 24,
+  statIconContainer: {
     marginBottom: 8,
   },
   statValue: {
@@ -685,8 +715,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
   },
-  subscriptionIcon: {
-    fontSize: 32,
+  subscriptionIconContainer: {
     marginRight: 12,
   },
   subscriptionTitle: {},
@@ -714,10 +743,7 @@ const styles = StyleSheet.create({
   featureRow: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  featureX: {
-    fontSize: 14,
-    marginRight: 8,
+    gap: 8,
   },
   featureText: {
     fontSize: 14,
@@ -751,14 +777,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  menuIcon: {
-    fontSize: 20,
+  menuIconContainer: {
     marginRight: 12,
   },
   menuLabel: {},
-  chevron: {
-    fontSize: 20,
-  },
   signUpPrompt: {
     borderRadius: 16,
     borderWidth: 1,
@@ -766,8 +788,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
   },
-  signUpIcon: {
-    fontSize: 40,
+  signUpIconContainer: {
     marginBottom: 12,
   },
   signUpTitle: {

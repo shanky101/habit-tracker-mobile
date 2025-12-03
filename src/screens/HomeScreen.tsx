@@ -29,6 +29,7 @@ import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 import { useSubscription } from '@/context/SubscriptionContext';
 import { useMascot } from '@/context/MascotContext';
 import { Mascot, MascotCelebration, DraggableHabitList } from '@/components';
+import { User } from 'lucide-react-native';
 
 type HomeScreenNavigationProp = StackNavigationProp<any, 'Home'>;
 type HomeScreenRouteProp = RouteProp<{ Home: { newHabit?: any } }, 'Home'>;
@@ -596,7 +597,7 @@ const HomeScreen: React.FC = () => {
           onPress={handleProfilePress}
           activeOpacity={0.7}
         >
-          <Text style={styles.profileIcon}>👤</Text>
+          <User size={22} color={theme.colors.primary} strokeWidth={2.5} />
         </TouchableOpacity>
       </Animated.View>
 
@@ -1054,9 +1055,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-  },
-  profileIcon: {
-    fontSize: 24,
   },
   profileInitials: {
     // styles from theme

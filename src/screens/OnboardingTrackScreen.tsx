@@ -12,6 +12,7 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { OnboardingStackParamList } from '@/navigation/OnboardingNavigator';
+import { ArrowLeft, Check } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -91,17 +92,20 @@ const OnboardingTrackScreen: React.FC = () => {
       {/* Navigation */}
       <View style={styles.topNav}>
         <TouchableOpacity style={styles.navButton} onPress={handleBack}>
-          <Text
-            style={[
-              styles.navText,
-              {
-                color: theme.colors.textSecondary,
-                fontFamily: theme.typography.fontFamilyBodyMedium,
-              },
-            ]}
-          >
-            ← Back
-          </Text>
+          <View style={styles.backButtonContent}>
+            <ArrowLeft size={16} color={theme.colors.textSecondary} strokeWidth={2} />
+            <Text
+              style={[
+                styles.navText,
+                {
+                  color: theme.colors.textSecondary,
+                  fontFamily: theme.typography.fontFamilyBodyMedium,
+                },
+              ]}
+            >
+              Back
+            </Text>
+          </View>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.navButton} onPress={handleSkip}>
@@ -175,7 +179,7 @@ const OnboardingTrackScreen: React.FC = () => {
                   },
                 ]}
               >
-                <Text style={styles.checkmark}>✓</Text>
+                <Check size={18} color="white" strokeWidth={3} />
               </Animated.View>
             </View>
           </View>
@@ -258,14 +262,7 @@ const OnboardingTrackScreen: React.FC = () => {
           {/* Feature Bullets */}
           <View style={styles.features}>
             <View style={styles.featureRow}>
-              <Text
-                style={[
-                  styles.featureIcon,
-                  { color: theme.colors.success },
-                ]}
-              >
-                ✓
-              </Text>
+              <Check size={18} color={theme.colors.success} strokeWidth={2.5} />
               <Text
                 style={[
                   styles.featureText,
@@ -280,14 +277,7 @@ const OnboardingTrackScreen: React.FC = () => {
             </View>
 
             <View style={styles.featureRow}>
-              <Text
-                style={[
-                  styles.featureIcon,
-                  { color: theme.colors.success },
-                ]}
-              >
-                ✓
-              </Text>
+              <Check size={18} color={theme.colors.success} strokeWidth={2.5} />
               <Text
                 style={[
                   styles.featureText,
@@ -302,14 +292,7 @@ const OnboardingTrackScreen: React.FC = () => {
             </View>
 
             <View style={styles.featureRow}>
-              <Text
-                style={[
-                  styles.featureIcon,
-                  { color: theme.colors.success },
-                ]}
-              >
-                ✓
-              </Text>
+              <Check size={18} color={theme.colors.success} strokeWidth={2.5} />
               <Text
                 style={[
                   styles.featureText,
@@ -392,6 +375,11 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
   },
+  backButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   navText: {
     fontSize: 16,
   },
@@ -433,11 +421,6 @@ const styles = StyleSheet.create({
   checkboxEmpty: {
     backgroundColor: 'transparent',
   },
-  checkmark: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: '700',
-  },
   textContent: {
     alignItems: 'center',
   },
@@ -460,10 +443,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-  },
-  featureIcon: {
-    fontSize: 18,
-    fontWeight: '700',
   },
   featureText: {
     fontSize: 16,

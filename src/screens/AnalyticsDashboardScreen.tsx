@@ -14,6 +14,18 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { useHabits } from '@/contexts/HabitsContext';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
+import {
+  Lock,
+  Check,
+  Upload,
+  TrendingUp,
+  Flame,
+  BarChart3,
+  Clipboard,
+  Lightbulb,
+  Sparkles,
+  ChevronRight,
+} from 'lucide-react-native';
 
 type AnalyticsDashboardNavigationProp = StackNavigationProp<any, 'AnalyticsDashboard'>;
 
@@ -160,7 +172,9 @@ const AnalyticsDashboardScreen: React.FC = () => {
       <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
         <View style={styles.premiumGate}>
           <View style={styles.blurOverlay}>
-            <Text style={styles.lockIcon}>🔒</Text>
+            <View style={styles.lockIconContainer}>
+              <Lock size={64} color={theme.colors.primary} strokeWidth={2} />
+            </View>
             <Text
               style={[
                 styles.gateTitle,
@@ -177,7 +191,7 @@ const AnalyticsDashboardScreen: React.FC = () => {
               {['Advanced statistics', 'AI-powered insights', 'Habit correlations', 'Export reports'].map(
                 (feature, index) => (
                   <View key={index} style={styles.featureItem}>
-                    <Text style={styles.featureCheck}>✓</Text>
+                    <Check size={18} color="#22C55E" strokeWidth={2.5} />
                     <Text
                       style={[
                         styles.featureText,
@@ -264,7 +278,7 @@ const AnalyticsDashboardScreen: React.FC = () => {
           onPress={() => navigation.navigate('ExportData')}
           activeOpacity={0.7}
         >
-          <Text style={{ fontSize: 20 }}>📤</Text>
+          <Upload size={20} color={theme.colors.primary} strokeWidth={2} />
         </TouchableOpacity>
       </Animated.View>
 
@@ -341,7 +355,9 @@ const AnalyticsDashboardScreen: React.FC = () => {
               },
             ]}
           >
-            <Text style={styles.summaryIcon}>✓</Text>
+            <View style={styles.summaryIconContainer}>
+              <Check size={24} color={theme.colors.primary} strokeWidth={2} />
+            </View>
             <Text
               style={[
                 styles.summaryValue,
@@ -367,7 +383,7 @@ const AnalyticsDashboardScreen: React.FC = () => {
               Completions
             </Text>
             <View style={styles.trendIndicator}>
-              <Text style={styles.trendArrow}>↑</Text>
+              <TrendingUp size={12} color="#22C55E" strokeWidth={2} />
               <Text
                 style={[
                   styles.trendText,
@@ -393,7 +409,9 @@ const AnalyticsDashboardScreen: React.FC = () => {
               },
             ]}
           >
-            <Text style={styles.summaryIcon}>🔥</Text>
+            <View style={styles.summaryIconContainer}>
+              <Flame size={24} color={theme.colors.primary} strokeWidth={2} />
+            </View>
             <Text
               style={[
                 styles.summaryValue,
@@ -430,7 +448,9 @@ const AnalyticsDashboardScreen: React.FC = () => {
               },
             ]}
           >
-            <Text style={styles.summaryIcon}>📊</Text>
+            <View style={styles.summaryIconContainer}>
+              <BarChart3 size={24} color={theme.colors.primary} strokeWidth={2} />
+            </View>
             <Text
               style={[
                 styles.summaryValue,
@@ -467,7 +487,9 @@ const AnalyticsDashboardScreen: React.FC = () => {
               },
             ]}
           >
-            <Text style={styles.summaryIcon}>📋</Text>
+            <View style={styles.summaryIconContainer}>
+              <Clipboard size={24} color={theme.colors.primary} strokeWidth={2} />
+            </View>
             <Text
               style={[
                 styles.summaryValue,
@@ -594,7 +616,9 @@ const AnalyticsDashboardScreen: React.FC = () => {
               { backgroundColor: `${theme.colors.primary}15` },
             ]}
           >
-            <Text style={styles.insightEmoji}>💡</Text>
+            <View style={styles.insightIconContainer}>
+              <Lightbulb size={16} color={theme.colors.primary} strokeWidth={2} />
+            </View>
             <Text
               style={[
                 styles.insightText,
@@ -660,7 +684,7 @@ const AnalyticsDashboardScreen: React.FC = () => {
               </View>
               <View style={styles.habitStats}>
                 <View style={styles.statBadge}>
-                  <Text style={styles.statEmoji}>🔥</Text>
+                  <Flame size={12} color={theme.colors.primary} strokeWidth={2} />
                   <Text
                     style={[
                       styles.statText,
@@ -686,7 +710,7 @@ const AnalyticsDashboardScreen: React.FC = () => {
                 >
                   {Math.floor(Math.random() * 20) + 80}%
                 </Text>
-                <Text style={styles.chevron}>›</Text>
+                <ChevronRight size={20} color="#9CA3AF" strokeWidth={2} />
               </View>
             </TouchableOpacity>
           ))}
@@ -704,7 +728,9 @@ const AnalyticsDashboardScreen: React.FC = () => {
           ]}
         >
           <View style={styles.aiHeader}>
-            <Text style={styles.aiIcon}>✨</Text>
+            <View style={styles.aiIconContainer}>
+              <Sparkles size={20} color={theme.colors.primary} strokeWidth={2} />
+            </View>
             <Text
               style={[
                 styles.aiTitle,
@@ -778,7 +804,7 @@ const AnalyticsDashboardScreen: React.FC = () => {
             onPress={() => navigation.navigate('ExportData')}
             activeOpacity={0.7}
           >
-            <Text style={styles.actionIcon}>📤</Text>
+            <Upload size={18} color={theme.colors.primary} strokeWidth={2} />
             <Text
               style={[
                 styles.actionText,
@@ -800,7 +826,7 @@ const AnalyticsDashboardScreen: React.FC = () => {
             onPress={() => console.log('Share report')}
             activeOpacity={0.7}
           >
-            <Text style={styles.actionIcon}>📊</Text>
+            <BarChart3 size={18} color={theme.colors.primary} strokeWidth={2} />
             <Text
               style={[
                 styles.actionText,
@@ -884,8 +910,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     alignItems: 'center',
   },
-  summaryIcon: {
-    fontSize: 24,
+  summaryIconContainer: {
     marginBottom: 8,
   },
   summaryValue: {
@@ -899,11 +924,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 8,
-  },
-  trendArrow: {
-    fontSize: 12,
-    color: '#22C55E',
-    marginRight: 2,
+    gap: 2,
   },
   trendText: {},
   archivedText: {
@@ -952,8 +973,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 10,
   },
-  insightEmoji: {
-    fontSize: 16,
+  insightIconContainer: {
     marginRight: 8,
   },
   insightText: {},
@@ -990,20 +1010,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginRight: 16,
-  },
-  statEmoji: {
-    fontSize: 12,
-    marginRight: 4,
+    gap: 4,
   },
   statText: {},
   completionRate: {
     marginRight: 8,
     minWidth: 40,
     textAlign: 'right',
-  },
-  chevron: {
-    fontSize: 20,
-    color: '#9CA3AF',
   },
   aiSection: {
     padding: 20,
@@ -1016,8 +1029,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
   },
-  aiIcon: {
-    fontSize: 20,
+  aiIconContainer: {
     marginRight: 8,
   },
   aiTitle: {
@@ -1061,10 +1073,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 14,
     borderRadius: 12,
-  },
-  actionIcon: {
-    fontSize: 18,
-    marginRight: 8,
+    gap: 8,
   },
   actionText: {},
   // Premium Gate styles
@@ -1078,8 +1087,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
   },
-  lockIcon: {
-    fontSize: 64,
+  lockIconContainer: {
     marginBottom: 24,
   },
   gateTitle: {
@@ -1094,11 +1102,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 12,
-  },
-  featureCheck: {
-    fontSize: 18,
-    marginRight: 12,
-    color: '#22C55E',
+    gap: 12,
   },
   featureText: {},
   upgradeButton: {

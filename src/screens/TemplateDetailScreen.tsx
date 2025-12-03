@@ -15,6 +15,7 @@ import { useTheme } from '@/theme';
 import { useTemplates } from '@/contexts/TemplateContext';
 import { useHabits, Habit } from '@/contexts/HabitsContext';
 import { TemplatesStackParamList } from '@/navigation/MainTabNavigator';
+import { ArrowLeft, Share2, Trash2, Edit3 } from 'lucide-react-native';
 
 type TemplateDetailRouteProp = RouteProp<TemplatesStackParamList, 'TemplateDetail'>;
 type NavigationProp = NativeStackNavigationProp<TemplatesStackParamList>;
@@ -175,35 +176,29 @@ const TemplateDetailScreen: React.FC = () => {
             style={[styles.backButton, { backgroundColor: theme.colors.surface }]}
             onPress={() => navigation.goBack()}
           >
-            <Text style={styles.backButtonText}>←</Text>
+            <ArrowLeft size={22} color={theme.colors.text} strokeWidth={2} />
           </TouchableOpacity>
 
           <View style={styles.headerRight}>
             <TouchableOpacity
-              style={[styles.textButton, { backgroundColor: theme.colors.surface }]}
+              style={[styles.iconButton, { backgroundColor: theme.colors.surface }]}
               onPress={handleShare}
             >
-              <Text style={[styles.textButtonLabel, { color: theme.colors.primary }]}>
-                Share
-              </Text>
+              <Share2 size={18} color={theme.colors.primary} strokeWidth={2} />
             </TouchableOpacity>
             {!template.isDefault && (
               <TouchableOpacity
-                style={[styles.textButton, { backgroundColor: theme.colors.surface }]}
+                style={[styles.iconButton, { backgroundColor: theme.colors.surface }]}
                 onPress={handleDelete}
               >
-                <Text style={[styles.textButtonLabel, { color: '#ff4444' }]}>
-                  Delete
-                </Text>
+                <Trash2 size={18} color="#ff4444" strokeWidth={2} />
               </TouchableOpacity>
             )}
             <TouchableOpacity
-              style={[styles.textButton, { backgroundColor: theme.colors.surface }]}
+              style={[styles.iconButton, { backgroundColor: theme.colors.surface }]}
               onPress={handleEdit}
             >
-              <Text style={[styles.textButtonLabel, { color: theme.colors.primary }]}>
-                {template.isDefault ? 'Copy' : 'Edit'}
-              </Text>
+              <Edit3 size={18} color={theme.colors.primary} strokeWidth={2} />
             </TouchableOpacity>
           </View>
         </View>
@@ -377,23 +372,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backButtonText: {
-    fontSize: 24,
-  },
   headerRight: {
     flexDirection: 'row',
     gap: 8,
   },
-  textButton: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 8,
+  iconButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  textButtonLabel: {
-    fontSize: 14,
-    fontWeight: '600',
   },
   templateInfo: {
     alignItems: 'center',

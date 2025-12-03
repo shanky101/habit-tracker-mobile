@@ -12,6 +12,7 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { OnboardingStackParamList } from '@/navigation/OnboardingNavigator';
+import { ArrowLeft, Flame, TrendingUp, Target, Trophy } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -93,17 +94,20 @@ const OnboardingStreaksScreen: React.FC = () => {
       {/* Back Button */}
       <View style={styles.topNav}>
         <TouchableOpacity style={styles.navButton} onPress={handleBack}>
-          <Text
-            style={[
-              styles.navText,
-              {
-                color: theme.colors.textSecondary,
-                fontFamily: theme.typography.fontFamilyBodyMedium,
-              },
-            ]}
-          >
-            ← Back
-          </Text>
+          <View style={styles.backButtonContent}>
+            <ArrowLeft size={16} color={theme.colors.textSecondary} strokeWidth={2} />
+            <Text
+              style={[
+                styles.navText,
+                {
+                  color: theme.colors.textSecondary,
+                  fontFamily: theme.typography.fontFamilyBodyMedium,
+                },
+              ]}
+            >
+              Back
+            </Text>
+          </View>
         </TouchableOpacity>
       </View>
 
@@ -117,16 +121,16 @@ const OnboardingStreaksScreen: React.FC = () => {
         {/* Streak Visualization */}
         <View style={styles.streakContainer}>
           {/* Flame Icon */}
-          <Animated.Text
+          <Animated.View
             style={[
-              styles.flameIcon,
+              styles.flameIconContainer,
               {
                 transform: [{ scale: flameScaleAnim }],
               },
             ]}
           >
-            🔥
-          </Animated.Text>
+            <Flame size={80} color={theme.colors.primary} strokeWidth={2} fill={theme.colors.primary} />
+          </Animated.View>
 
           {/* Animated Counter */}
           <View style={styles.counterContainer}>
@@ -203,7 +207,7 @@ const OnboardingStreaksScreen: React.FC = () => {
           {/* Benefits */}
           <View style={styles.benefits}>
             <View style={styles.benefitRow}>
-              <Text style={styles.benefitIcon}>📈</Text>
+              <TrendingUp size={24} color={theme.colors.primary} strokeWidth={2} />
               <Text
                 style={[
                   styles.benefitText,
@@ -218,7 +222,7 @@ const OnboardingStreaksScreen: React.FC = () => {
             </View>
 
             <View style={styles.benefitRow}>
-              <Text style={styles.benefitIcon}>🎯</Text>
+              <Target size={24} color={theme.colors.primary} strokeWidth={2} />
               <Text
                 style={[
                   styles.benefitText,
@@ -233,7 +237,7 @@ const OnboardingStreaksScreen: React.FC = () => {
             </View>
 
             <View style={styles.benefitRow}>
-              <Text style={styles.benefitIcon}>🏆</Text>
+              <Trophy size={24} color={theme.colors.primary} strokeWidth={2} />
               <Text
                 style={[
                   styles.benefitText,
@@ -328,6 +332,11 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
   },
+  backButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   navText: {
     fontSize: 16,
   },
@@ -341,8 +350,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 24,
   },
-  flameIcon: {
-    fontSize: 80,
+  flameIconContainer: {
     marginBottom: 16,
   },
   counterContainer: {
@@ -392,9 +400,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-  },
-  benefitIcon: {
-    fontSize: 24,
   },
   benefitText: {
     fontSize: 16,

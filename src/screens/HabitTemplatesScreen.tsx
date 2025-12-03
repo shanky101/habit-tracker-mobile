@@ -15,6 +15,7 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { useTemplates } from '@/contexts/TemplateContext';
 import { HabitTemplate, HabitTemplateConfig } from '@/types/HabitTemplate';
+import { ArrowLeft, Search, X } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 48 - 12) / 2; // 2 columns with padding and gap
@@ -312,7 +313,7 @@ const HabitTemplatesScreen: React.FC = () => {
           onPress={() => navigation.goBack()}
           activeOpacity={0.7}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <ArrowLeft size={24} color={theme.colors.text} strokeWidth={2} />
         </TouchableOpacity>
         <View style={styles.headerContent}>
           <Text
@@ -344,6 +345,7 @@ const HabitTemplatesScreen: React.FC = () => {
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
+        <Search size={20} color={theme.colors.textSecondary} strokeWidth={2} style={styles.searchIconAbsolute} />
         <TextInput
           style={[
             styles.searchInput,
@@ -360,7 +362,6 @@ const HabitTemplatesScreen: React.FC = () => {
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
-        <Text style={styles.searchIcon}>🔍</Text>
       </View>
 
       {/* Category Tabs */}
@@ -559,9 +560,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 8,
   },
-  backIcon: {
-    fontSize: 24,
-  },
   headerContent: {
     flex: 1,
   },
@@ -580,11 +578,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
   },
-  searchIcon: {
+  searchIconAbsolute: {
     position: 'absolute',
     left: 36,
     top: 28,
-    fontSize: 20,
+    zIndex: 1,
   },
   categoriesScroll: {
     flexGrow: 0,

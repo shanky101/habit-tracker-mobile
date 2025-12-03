@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '@/theme';
+import { Home, LayoutTemplate, Plus, TrendingUp, User } from 'lucide-react-native';
 import {
   HomeScreen,
   AddHabitStep1Screen,
@@ -84,13 +85,17 @@ const SettingsStack = createStackNavigator<SettingsStackParamList>();
 const ProfileStack = createStackNavigator<ProfileStackParamList>();
 
 // Tab Icon Component
-const TabIcon: React.FC<{ icon: string; focused: boolean; color: string }> = ({
-  icon,
-  focused,
-  color,
-}) => (
+const TabIcon: React.FC<{
+  IconComponent: React.ComponentType<any>;
+  focused: boolean;
+  color: string;
+}> = ({ IconComponent, focused, color }) => (
   <View style={styles.tabIconContainer}>
-    <Text style={[styles.tabIcon, { opacity: focused ? 1 : 0.6 }]}>{icon}</Text>
+    <IconComponent
+      size={24}
+      color={color}
+      strokeWidth={focused ? 2.5 : 2}
+    />
   </View>
 );
 
@@ -204,7 +209,7 @@ const CreateButton: React.FC = () => {
       onPress={() => navigation.navigate('Home', { screen: 'AddHabitStep1' })}
       activeOpacity={0.8}
     >
-      <Text style={styles.createButtonIcon}>+</Text>
+      <Plus color="#ffffff" size={28} strokeWidth={2.5} />
     </TouchableOpacity>
   );
 };
@@ -239,7 +244,7 @@ const MainTabNavigator: React.FC = () => {
         component={HomeStackNavigator}
         options={{
           tabBarIcon: ({ focused, color }) => (
-            <TabIcon icon="🏠" focused={focused} color={color} />
+            <TabIcon IconComponent={Home} focused={focused} color={color} />
           ),
         }}
       />
@@ -248,7 +253,7 @@ const MainTabNavigator: React.FC = () => {
         component={TemplatesStackNavigator}
         options={{
           tabBarIcon: ({ focused, color }) => (
-            <TabIcon icon="📋" focused={focused} color={color} />
+            <TabIcon IconComponent={LayoutTemplate} focused={focused} color={color} />
           ),
         }}
       />
@@ -271,7 +276,7 @@ const MainTabNavigator: React.FC = () => {
         component={AnalyticsStackNavigator}
         options={{
           tabBarIcon: ({ focused, color }) => (
-            <TabIcon icon="📊" focused={focused} color={color} />
+            <TabIcon IconComponent={TrendingUp} focused={focused} color={color} />
           ),
         }}
       />
@@ -280,7 +285,7 @@ const MainTabNavigator: React.FC = () => {
         component={ProfileStackNavigator}
         options={{
           tabBarIcon: ({ focused, color }) => (
-            <TabIcon icon="👤" focused={focused} color={color} />
+            <TabIcon IconComponent={User} focused={focused} color={color} />
           ),
         }}
       />
@@ -292,9 +297,6 @@ const styles = StyleSheet.create({
   tabIconContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  tabIcon: {
-    fontSize: 24,
   },
   createButton: {
     width: 56,
@@ -310,12 +312,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
-  },
-  createButtonIcon: {
-    color: '#fff',
-    fontSize: 32,
-    fontWeight: '300',
-    marginTop: -2,
   },
 });
 

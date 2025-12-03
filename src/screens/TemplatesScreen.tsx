@@ -21,6 +21,7 @@ import { useTemplates } from '@/contexts/TemplateContext';
 import { useHabits, Habit } from '@/contexts/HabitsContext';
 import { HabitTemplate } from '@/types/HabitTemplate';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
+import { Search, X, Copy, Plus } from 'lucide-react-native';
 
 type TemplatesNavigationProp = StackNavigationProp<any, 'Templates'>;
 
@@ -409,7 +410,7 @@ const TemplatesScreen: React.FC = () => {
             }
           ]}
         >
-          <Text style={styles.searchIcon}>🔍</Text>
+          <Search size={20} color={theme.colors.textSecondary} strokeWidth={2} style={styles.searchIcon} />
           <TextInput
             style={[
               styles.searchInput,
@@ -534,8 +535,9 @@ const TemplatesScreen: React.FC = () => {
               <TouchableOpacity
                 onPress={() => setShowImportModal(false)}
                 activeOpacity={0.7}
+                style={styles.modalCloseButton}
               >
-                <Text style={styles.modalClose}>✕</Text>
+                <X size={24} color={theme.colors.textSecondary} strokeWidth={2} />
               </TouchableOpacity>
             </View>
 
@@ -654,7 +656,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   searchIcon: {
-    fontSize: 18,
     marginRight: 8,
   },
   searchInput: {
@@ -809,9 +810,8 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 24,
   },
-  modalClose: {
-    fontSize: 24,
-    color: '#999',
+  modalCloseButton: {
+    padding: 4,
   },
   modalDescription: {
     fontSize: 14,

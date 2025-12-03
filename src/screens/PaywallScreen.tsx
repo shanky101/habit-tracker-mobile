@@ -16,6 +16,18 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 import { useSubscription, SubscriptionPlan } from '@/context/SubscriptionContext';
+import {
+  X,
+  Crown,
+  Infinity,
+  Cloud,
+  Sparkles,
+  BarChart3,
+  Upload,
+  MessageCircle,
+  Check,
+  Star,
+} from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -71,12 +83,12 @@ const PaywallScreen: React.FC = () => {
   };
 
   const features = [
-    { icon: '♾️', free: '5', premium: 'Unlimited', label: 'Habits' },
-    { icon: '☁️', free: '✕', premium: '✓', label: 'Cloud Sync' },
-    { icon: '✨', free: '✕', premium: '✓', label: 'AI Insights' },
-    { icon: '📊', free: 'Basic', premium: 'Advanced', label: 'Analytics' },
-    { icon: '📤', free: '✕', premium: '✓', label: 'Data Export' },
-    { icon: '💬', free: '✕', premium: '✓', label: 'Priority Support' },
+    { IconComponent: Infinity, free: '5', freeIsCheck: false, premium: 'Unlimited', premiumIsCheck: false, label: 'Habits' },
+    { IconComponent: Cloud, free: 'no', freeIsCheck: true, premium: 'yes', premiumIsCheck: true, label: 'Cloud Sync' },
+    { IconComponent: Sparkles, free: 'no', freeIsCheck: true, premium: 'yes', premiumIsCheck: true, label: 'AI Insights' },
+    { IconComponent: BarChart3, free: 'Basic', freeIsCheck: false, premium: 'Advanced', premiumIsCheck: false, label: 'Analytics' },
+    { IconComponent: Upload, free: 'no', freeIsCheck: true, premium: 'yes', premiumIsCheck: true, label: 'Data Export' },
+    { IconComponent: MessageCircle, free: 'no', freeIsCheck: true, premium: 'yes', premiumIsCheck: true, label: 'Priority Support' },
   ];
 
   const testimonials = [
@@ -93,7 +105,7 @@ const PaywallScreen: React.FC = () => {
           onPress={handleDismiss}
           activeOpacity={0.7}
         >
-          <Text style={[styles.closeIcon, { color: theme.colors.textSecondary }]}>✕</Text>
+          <X size={18} color={theme.colors.textSecondary} strokeWidth={2} />
         </TouchableOpacity>
       )}
 
@@ -110,7 +122,9 @@ const PaywallScreen: React.FC = () => {
         >
           {/* Hero Section */}
           <View style={styles.heroSection}>
-            <Text style={styles.heroEmoji}>👑</Text>
+            <View style={styles.heroIconContainer}>
+              <Crown size={60} color={theme.colors.primary} strokeWidth={2} />
+            </View>
             <Text
               style={[
                 styles.headline,
@@ -186,7 +200,9 @@ const PaywallScreen: React.FC = () => {
                 ]}
               >
                 <View style={styles.featureCell}>
-                  <Text style={styles.featureIcon}>{feat.icon}</Text>
+                  <View style={styles.featureIconContainer}>
+                    <feat.IconComponent size={16} color={theme.colors.primary} strokeWidth={2} />
+                  </View>
                   <Text
                     style={[
                       styles.featureLabel,
@@ -200,30 +216,38 @@ const PaywallScreen: React.FC = () => {
                   </Text>
                 </View>
                 <View style={styles.valueCell}>
-                  <Text
-                    style={[
-                      styles.freeValue,
-                      {
-                        color: feat.free === '✕' ? theme.colors.error : theme.colors.textSecondary,
-                        fontFamily: theme.typography.fontFamilyBody,
-                      },
-                    ]}
-                  >
-                    {feat.free}
-                  </Text>
+                  {feat.freeIsCheck ? (
+                    <X size={14} color={theme.colors.error} strokeWidth={2.5} />
+                  ) : (
+                    <Text
+                      style={[
+                        styles.freeValue,
+                        {
+                          color: theme.colors.textSecondary,
+                          fontFamily: theme.typography.fontFamilyBody,
+                        },
+                      ]}
+                    >
+                      {feat.free}
+                    </Text>
+                  )}
                 </View>
                 <View style={[styles.valueCell, styles.premiumCell]}>
-                  <Text
-                    style={[
-                      styles.premiumValue,
-                      {
-                        color: feat.premium === '✓' ? theme.colors.success : theme.colors.primary,
-                        fontFamily: theme.typography.fontFamilyBodySemibold,
-                      },
-                    ]}
-                  >
-                    {feat.premium}
-                  </Text>
+                  {feat.premiumIsCheck ? (
+                    <Check size={14} color={theme.colors.success} strokeWidth={2.5} />
+                  ) : (
+                    <Text
+                      style={[
+                        styles.premiumValue,
+                        {
+                          color: theme.colors.primary,
+                          fontFamily: theme.typography.fontFamilyBodySemibold,
+                        },
+                      ]}
+                    >
+                      {feat.premium}
+                    </Text>
+                  )}
                 </View>
               </View>
             ))}
@@ -245,7 +269,11 @@ const PaywallScreen: React.FC = () => {
             </Text>
 
             <View style={styles.rating}>
-              <Text style={styles.stars}>⭐⭐⭐⭐⭐</Text>
+              <View style={styles.starsContainer}>
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Star key={i} size={18} color="#FFD700" fill="#FFD700" strokeWidth={0} />
+                ))}
+              </View>
               <Text
                 style={[
                   styles.ratingText,
@@ -457,17 +485,46 @@ const PaywallScreen: React.FC = () => {
 
           {/* Trust Indicators */}
           <View style={styles.trustIndicators}>
-            <Text
-              style={[
-                styles.trustText,
-                {
-                  color: theme.colors.textTertiary,
-                  fontFamily: theme.typography.fontFamilyBody,
-                },
-              ]}
-            >
-              ✓ Cancel anytime  •  ✓ Secure payment  •  ✓ Instant access
-            </Text>
+            <View style={styles.trustRow}>
+              <Check size={12} color={theme.colors.success} strokeWidth={2.5} />
+              <Text
+                style={[
+                  styles.trustText,
+                  {
+                    color: theme.colors.textTertiary,
+                    fontFamily: theme.typography.fontFamilyBody,
+                  },
+                ]}
+              >
+                Cancel anytime
+              </Text>
+              <Text style={[styles.trustText, { color: theme.colors.textTertiary }]}>  •  </Text>
+              <Check size={12} color={theme.colors.success} strokeWidth={2.5} />
+              <Text
+                style={[
+                  styles.trustText,
+                  {
+                    color: theme.colors.textTertiary,
+                    fontFamily: theme.typography.fontFamilyBody,
+                  },
+                ]}
+              >
+                Secure payment
+              </Text>
+              <Text style={[styles.trustText, { color: theme.colors.textTertiary }]}>  •  </Text>
+              <Check size={12} color={theme.colors.success} strokeWidth={2.5} />
+              <Text
+                style={[
+                  styles.trustText,
+                  {
+                    color: theme.colors.textTertiary,
+                    fontFamily: theme.typography.fontFamilyBody,
+                  },
+                ]}
+              >
+                Instant access
+              </Text>
+            </View>
           </View>
         </Animated.View>
       </ScrollView>
@@ -491,9 +548,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  closeIcon: {
-    fontSize: 18,
-  },
   scrollView: {
     flex: 1,
   },
@@ -506,8 +560,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 32,
   },
-  heroEmoji: {
-    fontSize: 60,
+  heroIconContainer: {
     marginBottom: 16,
   },
   headline: {
@@ -551,8 +604,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  featureIcon: {
-    fontSize: 16,
+  featureIconContainer: {
     marginRight: 8,
   },
   featureLabel: {
@@ -580,8 +632,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
   },
-  stars: {
-    fontSize: 18,
+  starsContainer: {
+    flexDirection: 'row',
+    gap: 4,
     marginBottom: 4,
   },
   ratingText: {
@@ -657,6 +710,13 @@ const styles = StyleSheet.create({
   },
   trustIndicators: {
     alignItems: 'center',
+  },
+  trustRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 6,
   },
   trustText: {
     fontSize: 11,

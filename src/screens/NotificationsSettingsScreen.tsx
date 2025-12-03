@@ -17,6 +17,21 @@ import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
+import {
+  ArrowLeft,
+  Bell,
+  ArrowRight,
+  Clock,
+  Target,
+  AlertTriangle,
+  PartyPopper,
+  BarChart3,
+  Sparkles,
+  Volume2,
+  Circle,
+  Settings,
+  ChevronRight,
+} from 'lucide-react-native';
 import { sendTestNotification } from '@/utils/notificationService';
 
 type NotificationsSettingsNavigationProp = StackNavigationProp<any, 'NotificationsSettings'>;
@@ -97,7 +112,7 @@ const NotificationsSettingsScreen: React.FC = () => {
   };
 
   const renderToggleRow = (
-    icon: string,
+    IconComponent: React.ComponentType<any>,
     label: string,
     description: string,
     value: boolean,
@@ -116,7 +131,9 @@ const NotificationsSettingsScreen: React.FC = () => {
       ]}
     >
       <View style={styles.toggleInfo}>
-        <Text style={styles.toggleIcon}>{icon}</Text>
+        <View style={styles.toggleIconContainer}>
+          <IconComponent size={20} color={theme.colors.primary} strokeWidth={2} />
+        </View>
         <View style={styles.toggleText}>
           <Text
             style={[
@@ -175,7 +192,7 @@ const NotificationsSettingsScreen: React.FC = () => {
           onPress={() => navigation.goBack()}
           activeOpacity={0.7}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <ArrowLeft size={24} color={theme.colors.text} strokeWidth={2} />
         </TouchableOpacity>
         <Text
           style={[
@@ -218,7 +235,9 @@ const NotificationsSettingsScreen: React.FC = () => {
             ]}
           >
             <View style={styles.masterContent}>
-              <Text style={styles.masterIcon}>🔔</Text>
+              <View style={styles.masterIconContainer}>
+                <Bell size={32} color={theme.colors.primary} strokeWidth={2} />
+              </View>
               <View style={styles.masterText}>
                 <Text
                   style={[
@@ -273,7 +292,9 @@ const NotificationsSettingsScreen: React.FC = () => {
             activeOpacity={0.7}
           >
             <View style={styles.testButtonContent}>
-              <Text style={styles.testButtonIcon}>🔔</Text>
+              <View style={styles.testButtonIconContainer}>
+                <Bell size={24} color={theme.colors.primary} strokeWidth={2} />
+              </View>
               <View style={styles.testButtonText}>
                 <Text
                   style={[
@@ -309,14 +330,7 @@ const NotificationsSettingsScreen: React.FC = () => {
                     { backgroundColor: theme.colors.primary + '20' }
                   ]}
                 >
-                  <Text
-                    style={[
-                      styles.testButtonArrowText,
-                      { color: theme.colors.primary }
-                    ]}
-                  >
-                    →
-                  </Text>
+                  <ArrowRight size={18} color={theme.colors.primary} strokeWidth={2.5} />
                 </View>
               )}
             </View>
@@ -347,7 +361,7 @@ const NotificationsSettingsScreen: React.FC = () => {
             </Text>
 
             {renderToggleRow(
-              '⏰',
+              Bell,
               'Daily Reminder',
               'Get a reminder once per day',
               dailyReminder,
@@ -363,7 +377,9 @@ const NotificationsSettingsScreen: React.FC = () => {
                 activeOpacity={0.7}
               >
                 <View style={styles.timeInfo}>
-                  <Text style={styles.timeIcon}>🕐</Text>
+                  <View style={styles.timeIconContainer}>
+                    <Clock size={20} color={theme.colors.primary} strokeWidth={2} />
+                  </View>
                   <Text
                     style={[
                       styles.timeLabel,
@@ -390,7 +406,7 @@ const NotificationsSettingsScreen: React.FC = () => {
                   >
                     {dailyReminderTime}
                   </Text>
-                  <Text style={[styles.chevron, { color: theme.colors.textTertiary }]}>›</Text>
+                  <ChevronRight size={18} color={theme.colors.textTertiary} strokeWidth={2} />
                 </View>
               </TouchableOpacity>
             )}
@@ -424,7 +440,9 @@ const NotificationsSettingsScreen: React.FC = () => {
                     },
                   ]}
                 >
-                  <Text style={styles.previewIcon}>🎯</Text>
+                  <View style={styles.previewIconContainer}>
+                    <Target size={24} color={theme.colors.primary} strokeWidth={2} />
+                  </View>
                   <View style={styles.previewContent}>
                     <Text
                       style={[
@@ -563,7 +581,7 @@ const NotificationsSettingsScreen: React.FC = () => {
             </Text>
 
             {renderToggleRow(
-              '⚠️',
+              AlertTriangle,
               'Streak Risk Alerts',
               'Notifies if you might break a streak',
               streakRiskAlerts,
@@ -571,7 +589,7 @@ const NotificationsSettingsScreen: React.FC = () => {
             )}
 
             {renderToggleRow(
-              '🎉',
+              PartyPopper,
               'Streak Milestones',
               'Celebrate when you hit milestones',
               streakMilestones,
@@ -606,7 +624,7 @@ const NotificationsSettingsScreen: React.FC = () => {
             </Text>
 
             {renderToggleRow(
-              '📊',
+              BarChart3,
               'Weekly Summary',
               'Recap every Monday',
               weeklySummary,
@@ -614,7 +632,7 @@ const NotificationsSettingsScreen: React.FC = () => {
             )}
 
             {renderToggleRow(
-              '✨',
+              Sparkles,
               'AI Insights',
               'Personalized habit recommendations',
               aiInsights,
@@ -706,7 +724,7 @@ const NotificationsSettingsScreen: React.FC = () => {
             </Text>
 
             {renderToggleRow(
-              '🔊',
+              Volume2,
               'Sound',
               'Play a sound with notifications',
               soundEnabled,
@@ -714,7 +732,7 @@ const NotificationsSettingsScreen: React.FC = () => {
             )}
 
             {Platform.OS === 'ios' && renderToggleRow(
-              '🔴',
+              Circle,
               'Badge App Icon',
               'Show incomplete habit count on app icon',
               badgeEnabled,
@@ -736,7 +754,9 @@ const NotificationsSettingsScreen: React.FC = () => {
             onPress={openSystemSettings}
             activeOpacity={0.7}
           >
-            <Text style={styles.systemSettingsIcon}>⚙️</Text>
+            <View style={styles.systemSettingsIconContainer}>
+              <Settings size={20} color={theme.colors.primary} strokeWidth={2} />
+            </View>
             <Text
               style={[
                 styles.systemSettingsText,
@@ -749,7 +769,7 @@ const NotificationsSettingsScreen: React.FC = () => {
             >
               Open System Settings
             </Text>
-            <Text style={[styles.chevron, { color: theme.colors.textTertiary }]}>›</Text>
+            <ChevronRight size={18} color={theme.colors.textTertiary} strokeWidth={2} />
           </TouchableOpacity>
 
           <Text
@@ -787,9 +807,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  backIcon: {
-    fontSize: 24,
-  },
   headerTitle: {
     flex: 1,
     textAlign: 'center',
@@ -819,8 +836,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
-  masterIcon: {
-    fontSize: 32,
+  masterIconContainer: {
     marginRight: 14,
   },
   masterText: {
@@ -855,8 +871,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 12,
   },
-  toggleIcon: {
-    fontSize: 20,
+  toggleIconContainer: {
     marginRight: 12,
   },
   toggleText: {
@@ -878,8 +893,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  timeIcon: {
-    fontSize: 20,
+  timeIconContainer: {
     marginRight: 12,
   },
   timeLabel: {},
@@ -889,9 +903,6 @@ const styles = StyleSheet.create({
   },
   timeText: {
     marginRight: 6,
-  },
-  chevron: {
-    fontSize: 18,
   },
   previewContainer: {
     padding: 16,
@@ -906,8 +917,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
   },
-  previewIcon: {
-    fontSize: 24,
+  previewIconContainer: {
     marginRight: 10,
   },
   previewContent: {},
@@ -964,8 +974,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 12,
   },
-  systemSettingsIcon: {
-    fontSize: 20,
+  systemSettingsIconContainer: {
     marginRight: 12,
   },
   systemSettingsText: {
@@ -988,8 +997,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
   },
-  testButtonIcon: {
-    fontSize: 24,
+  testButtonIconContainer: {
     marginRight: 12,
   },
   testButtonText: {
@@ -1005,10 +1013,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  testButtonArrowText: {
-    fontSize: 18,
-    fontWeight: 'bold',
   },
 });
 

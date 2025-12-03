@@ -15,6 +15,20 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  ArrowLeft,
+  BarChart3,
+  Bug,
+  Lightbulb,
+  Upload,
+  Mail,
+  Eraser,
+  Lock,
+  FileText,
+  Clipboard,
+  Trash2,
+  ChevronRight,
+} from 'lucide-react-native';
 import { useTheme } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 
@@ -127,7 +141,7 @@ const DataPrivacyScreen: React.FC = () => {
   };
 
   const renderSettingToggle = (
-    icon: string,
+    IconComponent: React.ComponentType<any>,
     title: string,
     description: string,
     value: boolean,
@@ -140,7 +154,9 @@ const DataPrivacyScreen: React.FC = () => {
       ]}
     >
       <View style={styles.settingInfo}>
-        <Text style={styles.settingIcon}>{icon}</Text>
+        <View style={styles.settingIconContainer}>
+          <IconComponent size={20} color={theme.colors.primary} strokeWidth={2} />
+        </View>
         <View style={styles.settingText}>
           <Text
             style={[
@@ -182,7 +198,7 @@ const DataPrivacyScreen: React.FC = () => {
   );
 
   const renderActionRow = (
-    icon: string,
+    IconComponent: React.ComponentType<any>,
     title: string,
     description: string,
     onPress: () => void,
@@ -197,7 +213,9 @@ const DataPrivacyScreen: React.FC = () => {
       activeOpacity={0.7}
     >
       <View style={styles.actionInfo}>
-        <Text style={styles.actionIcon}>{icon}</Text>
+        <View style={styles.actionIconContainer}>
+          <IconComponent size={20} color={destructive ? theme.colors.error : theme.colors.primary} strokeWidth={2} />
+        </View>
         <View style={styles.actionText}>
           <Text
             style={[
@@ -225,7 +243,9 @@ const DataPrivacyScreen: React.FC = () => {
           </Text>
         </View>
       </View>
-      <Text style={[styles.chevron, { color: theme.colors.textTertiary }]}>›</Text>
+      <View style={styles.chevronContainer}>
+        <ChevronRight size={18} color={theme.colors.textTertiary} strokeWidth={2} />
+      </View>
     </TouchableOpacity>
   );
 
@@ -247,7 +267,7 @@ const DataPrivacyScreen: React.FC = () => {
           onPress={() => navigation.goBack()}
           activeOpacity={0.7}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <ArrowLeft size={24} color={theme.colors.text} strokeWidth={2} />
         </TouchableOpacity>
         <Text
           style={[
@@ -298,21 +318,21 @@ const DataPrivacyScreen: React.FC = () => {
               PRIVACY SETTINGS
             </Text>
             {renderSettingToggle(
-              '📊',
+              BarChart3,
               'Analytics',
               'Help improve the app by sending anonymous usage data',
               analyticsEnabled,
               setAnalyticsEnabled
             )}
             {renderSettingToggle(
-              '🐛',
+              Bug,
               'Crash Reports',
               'Automatically send crash reports to help fix bugs',
               crashReportsEnabled,
               setCrashReportsEnabled
             )}
             {renderSettingToggle(
-              '💡',
+              Lightbulb,
               'Personalized Tips',
               'Allow AI to analyze your habits for personalized insights',
               personalizedTips,
@@ -343,19 +363,19 @@ const DataPrivacyScreen: React.FC = () => {
               YOUR DATA
             </Text>
             {renderActionRow(
-              '📤',
+              Upload,
               'Export Data',
               'Download all your habits and completions',
               handleExportData
             )}
             {renderActionRow(
-              '📧',
+              Mail,
               'Request Your Data',
               'Get a copy of all data we have about you',
               handleRequestData
             )}
             {renderActionRow(
-              '🧹',
+              Eraser,
               'Clear Cache',
               'Free up storage by clearing temporary files',
               handleClearCache
@@ -372,7 +392,9 @@ const DataPrivacyScreen: React.FC = () => {
               },
             ]}
           >
-            <Text style={styles.infoIcon}>🔐</Text>
+            <View style={styles.infoIconContainer}>
+              <Lock size={24} color={theme.colors.primary} strokeWidth={2} />
+            </View>
             <View style={styles.infoText}>
               <Text
                 style={[
@@ -425,13 +447,13 @@ const DataPrivacyScreen: React.FC = () => {
               LEGAL
             </Text>
             {renderActionRow(
-              '📄',
+              FileText,
               'Privacy Policy',
               'How we handle your data',
               handleOpenPrivacyPolicy
             )}
             {renderActionRow(
-              '📋',
+              Clipboard,
               'Terms of Service',
               'Rules and guidelines for using the app',
               handleOpenTerms
@@ -461,7 +483,7 @@ const DataPrivacyScreen: React.FC = () => {
               DANGER ZONE
             </Text>
             {renderActionRow(
-              '🗑️',
+              Trash2,
               'Delete All Data',
               'Permanently delete all habits and settings',
               handleDeleteAllData,
@@ -505,9 +527,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  backIcon: {
-    fontSize: 24,
-  },
   headerTitle: {
     flex: 1,
     textAlign: 'center',
@@ -549,8 +568,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 12,
   },
-  settingIcon: {
-    fontSize: 20,
+  settingIconContainer: {
     marginRight: 12,
   },
   settingText: {
@@ -573,8 +591,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
-  actionIcon: {
-    fontSize: 20,
+  actionIconContainer: {
     marginRight: 12,
   },
   actionText: {
@@ -584,9 +601,7 @@ const styles = StyleSheet.create({
   actionDescription: {
     marginTop: 2,
   },
-  chevron: {
-    fontSize: 18,
-  },
+  chevronContainer: {},
   infoCard: {
     flexDirection: 'row',
     padding: 16,
@@ -594,8 +609,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 16,
   },
-  infoIcon: {
-    fontSize: 24,
+  infoIconContainer: {
     marginRight: 12,
   },
   infoText: {

@@ -18,6 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme, themes, themeMetadata } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 import { useMascot, MASCOT_NAME } from '@/context/MascotContext';
+import { User, Palette, Sparkles, PartyPopper, Smartphone, Lightbulb } from 'lucide-react-native';
 
 type SettingsNavigationProp = StackNavigationProp<any, 'Settings'>;
 
@@ -187,7 +188,9 @@ const SettingsScreen: React.FC = () => {
               activeOpacity={0.7}
             >
               <View style={styles.settingInfo}>
-                <Text style={styles.settingIcon}>👤</Text>
+                <View style={styles.settingIconContainer}>
+                  <User size={22} color={theme.colors.primary} strokeWidth={2} />
+                </View>
                 <View>
                   <Text
                     style={[
@@ -250,7 +253,9 @@ const SettingsScreen: React.FC = () => {
             activeOpacity={0.7}
           >
             <View style={styles.settingInfo}>
-              <Text style={styles.settingIcon}>🎨</Text>
+              <View style={styles.settingIconContainer}>
+                <Palette size={22} color={theme.colors.primary} strokeWidth={2} />
+              </View>
               <View>
                 <Text
                   style={[
@@ -319,7 +324,9 @@ const SettingsScreen: React.FC = () => {
 
           <View style={[styles.settingRow, { borderBottomColor: theme.colors.border }]}>
             <View style={styles.settingInfo}>
-              <Text style={styles.settingIcon}>🐾</Text>
+              <View style={styles.settingIconContainer}>
+                <Sparkles size={22} color={theme.colors.primary} strokeWidth={2} />
+              </View>
               <View style={styles.settingTextContainer}>
                 <Text
                   style={[
@@ -357,7 +364,9 @@ const SettingsScreen: React.FC = () => {
 
           <View style={[styles.settingRow, { borderBottomWidth: 0, opacity: mascotSettings.enabled ? 1 : 0.5 }]}>
             <View style={styles.settingInfo}>
-              <Text style={styles.settingIcon}>🎉</Text>
+              <View style={styles.settingIconContainer}>
+                <PartyPopper size={22} color={theme.colors.primary} strokeWidth={2} />
+              </View>
               <View style={styles.settingTextContainer}>
                 <Text
                   style={[
@@ -421,7 +430,9 @@ const SettingsScreen: React.FC = () => {
 
           <View style={[styles.settingRow, { borderBottomColor: theme.colors.border }]}>
             <View style={styles.settingInfo}>
-              <Text style={styles.settingIcon}>📱</Text>
+              <View style={styles.settingIconContainer}>
+                <Smartphone size={22} color={theme.colors.primary} strokeWidth={2} />
+              </View>
               <View>
                 <Text
                   style={[
@@ -457,7 +468,9 @@ const SettingsScreen: React.FC = () => {
             activeOpacity={0.7}
           >
             <View style={styles.settingInfo}>
-              <Text style={styles.settingIcon}>💡</Text>
+              <View style={styles.settingIconContainer}>
+                <Lightbulb size={22} color={theme.colors.primary} strokeWidth={2} />
+              </View>
               <View>
                 <Text
                   style={[
@@ -535,8 +548,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
-  settingIcon: {
-    fontSize: 24,
+  settingIconContainer: {
     marginRight: 14,
   },
   settingTextContainer: {

@@ -16,6 +16,21 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
+import {
+  ArrowLeft,
+  Cloud,
+  RefreshCw,
+  Sparkles,
+  Mail,
+  Key,
+  Camera,
+  Upload,
+  Zap,
+  Apple,
+  Trash2,
+  AlertTriangle,
+  ChevronRight,
+} from 'lucide-react-native';
 
 type AccountSettingsNavigationProp = StackNavigationProp<any, 'AccountSettings'>;
 
@@ -132,7 +147,7 @@ const AccountSettingsScreen: React.FC = () => {
   };
 
   const renderActionRow = (
-    icon: string,
+    IconComponent: React.ComponentType<any>,
     label: string,
     value: string | null,
     onPress: () => void,
@@ -150,7 +165,9 @@ const AccountSettingsScreen: React.FC = () => {
       activeOpacity={0.7}
     >
       <View style={styles.actionInfo}>
-        <Text style={styles.actionIcon}>{icon}</Text>
+        <View style={styles.actionIconContainer}>
+          <IconComponent size={20} color={theme.colors.primary} strokeWidth={2} />
+        </View>
         <View style={styles.actionText}>
           <Text
             style={[
@@ -180,12 +197,12 @@ const AccountSettingsScreen: React.FC = () => {
           )}
         </View>
       </View>
-      <Text style={[styles.chevron, { color: theme.colors.textTertiary }]}>›</Text>
+      <ChevronRight size={18} color={theme.colors.textTertiary} strokeWidth={2} />
     </TouchableOpacity>
   );
 
   const renderConnectedAccount = (
-    icon: string,
+    IconComponent: React.ComponentType<any>,
     provider: string,
     connected: boolean,
     onToggle: () => void,
@@ -201,7 +218,9 @@ const AccountSettingsScreen: React.FC = () => {
       ]}
     >
       <View style={styles.connectedInfo}>
-        <Text style={styles.connectedIcon}>{icon}</Text>
+        <View style={styles.connectedIconContainer}>
+          <IconComponent size={20} color={theme.colors.primary} strokeWidth={2} />
+        </View>
         <Text
           style={[
             styles.connectedLabel,
@@ -262,7 +281,7 @@ const AccountSettingsScreen: React.FC = () => {
           onPress={() => navigation.goBack()}
           activeOpacity={0.7}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <ArrowLeft size={24} color={theme.colors.text} strokeWidth={2} />
         </TouchableOpacity>
         <Text
           style={[
@@ -301,7 +320,9 @@ const AccountSettingsScreen: React.FC = () => {
                 },
               ]}
             >
-              <Text style={styles.anonymousIcon}>☁️</Text>
+              <View style={styles.anonymousIconContainer}>
+                <Cloud size={48} color={theme.colors.primary} strokeWidth={2} />
+              </View>
               <Text
                 style={[
                   styles.anonymousTitle,
@@ -329,12 +350,14 @@ const AccountSettingsScreen: React.FC = () => {
 
               <View style={styles.benefitsList}>
                 {[
-                  { icon: '☁️', text: 'Cloud backup' },
-                  { icon: '🔄', text: 'Sync across devices' },
-                  { icon: '✨', text: 'Access premium features' },
+                  { IconComponent: Cloud, text: 'Cloud backup' },
+                  { IconComponent: RefreshCw, text: 'Sync across devices' },
+                  { IconComponent: Sparkles, text: 'Access premium features' },
                 ].map((benefit, index) => (
                   <View key={index} style={styles.benefitRow}>
-                    <Text style={styles.benefitIcon}>{benefit.icon}</Text>
+                    <View style={styles.benefitIconContainer}>
+                      <benefit.IconComponent size={18} color={theme.colors.primary} strokeWidth={2} />
+                    </View>
                     <Text
                       style={[
                         styles.benefitText,
@@ -414,21 +437,21 @@ const AccountSettingsScreen: React.FC = () => {
               </Text>
 
               {renderActionRow(
-                '✉️',
+                Mail,
                 'Email',
                 userEmail || 'user@example.com',
                 handleChangeEmail
               )}
 
               {renderActionRow(
-                '🔑',
+                Key,
                 'Password',
                 '••••••••',
                 handleChangePassword
               )}
 
               {renderActionRow(
-                '📷',
+                Camera,
                 'Profile Picture',
                 'Tap to change',
                 () => {},
@@ -463,7 +486,9 @@ const AccountSettingsScreen: React.FC = () => {
 
               <View style={styles.syncRow}>
                 <View style={styles.syncInfo}>
-                  <Text style={styles.syncIcon}>☁️</Text>
+                  <View style={styles.syncIconContainer}>
+                    <Cloud size={20} color={theme.colors.primary} strokeWidth={2} />
+                  </View>
                   <View style={styles.syncText}>
                     <Text
                       style={[
@@ -525,7 +550,9 @@ const AccountSettingsScreen: React.FC = () => {
                   { borderTopColor: theme.colors.border },
                 ]}
               >
-                <Text style={styles.conflictIcon}>⚡</Text>
+                <View style={styles.conflictIconContainer}>
+                  <Zap size={18} color={theme.colors.primary} strokeWidth={2} />
+                </View>
                 <View style={styles.conflictText}>
                   <Text
                     style={[
@@ -581,14 +608,14 @@ const AccountSettingsScreen: React.FC = () => {
               </Text>
 
               {renderConnectedAccount(
-                '🍎',
+                Apple,
                 'Apple ID',
                 connectedApple,
                 () => setConnectedApple(!connectedApple)
               )}
 
               {renderConnectedAccount(
-                '📧',
+                Mail,
                 'Google',
                 connectedGoogle,
                 () => setConnectedGoogle(!connectedGoogle),
@@ -621,7 +648,7 @@ const AccountSettingsScreen: React.FC = () => {
             </Text>
 
             {renderActionRow(
-              '📤',
+              Upload,
               'Download Your Data',
               'Export all habits and history',
               () => navigation.navigate('ExportData')
@@ -636,7 +663,9 @@ const AccountSettingsScreen: React.FC = () => {
               activeOpacity={0.7}
             >
               <View style={styles.actionInfo}>
-                <Text style={styles.actionIcon}>🗑️</Text>
+                <View style={styles.actionIconContainer}>
+                  <Trash2 size={20} color={theme.colors.error} strokeWidth={2} />
+                </View>
                 <View style={styles.actionText}>
                   <Text
                     style={[
@@ -664,7 +693,7 @@ const AccountSettingsScreen: React.FC = () => {
                   </Text>
                 </View>
               </View>
-              <Text style={[styles.chevron, { color: theme.colors.textTertiary }]}>›</Text>
+              <ChevronRight size={18} color={theme.colors.textTertiary} strokeWidth={2} />
             </TouchableOpacity>
           </View>
 
@@ -698,7 +727,9 @@ const AccountSettingsScreen: React.FC = () => {
                 activeOpacity={0.7}
               >
                 <View style={styles.deleteAccountInfo}>
-                  <Text style={styles.deleteAccountIcon}>⚠️</Text>
+                  <View style={styles.deleteAccountIconContainer}>
+                    <AlertTriangle size={20} color={theme.colors.error} strokeWidth={2} />
+                  </View>
                   <View style={styles.deleteAccountText}>
                     <Text
                       style={[
@@ -726,7 +757,7 @@ const AccountSettingsScreen: React.FC = () => {
                     </Text>
                   </View>
                 </View>
-                <Text style={[styles.chevron, { color: theme.colors.error }]}>›</Text>
+                <ChevronRight size={18} color={theme.colors.error} strokeWidth={2} />
               </TouchableOpacity>
             </View>
           )}
@@ -768,9 +799,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  backIcon: {
-    fontSize: 24,
-  },
   headerTitle: {
     flex: 1,
     textAlign: 'center',
@@ -793,8 +821,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 24,
   },
-  anonymousIcon: {
-    fontSize: 48,
+  anonymousIconContainer: {
     marginBottom: 16,
   },
   anonymousTitle: {
@@ -814,8 +841,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
-  benefitIcon: {
-    fontSize: 18,
+  benefitIconContainer: {
     marginRight: 10,
   },
   benefitText: {},
@@ -855,8 +881,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
-  actionIcon: {
-    fontSize: 20,
+  actionIconContainer: {
     marginRight: 12,
   },
   actionText: {
@@ -865,9 +890,6 @@ const styles = StyleSheet.create({
   actionLabel: {},
   actionValue: {
     marginTop: 2,
-  },
-  chevron: {
-    fontSize: 18,
   },
   syncRow: {
     flexDirection: 'row',
@@ -880,8 +902,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  syncIcon: {
-    fontSize: 20,
+  syncIconContainer: {
     marginRight: 12,
   },
   syncText: {},
@@ -904,8 +925,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderTopWidth: 1,
   },
-  conflictIcon: {
-    fontSize: 18,
+  conflictIconContainer: {
     marginRight: 12,
   },
   conflictText: {},
@@ -924,8 +944,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  connectedIcon: {
-    fontSize: 20,
+  connectedIconContainer: {
     marginRight: 12,
   },
   connectedLabel: {},
@@ -969,8 +988,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
-  deleteAccountIcon: {
-    fontSize: 20,
+  deleteAccountIconContainer: {
     marginRight: 12,
   },
   deleteAccountText: {

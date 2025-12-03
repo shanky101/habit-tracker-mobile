@@ -13,6 +13,15 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
+import {
+  ArrowLeft,
+  Check,
+  X,
+  FileSpreadsheet,
+  Braces,
+  FileText,
+  Lock,
+} from 'lucide-react-native';
 import { useTheme } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 import { useHabits } from '@/contexts/HabitsContext';
@@ -133,7 +142,7 @@ const ExportDataScreen: React.FC = () => {
           onPress={() => navigation.goBack()}
           activeOpacity={0.7}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <ArrowLeft size={24} color={theme.colors.text} strokeWidth={2} />
         </TouchableOpacity>
         <View style={styles.headerCenter}>
           <Text
@@ -436,7 +445,7 @@ const ExportDataScreen: React.FC = () => {
                       ]}
                     >
                       {habit.selected && (
-                        <Text style={styles.checkmark}>✓</Text>
+                        <Check size={14} color="#fff" strokeWidth={3} />
                       )}
                     </View>
                   </TouchableOpacity>
@@ -478,9 +487,15 @@ const ExportDataScreen: React.FC = () => {
                   onPress={() => setExportFormat(format)}
                   activeOpacity={0.7}
                 >
-                  <Text style={styles.formatIcon}>
-                    {format === 'csv' ? '📊' : format === 'json' ? '{ }' : '📄'}
-                  </Text>
+                  <View style={styles.formatIconContainer}>
+                    {format === 'csv' ? (
+                      <FileSpreadsheet size={24} color={exportFormat === format ? theme.colors.primary : theme.colors.text} strokeWidth={2} />
+                    ) : format === 'json' ? (
+                      <Braces size={24} color={exportFormat === format ? theme.colors.primary : theme.colors.text} strokeWidth={2} />
+                    ) : (
+                      <FileText size={24} color={exportFormat === format ? theme.colors.primary : theme.colors.text} strokeWidth={2} />
+                    )}
+                  </View>
                   <Text
                     style={[
                       styles.formatLabel,
@@ -548,14 +563,13 @@ const ExportDataScreen: React.FC = () => {
                     },
                   ]}
                 >
-                  <Text
-                    style={[
-                      styles.includedIcon,
-                      { color: item.included ? theme.colors.success : theme.colors.error },
-                    ]}
-                  >
-                    {item.included ? '✓' : '✕'}
-                  </Text>
+                  <View style={styles.includedIconContainer}>
+                    {item.included ? (
+                      <Check size={16} color={theme.colors.success} strokeWidth={2.5} />
+                    ) : (
+                      <X size={16} color={theme.colors.error} strokeWidth={2.5} />
+                    )}
+                  </View>
                   <Text
                     style={[
                       styles.includedLabel,
@@ -586,7 +600,9 @@ const ExportDataScreen: React.FC = () => {
             ]}
           >
             <View style={styles.privacyInfo}>
-              <Text style={styles.privacyIcon}>🔒</Text>
+              <View style={styles.privacyIconContainer}>
+                <Lock size={24} color={theme.colors.primary} strokeWidth={2} />
+              </View>
               <View style={styles.privacyText}>
                 <Text
                   style={[
@@ -710,9 +726,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  backIcon: {
-    fontSize: 24,
-  },
   headerCenter: {
     flex: 1,
     marginLeft: 8,
@@ -806,11 +819,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  checkmark: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
   formatGrid: {
     flexDirection: 'row',
     gap: 12,
@@ -825,8 +833,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     position: 'relative',
   },
-  formatIcon: {
-    fontSize: 24,
+  formatIconContainer: {
     marginBottom: 8,
   },
   formatLabel: {},
@@ -857,10 +864,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
   },
-  includedIcon: {
-    fontSize: 16,
+  includedIconContainer: {
     marginRight: 12,
-    fontWeight: 'bold',
   },
   includedLabel: {},
   privacyCard: {
@@ -877,8 +882,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
-  privacyIcon: {
-    fontSize: 24,
+  privacyIconContainer: {
     marginRight: 12,
   },
   privacyText: {

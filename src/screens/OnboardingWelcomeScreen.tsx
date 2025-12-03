@@ -12,6 +12,7 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { OnboardingStackParamList } from '@/navigation/OnboardingNavigator';
+import { Check } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -105,7 +106,7 @@ const OnboardingWelcomeScreen: React.FC = () => {
               },
             ]}
           >
-            <Text style={styles.illustrationIcon}>✓</Text>
+            <Check size={80} color="white" strokeWidth={3} />
           </View>
         </View>
 
@@ -227,10 +228,6 @@ const styles = StyleSheet.create({
     borderRadius: 90,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  illustrationIcon: {
-    fontSize: 80,
-    color: 'white',
   },
   textContent: {
     alignItems: 'center',

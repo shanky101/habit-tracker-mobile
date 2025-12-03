@@ -15,6 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { OnboardingStackParamList } from '@/navigation/OnboardingNavigator';
+import { Bell, Target } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -147,16 +148,16 @@ const PermissionNotificationScreen: React.FC = () => {
               },
             ]}
           >
-            <Animated.Text
+            <Animated.View
               style={[
-                styles.bellIcon,
+                styles.bellIconContainer,
                 {
                   transform: [{ rotate: bellRotation }],
                 },
               ]}
             >
-              🔔
-            </Animated.Text>
+              <Bell size={64} color={theme.colors.primary} strokeWidth={2} />
+            </Animated.View>
           </View>
         </View>
 
@@ -364,8 +365,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     opacity: 0.2,
   },
-  bellIcon: {
-    fontSize: 64,
+  bellIconContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   textContent: {
     alignItems: 'center',

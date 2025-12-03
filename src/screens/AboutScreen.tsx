@@ -16,6 +16,19 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import * as Application from 'expo-application';
 import { useTheme } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
+import {
+  ArrowLeft,
+  Globe,
+  Mail,
+  Twitter,
+  Instagram,
+  Star,
+  Upload,
+  FileText,
+  Lock,
+  ChevronRight,
+  Heart,
+} from 'lucide-react-native';
 
 type AboutNavigationProp = StackNavigationProp<any, 'About'>;
 
@@ -98,7 +111,7 @@ const AboutScreen: React.FC = () => {
   const handleTerms = () => openURL('https://habittracker.app/terms');
 
   const renderLinkRow = (
-    icon: string,
+    IconComponent: React.ComponentType<any>,
     label: string,
     subtitle: string | null,
     onPress: () => void,
@@ -116,7 +129,9 @@ const AboutScreen: React.FC = () => {
       activeOpacity={0.7}
     >
       <View style={styles.linkInfo}>
-        <Text style={styles.linkIcon}>{icon}</Text>
+        <View style={styles.linkIconContainer}>
+          <IconComponent size={20} color={theme.colors.primary} strokeWidth={2} />
+        </View>
         <View style={styles.linkText}>
           <Text
             style={[
@@ -146,7 +161,7 @@ const AboutScreen: React.FC = () => {
           )}
         </View>
       </View>
-      <Text style={[styles.chevron, { color: theme.colors.textTertiary }]}>›</Text>
+      <ChevronRight size={18} color={theme.colors.textTertiary} strokeWidth={2} />
     </TouchableOpacity>
   );
 
@@ -168,7 +183,7 @@ const AboutScreen: React.FC = () => {
           onPress={() => navigation.goBack()}
           activeOpacity={0.7}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <ArrowLeft size={24} color={theme.colors.text} strokeWidth={2} />
         </TouchableOpacity>
         <Text
           style={[
@@ -298,10 +313,10 @@ const AboutScreen: React.FC = () => {
               CONNECT WITH US
             </Text>
 
-            {renderLinkRow('🌐', 'Website', 'habittracker.app', handleWebsite)}
-            {renderLinkRow('✉️', 'Contact Support', 'support@habittracker.app', handleEmail)}
-            {renderLinkRow('🐦', 'Twitter', '@habittracker', handleTwitter)}
-            {renderLinkRow('📸', 'Instagram', '@habittracker', handleInstagram, false)}
+            {renderLinkRow(Globe, 'Website', 'habittracker.app', handleWebsite)}
+            {renderLinkRow(Mail, 'Contact Support', 'support@habittracker.app', handleEmail)}
+            {renderLinkRow(Twitter, 'Twitter', '@habittracker', handleTwitter)}
+            {renderLinkRow(Instagram, 'Instagram', '@habittracker', handleInstagram, false)}
           </View>
 
           {/* App Store Actions */}
@@ -327,8 +342,8 @@ const AboutScreen: React.FC = () => {
               SPREAD THE WORD
             </Text>
 
-            {renderLinkRow('⭐', 'Rate on App Store', 'Help others discover the app', handleRateApp)}
-            {renderLinkRow('📤', 'Share App', 'Tell your friends about us', handleShareApp, false)}
+            {renderLinkRow(Star, 'Rate on App Store', 'Help others discover the app', handleRateApp)}
+            {renderLinkRow(Upload, 'Share App', 'Tell your friends about us', handleShareApp, false)}
           </View>
 
           {/* Legal Section */}
@@ -354,8 +369,8 @@ const AboutScreen: React.FC = () => {
               LEGAL
             </Text>
 
-            {renderLinkRow('📄', 'Terms of Service', null, handleTerms)}
-            {renderLinkRow('🔒', 'Privacy Policy', null, handlePrivacy, false)}
+            {renderLinkRow(FileText, 'Terms of Service', null, handleTerms)}
+            {renderLinkRow(Lock, 'Privacy Policy', null, handlePrivacy, false)}
           </View>
 
           {/* Credits */}
@@ -396,7 +411,7 @@ const AboutScreen: React.FC = () => {
                   },
                 ]}
               >
-                Icons by Emoji
+                Icons by Lucide
               </Text>
               <Text
                 style={[
@@ -412,18 +427,33 @@ const AboutScreen: React.FC = () => {
               </Text>
             </View>
 
-            <Text
-              style={[
-                styles.madeWith,
-                {
-                  color: theme.colors.textSecondary,
-                  fontFamily: theme.typography.fontFamilyBody,
-                  fontSize: theme.typography.fontSizeSM,
-                },
-              ]}
-            >
-              Made with ❤️ for habit builders everywhere
-            </Text>
+            <View style={styles.madeWithContainer}>
+              <Text
+                style={[
+                  styles.madeWith,
+                  {
+                    color: theme.colors.textSecondary,
+                    fontFamily: theme.typography.fontFamilyBody,
+                    fontSize: theme.typography.fontSizeSM,
+                  },
+                ]}
+              >
+                Made with{' '}
+              </Text>
+              <Heart size={16} color={theme.colors.error} fill={theme.colors.error} strokeWidth={0} />
+              <Text
+                style={[
+                  styles.madeWith,
+                  {
+                    color: theme.colors.textSecondary,
+                    fontFamily: theme.typography.fontFamilyBody,
+                    fontSize: theme.typography.fontSizeSM,
+                  },
+                ]}
+              >
+                {' '}for habit builders everywhere
+              </Text>
+            </View>
           </View>
 
           {/* Copyright */}
@@ -461,9 +491,6 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  backIcon: {
-    fontSize: 24,
   },
   headerTitle: {
     flex: 1,
@@ -535,8 +562,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
-  linkIcon: {
-    fontSize: 20,
+  linkIconContainer: {
     marginRight: 12,
   },
   linkText: {},
@@ -563,9 +589,13 @@ const styles = StyleSheet.create({
   creditItem: {
     marginBottom: 4,
   },
-  madeWith: {
+  madeWithContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 8,
   },
+  madeWith: {},
   copyright: {
     textAlign: 'center',
   },
