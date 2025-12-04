@@ -14,6 +14,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
+import { ArrowLeft } from 'lucide-react-native';
 
 type SignUpScreenNavigationProp = StackNavigationProp<any, 'SignUp'>;
 
@@ -161,9 +162,12 @@ const SignUpScreen: React.FC = () => {
               style={styles.backButton}
               activeOpacity={0.7}
             >
-              <Text style={[styles.backButtonText, { color: theme.colors.primary, fontFamily: theme.typography.fontFamilyBodySemibold }]}>
-                ← Back
-              </Text>
+              <View style={styles.backButtonContent}>
+                <ArrowLeft size={18} color={theme.colors.primary} strokeWidth={2} />
+                <Text style={[styles.backButtonText, { color: theme.colors.primary, fontFamily: theme.typography.fontFamilyBodySemibold }]}>
+                  Back
+                </Text>
+              </View>
             </TouchableOpacity>
             <Text
               style={[
@@ -431,6 +435,11 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     paddingVertical: 8,
     marginBottom: 16,
+  },
+  backButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   backButtonText: {
     fontSize: 16,
