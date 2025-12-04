@@ -256,28 +256,16 @@ const HomeScreen: React.FC = () => {
       // Check if all habits will be complete
       const willAllBeComplete = completedCount + 1 === totalCount;
 
-      // Show quick note modal occasionally (first time or every 5th check-in)
-      const shouldShowNote = Math.random() < 0.2; // 20% chance
-      if (shouldShowNote) {
-        setQuickNoteHabitId(habitId);
-        setShowQuickNoteModal(true);
-        // If all complete, mark as pending so celebration shows after modal closes
-        if (willAllBeComplete) {
-          setPendingAllComplete(true);
-        }
-      } else if (willAllBeComplete) {
-        // No quick note modal, show celebration directly
-        if (mascotSettings.enabled) {
-          triggerReaction('ecstatic', "YOU DID IT! All habits complete! 🎉🎊");
-        }
-        // Show mascot celebration overlay - brings Habi to the user!
-        if (mascotSettings.enabled && mascotSettings.showCelebrations) {
-          setTimeout(() => setShowMascotCelebration(true), 300);
-        } else {
-          // No mascot, show share modal directly
-          setTimeout(() => setShowAllCompleteModal(true), 300);
-        }
+      // Always show quick note modal when completing a habit
+      setQuickNoteHabitId(habitId);
+      setShowQuickNoteModal(true);
+      // If all complete, mark as pending so celebration shows after modal closes
+      if (willAllBeComplete) {
+        setPendingAllComplete(true);
       }
+      // The original `else if (willAllBeComplete)` block is now handled by `pendingAllComplete`
+      // and the quick note modal's `handleSaveQuickNote` or `handleSkipQuickNote`
+      // So, we remove the direct celebration trigger here.
 
       // Check for streak milestones
       if (habit.streak === 6 || habit.streak === 29 || habit.streak === 99) {
