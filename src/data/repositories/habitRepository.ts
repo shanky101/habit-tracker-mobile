@@ -1,5 +1,5 @@
 import { db } from '../database/client';
-import { Habit, DailyCompletion, HabitEntry } from '@/contexts/HabitsContext';
+import { Habit, DailyCompletion, HabitEntry } from '@/hooks/useHabits';
 import { HabitRow, CompletionRow, EntryRow } from './types';
 
 /**

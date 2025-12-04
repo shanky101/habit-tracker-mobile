@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { Habit, DailyCompletion, HabitEntry } from '@/contexts/HabitsContext';
+import { Habit, DailyCompletion, HabitEntry } from '../types/habit';
 import { sqliteStorage } from './sqliteStorage';
 
 interface HabitState {

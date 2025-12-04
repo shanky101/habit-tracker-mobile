@@ -14,7 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { format } from 'date-fns';
 import { useTheme } from '@/theme';
-import { useHabits } from '@/contexts/HabitsContext';
+import { useHabits } from '@/hooks/useHabits';
 import { useSubscription } from '@/context/SubscriptionContext';
 
 const { width } = Dimensions.get('window');

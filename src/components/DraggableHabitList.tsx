@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '@/theme';
-import { Habit } from '@/contexts/HabitsContext';
+import { Habit } from '@/hooks/useHabits';
 import SwipeableHabitCard from './SwipeableHabitCard';
 
 interface DraggableHabitListProps {

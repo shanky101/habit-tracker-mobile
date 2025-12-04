@@ -1,7 +1,7 @@
 import { Paths, File } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import * as Print from 'expo-print';
-import { Habit, DailyCompletion } from '@/contexts/HabitsContext';
+import { Habit, DailyCompletion } from '@/hooks/useHabits';
 
 export type ExportFormat = 'csv' | 'json' | 'pdf';
 

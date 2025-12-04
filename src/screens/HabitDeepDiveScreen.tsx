@@ -13,7 +13,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
-import { Habit, HabitEntry, useHabits } from '@/contexts/HabitsContext';
+import { Habit, HabitEntry, useHabits } from '@/hooks/useHabits';
 
 type HabitDeepDiveNavigationProp = StackNavigationProp<any, 'HabitDeepDive'>;
 type HabitDeepDiveRouteProp = RouteProp<

@@ -1,5 +1,5 @@
 import { db, enableForeignKeys } from './client';
-import { Habit } from '@/contexts/HabitsContext';
+import { Habit } from '@/hooks/useHabits';
 
 // Default habits to seed on first run
 const DEFAULT_HABITS: Habit[] = [

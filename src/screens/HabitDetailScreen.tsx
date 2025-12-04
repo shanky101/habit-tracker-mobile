@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
-import { useHabits, Habit, HabitEntry } from '@/contexts/HabitsContext';
+import { useHabits, Habit, HabitEntry } from '@/hooks/useHabits';
 import { ExportManager, ExportFormat } from '@/utils/exportManager';
 import {
   ArrowLeft,

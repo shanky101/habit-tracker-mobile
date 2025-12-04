@@ -1,5 +1,5 @@
 import { useHabitStore } from '../store/habitStore';
-import { Habit, DailyCompletion, HabitEntry } from '@/contexts/HabitsContext';
+import { Habit, DailyCompletion, HabitEntry } from '../types/habit';
 
 /**
  * Compatibility hook that wraps Zustand store

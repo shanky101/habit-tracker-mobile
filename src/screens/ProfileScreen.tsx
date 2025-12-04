@@ -16,7 +16,7 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
-import { useHabits } from '@/contexts/HabitsContext';
+import { useHabits } from '@/hooks/useHabits';
 import { useSubscription, formatPlanName } from '@/context/SubscriptionContext';
 import {
   Settings,

@@ -18,7 +18,7 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import * as Clipboard from 'expo-clipboard';
 import { useTheme } from '@/theme';
 import { useTemplates } from '@/contexts/TemplateContext';
-import { useHabits, Habit } from '@/contexts/HabitsContext';
+import { useHabits, Habit } from '@/hooks/useHabits';
 import { HabitTemplate } from '@/types/HabitTemplate';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 import { Search, X, Copy, Plus } from 'lucide-react-native';

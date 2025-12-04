@@ -14,7 +14,7 @@ import {
   PanGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
 import { useTheme } from '@/theme';
-import { Habit, useHabits } from '@/contexts/HabitsContext';
+import { Habit, useHabits } from '@/hooks/useHabits';
 
 // Constants matching the design reference
 const RIGHT_ACTIONS_WIDTH = 210; // 70px per action × 3 actions
@@ -318,14 +318,31 @@ const SwipeableHabitCard: React.FC<SwipeableHabitCardProps> = ({
           style={[
             styles.habitCard,
             {
-              backgroundColor: theme.colors.surface,
-              borderColor: isCompleted ? theme.colors.primary : theme.colors.border,
-              borderWidth: isCompleted ? 2 : 1,
+              backgroundColor: theme.colors.surfaceSecondary, // Use secondary surface for better contrast
               height: cardHeight,
               transform: [{ translateX }],
+              // Modern layered shadow for depth
+              shadowColor: isCompleted ? theme.colors.primary : '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: isCompleted ? 0.15 : 0.08,
+              shadowRadius: isCompleted ? 8 : 4,
+              elevation: isCompleted ? 4 : 2,
+              // Subtle border for themes with low contrast
+              borderWidth: 1,
+              borderColor: theme.colors.borderLight,
             },
-          ]}
-        >
+          ]}>
+          {/* Subtle gradient overlay for completed cards */}
+          {isCompleted && (
+            <View
+              style={[
+                styles.gradientOverlay,
+                {
+                  backgroundColor: `${theme.colors.primary}08`, // 3% opacity
+                },
+              ]}>
+            </View>
+          )}
           <View style={styles.cardContent}>
             {/* Emoji/Icon */}
             <View style={styles.emojiContainer}>
@@ -444,7 +461,8 @@ const SwipeableHabitCard: React.FC<SwipeableHabitCardProps> = ({
 
 const styles = StyleSheet.create({
   swipeableContainer: {
-    marginBottom: 8, // Increased for better separation
+    marginBottom: 12, // Increased from 8 for better floating card separation
+    marginHorizontal: 2, // Add slight horizontal margin for shadow visibility
     position: 'relative',
     // Height is set dynamically via style prop
   },
@@ -454,7 +472,7 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     width: 100,
-    borderRadius: 12,
+    borderRadius: 14, // Slightly larger radius for smoother feel
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -481,7 +499,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: RIGHT_ACTIONS_WIDTH,
     flexDirection: 'row',
-    borderRadius: 12,
+    borderRadius: 14,
     overflow: 'hidden',
   },
   actionButton: {
@@ -509,19 +527,25 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   habitCard: {
-    borderRadius: 12,
+    borderRadius: 16, // Increased from 12 for more modern feel
+    overflow: 'hidden', // For gradient overlay
     // Height is set dynamically via style prop
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
+    // Border removed for cleaner look
+    // Shadow properties set inline for dynamic values
+  },
+  gradientOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    pointerEvents: 'none', // Don't block touch events
   },
   cardContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 14, // Slightly increased for better breathing room
-    paddingVertical: 12, // Added vertical padding
+    paddingHorizontal: 16, // Increased from 14 for better spacing
+    paddingVertical: 14, // Increased from 12 for more breathing room
     height: '100%',
   },
   emojiContainer: {

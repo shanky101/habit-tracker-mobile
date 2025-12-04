@@ -17,7 +17,7 @@ import { useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navig
 import type { StackNavigationProp } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '@/theme';
-import { useHabits, Habit } from '@/contexts/HabitsContext';
+import { useHabits, Habit } from '@/hooks/useHabits';
 import CelebrationModal from '@/components/CelebrationModal';
 import {
   AllHabitsCompleteModal,
