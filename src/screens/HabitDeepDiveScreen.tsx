@@ -39,11 +39,96 @@ const HabitDeepDiveScreen: React.FC = () => {
   // Get the latest habit data from context (includes updated entries)
   const habitData = habits.find(h => h.id === habitId) || route.params.habitData;
 
-  // Mock data
-  const currentStreak = habitData.streak;
-  const longestStreak = Math.max(currentStreak + 24, 58);
-  const totalCompletions = 142;
-  const completionRate = 86;
+  // Calculate real stats from completion data
+  const calculateBasicStats = () => {
+    const completions = habitData.completions || {};
+    const completionDates = Object.keys(completions);
+
+    // Current streak (already real)
+    const currentStreak = habitData.streak || 0;
+
+    // Total completions: sum all completion counts
+    const totalCompletions = completionDates.reduce((sum, date) => {
+      return sum + (completions[date]?.completionCount || 0);
+    }, 0);
+
+    // Longest streak: calculate from completion history
+    const calculateLongestStreak = (): number => {
+      if (completionDates.length === 0) return 0;
+
+      const sortedDates = completionDates.sort();
+      let longestStreak = 0;
+      let currentStreakLength = 0;
+
+      for (let i = 0; i < sortedDates.length; i++) {
+        const currentDate = new Date(sortedDates[i]);
+        const completion = completions[sortedDates[i]];
+
+        // Check if this day was completed (met target)
+        if (completion && completion.completionCount >= completion.targetCount) {
+          if (i === 0) {
+            currentStreakLength = 1;
+          } else {
+            const prevDate = new Date(sortedDates[i - 1]);
+            const daysDiff = Math.floor((currentDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
+
+            // Consecutive day
+            if (daysDiff === 1) {
+              currentStreakLength++;
+            } else {
+              currentStreakLength = 1;
+            }
+          }
+
+          longestStreak = Math.max(longestStreak, currentStreakLength);
+        } else {
+          currentStreakLength = 0;
+        }
+      }
+
+      return longestStreak;
+    };
+
+    // Completion rate for last 30 days
+    const calculateCompletionRate = (): number => {
+      const today = new Date();
+      const thirtyDaysAgo = new Date(today);
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      let scheduledDays = 0;
+      let completedDays = 0;
+      const currentDate = new Date(thirtyDaysAgo);
+
+      while (currentDate <= today) {
+        const dayOfWeek = currentDate.getDay();
+        const dateStr = currentDate.toISOString().split('T')[0];
+
+        if (habitData.selectedDays.includes(dayOfWeek)) {
+          scheduledDays++;
+          const completion = completions[dateStr];
+          if (completion && completion.completionCount >= completion.targetCount) {
+            completedDays++;
+          }
+        }
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+
+      return scheduledDays > 0 ? Math.round((completedDays / scheduledDays) * 100) : 0;
+    };
+
+    return {
+      currentStreak,
+      longestStreak: calculateLongestStreak(),
+      totalCompletions,
+      completionRate: calculateCompletionRate(),
+    };
+  };
+
+  const stats = calculateBasicStats();
+  const currentStreak = stats.currentStreak;
+  const longestStreak = stats.longestStreak;
+  const totalCompletions = stats.totalCompletions;
+  const completionRate = stats.completionRate;
 
   // Mock completion by hour data
   const completionByHour = [
@@ -56,16 +141,28 @@ const HabitDeepDiveScreen: React.FC = () => {
   ];
   const maxHourValue = Math.max(...completionByHour.map((h) => h.value));
 
-  // Mock day of week breakdown
-  const dayOfWeekData = [
-    { day: 'Mon', value: 95 },
-    { day: 'Tue', value: 90 },
-    { day: 'Wed', value: 82 },
-    { day: 'Thu', value: 88 },
-    { day: 'Fri', value: 85 },
-    { day: 'Sat', value: 65 },
-    { day: 'Sun', value: 60 },
-  ];
+  // Calculate real day of week breakdown
+  const calculateDayOfWeekStats = () => {
+    const completions = habitData.completions || {};
+    const dayStats = Array(7).fill(null).map(() => ({ scheduled: 0, completed: 0 }));
+
+    Object.entries(completions).forEach(([dateStr, completion]) => {
+      const dayOfWeek = new Date(dateStr).getDay();
+      dayStats[dayOfWeek].scheduled++;
+      if (completion && completion.completionCount >= completion.targetCount) {
+        dayStats[dayOfWeek].completed++;
+      }
+    });
+
+    return dayStats.map((stat, index) => ({
+      day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][index],
+      value: stat.scheduled > 0
+        ? Math.round((stat.completed / stat.scheduled) * 100)
+        : 0
+    }));
+  };
+
+  const dayOfWeekData = calculateDayOfWeekStats();
 
   // Mock milestones
   const milestones = [
@@ -402,7 +499,10 @@ const HabitDeepDiveScreen: React.FC = () => {
           </View>
         </Animated.View>
 
-        {/* Completion by Hour */}
+        {/* Completion by Hour - DISABLED (requires timestamp tracking)
+         Feature disabled: Time-of-day analytics require timestamp data which is not currently tracked.
+         To enable this feature, update the data model to store completion timestamps.
+        
         <Animated.View
           style={[
             styles.chartSection,
@@ -501,8 +601,12 @@ const HabitDeepDiveScreen: React.FC = () => {
             </Text>
           </View>
         </Animated.View>
+        */}
 
-        {/* Pattern Recognition */}
+        {/* Pattern Recognition - DISABLED (requires ML/pattern detection algorithms)
+         Feature disabled: AI pattern insights require complex analytics or ML models.
+         Consider implementing simple rule-based insights in the future.
+         
         <Animated.View
           style={[
             styles.patternsSection,
@@ -546,6 +650,7 @@ const HabitDeepDiveScreen: React.FC = () => {
             </View>
           ))}
         </Animated.View>
+        */}
 
         {/* Milestones Timeline */}
         <Animated.View
