@@ -14,6 +14,21 @@ import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
+import {
+  ArrowLeft,
+  RefreshCw,
+  Sparkles,
+  MessageCircle,
+  ArrowRight,
+  BarChart3,
+  Lightbulb,
+  AlertTriangle,
+  Search,
+  Target,
+  Trophy,
+  Clock,
+  Bell,
+} from 'lucide-react-native';
 
 type AIInsightsNavigationProp = StackNavigationProp<any, 'AIInsights'>;
 
@@ -22,7 +37,7 @@ interface InsightCard {
   type: 'weekly' | 'recommendation' | 'alert' | 'pattern' | 'motivation' | 'milestone';
   title: string;
   content: string;
-  icon: string;
+  IconComponent: React.ComponentType<any>;
   actionLabel?: string;
   actionRoute?: string;
   urgency?: 'low' | 'medium' | 'high';
@@ -44,7 +59,7 @@ const AIInsightsScreen: React.FC = () => {
       type: 'weekly',
       title: 'Weekly Summary',
       content: 'This week you completed 18 of 21 habits (86%). That\'s 5% better than last week! Keep it up!',
-      icon: '📊',
+      IconComponent: BarChart3,
       actionLabel: 'View Details',
     },
     {
@@ -52,7 +67,7 @@ const AIInsightsScreen: React.FC = () => {
       type: 'recommendation',
       title: 'Habit Recommendation',
       content: 'Based on your morning routine success, consider adding "Stretch for 5 minutes" before breakfast.',
-      icon: '💡',
+      IconComponent: Lightbulb,
       actionLabel: 'Add Habit',
     },
     {
@@ -60,7 +75,7 @@ const AIInsightsScreen: React.FC = () => {
       type: 'alert',
       title: 'Streak Risk Alert',
       content: 'You haven\'t checked in "Meditate" yet today. Don\'t break your 24-day streak!',
-      icon: '⚠️',
+      IconComponent: AlertTriangle,
       urgency: 'high',
       actionLabel: 'Check in now',
     },
@@ -69,21 +84,21 @@ const AIInsightsScreen: React.FC = () => {
       type: 'pattern',
       title: 'Pattern Discovery',
       content: 'You\'re 3x more likely to exercise when you complete your morning routine first. Try habit stacking!',
-      icon: '🔍',
+      IconComponent: Search,
     },
     {
       id: '5',
       type: 'motivation',
       title: 'Tip of the Day',
       content: 'Struggling with consistency? Try the "2-minute rule" - start with just 2 minutes and build from there.',
-      icon: '🎯',
+      IconComponent: Target,
     },
     {
       id: '6',
       type: 'milestone',
       title: 'Milestone Prediction',
       content: 'At your current pace, you\'ll hit 100 days on "Read 20 pages" in 12 days!',
-      icon: '🏆',
+      IconComponent: Trophy,
     },
   ];
 
@@ -133,7 +148,9 @@ const AIInsightsScreen: React.FC = () => {
       ]}
     >
       <View style={styles.insightHeader}>
-        <Text style={styles.insightIcon}>{insight.icon}</Text>
+        <View style={styles.insightIconContainer}>
+          <insight.IconComponent size={28} color={getUrgencyColor(insight.urgency)} strokeWidth={2} />
+        </View>
         <View style={styles.insightHeaderText}>
           <Text
             style={[
@@ -232,7 +249,9 @@ const AIInsightsScreen: React.FC = () => {
           onPress={() => navigation.goBack()}
           activeOpacity={0.7}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <View style={styles.backIconContainer}>
+            <ArrowLeft size={24} color={theme.colors.text} strokeWidth={2} />
+          </View>
         </TouchableOpacity>
         <View style={styles.headerCenter}>
           <Text
@@ -269,7 +288,9 @@ const AIInsightsScreen: React.FC = () => {
           {isLoading ? (
             <ActivityIndicator size="small" color={theme.colors.primary} />
           ) : (
-            <Text style={styles.refreshIcon}>🔄</Text>
+            <View style={styles.refreshIconContainer}>
+              <RefreshCw size={20} color={theme.colors.primary} strokeWidth={2} />
+            </View>
           )}
         </TouchableOpacity>
       </Animated.View>
@@ -296,7 +317,9 @@ const AIInsightsScreen: React.FC = () => {
                 },
               ]}
             >
-              <Text style={styles.aiIcon}>✨</Text>
+              <View style={styles.aiIconContainer}>
+                <Sparkles size={14} color={theme.colors.primary} strokeWidth={2} />
+              </View>
               <Text
                 style={[
                   styles.aiBadgeText,
@@ -328,7 +351,9 @@ const AIInsightsScreen: React.FC = () => {
             ]}
           >
             <View style={styles.askHeader}>
-              <Text style={styles.askIcon}>💬</Text>
+              <View style={styles.askIconContainer}>
+                <MessageCircle size={24} color={theme.colors.primary} strokeWidth={2} />
+              </View>
               <Text
                 style={[
                   styles.askTitle,
@@ -433,7 +458,9 @@ const AIInsightsScreen: React.FC = () => {
                 {isLoading ? (
                   <ActivityIndicator size="small" color={theme.colors.white} />
                 ) : (
-                  <Text style={styles.sendIcon}>→</Text>
+                  <View style={styles.sendIconContainer}>
+                    <ArrowRight size={20} color="#fff" strokeWidth={2} />
+                  </View>
                 )}
               </TouchableOpacity>
             </View>
@@ -477,7 +504,9 @@ const AIInsightsScreen: React.FC = () => {
 
             <View style={styles.settingRow}>
               <View style={styles.settingInfo}>
-                <Text style={styles.settingIcon}>🕐</Text>
+                <View style={styles.settingIconContainer}>
+                  <Clock size={18} color={theme.colors.primary} strokeWidth={2} />
+                </View>
                 <Text
                   style={[
                     styles.settingLabel,
@@ -507,7 +536,9 @@ const AIInsightsScreen: React.FC = () => {
 
             <View style={[styles.settingRow, { borderBottomWidth: 0 }]}>
               <View style={styles.settingInfo}>
-                <Text style={styles.settingIcon}>🔔</Text>
+                <View style={styles.settingIconContainer}>
+                  <Bell size={18} color={theme.colors.primary} strokeWidth={2} />
+                </View>
                 <Text
                   style={[
                     styles.settingLabel,
@@ -558,8 +589,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  backIcon: {
-    fontSize: 24,
+  backIconContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerCenter: {
     flex: 1,
@@ -575,8 +607,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  refreshIcon: {
-    fontSize: 20,
+  refreshIconContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   scrollView: {
     flex: 1,
@@ -598,8 +631,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
   },
-  aiIcon: {
-    fontSize: 14,
+  aiIconContainer: {
     marginRight: 6,
   },
   aiBadgeText: {},
@@ -618,8 +650,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
   },
-  insightIcon: {
-    fontSize: 28,
+  insightIconContainer: {
     marginRight: 12,
   },
   insightHeaderText: {
@@ -656,8 +687,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
-  askIcon: {
-    fontSize: 24,
+  askIconContainer: {
     marginRight: 10,
   },
   askTitle: {},
@@ -700,9 +730,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  sendIcon: {
-    fontSize: 20,
-    color: '#fff',
+  sendIconContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   questionsRemaining: {
     textAlign: 'center',
@@ -731,8 +761,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  settingIcon: {
-    fontSize: 18,
+  settingIconContainer: {
     marginRight: 10,
   },
   settingLabel: {},

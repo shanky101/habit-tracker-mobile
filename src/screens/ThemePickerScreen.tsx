@@ -12,6 +12,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme, themes, themeMetadata, ThemeVariant } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
+import { ArrowLeft, Check, Moon } from 'lucide-react-native';
 
 type ThemePickerNavigationProp = StackNavigationProp<any, 'ThemePicker'>;
 
@@ -118,7 +119,7 @@ const ThemePickerScreen: React.FC = () => {
                   { backgroundColor: theme.colors.primary },
                 ]}
               >
-                <Text style={styles.checkmark}>✓</Text>
+                <Check size={14} color="#fff" strokeWidth={3} />
               </View>
             )}
           </View>
@@ -163,7 +164,7 @@ const ThemePickerScreen: React.FC = () => {
           onPress={() => navigation.goBack()}
           activeOpacity={0.7}
         >
-          <Text style={{ fontSize: 20 }}>←</Text>
+          <ArrowLeft size={20} color={theme.colors.text} strokeWidth={2} />
         </TouchableOpacity>
         <Text
           style={[
@@ -200,7 +201,9 @@ const ThemePickerScreen: React.FC = () => {
             activeOpacity={0.7}
           >
             <View style={styles.autoInfo}>
-              <Text style={styles.autoIcon}>🌓</Text>
+              <View style={styles.autoIconContainer}>
+                <Moon size={28} color={theme.colors.primary} strokeWidth={2} />
+              </View>
               <View>
                 <Text
                   style={[
@@ -235,7 +238,7 @@ const ThemePickerScreen: React.FC = () => {
                   { backgroundColor: theme.colors.primary },
                 ]}
               >
-                <Text style={styles.checkmark}>✓</Text>
+                <Check size={14} color="#fff" strokeWidth={3} />
               </View>
             )}
           </TouchableOpacity>
@@ -306,8 +309,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  autoIcon: {
-    fontSize: 28,
+  autoIconContainer: {
     marginRight: 14,
   },
   autoTitle: {},
@@ -377,11 +379,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  checkmark: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: 'bold',
   },
   themeDescription: {
     marginBottom: 12,

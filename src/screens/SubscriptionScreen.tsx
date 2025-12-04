@@ -17,6 +17,19 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 import { useSubscription, formatPlanName, getPlanPrice, SubscriptionPlan } from '@/context/SubscriptionContext';
+import {
+  ArrowLeft,
+  Check,
+  Crown,
+  RefreshCw,
+  Infinity,
+  Cloud,
+  Sparkles,
+  BarChart3,
+  Upload,
+  Palette,
+  MessageCircle,
+} from 'lucide-react-native';
 
 type SubscriptionNavigationProp = StackNavigationProp<any, 'Subscription'>;
 
@@ -145,7 +158,7 @@ const SubscriptionScreen: React.FC = () => {
           </Text>
           {isSelected && !subscription.isPremium && (
             <View style={[styles.checkmark, { backgroundColor: theme.colors.primary }]}>
-              <Text style={styles.checkmarkText}>✓</Text>
+              <Check size={14} color="#fff" strokeWidth={3} />
             </View>
           )}
         </View>
@@ -210,7 +223,9 @@ const SubscriptionScreen: React.FC = () => {
           onPress={() => navigation.goBack()}
           activeOpacity={0.7}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <View style={styles.backIconContainer}>
+            <ArrowLeft size={24} color={theme.colors.text} strokeWidth={2} />
+          </View>
         </TouchableOpacity>
         <Text
           style={[
@@ -250,7 +265,9 @@ const SubscriptionScreen: React.FC = () => {
               ]}
             >
               <View style={styles.statusHeader}>
-                <Text style={styles.statusIcon}>👑</Text>
+                <View style={styles.statusIconContainer}>
+                  <Crown size={40} color={theme.colors.primary} strokeWidth={2} fill={theme.colors.primary} />
+                </View>
                 <View style={styles.statusInfo}>
                   <Text
                     style={[
@@ -425,16 +442,18 @@ const SubscriptionScreen: React.FC = () => {
                 </Text>
 
                 {[
-                  { icon: '♾️', text: 'Unlimited habits' },
-                  { icon: '☁️', text: 'Cloud sync across devices' },
-                  { icon: '✨', text: 'AI-powered insights' },
-                  { icon: '📊', text: 'Advanced analytics' },
-                  { icon: '📤', text: 'Export to PDF' },
-                  { icon: '🎨', text: 'Premium themes' },
-                  { icon: '💬', text: 'Priority support' },
+                  { IconComponent: Infinity, text: 'Unlimited habits' },
+                  { IconComponent: Cloud, text: 'Cloud sync across devices' },
+                  { IconComponent: Sparkles, text: 'AI-powered insights' },
+                  { IconComponent: BarChart3, text: 'Advanced analytics' },
+                  { IconComponent: Upload, text: 'Export to PDF' },
+                  { IconComponent: Palette, text: 'Premium themes' },
+                  { IconComponent: MessageCircle, text: 'Priority support' },
                 ].map((feature, index) => (
                   <View key={index} style={styles.featureRow}>
-                    <Text style={styles.featureIcon}>{feature.icon}</Text>
+                    <View style={styles.featureIconContainer}>
+                      <feature.IconComponent size={18} color={theme.colors.primary} strokeWidth={2} />
+                    </View>
                     <Text
                       style={[
                         styles.featureText,
@@ -608,8 +627,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  backIcon: {
-    fontSize: 24,
+  backIconContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerTitle: {
     flex: 1,
@@ -637,8 +657,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
-  statusIcon: {
-    fontSize: 40,
+  statusIconContainer: {
     marginRight: 14,
   },
   statusInfo: {},
@@ -738,11 +757,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  checkmarkText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
   planPrice: {},
   planPeriod: {
     marginTop: 4,
@@ -761,8 +775,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
   },
-  featureIcon: {
-    fontSize: 18,
+  featureIconContainer: {
     marginRight: 12,
   },
   featureText: {},

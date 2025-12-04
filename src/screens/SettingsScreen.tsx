@@ -18,7 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme, themes, themeMetadata } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 import { useMascot, MASCOT_NAME } from '@/context/MascotContext';
-import { User, Palette, Sparkles, PartyPopper, Smartphone, Lightbulb } from 'lucide-react-native';
+import { User, Palette, Sparkles, PartyPopper, Smartphone, Lightbulb, ChevronRight } from 'lucide-react-native';
 
 type SettingsNavigationProp = StackNavigationProp<any, 'Settings'>;
 
@@ -218,7 +218,7 @@ const SettingsScreen: React.FC = () => {
                   </Text>
                 </View>
               </View>
-              <Text style={styles.chevron}>›</Text>
+              <ChevronRight size={18} color={theme.colors.textTertiary} strokeWidth={2} />
             </TouchableOpacity>
           )}
         </Animated.View>
@@ -293,7 +293,7 @@ const SettingsScreen: React.FC = () => {
                   ]}
                 />
               ))}
-              <Text style={styles.chevron}>›</Text>
+              <ChevronRight size={18} color={theme.colors.textTertiary} strokeWidth={2} />
             </View>
           </TouchableOpacity>
         </Animated.View>
@@ -498,7 +498,7 @@ const SettingsScreen: React.FC = () => {
                 </Text>
               </View>
             </View>
-            <Text style={styles.chevron}>›</Text>
+            <ChevronRight size={18} color={theme.colors.textTertiary} strokeWidth={2} />
           </TouchableOpacity>
         </Animated.View>
       </ScrollView>
@@ -557,10 +557,6 @@ const styles = StyleSheet.create({
   settingLabel: {},
   settingValue: {
     marginTop: 2,
-  },
-  chevron: {
-    fontSize: 20,
-    color: '#9CA3AF',
   },
   themePreview: {
     flexDirection: 'row',
