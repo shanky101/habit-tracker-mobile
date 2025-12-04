@@ -16,6 +16,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTheme } from '@/theme';
 import { useTemplates } from '@/contexts/TemplateContext';
 import { HabitTemplate, HabitTemplateConfig, TemplateUtils } from '@/types/HabitTemplate';
+import { ArrowLeft, FileText, X, Minus, Plus } from 'lucide-react-native';
 
 type CreateTemplateRouteProp = RouteProp<any, 'CreateTemplate'>;
 type NavigationProp = NativeStackNavigationProp<any>;
@@ -204,7 +205,7 @@ const CreateTemplateScreen: React.FC = () => {
             style={[styles.backButton, { backgroundColor: theme.colors.surface }]}
             onPress={() => navigation.goBack()}
           >
-            <Text style={styles.backButtonText}>←</Text>
+            <ArrowLeft size={24} color={theme.colors.text} strokeWidth={2} />
           </TouchableOpacity>
           <Text style={[styles.headerTitle, { color: theme.colors.text }]}>
             {mode === 'edit' ? 'Edit Template' : mode === 'copy' ? 'Copy Template' : 'Create Template'}
@@ -344,7 +345,7 @@ const CreateTemplateScreen: React.FC = () => {
 
           {habits.length === 0 ? (
             <View style={[styles.emptyHabits, { backgroundColor: theme.colors.surface }]}>
-              <Text style={styles.emptyHabitsEmoji}>📝</Text>
+              <FileText size={48} color={theme.colors.textSecondary} strokeWidth={1.5} />
               <Text style={[styles.emptyHabitsText, { color: theme.colors.textSecondary }]}>
                 No habits yet. Tap "Add Habit" to get started!
               </Text>
@@ -413,7 +414,7 @@ const CreateTemplateScreen: React.FC = () => {
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, { color: theme.colors.text }]}>Choose an Icon</Text>
               <TouchableOpacity onPress={() => setShowEmojiPicker(false)}>
-                <Text style={[styles.modalClose, { color: theme.colors.textSecondary }]}>✕</Text>
+                <X size={24} color={theme.colors.textSecondary} strokeWidth={2} />
               </TouchableOpacity>
             </View>
 
@@ -526,7 +527,7 @@ const HabitModal: React.FC<HabitModalProps> = ({ visible, onClose, onSave, initi
                 {initialHabit ? 'Edit Habit' : 'Add Habit'}
               </Text>
               <TouchableOpacity onPress={onClose}>
-                <Text style={[styles.modalClose, { color: theme.colors.textSecondary }]}>✕</Text>
+                <X size={24} color={theme.colors.textSecondary} strokeWidth={2} />
               </TouchableOpacity>
             </View>
 
@@ -693,14 +694,14 @@ const HabitModal: React.FC<HabitModalProps> = ({ visible, onClose, onSave, initi
                     style={[styles.counterButton, { backgroundColor: theme.colors.surface }]}
                     onPress={() => setTargetCount(Math.max(2, targetCount - 1))}
                   >
-                    <Text style={[styles.counterButtonText, { color: theme.colors.text }]}>−</Text>
+                    <Minus size={20} color={theme.colors.text} strokeWidth={2} />
                   </TouchableOpacity>
                   <Text style={[styles.counterValue, { color: theme.colors.text }]}>{targetCount}x</Text>
                   <TouchableOpacity
                     style={[styles.counterButton, { backgroundColor: theme.colors.surface }]}
                     onPress={() => setTargetCount(Math.min(20, targetCount + 1))}
                   >
-                    <Text style={[styles.counterButtonText, { color: theme.colors.text }]}>+</Text>
+                    <Plus size={20} color={theme.colors.text} strokeWidth={2} />
                   </TouchableOpacity>
                 </View>
               </View>
