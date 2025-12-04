@@ -16,6 +16,15 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { useHabits, Habit, HabitEntry } from '@/contexts/HabitsContext';
 import { ExportManager, ExportFormat } from '@/utils/exportManager';
+import {
+  ArrowLeft,
+  Calendar,
+  Clock,
+  Palette,
+  FileText,
+  Check,
+  X,
+} from 'lucide-react-native';
 
 type HabitDetailRouteProp = RouteProp<
   { HabitDetail: { habitId: string; habitData: Habit } },
@@ -276,7 +285,7 @@ const HabitDetailScreen: React.FC = () => {
         {/* Schedule */}
         <View style={styles.detailRow}>
           <View style={styles.detailIcon}>
-            <Text style={styles.detailEmoji}>📅</Text>
+            <Calendar size={20} color={theme.colors.textSecondary} strokeWidth={2} />
           </View>
           <View style={styles.detailContent}>
             <Text
@@ -309,7 +318,7 @@ const HabitDetailScreen: React.FC = () => {
         {/* Reminder */}
         <View style={[styles.detailRow, { borderTopWidth: 1, borderTopColor: theme.colors.border }]}>
           <View style={styles.detailIcon}>
-            <Text style={styles.detailEmoji}>⏰</Text>
+            <Clock size={20} color={theme.colors.textSecondary} strokeWidth={2} />
           </View>
           <View style={styles.detailContent}>
             <Text
@@ -344,7 +353,7 @@ const HabitDetailScreen: React.FC = () => {
         {/* Color */}
         <View style={[styles.detailRow, { borderTopWidth: 1, borderTopColor: theme.colors.border }]}>
           <View style={styles.detailIcon}>
-            <Text style={styles.detailEmoji}>🎨</Text>
+            <Palette size={20} color={theme.colors.textSecondary} strokeWidth={2} />
           </View>
           <View style={styles.detailContent}>
             <Text
@@ -387,7 +396,7 @@ const HabitDetailScreen: React.FC = () => {
         {habitData.notes && (
           <View style={[styles.detailRow, { borderTopWidth: 1, borderTopColor: theme.colors.border }]}>
             <View style={styles.detailIcon}>
-              <Text style={styles.detailEmoji}>📝</Text>
+              <FileText size={20} color={theme.colors.textSecondary} strokeWidth={2} />
             </View>
             <View style={styles.detailContent}>
               <Text
@@ -518,7 +527,7 @@ const HabitDetailScreen: React.FC = () => {
                         ]}
                       >
                         {day.completed && (
-                          <Text style={styles.checkMark}>✓</Text>
+                          <Check size={12} color="#fff" strokeWidth={3} />
                         )}
                       </View>
                     );
@@ -632,9 +641,11 @@ const HabitDetailScreen: React.FC = () => {
                 },
               ]}
             >
-              <Text style={styles.activityIconText}>
-                {activity.completed ? '✓' : '✕'}
-              </Text>
+              {activity.completed ? (
+                <Check size={14} color="#22C55E" strokeWidth={3} />
+              ) : (
+                <X size={14} color={theme.colors.textTertiary} strokeWidth={3} />
+              )}
             </View>
             <View style={styles.activityInfo}>
               <Text
@@ -787,7 +798,7 @@ const HabitDetailScreen: React.FC = () => {
           onPress={() => navigation.goBack()}
           activeOpacity={0.7}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <ArrowLeft size={24} color={theme.colors.text} strokeWidth={2} />
         </TouchableOpacity>
         <View style={styles.headerCenter}>
           <View style={styles.habitHeader}>
