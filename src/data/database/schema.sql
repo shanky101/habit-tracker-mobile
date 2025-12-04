@@ -44,6 +44,38 @@ CREATE TABLE IF NOT EXISTS entries (
   timestamp INTEGER NOT NULL -- Unix timestamp
 );
 
+-- Mascot Customization Table
+CREATE TABLE IF NOT EXISTS mascot_customization (
+  id TEXT PRIMARY KEY DEFAULT 'default',
+  name TEXT NOT NULL,
+
+  -- Face
+  eyes TEXT NOT NULL DEFAULT 'happy',
+  eyebrows TEXT NOT NULL DEFAULT 'normal',
+  mouth TEXT NOT NULL DEFAULT 'smile',
+  blush_enabled INTEGER NOT NULL DEFAULT 1,
+  blush_color TEXT NOT NULL DEFAULT '#FFB6C1',
+
+  -- Head Accessories
+  hair_style TEXT NOT NULL DEFAULT 'none',
+  hair_color TEXT NOT NULL DEFAULT '#8B4513',
+  hat TEXT NOT NULL DEFAULT 'none',
+  glasses TEXT NOT NULL DEFAULT 'none',
+
+  -- Body
+  body_color TEXT NOT NULL DEFAULT '#7FD1AE',
+  pattern TEXT NOT NULL DEFAULT 'solid',
+  pattern_color TEXT,
+
+  -- Accessories
+  necklace TEXT NOT NULL DEFAULT 'none',
+  special_effect TEXT NOT NULL DEFAULT 'none',
+
+  -- Metadata
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_completions_habit_id ON completions(habit_id);
 CREATE INDEX IF NOT EXISTS idx_completions_date ON completions(date);
@@ -51,3 +83,4 @@ CREATE INDEX IF NOT EXISTS idx_entries_habit_id ON entries(habit_id);
 CREATE INDEX IF NOT EXISTS idx_entries_date ON entries(date);
 CREATE INDEX IF NOT EXISTS idx_habits_archived ON habits(archived);
 CREATE INDEX IF NOT EXISTS idx_habits_sort_order ON habits(sort_order);
+CREATE INDEX IF NOT EXISTS idx_mascot_updated ON mascot_customization(updated_at);

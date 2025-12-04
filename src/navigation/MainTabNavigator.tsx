@@ -32,6 +32,7 @@ import {
 import TemplatesScreen from '@/screens/TemplatesScreen';
 import TemplateDetailScreen from '@/screens/TemplateDetailScreen';
 import CreateTemplateScreen from '@/screens/CreateTemplateScreen';
+import CustomizeHabiScreen from '@/screens/CustomizeHabiScreen';
 
 export type HomeStackParamList = {
   HomeMain: { newHabit?: any } | undefined;
@@ -69,6 +70,7 @@ export type ProfileStackParamList = {
   Paywall: undefined;
   DataPrivacy: undefined;
   ChangePassword: undefined;
+  CustomizeHabi: undefined;
 };
 
 export type TemplatesStackParamList = {
@@ -188,6 +190,7 @@ const ProfileStackNavigator: React.FC = () => {
       <ProfileStack.Screen name="Paywall" component={PaywallScreen} />
       <ProfileStack.Screen name="DataPrivacy" component={DataPrivacyScreen} />
       <ProfileStack.Screen name="ChangePassword" component={ChangePasswordScreen} />
+      <ProfileStack.Screen name="CustomizeHabi" component={CustomizeHabiScreen} />
     </ProfileStack.Navigator>
   );
 };

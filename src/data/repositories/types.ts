@@ -41,3 +41,24 @@ export interface EntryRow {
   note: string | null;
   timestamp: number;
 }
+
+export interface MascotRow {
+  id: string;
+  name: string;
+  eyes: string;
+  eyebrows: string;
+  mouth: string;
+  blush_enabled: number; // SQLite boolean (0 or 1)
+  blush_color: string;
+  hair_style: string;
+  hair_color: string;
+  hat: string;
+  glasses: string;
+  body_color: string;
+  pattern: string;
+  pattern_color: string | null;
+  necklace: string;
+  special_effect: string;
+  created_at: string;
+  updated_at: string;
+}
