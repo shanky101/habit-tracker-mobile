@@ -29,6 +29,7 @@ import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 import { useSubscription } from '@/context/SubscriptionContext';
 import { useMascot } from '@/context/MascotContext';
 import { MascotDisplay } from '@/components/mascot';
+import type { HabiMascotRef } from '@/components/mascot/HabiMascot';
 import { MascotCelebration, DraggableHabitList } from '@/components';
 import { User } from 'lucide-react-native';
 
@@ -96,6 +97,7 @@ const HomeScreen: React.FC = () => {
   const { subscription } = useSubscription();
   const { triggerReaction, getMascotForProgress, setMood, settings: mascotSettings, toggleMascot, petMascot } = useMascot();
   const dateScrollRef = useRef<ScrollView>(null);
+  const mascotRef = useRef<HabiMascotRef>(null);
 
   const { fadeAnim, slideAnim, fabScale } = useScreenAnimation({ enableFAB: true });
 
@@ -656,6 +658,7 @@ const HomeScreen: React.FC = () => {
             </TouchableOpacity>
             {/* Customized Habi with interaction support */}
             <MascotDisplay
+              ref={mascotRef}
               size={180}
               showName
               showMessage
@@ -981,7 +984,10 @@ const HomeScreen: React.FC = () => {
         message={`You completed all ${totalCount} habits today! ${userName ? userName + ', you' : 'You'}'re absolutely crushing it!`}
         onDismiss={() => {
           setShowMascotCelebration(false);
-          // Optionally show share modal after
+          setCelebrationType('allComplete');
+          // Trigger mascot celebration animation
+          // TODO: Re-add celebration animation after implementing differently
+          // setTimeout(() => mascotRef.current?.celebrate(), 100);
           setTimeout(() => setShowAllCompleteModal(true), 300);
         }}
       />
