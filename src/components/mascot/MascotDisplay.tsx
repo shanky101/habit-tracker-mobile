@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { HabiMascot } from './HabiMascot';
 import { useMascotCustomization } from '@/hooks/useMascotCustomization';
 import { useMascot } from '@/context/MascotContext';
@@ -45,6 +46,9 @@ export const MascotDisplay: React.FC<MascotDisplayProps> = ({
   const { mascot, petMascot } = useMascot();
 
   const handlePress = () => {
+    // Haptic feedback for interaction
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
     if (onPress) {
       onPress();
     } else {

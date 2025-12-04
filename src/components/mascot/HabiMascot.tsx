@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, StyleSheet, Animated, Easing } from 'react-native';
 import Svg from 'react-native-svg';
 import { HabiCustomization } from '@/types/mascotCustomization';
 import { MascotMood } from '@/context/MascotContext';
@@ -24,6 +24,8 @@ interface HabiMascotProps {
  * 3. Face (eyes, eyebrows, mouth, blush)
  * 4. Accessories (hair, hat, glasses, necklace)
  * 5. Effects (sparkles, stars, hearts, glow)
+ * 
+ * Features smooth floating animation for idle state
  */
 export const HabiMascot: React.FC<HabiMascotProps> = ({
   customization,
@@ -33,8 +35,41 @@ export const HabiMascot: React.FC<HabiMascotProps> = ({
 }) => {
   const viewBox = '0 0 200 200';
 
+  // Floating animation using RN Animated
+  const translateY = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    // Gentle floating animation (idle, continuous)
+    const floatAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(translateY, {
+          toValue: -5,
+          duration: 2000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(translateY, {
+          toValue: 0,
+          duration: 2000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    );
+
+    floatAnimation.start();
+
+    return () => floatAnimation.stop();
+  }, [translateY]);
+
   return (
-    <View style={[styles.container, { width: size, height: size }]}>
+    <Animated.View
+      style={[
+        styles.container,
+        { width: size, height: size },
+        { transform: [{ translateY }] }
+      ]}
+    >
       <Svg width={size} height={size} viewBox={viewBox}>
         {/* Layer 1: Body (base shape with arms and feet) */}
         <BodyLayer customization={customization} />
@@ -55,7 +90,7 @@ export const HabiMascot: React.FC<HabiMascotProps> = ({
           <EffectsLayer customization={customization} animated={animated} />
         )}
       </Svg>
-    </View>
+    </Animated.View>
   );
 };
 

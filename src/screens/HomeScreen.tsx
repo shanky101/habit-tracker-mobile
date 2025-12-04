@@ -28,7 +28,8 @@ import {
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 import { useSubscription } from '@/context/SubscriptionContext';
 import { useMascot } from '@/context/MascotContext';
-import { Mascot, MascotCelebration, DraggableHabitList } from '@/components';
+import { MascotDisplay } from '@/components/mascot';
+import { MascotCelebration, DraggableHabitList } from '@/components';
 import { User } from 'lucide-react-native';
 
 type HomeScreenNavigationProp = StackNavigationProp<any, 'Home'>;
@@ -93,7 +94,7 @@ const HomeScreen: React.FC = () => {
     reorderHabits,
   } = useHabits();
   const { subscription } = useSubscription();
-  const { triggerReaction, getMascotForProgress, setMood, settings: mascotSettings, toggleMascot } = useMascot();
+  const { triggerReaction, getMascotForProgress, setMood, settings: mascotSettings, toggleMascot, petMascot } = useMascot();
   const dateScrollRef = useRef<ScrollView>(null);
 
   const { fadeAnim, slideAnim, fabScale } = useScreenAnimation({ enableFAB: true });
@@ -653,7 +654,13 @@ const HomeScreen: React.FC = () => {
                 Hide
               </Text>
             </TouchableOpacity>
-            <Mascot variant="hero" size="medium" showName />
+            {/* Customized Habi with interaction support */}
+            <MascotDisplay
+              size={180}
+              showName
+              showMessage
+              onPress={petMascot}
+            />
           </Animated.View>
         ) : (
           /* Show Habi pill when mascot is hidden */
