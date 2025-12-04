@@ -615,21 +615,21 @@ const EditHabitScreen: React.FC = () => {
             </Text>
           </View>
 
-          {/* Destructive Actions */}
+          {/* Action Buttons Section */}
           <View style={styles.destructiveSection}>
             <TouchableOpacity
               style={[
-                styles.archiveButton,
+                styles.saveButton,
                 {
                   backgroundColor: theme.colors.primary,
                 },
               ]}
-              onPress={handleArchive}
+              onPress={handleSave}
               activeOpacity={0.7}
             >
               <Text
                 style={[
-                  styles.archiveButtonText,
+                  styles.saveButtonText,
                   {
                     color: theme.colors.white,
                     fontSize: theme.typography.fontSizeMD,
@@ -637,7 +637,7 @@ const EditHabitScreen: React.FC = () => {
                   },
                 ]}
               >
-                Archive Habit
+                Save Changes
               </Text>
             </TouchableOpacity>
 
@@ -827,7 +827,7 @@ const styles = StyleSheet.create({
   destructiveSection: {
     marginTop: 24,
   },
-  archiveButton: {
+  saveButton: {
     width: '100%',
     paddingVertical: 16,
     paddingHorizontal: 24,
@@ -836,7 +836,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 12,
   },
-  archiveButtonText: {
+  saveButtonText: {
     // styles from theme
   },
   deleteButton: {
@@ -848,7 +848,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   deleteButtonText: {
-    // styles from theme
+    //styles from theme
   },
 });
 

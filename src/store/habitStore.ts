@@ -33,181 +33,187 @@ interface HabitState {
 export const useHabitStore = create<HabitState>()(
   persist(
     (set, get) => ({
-  // Initial state
-  habits: [],
-  isHydrated: false,
+      // Initial state
+      habits: [],
+      isHydrated: false,
 
-  // Habit CRUD operations
-  addHabit: (habit) =>
-    set((state) => ({
-      habits: [habit, ...state.habits],
-    })),
+      // Habit CRUD operations
+      addHabit: (habit) =>
+        set((state) => ({
+          habits: [habit, ...state.habits],
+        })),
 
-  updateHabit: (id, updates) =>
-    set((state) => ({
-      habits: state.habits.map((habit) =>
-        habit.id === id ? { ...habit, ...updates } : habit
-      ),
-    })),
+      updateHabit: (id, updates) =>
+        set((state) => ({
+          habits: state.habits.map((habit) =>
+            habit.id === id ? { ...habit, ...updates } : habit
+          ),
+        })),
 
-  deleteHabit: (id) =>
-    set((state) => ({
-      habits: state.habits.filter((habit) => habit.id !== id),
-    })),
+      deleteHabit: (id) =>
+        set((state) => ({
+          habits: state.habits.filter((habit) => habit.id !== id),
+        })),
 
-  archiveHabit: (id) =>
-    set((state) => ({
-      habits: state.habits.map((habit) =>
-        habit.id === id ? { ...habit, archived: true } : habit
-      ),
-    })),
+      archiveHabit: (id) =>
+        set((state) => ({
+          habits: state.habits.map((habit) =>
+            habit.id === id ? { ...habit, archived: true } : habit
+          ),
+        })),
 
-  reorderHabits: (fromIndex, toIndex) =>
-    set((state) => {
-      const newHabits = [...state.habits];
-      const [movedHabit] = newHabits.splice(fromIndex, 1);
-      newHabits.splice(toIndex, 0, movedHabit);
-      return { habits: newHabits };
-    }),
+      reorderHabits: (fromIndex, toIndex) =>
+        set((state) => {
+          const newHabits = [...state.habits];
+          const [movedHabit] = newHabits.splice(fromIndex, 1);
+          newHabits.splice(toIndex, 0, movedHabit);
+          return { habits: newHabits };
+        }),
 
-  // Completion operations
-  completeHabit: (id, date, entry) =>
-    set((state) => ({
-      habits: state.habits.map((habit) => {
-        if (habit.id !== id) return habit;
+      // Completion operations
+      completeHabit: (id, date, entry) =>
+        set((state) => ({
+          habits: state.habits.map((habit) => {
+            if (habit.id !== id) return habit;
 
-        const existingCompletion = habit.completions[date];
-        const now = Date.now();
+            const existingCompletion = habit.completions[date];
+            const now = Date.now();
 
-        // Create new entry if mood or note provided
-        const newEntry: HabitEntry | undefined =
-          entry?.mood || entry?.note
-            ? {
-                id: `${id}-${date}-${now}`,
-                date,
-                mood: entry.mood,
-                note: entry.note,
-                timestamp: now,
-              }
-            : undefined;
+            // Create new entry if mood or note provided
+            const newEntry: HabitEntry | undefined =
+              entry?.mood || entry?.note
+                ? {
+                  id: `${id}-${date}-${now}`,
+                  date,
+                  mood: entry.mood,
+                  note: entry.note,
+                  timestamp: now,
+                }
+                : undefined;
 
-        if (existingCompletion) {
-          // Increment existing completion
-          return {
-            ...habit,
-            completions: {
-              ...habit.completions,
-              [date]: {
-                ...existingCompletion,
-                completionCount: existingCompletion.completionCount + 1,
-                timestamps: [...existingCompletion.timestamps, now],
-                entries: newEntry
-                  ? [...existingCompletion.entries, newEntry]
-                  : existingCompletion.entries,
-              },
-            },
-          };
-        } else {
-          // Create new completion
-          return {
-            ...habit,
-            completions: {
-              ...habit.completions,
-              [date]: {
-                date,
-                completionCount: 1,
-                targetCount: habit.targetCompletionsPerDay,
-                timestamps: [now],
-                entries: newEntry ? [newEntry] : [],
-              },
-            },
-          };
-        }
-      }),
-    })),
+            if (existingCompletion) {
+              // Increment existing completion
+              return {
+                ...habit,
+                completions: {
+                  ...habit.completions,
+                  [date]: {
+                    ...existingCompletion,
+                    completionCount: existingCompletion.completionCount + 1,
+                    timestamps: [...existingCompletion.timestamps, now],
+                    entries: newEntry
+                      ? [...existingCompletion.entries, newEntry]
+                      : existingCompletion.entries,
+                  },
+                },
+              };
+            } else {
+              // Create new completion
+              return {
+                ...habit,
+                completions: {
+                  ...habit.completions,
+                  [date]: {
+                    date,
+                    completionCount: 1,
+                    targetCount: habit.targetCompletionsPerDay,
+                    timestamps: [now],
+                    entries: newEntry ? [newEntry] : [],
+                  },
+                },
+              };
+            }
+          }),
+        })),
 
-  uncompleteHabit: (id, date) =>
-    set((state) => ({
-      habits: state.habits.map((habit) => {
-        if (habit.id !== id) return habit;
+      uncompleteHabit: (id, date) =>
+        set((state) => ({
+          habits: state.habits.map((habit) => {
+            if (habit.id !== id) return habit;
 
-        const existingCompletion = habit.completions[date];
-        if (!existingCompletion) return habit;
+            const existingCompletion = habit.completions[date];
+            if (!existingCompletion) return habit;
 
-        if (existingCompletion.completionCount <= 1) {
-          // Remove completion entirely
-          const { [date]: removed, ...remainingCompletions } = habit.completions;
-          return {
-            ...habit,
-            completions: remainingCompletions,
-          };
-        } else {
-          // Decrement completion count
-          const newTimestamps = [...existingCompletion.timestamps];
-          newTimestamps.pop(); // Remove last timestamp
+            if (existingCompletion.completionCount <= 1) {
+              // Remove completion entirely
+              const { [date]: removed, ...remainingCompletions } = habit.completions;
+              return {
+                ...habit,
+                completions: remainingCompletions,
+              };
+            } else {
+              // Decrement completion count
+              const newTimestamps = [...existingCompletion.timestamps];
+              newTimestamps.pop(); // Remove last timestamp
 
-          const newEntries = [...existingCompletion.entries];
-          newEntries.pop(); // Remove last entry
+              const newEntries = [...existingCompletion.entries];
+              newEntries.pop(); // Remove last entry
 
-          return {
-            ...habit,
-            completions: {
-              ...habit.completions,
-              [date]: {
-                ...existingCompletion,
-                completionCount: existingCompletion.completionCount - 1,
-                timestamps: newTimestamps,
-                entries: newEntries,
-              },
-            },
-          };
-        }
-      }),
-    })),
+              return {
+                ...habit,
+                completions: {
+                  ...habit.completions,
+                  [date]: {
+                    ...existingCompletion,
+                    completionCount: existingCompletion.completionCount - 1,
+                    timestamps: newTimestamps,
+                    entries: newEntries,
+                  },
+                },
+              };
+            }
+          }),
+        })),
 
-  resetHabitForDate: (id, date) =>
-    set((state) => ({
-      habits: state.habits.map((habit) => {
-        if (habit.id !== id) return habit;
+      resetHabitForDate: (id, date) =>
+        set((state) => ({
+          habits: state.habits.map((habit) => {
+            if (habit.id !== id) return habit;
 
-        const { [date]: removed, ...remainingCompletions } = habit.completions;
+            const { [date]: removed, ...remainingCompletions } = habit.completions;
+            return {
+              ...habit,
+              completions: remainingCompletions,
+            };
+          }),
+        })),
+
+      // Selectors
+      getCompletionForDate: (id, date) => {
+        const habit = get().habits.find((h) => h.id === id);
+        return habit?.completions[date];
+      },
+
+      isHabitCompletedForDate: (id, date) => {
+        const completion = get().getCompletionForDate(id, date);
+        if (!completion) return false;
+        return completion.completionCount >= completion.targetCount;
+      },
+
+      getCompletionProgress: (id, date) => {
+        const habit = get().habits.find((h) => h.id === id);
+        const completion = habit?.completions[date];
+
         return {
-          ...habit,
-          completions: remainingCompletions,
+          current: completion?.completionCount || 0,
+          target: habit?.targetCompletionsPerDay || 1,
         };
-      }),
-    })),
+      },
 
-  // Selectors
-  getCompletionForDate: (id, date) => {
-    const habit = get().habits.find((h) => h.id === id);
-    return habit?.completions[date];
-  },
+      // Internal methods
+      setHydrated: (hydrated) => set({ isHydrated: hydrated }),
 
-  isHabitCompletedForDate: (id, date) => {
-    const completion = get().getCompletionForDate(id, date);
-    if (!completion) return false;
-    return completion.completionCount >= completion.targetCount;
-  },
-
-  getCompletionProgress: (id, date) => {
-    const habit = get().habits.find((h) => h.id === id);
-    const completion = habit?.completions[date];
-
-    return {
-      current: completion?.completionCount || 0,
-      target: habit?.targetCompletionsPerDay || 1,
-    };
-  },
-
-  // Internal methods
-  setHydrated: (hydrated) => set({ isHydrated: hydrated }),
-
-  _setHabits: (habits) => set({ habits }),
+      _setHabits: (habits) => set({ habits }),
     }),
     {
       name: 'habit-store',
       storage: createJSONStorage(() => sqliteStorage),
+      version: 1,
+      migrate: (persistedState: any, version: number) => {
+        // No migration needed yet, just return the state as-is
+        // This prevents the "no migrate function" warning
+        return persistedState;
+      },
       onRehydrateStorage: () => {
         console.log('[Store] Starting hydration...');
         return (state, error) => {

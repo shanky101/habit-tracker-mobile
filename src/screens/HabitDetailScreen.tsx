@@ -24,6 +24,9 @@ import {
   FileText,
   Check,
   X,
+  Edit3,
+  Upload,
+  Share2,
 } from 'lucide-react-native';
 
 type HabitDetailRouteProp = RouteProp<
@@ -945,7 +948,7 @@ const HabitDetailScreen: React.FC = () => {
           onPress={handleEdit}
           activeOpacity={0.7}
         >
-          <Text style={styles.editIcon}>✏️</Text>
+          <Edit3 size={20} color={theme.colors.primary} strokeWidth={2} />
         </TouchableOpacity>
       </View>
 
@@ -1055,7 +1058,7 @@ const HabitDetailScreen: React.FC = () => {
             {isExporting ? (
               <ActivityIndicator size="small" color={theme.colors.primary} />
             ) : (
-              <Text style={styles.actionEmoji}>📤</Text>
+              <Upload size={20} color={theme.colors.text} strokeWidth={2.5} />
             )}
             <Text
               style={[
@@ -1082,7 +1085,7 @@ const HabitDetailScreen: React.FC = () => {
             onPress={handleShareStreak}
             activeOpacity={0.7}
           >
-            <Text style={styles.actionEmoji}>🎉</Text>
+            <Share2 size={20} color={theme.colors.text} strokeWidth={2.5} />
             <Text
               style={[
                 styles.actionText,

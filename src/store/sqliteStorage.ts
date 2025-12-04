@@ -1,5 +1,20 @@
 import { StateStorage } from 'zustand/middleware';
 import { habitRepository } from '../data/repositories';
+import { initializeDatabase } from '../data/database/initialize';
+
+// Track if database has been initialized
+let dbInitialized = false;
+
+/**
+ * Ensure database is initialized before any operations
+ */
+const ensureDbInitialized = async (): Promise<void> => {
+  if (!dbInitialized) {
+    console.log('[SQLiteStorage] Initializing database on first access');
+    await initializeDatabase();
+    dbInitialized = true;
+  }
+};
 
 /**
  * SQLite storage adapter for Zustand persist middleware
@@ -12,6 +27,9 @@ export const sqliteStorage: StateStorage = {
    */
   getItem: async (name: string): Promise<string | null> => {
     try {
+      // CRITICAL: Ensure database is initialized before any queries
+      await ensureDbInitialized();
+
       console.log('[SQLiteStorage] getItem called');
       const habits = await habitRepository.getAll(true); // Include archived
 

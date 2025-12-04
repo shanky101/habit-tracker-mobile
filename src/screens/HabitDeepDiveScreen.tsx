@@ -164,13 +164,123 @@ const HabitDeepDiveScreen: React.FC = () => {
 
   const dayOfWeekData = calculateDayOfWeekStats();
 
-  // Mock milestones
-  const milestones = [
-    { date: 'Oct 15, 2024', event: 'Habit Created', icon: '🌱' },
-    { date: 'Oct 22, 2024', event: '7 Day Streak', icon: '🔥' },
-    { date: 'Nov 15, 2024', event: '30 Day Streak', icon: '🏆' },
-    { date: 'Nov 20, 2024', event: '100th Completion', icon: '💯' },
-  ];
+  // Calculate real milestones from habit history
+  const calculateMilestones = () => {
+    const milestones: Array<{ date: string; event: string; icon: string }> = [];
+    const completions = habitData.completions || {};
+    const completionDates = Object.keys(completions).sort();
+
+    // 1. Habit Created milestone
+    if (habitData.createdAt) {
+      const createdDate = new Date(habitData.createdAt);
+      milestones.push({
+        date: createdDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        event: 'Habit Created',
+        icon: '🌱',
+      });
+    }
+
+    // 2. Completion count milestones (10th, 25th, 50th, 100th, 200th, 500th, 1000th)
+    const completionMilestones = [10, 25, 50, 100, 200, 500, 1000];
+    const completionMilestoneIcons: { [key: number]: string } = {
+      10: '⭐',
+      25: '🎯',
+      50: '🏅',
+      100: '💯',
+      200: '🎖️',
+      500: '👑',
+      1000: '🏆',
+    };
+
+    let cumulativeCompletions = 0;
+    const milestoneTracker = new Set<number>();
+
+    for (const dateStr of completionDates) {
+      const completion = completions[dateStr];
+      cumulativeCompletions += completion?.completionCount || 0;
+
+      // Check if we've crossed any milestone thresholds
+      for (const milestone of completionMilestones) {
+        if (cumulativeCompletions >= milestone && !milestoneTracker.has(milestone)) {
+          milestoneTracker.add(milestone);
+          const milestoneDate = new Date(dateStr);
+          milestones.push({
+            date: milestoneDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            event: `${milestone}${milestone === 100 ? 'th' : milestone === 1000 ? 'th' : milestone === 10 ? 'th' : milestone === 25 ? 'th' : milestone === 50 ? 'th' : 'th'} Completion`,
+            icon: completionMilestoneIcons[milestone] || '🎉',
+          });
+        }
+      }
+    }
+
+    // 3. Streak milestones (7, 14, 30, 60, 90, 180, 365 days)
+    const streakMilestones = [7, 14, 30, 60, 90, 180, 365];
+    const streakMilestoneIcons: { [key: number]: string } = {
+      7: '🔥',
+      14: '💪',
+      30: '🏆',
+      60: '⚡',
+      90: '🌟',
+      180: '💎',
+      365: '👑',
+    };
+
+    let currentStreakLength = 0;
+    let streakStartDate: string | null = null;
+    const streakMilestoneTracker = new Set<number>();
+
+    for (let i = 0; i < completionDates.length; i++) {
+      const currentDate = new Date(completionDates[i]);
+      const completion = completions[completionDates[i]];
+
+      // Check if this day was completed (met target)
+      if (completion && completion.completionCount >= completion.targetCount) {
+        if (i === 0) {
+          currentStreakLength = 1;
+          streakStartDate = completionDates[i];
+        } else {
+          const prevDate = new Date(completionDates[i - 1]);
+          const daysDiff = Math.floor((currentDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
+
+          if (daysDiff === 1) {
+            currentStreakLength++;
+          } else {
+            // Streak broken, reset
+            currentStreakLength = 1;
+            streakStartDate = completionDates[i];
+            streakMilestoneTracker.clear();
+          }
+        }
+
+        // Check if current streak has reached any milestone
+        for (const milestone of streakMilestones) {
+          if (currentStreakLength === milestone && !streakMilestoneTracker.has(milestone)) {
+            streakMilestoneTracker.add(milestone);
+            const milestoneDate = new Date(completionDates[i]);
+            milestones.push({
+              date: milestoneDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+              event: `${milestone} Day Streak`,
+              icon: streakMilestoneIcons[milestone] || '🔥',
+            });
+          }
+        }
+      } else {
+        // Day not completed, streak broken
+        currentStreakLength = 0;
+        streakStartDate = null;
+        streakMilestoneTracker.clear();
+      }
+    }
+
+    // Sort milestones chronologically (oldest first)
+    return milestones.sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      return dateA.getTime() - dateB.getTime();
+    });
+  };
+
+  const milestones = calculateMilestones();
 
   // Mock patterns
   const patterns = [

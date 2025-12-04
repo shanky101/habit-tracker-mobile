@@ -152,20 +152,27 @@ const milestones = [
 
 **Implementation Plan**:
 
-- [ ] **Checkpoint 2.4.1**: Calculate automated milestones
+- [x] **Checkpoint 2.4.1**: Calculate automated milestones
   - ✅ Habit Created: Use `habitData.createdAt`
-  - ✅ Completion milestones (10th, 25th, 50th, 100th)
-  - ✅ Streak milestones (7, 14, 30, 60, 90 days)
+  - ✅ Completion milestones (10th, 25th, 50th, 100th, 200th, 500th, 1000th)
+  - ✅ Streak milestones (7, 14, 30, 60, 90, 180, 365 days)
 
-- [ ] **Checkpoint 2.4.2**: Scan completion history for milestone dates
+- [x] **Checkpoint 2.4.2**: Scan completion history for milestone dates
   - When did user hit 10th completion?
   - When did user achieve first 7-day streak?
   - Calculate retroactively from `habitData.completions`
 
-- [ ] **Checkpoint 2.4.3**: Sort chronologically and display
+- [x] **Checkpoint 2.4.3**: Sort chronologically and display
 
+**Status**: ✅ COMPLETE
 **Estimated Effort**: 30-45 minutes
 **Data Required**: ✅ Available (uses `habitData.createdAt` + `completions`)
+
+**Implementation Details**:
+- Tracks cumulative completions to detect completion milestones
+- Tracks consecutive streaks to detect streak milestones
+- Handles streak breaks and resets properly
+- Sorts all milestones chronologically for timeline display
 
 **Limitation**: Can only show milestones that actually happened. If user hasn't hit 100 completions, won't show that milestone.
 

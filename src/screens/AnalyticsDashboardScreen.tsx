@@ -41,11 +41,41 @@ const AnalyticsDashboardScreen: React.FC = () => {
   const { subscription } = useSubscription();
   const { fadeAnim, slideAnim } = useScreenAnimation();
 
-  const [selectedRange, setSelectedRange] = useState('30 days');
+  const [selectedRange, setSelectedRange] = useState<'7 days' | '30 days' | '90 days' | 'All time'>('30 days');
   const [isPremium] = useState(true); // For demo, set to true
 
-  // Get active and archived habits
-  const activeHabits = habits.filter((h) => !h.archived);
+  // Filter out archived habits
+  const activeHabits = habits.filter(h => !h.archived);
+
+  // Helper function to get start date for a range
+  const getStartDateForRange = (range: string): Date => {
+    const now = new Date();
+    const startDate = new Date(now);
+
+    switch (range) {
+      case '7 days':
+        startDate.setDate(now.getDate() - 7);
+        break;
+      case '30 days':
+        startDate.setDate(now.getDate() - 30);
+        break;
+      case '90 days':
+        startDate.setDate(now.getDate() - 90);
+        break;
+      case 'All time':
+        // Find earliest habit creation date
+        const earliestHabit = activeHabits.reduce((earliest: Date | null, habit) => {
+          if (!habit.createdAt) return earliest;
+          const createdDate = new Date(habit.createdAt);
+          return !earliest || createdDate < earliest ? createdDate : earliest;
+        }, null);
+        return earliestHabit || new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+      default:
+        startDate.setDate(now.getDate() - 30);
+    }
+
+    return startDate;
+  };
 
   // Helper function to calculate completion rate for a habit
   const calculateCompletionRate = (habit: any): number => {
@@ -81,69 +111,93 @@ const AnalyticsDashboardScreen: React.FC = () => {
 
   // Calculate analytics data based on selected range
   const analyticsData = useMemo(() => {
-    // Multiplier based on selected range to simulate different data
-    const rangeMultipliers: Record<string, number> = {
-      '7 days': 0.25,
-      '30 days': 1,
-      '90 days': 3,
-      'All time': 6,
+    const now = new Date();
+    const startDate = getStartDateForRange(selectedRange);
+
+    // Calculate real total completions within the selected range
+    const totalCompletions = activeHabits.reduce((sum, habit) => {
+      const completions = habit.completions || {};
+      const completionsInRange = Object.keys(completions).filter(dateStr => {
+        const completionDate = new Date(dateStr);
+        return completionDate >= startDate && completionDate <= now;
+      });
+
+      // Sum up all completion counts in range
+      return sum + completionsInRange.reduce((dateSum, dateStr) => {
+        const completion = completions[dateStr];
+        return dateSum + (completion?.completionCount || 0);
+      }, 0);
+    }, 0);
+
+    // Calculate real consistency score (avg completion rate across scheduled days)
+    const calculateConsistencyScore = () => {
+      if (activeHabits.length === 0) return 0;
+
+      const now = new Date();
+      const startDate = getStartDateForRange(selectedRange);
+
+      let totalScheduledDays = 0;
+      let totalCompletedDays = 0;
+
+      activeHabits.forEach(habit => {
+        const completions = habit.completions || {};
+        const currentDate = new Date(startDate);
+
+        while (currentDate <= now) {
+          const dayOfWeek = currentDate.getDay();
+          const dateStr = currentDate.toISOString().split('T')[0];
+
+          // Check if this habit is scheduled for this day
+          if (habit.selectedDays.includes(dayOfWeek)) {
+            // Only count days on or after habit creation
+            if (!habit.createdAt || new Date(habit.createdAt) <= currentDate) {
+              totalScheduledDays++;
+              const completion = completions[dateStr];
+              if (completion && completion.completionCount >= completion.targetCount) {
+                totalCompletedDays++;
+              }
+            }
+          }
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+      });
+
+      return totalScheduledDays > 0 ? Math.round((totalCompletedDays / totalScheduledDays) * 100) : 0;
     };
 
-    const multiplier = rangeMultipliers[selectedRange] || 1;
-    const baseCompletions = activeHabits.reduce(
-      (sum, h) => sum + Object.keys(h.completions).length,
-      0
-    );
+    // Calculate real day of week data from completion history
+    const calculateDayOfWeekData = () => {
+      const dayStats = Array(7).fill(null).map(() => ({ scheduled: 0, completed: 0 }));
+      const now = new Date();
+      const startDate = getStartDateForRange(selectedRange);
 
-    // Generate different data for each range
-    const totalCompletions = Math.round((baseCompletions + activeHabits.length * 5) * multiplier);
+      activeHabits.forEach(habit => {
+        const completions = habit.completions || {};
+        const currentDate = new Date(startDate);
 
-    // Consistency varies by range
-    const consistencyScores: Record<string, number> = {
-      '7 days': 92,
-      '30 days': 87,
-      '90 days': 78,
-      'All time': 73,
-    };
+        while (currentDate <= now) {
+          const dayOfWeek = currentDate.getDay();
+          const dateStr = currentDate.toISOString().split('T')[0];
 
-    // Day of week data varies by range
-    const dayOfWeekDataByRange: Record<string, Array<{ day: string; value: number }>> = {
-      '7 days': [
-        { day: 'Mon', value: 100 },
-        { day: 'Tue', value: 85 },
-        { day: 'Wed', value: 90 },
-        { day: 'Thu', value: 100 },
-        { day: 'Fri', value: 75 },
-        { day: 'Sat', value: 50 },
-        { day: 'Sun', value: 65 },
-      ],
-      '30 days': [
-        { day: 'Mon', value: 92 },
-        { day: 'Tue', value: 88 },
-        { day: 'Wed', value: 75 },
-        { day: 'Thu', value: 90 },
-        { day: 'Fri', value: 85 },
-        { day: 'Sat', value: 60 },
-        { day: 'Sun', value: 55 },
-      ],
-      '90 days': [
-        { day: 'Mon', value: 85 },
-        { day: 'Tue', value: 80 },
-        { day: 'Wed', value: 78 },
-        { day: 'Thu', value: 82 },
-        { day: 'Fri', value: 75 },
-        { day: 'Sat', value: 55 },
-        { day: 'Sun', value: 50 },
-      ],
-      'All time': [
-        { day: 'Mon', value: 78 },
-        { day: 'Tue', value: 75 },
-        { day: 'Wed', value: 72 },
-        { day: 'Thu', value: 76 },
-        { day: 'Fri', value: 70 },
-        { day: 'Sat', value: 52 },
-        { day: 'Sun', value: 48 },
-      ],
+          if (habit.selectedDays.includes(dayOfWeek)) {
+            if (!habit.createdAt || new Date(habit.createdAt) <= currentDate) {
+              dayStats[dayOfWeek].scheduled++;
+              const completion = completions[dateStr];
+              if (completion && completion.completionCount >= completion.targetCount) {
+                dayStats[dayOfWeek].completed++;
+              }
+            }
+          }
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+      });
+
+      return dayStats.map((stat, index) => ({
+        day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][index],
+        value: stat.scheduled > 0
+          ? Math.round((stat.completed / stat.scheduled) * 100)
+          : 0
+      }));
     };
 
     // Trend percentages by range
@@ -186,12 +240,24 @@ const AnalyticsDashboardScreen: React.FC = () => {
       ],
     };
 
+    const consistencyScore = calculateConsistencyScore();
+    const dayOfWeekData = calculateDayOfWeekData();
+
+    // Find best day from real data
+    const bestDay = dayOfWeekData.reduce((best, current) =>
+      current.value > best.value ? current : best
+      , dayOfWeekData[0]);
+
+    const bestDayInsight = bestDay.value > 0
+      ? `You're most productive on ${bestDay.day}s with ${bestDay.value}% completion!`
+      : "Complete more habits to see insights";
+
     return {
       totalCompletions,
-      consistencyScore: consistencyScores[selectedRange] || 87,
-      dayOfWeekData: dayOfWeekDataByRange[selectedRange] || dayOfWeekDataByRange['30 days'],
+      consistencyScore,
+      dayOfWeekData,
       trendPercentage: trendPercentages[selectedRange] || '+12%',
-      bestDayInsight: bestDayInsights[selectedRange] || bestDayInsights['30 days'],
+      bestDayInsight,
       aiInsights: aiInsightsByRange[selectedRange] || aiInsightsByRange['30 days'],
     };
   }, [selectedRange, activeHabits, habits.length]);
@@ -693,63 +759,83 @@ const AnalyticsDashboardScreen: React.FC = () => {
           >
             Habits Performance
           </Text>
-          {activeHabits.slice(0, 5).map((habit) => (
-            <TouchableOpacity
-              key={habit.id}
-              style={[styles.habitRow, { borderBottomColor: theme.colors.border }]}
-              onPress={() =>
-                navigation.navigate('HabitDeepDive', { habitId: habit.id, habitData: habit })
-              }
-              activeOpacity={0.7}
-            >
-              <View style={styles.habitInfo}>
-                <Text style={styles.habitEmoji}>{habit.emoji}</Text>
-                <Text
-                  style={[
-                    styles.habitName,
-                    {
-                      color: theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBodyMedium,
-                      fontSize: theme.typography.fontSizeSM,
-                    },
-                  ]}
-                  numberOfLines={1}
-                >
-                  {habit.name}
-                </Text>
-              </View>
-              <View style={styles.habitStats}>
-                <View style={styles.statBadge}>
-                  <Flame size={12} color={theme.colors.primary} strokeWidth={2} />
+          {activeHabits.length === 0 ? (
+            <View style={{ paddingVertical: 32, alignItems: 'center' }}>
+              <Text style={{ fontSize: 48, marginBottom: 12 }}>📊</Text>
+              <Text
+                style={[
+                  {
+                    color: theme.colors.textSecondary,
+                    fontFamily: theme.typography.fontFamilyBody,
+                    fontSize: theme.typography.fontSizeSM,
+                    textAlign: 'center',
+                    paddingHorizontal: 24,
+                    lineHeight: theme.typography.fontSizeSM * theme.typography.lineHeightRelaxed,
+                  },
+                ]}
+              >
+                Complete a few habits to see detailed performance insights and track your progress over time.
+              </Text>
+            </View>
+          ) : (
+            activeHabits.slice(0, 5).map((habit) => (
+              <TouchableOpacity
+                key={habit.id}
+                style={[styles.habitRow, { borderBottomColor: theme.colors.border }]}
+                onPress={() =>
+                  navigation.navigate('HabitDeepDive', { habitId: habit.id, habitData: habit })
+                }
+                activeOpacity={0.7}
+              >
+                <View style={styles.habitInfo}>
+                  <Text style={styles.habitEmoji}>{habit.emoji}</Text>
                   <Text
                     style={[
-                      styles.statText,
+                      styles.habitName,
                       {
                         color: theme.colors.text,
-                        fontFamily: theme.typography.fontFamilyBody,
-                        fontSize: theme.typography.fontSizeXS,
+                        fontFamily: theme.typography.fontFamilyBodyMedium,
+                        fontSize: theme.typography.fontSizeSM,
+                      },
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {habit.name}
+                  </Text>
+                </View>
+                <View style={styles.habitStats}>
+                  <View style={styles.statBadge}>
+                    <Flame size={12} color={theme.colors.primary} strokeWidth={2} />
+                    <Text
+                      style={[
+                        styles.statText,
+                        {
+                          color: theme.colors.text,
+                          fontFamily: theme.typography.fontFamilyBody,
+                          fontSize: theme.typography.fontSizeXS,
+                        },
+                      ]}
+                    >
+                      {habit.streak}
+                    </Text>
+                  </View>
+                  <Text
+                    style={[
+                      styles.completionRate,
+                      {
+                        color: theme.colors.success,
+                        fontFamily: theme.typography.fontFamilyBodySemibold,
+                        fontSize: theme.typography.fontSizeSM,
                       },
                     ]}
                   >
-                    {habit.streak}
+                    {calculateCompletionRate(habit)}%
                   </Text>
+                  <ChevronRight size={20} color="#9CA3AF" strokeWidth={2} />
                 </View>
-                <Text
-                  style={[
-                    styles.completionRate,
-                    {
-                      color: theme.colors.success,
-                      fontFamily: theme.typography.fontFamilyBodySemibold,
-                      fontSize: theme.typography.fontSizeSM,
-                    },
-                  ]}
-                >
-                  {calculateCompletionRate(habit)}%
-                </Text>
-                <ChevronRight size={20} color="#9CA3AF" strokeWidth={2} />
-              </View>
-            </TouchableOpacity>
-          ))}
+              </TouchableOpacity>
+            ))
+          )}
         </Animated.View>
 
         {/* AI Insights Panel */}
