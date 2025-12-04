@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
+import { format } from 'date-fns';
 import { useTheme } from '@/theme';
 import { useHabits } from '@/contexts/HabitsContext';
 import { useSubscription } from '@/context/SubscriptionContext';
@@ -23,7 +24,7 @@ const DAY_SIZE = (width - CALENDAR_PADDING * 2) / 7;
 const CalendarViewScreen: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<any>>();
   const { theme } = useTheme();
-  const { habits, toggleHabit } = useHabits();
+  const { habits, completeHabit, uncompleteHabit, isHabitCompletedForDate } = useHabits();
   const { subscription } = useSubscription();
 
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -62,7 +63,15 @@ const CalendarViewScreen: React.FC = () => {
       return;
     }
     // Toggle habit for the past date
-    toggleHabit(habitId);
+    const dateStr = format(date, 'yyyy-MM-dd');
+    const isCompleted = isHabitCompletedForDate(habitId, dateStr);
+
+    if (isCompleted) {
+      uncompleteHabit(habitId, dateStr);
+    } else {
+      completeHabit(habitId, dateStr);
+    }
+
     Alert.alert('Check-in Updated', `Habit marked for ${date.toLocaleDateString()}`);
   };
 

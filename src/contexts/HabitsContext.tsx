@@ -367,10 +367,5 @@ export const HabitsProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   );
 };
 
-export const useHabits = () => {
-  const context = useContext(HabitsContext);
-  if (context === undefined) {
-    throw new Error('useHabits must be used within a HabitsProvider');
-  }
-  return context;
-};
+// Re-export the new Zustand-based useHabits hook for backward compatibility
+export { useHabits } from '../hooks/useHabits';

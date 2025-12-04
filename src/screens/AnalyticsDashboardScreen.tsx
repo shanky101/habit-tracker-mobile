@@ -57,7 +57,10 @@ const AnalyticsDashboardScreen: React.FC = () => {
     };
 
     const multiplier = rangeMultipliers[selectedRange] || 1;
-    const baseCompletions = activeHabits.reduce((sum, h) => sum + (h.completed ? 1 : 0), 0);
+    const baseCompletions = activeHabits.reduce(
+      (sum, h) => sum + Object.keys(h.completions).length,
+      0
+    );
 
     // Generate different data for each range
     const totalCompletions = Math.round((baseCompletions + activeHabits.length * 5) * multiplier);
