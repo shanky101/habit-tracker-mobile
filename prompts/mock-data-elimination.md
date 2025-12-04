@@ -213,7 +213,7 @@ Calculate user-level aggregate stats across all habits.
 **Location**: Line 55 (mock stats comment)
 
 ### Implementation Plan
-- [ ] **Checkpoint 3.1**: Identify what stats to show
+- [x] **Checkpoint 3.1**: Identify what stats to show
   - Total habits created
   - Total active habits
   - Overall completion rate (across all habits)
@@ -221,13 +221,14 @@ Calculate user-level aggregate stats across all habits.
   - Longest streak (best across all habits)
   - Current active streaks count
 
-- [ ] **Checkpoint 3.2**: Create aggregation functions
+- [x] **Checkpoint 3.2**: Create aggregation functions
   - Iterate through all active habits
   - Sum/average relevant metrics
   - Handle edge cases (no habits, all archived, etc.)
 
-- [ ] **Checkpoint 3.3**: Update UI to display real stats
+- [x] **Checkpoint 3.3**: Update UI to display real stats
 
+**Status**: ✅ COMPLETE
 **Estimated Effort**: 30 minutes
 **Data Required**: ✅ Available (aggregate from all `habits`)
 
@@ -265,8 +266,13 @@ const shouldShowNote = Math.random() < 0.2; // 20% chance
 ```
 
 ### Investigation Needed
-- [ ] **Checkpoint 5.1**: Check if this is actually mock or intentional randomness
-- [ ] **Checkpoint 5.2**: If mock, replace with: "Show note if entry has `.note` or `.mood`"
+- [x] **Checkpoint 5.1**: Check if this is actually mock or intentional randomness
+- [x] **Checkpoint 5.2**: If mock, replace with: "Show note if entry has `.note` or `.mood`"
+
+**Status**: ✅ VERIFIED - NOT MOCK DATA
+**Finding**: The `Math.random()` on line 259 is **intentional UX logic**, not mock data. It provides a 20% chance to show the quick note modal after completing a habit to encourage occasional note/mood tracking without being intrusive.
+
+**No changes needed** - this is working as designed.
 
 **Estimated Effort**: 5 minutes
 
