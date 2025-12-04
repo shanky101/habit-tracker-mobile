@@ -49,17 +49,16 @@ export const MascotDisplay = forwardRef<HabiMascotRef, MascotDisplayProps>(({
 }, ref) => {
   const { theme } = useTheme();
   const { customization } = useMascotCustomization();
-  const { mascot, petMascot, getRandomMessage } = useMascot();
+  const { mascot, getRandomMessage } = useMascot();
   const [showBubble, setShowBubble] = useState(false);
   const [currentMessage, setCurrentMessage] = useState('');
 
-  // Show bubble when message changes
+  // Initialize with mascot message (only once on mount)
   useEffect(() => {
-    if (mascot.message) {
+    if (mascot.message && !currentMessage) {
       setCurrentMessage(mascot.message);
-      setShowBubble(true);
     }
-  }, [mascot.message]);
+  }, []); // Empty deps - only run once!
 
   const handlePress = () => {
     // Haptic feedback for interaction
@@ -70,12 +69,12 @@ export const MascotDisplay = forwardRef<HabiMascotRef, MascotDisplayProps>(({
       ref.current.bounce();
     }
 
-    // Get a new random message from "waving" mood (don't trigger petMascot to avoid loop)
+    // Get a new random message from "waving" mood
     const newMessage = getRandomMessage('waving');
     setCurrentMessage(newMessage);
     setShowBubble(true);
 
-    // Only call onPress if explicitly provided (don't default to petMascot)
+    // Only call onPress if explicitly provided
     if (onPress) {
       onPress();
     }
@@ -104,7 +103,7 @@ export const MascotDisplay = forwardRef<HabiMascotRef, MascotDisplayProps>(({
       </Container>
 
       {/* Show mascot message if requested */}
-      {showMessage && (
+      {showMessage && currentMessage && (
         <SpeechBubble
           message={currentMessage}
           visible={showBubble}

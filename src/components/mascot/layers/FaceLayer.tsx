@@ -14,37 +14,8 @@ interface FaceLayerProps {
  * Enhanced with larger eyes, sparkles, and friendlier expressions
  */
 export const FaceLayer: React.FC<FaceLayerProps> = ({ customization, mood = 'happy' }) => {
-  // Blinking animation
-  const blinkValue = useRef(new Animated.Value(1)).current;
-
-  useEffect(() => {
-    // Random blinking every 2-4 seconds (more frequent for liveness!)
-    const startBlinking = () => {
-      const randomDelay = Math.random() * 2000 + 2000; // 2-4 seconds (was 3-5)
-
-      setTimeout(() => {
-        Animated.sequence([
-          Animated.timing(blinkValue, {
-            toValue: 0,
-            duration: 100,
-            useNativeDriver: false,
-          }),
-          Animated.timing(blinkValue, {
-            toValue: 1,
-            duration: 100,
-            useNativeDriver: false,
-          }),
-        ]).start(() => startBlinking());
-      }, randomDelay);
-    };
-
-    startBlinking();
-  }, []);
-
   // Render eyes based on customization - LARGER & CUTER
   const renderEyes = () => {
-    const eyeScaleY = blinkValue;
-
     switch (customization.eyes) {
       case 'happy':
         return (
