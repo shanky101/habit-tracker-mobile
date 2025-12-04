@@ -40,6 +40,7 @@ export interface Habit {
   completions: Record<string, DailyCompletion>; // Date-indexed completion records (YYYY-MM-DD)
   isDefault?: boolean; // Track if this is a default habit
   archived?: boolean; // Track if this habit is archived
+  createdAt?: string; // ISO timestamp of when habit was created
 }
 
 interface HabitsContextType {
@@ -225,12 +226,12 @@ export const HabitsProvider: React.FC<{ children: ReactNode }> = ({ children }) 
           if (existing.completionCount < existing.targetCount) {
             const newEntry: HabitEntry | undefined = entry
               ? {
-                  id: `${id}-${date}-${timestamp}`,
-                  date,
-                  mood: entry.mood,
-                  note: entry.note,
-                  timestamp,
-                }
+                id: `${id}-${date}-${timestamp}`,
+                date,
+                mood: entry.mood,
+                note: entry.note,
+                timestamp,
+              }
               : undefined;
 
             completions[date] = {
@@ -244,12 +245,12 @@ export const HabitsProvider: React.FC<{ children: ReactNode }> = ({ children }) 
           // Create new completion record for this date
           const newEntry: HabitEntry | undefined = entry
             ? {
-                id: `${id}-${date}-${timestamp}`,
-                date,
-                mood: entry.mood,
-                note: entry.note,
-                timestamp,
-              }
+              id: `${id}-${date}-${timestamp}`,
+              date,
+              mood: entry.mood,
+              note: entry.note,
+              timestamp,
+            }
             : undefined;
 
           completions[date] = {

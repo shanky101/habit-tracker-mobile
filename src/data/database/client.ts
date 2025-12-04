@@ -16,3 +16,6 @@ export const enableForeignKeys = () => {
     throw error;
   }
 };
+
+// Enable foreign keys immediately
+enableForeignKeys();

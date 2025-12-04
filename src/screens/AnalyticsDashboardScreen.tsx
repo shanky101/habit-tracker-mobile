@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { useHabits } from '@/contexts/HabitsContext';
+import { useSubscription } from '@/context/SubscriptionContext';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 import {
   Lock,
@@ -37,6 +38,7 @@ const AnalyticsDashboardScreen: React.FC = () => {
   const navigation = useNavigation<AnalyticsDashboardNavigationProp>();
   const { theme } = useTheme();
   const { habits } = useHabits();
+  const { subscription } = useSubscription();
   const { fadeAnim, slideAnim } = useScreenAnimation();
 
   const [selectedRange, setSelectedRange] = useState('30 days');
@@ -44,6 +46,37 @@ const AnalyticsDashboardScreen: React.FC = () => {
 
   // Get active and archived habits
   const activeHabits = habits.filter((h) => !h.archived);
+
+  // Helper function to calculate completion rate for a habit
+  const calculateCompletionRate = (habit: any): number => {
+    if (!habit.createdAt) return 0;
+
+    const createdDate = new Date(habit.createdAt);
+    const today = new Date();
+    const completions = habit.completions || {};
+
+    // Count scheduled days since creation
+    let scheduledDays = 0;
+    const currentDate = new Date(createdDate);
+
+    while (currentDate <= today) {
+      const dayOfWeek = currentDate.getDay();
+      if (habit.selectedDays.includes(dayOfWeek)) {
+        scheduledDays++;
+      }
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    if (scheduledDays === 0) return 0;
+
+    // Count completed days (met target)
+    const completedDays = Object.keys(completions).filter(date => {
+      const completion = completions[date];
+      return completion && completion.completionCount >= completion.targetCount;
+    }).length;
+
+    return Math.round((completedDays / scheduledDays) * 100);
+  };
   const archivedCount = habits.filter((h) => h.archived).length;
 
   // Calculate analytics data based on selected range
@@ -711,7 +744,7 @@ const AnalyticsDashboardScreen: React.FC = () => {
                     },
                   ]}
                 >
-                  {Math.floor(Math.random() * 20) + 80}%
+                  {calculateCompletionRate(habit)}%
                 </Text>
                 <ChevronRight size={20} color="#9CA3AF" strokeWidth={2} />
               </View>

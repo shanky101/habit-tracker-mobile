@@ -3,6 +3,19 @@ import { Habit, DailyCompletion, HabitEntry } from '@/contexts/HabitsContext';
 import { HabitRow, CompletionRow, EntryRow } from './types';
 
 /**
+ * Safe JSON parse helpers - return default values on parse failure
+ */
+const safeParseJSON = <T>(jsonString: string | null, defaultValue: T): T => {
+  if (!jsonString) return defaultValue;
+  try {
+    return JSON.parse(jsonString) as T;
+  } catch (error) {
+    console.error('[Repository] JSON parse error:', error);
+    return defaultValue;
+  }
+};
+
+/**
  * Denormalize database rows into Habit object
  * Converts normalized SQLite data into the denormalized shape used by the UI
  */
@@ -31,15 +44,15 @@ const denormalize = (
       date: completionRow.date,
       completionCount: completionRow.completion_count,
       targetCount: completionRow.target_count,
-      timestamps: JSON.parse(completionRow.timestamps),
+      timestamps: safeParseJSON<number[]>(completionRow.timestamps, []),
       entries: habitEntries,
     };
   });
 
-  // Parse JSON fields
-  const selectedDays = JSON.parse(habitRow.selected_days) as number[];
+  // Parse JSON fields with safe parsing
+  const selectedDays = safeParseJSON<number[]>(habitRow.selected_days, [0, 1, 2, 3, 4, 5, 6]);
   const notificationIds = habitRow.notification_ids
-    ? (JSON.parse(habitRow.notification_ids) as string[])
+    ? safeParseJSON<string[]>(habitRow.notification_ids, [])
     : undefined;
 
   return {
@@ -60,6 +73,7 @@ const denormalize = (
     completions,
     isDefault: habitRow.is_default === 1,
     archived: habitRow.archived === 1,
+    createdAt: habitRow.created_at, // Map database created_at to createdAt
   };
 };
 
