@@ -84,12 +84,13 @@ const HomeScreen: React.FC = () => {
     addHabit,
     deleteHabit,
     updateHabit,
-    reorderHabits,
     completeHabit,
     uncompleteHabit,
     resetHabitForDate,
-    isHabitCompletedForDate,
+    addNoteToCompletion,
     getCompletionProgress,
+    isHabitCompletedForDate,
+    reorderHabits,
   } = useHabits();
   const { subscription } = useSubscription();
   const { triggerReaction, getMascotForProgress, setMood, settings: mascotSettings, toggleMascot } = useMascot();
@@ -359,12 +360,11 @@ const HomeScreen: React.FC = () => {
 
   // Handle quick note save
   const handleSaveQuickNote = (note: string, mood?: string) => {
-    // TODO: This needs to be refactored to add the note/mood to the completion record
-    // For now, just close the modal since the habit was already completed
-    // In the future, we should pass mood/note directly to completeHabit
     if (quickNoteHabitId) {
-      console.log('Note/mood captured:', note, mood, 'for habit:', quickNoteHabitId);
-      // This would need to update the completion entry for today's date
+      const today = new Date().toISOString().split('T')[0];
+      // Add the note/mood to today's completion
+      addNoteToCompletion(quickNoteHabitId, today, { mood, note });
+      console.log('Note/mood saved:', note, mood, 'for habit:', quickNoteHabitId);
     }
 
     setShowQuickNoteModal(false);

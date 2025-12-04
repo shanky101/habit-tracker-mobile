@@ -117,10 +117,14 @@ const AnalyticsDashboardScreen: React.FC = () => {
     // Calculate real total completions within the selected range
     const totalCompletions = activeHabits.reduce((sum, habit) => {
       const completions = habit.completions || {};
-      const completionsInRange = Object.keys(completions).filter(dateStr => {
-        const completionDate = new Date(dateStr);
-        return completionDate >= startDate && completionDate <= now;
-      });
+
+      // For "All time", don't filter by date - count all completions
+      const completionsInRange = selectedRange === 'All time'
+        ? Object.keys(completions)
+        : Object.keys(completions).filter(dateStr => {
+          const completionDate = new Date(dateStr);
+          return completionDate >= startDate && completionDate <= now;
+        });
 
       // Sum up all completion counts in range
       return sum + completionsInRange.reduce((dateSum, dateStr) => {

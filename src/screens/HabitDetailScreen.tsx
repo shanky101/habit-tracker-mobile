@@ -785,16 +785,48 @@ const HabitDetailScreen: React.FC = () => {
   );
 
   const renderMoodNoteHistory = () => {
-    // Get all entries from all daily completions
-    const allEntries: HabitEntry[] = [];
-    Object.values(habitData.completions || {}).forEach(completion => {
-      allEntries.push(...completion.entries);
-    });
+    // Get all entries with notes/moods from completions
+    const getAllEntriesWithNotes = () => {
+      const entries: Array<{
+        id: string;
+        date: string;
+        mood?: string;
+        note?: string;
+      }> = [];
 
-    if (allEntries.length === 0) return null;
+      const completions = habitData.completions || {};
 
-    // Sort entries by timestamp (newest first)
-    const sortedEntries = [...allEntries].sort((a, b) => b.timestamp - a.timestamp);
+      // Iterate through all completion dates
+      Object.keys(completions).forEach((dateStr) => {
+        const completion = completions[dateStr];
+        if (completion?.entries && completion.entries.length > 0) {
+          completion.entries.forEach((entry, index) => {
+            // Only include entries that have a note or mood
+            if (entry.note || entry.mood) {
+              entries.push({
+                id: `${dateStr}-${index}`,
+                date: dateStr,
+                mood: entry.mood,
+                note: entry.note,
+              });
+            }
+          });
+        }
+      });
+
+      return entries;
+    };
+
+    const allEntries = getAllEntriesWithNotes();
+
+    // Sort by date (most recent first) and limit to 100
+    const sortedEntries = allEntries
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, 100);
+
+    if (sortedEntries.length === 0) {
+      return null;
+    }
 
     return (
       <View style={styles.moodNoteContainer}>
@@ -808,78 +840,84 @@ const HabitDetailScreen: React.FC = () => {
             },
           ]}
         >
-          Mood & Notes History
+          Recent Notes ({sortedEntries.length})
         </Text>
-        {sortedEntries.slice(0, 10).map((entry, index) => {
-          const date = new Date(entry.date);
-          const today = new Date();
-          const yesterday = new Date(today);
-          yesterday.setDate(yesterday.getDate() - 1);
+        <ScrollView
+          style={styles.notesScrollView}
+          showsVerticalScrollIndicator={true}
+          nestedScrollEnabled={true}
+        >
+          {sortedEntries.map((entry, index) => {
+            const date = new Date(entry.date);
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
 
-          let dateLabel = entry.date;
-          if (entry.date === today.toISOString().split('T')[0]) {
-            dateLabel = 'Today';
-          } else if (entry.date === yesterday.toISOString().split('T')[0]) {
-            dateLabel = 'Yesterday';
-          } else {
-            const daysAgo = Math.floor(
-              (today.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)
-            );
-            if (daysAgo < 30) {
-              dateLabel = `${daysAgo} days ago`;
+            let dateLabel = entry.date;
+            if (entry.date === today.toISOString().split('T')[0]) {
+              dateLabel = 'Today';
+            } else if (entry.date === yesterday.toISOString().split('T')[0]) {
+              dateLabel = 'Yesterday';
             } else {
-              const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-              dateLabel = `${months[date.getMonth()]} ${date.getDate()}`;
+              const daysAgo = Math.floor(
+                (today.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)
+              );
+              if (daysAgo < 30) {
+                dateLabel = `${daysAgo} days ago`;
+              } else {
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                dateLabel = `${months[date.getMonth()]} ${date.getDate()}`;
+              }
             }
-          }
 
-          return (
-            <View
-              key={entry.id}
-              style={[
-                styles.moodNoteItem,
-                {
-                  backgroundColor: theme.colors.surface,
-                  borderColor: theme.colors.border,
-                },
-                index === sortedEntries.length - 1 && { borderBottomWidth: 0 },
-              ]}
-            >
-              <View style={styles.moodNoteHeader}>
-                {entry.mood && (
-                  <Text style={styles.moodEmoji}>{entry.mood}</Text>
+            return (
+              <View
+                key={entry.id}
+                style={[
+                  styles.moodNoteItem,
+                  {
+                    backgroundColor: theme.colors.surface,
+                    borderColor: theme.colors.border,
+                  },
+                  index === sortedEntries.length - 1 && { borderBottomWidth: 0 },
+                ]}
+              >
+                <View style={styles.moodNoteHeader}>
+                  {entry.mood && (
+                    <Text style={styles.moodEmoji}>{entry.mood}</Text>
+                  )}
+                  <Text
+                    style={[
+                      styles.moodNoteDate,
+                      {
+                        color: theme.colors.textSecondary,
+                        fontFamily: theme.typography.fontFamilyBody,
+                        fontSize: theme.typography.fontSizeXS,
+                      },
+                    ]}
+                  >
+                    {dateLabel}
+                  </Text>
+                </View>
+                {entry.note && (
+                  <Text
+                    style={[
+                      styles.moodNoteText,
+                      {
+                        color: theme.colors.text,
+                        fontFamily: theme.typography.fontFamilyBody,
+                        fontSize: theme.typography.fontSizeSM,
+                        lineHeight: theme.typography.fontSizeSM * theme.typography.lineHeightRelaxed,
+                      },
+                    ]}
+                  >
+                    {entry.note}
+                  </Text>
                 )}
-                <Text
-                  style={[
-                    styles.moodNoteDate,
-                    {
-                      color: theme.colors.textSecondary,
-                      fontFamily: theme.typography.fontFamilyBody,
-                      fontSize: theme.typography.fontSizeXS,
-                    },
-                  ]}
-                >
-                  {dateLabel}
-                </Text>
               </View>
-              {entry.note && (
-                <Text
-                  style={[
-                    styles.moodNoteText,
-                    {
-                      color: theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBody,
-                      fontSize: theme.typography.fontSizeSM,
-                      lineHeight: theme.typography.fontSizeSM * theme.typography.lineHeightRelaxed,
-                    },
-                  ]}
-                >
-                  {entry.note}
-                </Text>
-              )}
-            </View>
-          );
-        })}
+            );
+          })}
+        </ScrollView>
       </View>
     );
   };
@@ -1046,8 +1084,7 @@ const HabitDetailScreen: React.FC = () => {
             style={[
               styles.actionButton,
               {
-                backgroundColor: theme.colors.backgroundSecondary,
-                borderColor: theme.colors.border,
+                backgroundColor: theme.colors.primary,
                 opacity: isExporting ? 0.5 : 1,
               },
             ]}
@@ -1056,41 +1093,42 @@ const HabitDetailScreen: React.FC = () => {
             disabled={isExporting}
           >
             {isExporting ? (
-              <ActivityIndicator size="small" color={theme.colors.primary} />
+              <ActivityIndicator size="small" color={theme.colors.white} />
             ) : (
-              <Upload size={20} color={theme.colors.text} strokeWidth={2.5} />
+              <>
+                <Upload size={18} color={theme.colors.white} strokeWidth={2.5} />
+                <Text
+                  style={[
+                    styles.actionText,
+                    {
+                      color: theme.colors.white,
+                      fontSize: theme.typography.fontSizeSM,
+                      fontFamily: theme.typography.fontFamilyBodyMedium,
+                    },
+                  ]}
+                >
+                  {isExporting ? 'Exporting...' : 'Export Data'}
+                </Text>
+              </>
             )}
-            <Text
-              style={[
-                styles.actionText,
-                {
-                  color: theme.colors.text,
-                  fontSize: theme.typography.fontSizeSM,
-                  fontFamily: theme.typography.fontFamilyBodyMedium,
-                },
-              ]}
-            >
-              {isExporting ? 'Exporting...' : 'Export Data'}
-            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[
               styles.actionButton,
               {
-                backgroundColor: theme.colors.backgroundSecondary,
-                borderColor: theme.colors.border,
+                backgroundColor: theme.colors.success,
               },
             ]}
             onPress={handleShareStreak}
             activeOpacity={0.7}
           >
-            <Share2 size={20} color={theme.colors.text} strokeWidth={2.5} />
+            <Share2 size={18} color={theme.colors.white} strokeWidth={2.5} />
             <Text
               style={[
                 styles.actionText,
                 {
-                  color: theme.colors.text,
+                  color: theme.colors.white,
                   fontSize: theme.typography.fontSizeSM,
                   fontFamily: theme.typography.fontFamilyBodyMedium,
                 },
@@ -1369,6 +1407,10 @@ const styles = StyleSheet.create({
     marginTop: 24,
     paddingHorizontal: 24,
   },
+  notesScrollView: {
+    maxHeight: 400,
+    marginTop: 12,
+  },
   moodNoteItem: {
     padding: 16,
     borderRadius: 12,
@@ -1391,22 +1433,28 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   actionsContainer: {
-    marginTop: 24,
-    paddingHorizontal: 24,
+    flexDirection: 'row',
     gap: 12,
+    paddingHorizontal: 24,
+    marginTop: 24,
   },
   actionButton: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    borderRadius: 16,
-    borderWidth: 1,
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 12,
   },
   actionEmoji: {
     fontSize: 24,
-    marginRight: 12,
+    marginRight: 8,
   },
-  actionText: {},
+  actionText: {
+    // styles from theme
+  },
 });
 
 export default HabitDetailScreen;

@@ -53,6 +53,7 @@ interface HabitsContextType {
   completeHabit: (id: string, date: string, entry?: { mood?: string; note?: string }) => void;
   uncompleteHabit: (id: string, date: string) => void;
   resetHabitForDate: (id: string, date: string) => void;
+  addNoteToCompletion: (id: string, date: string, entry: { mood?: string; note?: string }) => void;
   getCompletionForDate: (id: string, date: string) => DailyCompletion | undefined;
   isHabitCompletedForDate: (id: string, date: string) => boolean;
   getCompletionProgress: (id: string, date: string) => { current: number; target: number };
@@ -317,6 +318,55 @@ export const HabitsProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     );
   };
 
+  // Add or update a note/mood for an existing completion
+  const addNoteToCompletion = (id: string, date: string, entry: { mood?: string; note?: string }) => {
+    setHabits((prevHabits) =>
+      prevHabits.map((habit) => {
+        if (habit.id !== id) return habit;
+
+        const completions = { ...habit.completions };
+        const existing = completions[date];
+
+        if (!existing) {
+          // No completion exists for this date, create one with the note/mood
+          const timestamp = Date.now();
+          const newEntry: HabitEntry = {
+            id: `${id}-${date}-${timestamp}`,
+            date,
+            mood: entry.mood,
+            note: entry.note,
+            timestamp,
+          };
+
+          completions[date] = {
+            date,
+            completionCount: 1,
+            targetCount: habit.targetCompletionsPerDay,
+            timestamps: [timestamp],
+            entries: [newEntry],
+          };
+        } else {
+          // Completion exists, add the note/mood to the most recent entry or create a new one
+          const timestamp = Date.now();
+          const newEntry: HabitEntry = {
+            id: `${id}-${date}-${timestamp}`,
+            date,
+            mood: entry.mood,
+            note: entry.note,
+            timestamp,
+          };
+
+          completions[date] = {
+            ...existing,
+            entries: [...existing.entries, newEntry],
+          };
+        }
+
+        return { ...habit, completions };
+      })
+    );
+  };
+
   // Get completion record for a specific date
   const getCompletionForDate = (id: string, date: string): DailyCompletion | undefined => {
     const habit = habits.find((h) => h.id === id);
@@ -358,6 +408,7 @@ export const HabitsProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         completeHabit,
         uncompleteHabit,
         resetHabitForDate,
+        addNoteToCompletion,
         getCompletionForDate,
         isHabitCompletedForDate,
         getCompletionProgress,

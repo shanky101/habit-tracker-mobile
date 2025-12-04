@@ -6,10 +6,6 @@ import {
   OnboardingTrackScreen,
   OnboardingStreaksScreen,
   PermissionNotificationScreen,
-  WelcomeScreen,
-  SignUpScreen,
-  LoginScreen,
-  PasswordResetScreen,
 } from '@/screens';
 import MainTabNavigator from './MainTabNavigator';
 
@@ -19,10 +15,6 @@ export type OnboardingStackParamList = {
   OnboardingTrack: undefined;
   OnboardingStreaks: undefined;
   PermissionNotification: undefined;
-  Welcome: undefined;
-  SignUp: undefined;
-  Login: undefined;
-  PasswordReset: undefined;
   MainApp: undefined;
 };
 
@@ -41,10 +33,6 @@ const OnboardingNavigator: React.FC = () => {
       <Stack.Screen name="OnboardingTrack" component={OnboardingTrackScreen} />
       <Stack.Screen name="OnboardingStreaks" component={OnboardingStreaksScreen} />
       <Stack.Screen name="PermissionNotification" component={PermissionNotificationScreen} />
-      <Stack.Screen name="Welcome" component={WelcomeScreen} />
-      <Stack.Screen name="SignUp" component={SignUpScreen} />
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="PasswordReset" component={PasswordResetScreen} />
       <Stack.Screen
         name="MainApp"
         component={MainTabNavigator}

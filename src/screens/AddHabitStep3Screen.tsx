@@ -611,39 +611,63 @@ const AddHabitStep3Screen: React.FC = () => {
 
             {reminderEnabled && showTimePicker && (
               <View style={styles.timePickerContainer}>
-                <DateTimePicker
-                  value={(() => {
-                    const [hours, minutes] = reminderTime.split(':');
-                    const date = new Date();
-                    date.setHours(parseInt(hours, 10));
-                    date.setMinutes(parseInt(minutes, 10));
-                    return date;
-                  })()}
-                  mode="time"
-                  is24Hour={false}
-                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                  onChange={handleTimeChange}
-                />
                 {Platform.OS === 'ios' && (
-                  <TouchableOpacity
-                    style={[
-                      styles.doneButton,
-                      { backgroundColor: theme.colors.primary }
-                    ]}
-                    onPress={handleTimePickerDismiss}
-                  >
-                    <Text
+                  <View style={[styles.iosTimePickerModal, { backgroundColor: theme.colors.backgroundSecondary }]}>
+                    <View style={[styles.iosPickerHeader, { borderBottomColor: theme.colors.border }]}>
+                      <Text style={[styles.iosPickerTitle, { color: theme.colors.text, fontFamily: theme.typography.fontFamilyBodySemibold }]}>
+                        Select Time
+                      </Text>
+                    </View>
+                    <DateTimePicker
+                      value={(() => {
+                        const [hours, minutes] = reminderTime.split(':');
+                        const date = new Date();
+                        date.setHours(parseInt(hours, 10));
+                        date.setMinutes(parseInt(minutes, 10));
+                        return date;
+                      })()}
+                      mode="time"
+                      is24Hour={false}
+                      display="spinner"
+                      onChange={handleTimeChange}
+                      textColor={theme.colors.text}
+                      style={styles.iosTimePicker}
+                    />
+                    <TouchableOpacity
                       style={[
-                        styles.doneButtonText,
-                        {
-                          color: theme.colors.white,
-                          fontFamily: theme.typography.fontFamilyBodySemibold,
-                        }
+                        styles.doneButton,
+                        { backgroundColor: theme.colors.primary }
                       ]}
+                      onPress={handleTimePickerDismiss}
                     >
-                      Done
-                    </Text>
-                  </TouchableOpacity>
+                      <Text
+                        style={[
+                          styles.doneButtonText,
+                          {
+                            color: theme.colors.white,
+                            fontFamily: theme.typography.fontFamilyBodySemibold,
+                          }
+                        ]}
+                      >
+                        Done
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+                {Platform.OS === 'android' && (
+                  <DateTimePicker
+                    value={(() => {
+                      const [hours, minutes] = reminderTime.split(':');
+                      const date = new Date();
+                      date.setHours(parseInt(hours, 10));
+                      date.setMinutes(parseInt(minutes, 10));
+                      return date;
+                    })()}
+                    mode="time"
+                    is24Hour={false}
+                    display="default"
+                    onChange={handleTimeChange}
+                  />
                 )}
               </View>
             )}
@@ -939,12 +963,36 @@ const styles = StyleSheet.create({
     marginTop: 16,
     alignItems: 'center',
   },
+  iosTimePickerModal: {
+    borderRadius: 16,
+    padding: 20,
+    marginTop: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  iosPickerHeader: {
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    marginBottom: 16,
+    alignItems: 'center',
+  },
+  iosPickerTitle: {
+    fontSize: 18,
+  },
+  iosTimePicker: {
+    height: 180,
+    marginVertical: 8,
+  },
   doneButton: {
-    marginTop: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 32,
+    width: '100%',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
     borderRadius: 12,
     alignItems: 'center',
+    marginTop: 16,
   },
   doneButtonText: {
     fontSize: 16,

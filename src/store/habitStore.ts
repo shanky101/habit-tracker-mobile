@@ -19,6 +19,7 @@ interface HabitState {
   completeHabit: (id: string, date: string, entry?: { mood?: string; note?: string }) => void;
   uncompleteHabit: (id: string, date: string) => void;
   resetHabitForDate: (id: string, date: string) => void;
+  addNoteToCompletion: (id: string, date: string, entry: { mood?: string; note?: string }) => void;
 
   // Selectors
   getCompletionForDate: (id: string, date: string) => DailyCompletion | undefined;
@@ -175,6 +176,54 @@ export const useHabitStore = create<HabitState>()(
               ...habit,
               completions: remainingCompletions,
             };
+          }),
+        })),
+
+      // Add or update note/mood for existing completion
+      addNoteToCompletion: (id, date, entry) =>
+        set((state) => ({
+          habits: state.habits.map((habit) => {
+            if (habit.id !== id) return habit;
+
+            const existingCompletion = habit.completions[date];
+            const now = Date.now();
+
+            const newEntry: HabitEntry = {
+              id: `${id}-${date}-${now}`,
+              date,
+              mood: entry.mood,
+              note: entry.note,
+              timestamp: now,
+            };
+
+            if (!existingCompletion) {
+              // No completion exists, create one with the note
+              return {
+                ...habit,
+                completions: {
+                  ...habit.completions,
+                  [date]: {
+                    date,
+                    completionCount: 1,
+                    targetCount: habit.targetCompletionsPerDay,
+                    timestamps: [now],
+                    entries: [newEntry],
+                  },
+                },
+              };
+            } else {
+              // Add note to existing completion
+              return {
+                ...habit,
+                completions: {
+                  ...habit.completions,
+                  [date]: {
+                    ...existingCompletion,
+                    entries: [...existingCompletion.entries, newEntry],
+                  },
+                },
+              };
+            }
           }),
         })),
 
