@@ -14,67 +14,153 @@ export type MascotMood =
   | 'thinking'     // Analyzing/loading
   | 'waving';      // Greeting
 
-// Mascot personality messages
+// Mascot personality messages - Expanded library with humor and motivation!
 export const MASCOT_MESSAGES: Record<MascotMood, string[]> = {
   happy: [
     "Let's crush some habits today! 💪",
     "You've got this! I believe in you!",
     "Ready to make today awesome?",
     "Together we're unstoppable!",
+    "New day, new opportunities! ✨",
+    "I'm so excited to help you today!",
+    "Your future self will thank you!",
+    "Let's gooooo! 🚀",
+    "Vibes are immaculate today!",
+    "You're basically a superhero tbh",
+    "Main character energy! 💫",
+    "Let's make some magic happen!",
+    "Today's forecast: 100% awesome",
+    "Feeling cute, might build habits later",
+    "You look amazing today btw",
+    "Plot twist: you succeed at everything today",
   ],
   ecstatic: [
     "AMAZING! You did it all! 🎉",
     "I'm SO proud of you! This is incredible!",
     "You're on FIRE! Keep this energy!",
     "Best. Day. Ever! You're a legend!",
+    "LEGENDARY STATUS ACHIEVED! 🏆",
+    "YOU'RE A HABIT WIZARD! ⚡",
+    "Can I get your autograph?? 📝",
+    "YASSS QUEEN/KING! 👑",
+    "This is your villain origin story!",
+    "You've unlocked BEAST MODE! 🦁",
+    "Netflix should make a documentary about you!",
+    "Breaking news: You're INCREDIBLE!",
+    "Tell me your secrets! (Actually don't, you earned this)",
+    "Standing ovation! 👏👏👏",
+    "I'm not crying, you're crying! 😭",
   ],
   proud: [
     "Great progress! Keep going!",
     "You're doing wonderfully!",
     "Look at you crushing it!",
     "I knew you could do it!",
+    "Slow and steady wins the race! 🐢",
+    "You're killing it softly!",
+    "Character development! 📈",
+    "That's what I'm talking about!",
+    "Consistency is your superpower!",
+    "You're writing your success story!",
+    "Absolute chef's kiss 👨‍🍳💋",
+    "10/10, no notes!",
+    "Momentum = building...",
   ],
   encouraging: [
     "Every small step counts!",
     "You can do this! Start with one!",
     "Progress, not perfection!",
     "I'm here cheering you on!",
+    "Rome wasn't built in a day!",
+    "Just one more? Pretty please? 🥺",
+    "You're closer than you think!",
+    "Small wins lead to big victories!",
+    "The hardest part is starting!",
+    "Future you is rooting for present you!",
+    "One step at a time, friend!",
+    "You've got this energy!",
+    "Believe in the power of YET!",
+    "Even a tiny step is progress!",
+    "I see potential! Let's unlock it!",
+    "Your comeback story starts now!",
   ],
   sleepy: [
     "*yawns* Good morning! Ready to start?",
     "Rise and shine! New day, new wins!",
     "Let's wake up and get moving!",
     "Morning! What shall we tackle first?",
+    "Coffee first, then habits? ☕",
+    "*stretches* Time to adulting!",
+    "The early bird gets the... habits?",
+    "Good morning, sunshine! ☀️",
+    "Let's do this... after I wake up fully",
+    "Fresh start incoming!",
+    "New day, who dis?",
+    "Morning motivation loading... 73%",
   ],
   worried: [
     "Your streak is at risk! Let's save it!",
     "Don't forget about your habits today!",
     "Quick! There's still time!",
     "I don't want to see your streak break!",
+    "SOS! Your streak needs you! 🆘",
+    "Red alert! Habits at risk!",
+    "Don't let the streak die on my watch!",
+    "We can still save this!",
+    "Five-alarm fire! But we got this! 🚨",
+    "Plot twist time - you still have time!",
+    "Your streak called, it needs you!",
   ],
   sad: [
     "We lost a streak... but we'll rebuild!",
     "It's okay, tomorrow is a new day!",
     "Let's start fresh together!",
     "I still believe in you!",
+    "Every champion has setbacks!",
+    "Comeback stories are the best stories!",
+    "Failure is just data for success!",
+    "We learn, we grow, we improve!",
+    "This is just a plot point, not the ending!",
+    "Phoenix mode: activated! 🔥",
+    "It's okay to restart. Champions do it all the time!",
+    "One bad day doesn't define you!",
   ],
   celebrating: [
     "🏆 Achievement unlocked!",
     "You earned a new badge! Woohoo!",
     "This calls for a celebration!",
     "Another milestone crushed!",
+    "History in the making! 📚",
+    "You've leveled UP! 🎮",
+    "New high score! 🎯",
+    "And the crowd goes wild! 🎊",
+    "Confetti cannon activated! 🎉",
+    "Someone's on a roll!",
+    "Achievement: Absolute Legend!",
   ],
   thinking: [
     "Hmm, let me think...",
     "Analyzing your progress...",
     "Crunching the numbers...",
     "One moment...",
+    "Loading brilliance... 🤔",
+    "Processing your awesomeness...",
+    "Calculating your greatness...",
+    "The data is... impressive!",
+    "Running the numbers... looking good!",
   ],
   waving: [
     "Hey there! Welcome back!",
     "Hi friend! Great to see you!",
     "Hello! Ready for today?",
     "👋 I missed you!",
+    "Look who's back!",
+    "The legend returns!",
+    "My favorite human!",
+    "Welcome back, superstar!",
+    "Hey! Was just thinking about you!",
+    "There you are! Let's do this!",
+    "Ayy! Ready to win today?",
   ],
 };
 
@@ -103,9 +189,10 @@ interface MascotState {
   totalPets: number; // Fun interaction counter
 }
 
-interface MascotSettings {
+export interface MascotSettings {
   enabled: boolean;
   showCelebrations: boolean;
+  displayMode: 'compact' | 'default';
 }
 
 interface MascotContextType {
@@ -115,9 +202,10 @@ interface MascotContextType {
   triggerReaction: (mood: MascotMood, customMessage?: string) => void;
   petMascot: () => void;
   getMascotForProgress: (completed: number, total: number, hasStreakAtRisk: boolean) => MascotMood;
-  getRandomMessage: (mood: MascotMood) => string;
-  toggleMascot: (enabled: boolean) => void;
-  toggleCelebrations: (enabled: boolean) => void;
+  getRandomMessage: (mood?: MascotMood) => string;
+  toggleMascot: (enabled?: boolean) => void;
+  toggleCelebrations: (enabled?: boolean) => void;
+  toggleDisplayMode: (mode?: 'compact' | 'default') => void;
 }
 
 const MASCOT_STORAGE_KEY = '@habit_tracker_mascot';
@@ -137,6 +225,7 @@ export const MascotProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [settings, setSettings] = useState<MascotSettings>({
     enabled: true,
     showCelebrations: true,
+    displayMode: 'compact',
   });
 
   // Load saved mascot data and settings
@@ -162,6 +251,7 @@ export const MascotProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           setSettings({
             enabled: settingsData.enabled ?? true,
             showCelebrations: settingsData.showCelebrations ?? true,
+            displayMode: settingsData.displayMode ?? 'compact',
           });
         }
       } catch (error) {
@@ -192,17 +282,32 @@ export const MascotProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
-  const toggleMascot = useCallback((enabled: boolean) => {
-    const newSettings = { ...settings, enabled };
-    setSettings(newSettings);
-    saveMascotSettings(newSettings);
-  }, [settings]);
+  const toggleMascot = useCallback((enabled?: boolean) => {
+    setSettings(prev => {
+      const newEnabled = enabled !== undefined ? enabled : !prev.enabled;
+      const updated = { ...prev, enabled: newEnabled };
+      saveMascotSettings(updated);
+      return updated;
+    });
+  }, []);
 
-  const toggleCelebrations = useCallback((enabled: boolean) => {
-    const newSettings = { ...settings, showCelebrations: enabled };
-    setSettings(newSettings);
-    saveMascotSettings(newSettings);
-  }, [settings]);
+  const toggleCelebrations = useCallback((enabled?: boolean) => {
+    setSettings(prev => {
+      const newEnabled = enabled !== undefined ? enabled : !prev.showCelebrations;
+      const updated = { ...prev, showCelebrations: newEnabled };
+      saveMascotSettings(updated);
+      return updated;
+    });
+  }, []);
+
+  const toggleDisplayMode = useCallback((mode?: 'compact' | 'default') => {
+    setSettings(prev => {
+      const newMode = mode !== undefined ? mode : (prev.displayMode === 'compact' ? 'default' : 'compact');
+      const updated = { ...prev, displayMode: newMode };
+      saveMascotSettings(updated);
+      return updated;
+    });
+  }, []);
 
   const getRandomMessage = useCallback((mood: MascotMood): string => {
     const messages = MASCOT_MESSAGES[mood];
@@ -329,12 +434,14 @@ export const MascotProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         getRandomMessage,
         toggleMascot,
         toggleCelebrations,
+        toggleDisplayMode,
       }}
     >
       {children}
     </MascotContext.Provider>
   );
 };
+
 
 export const useMascot = () => {
   const context = useContext(MascotContext);

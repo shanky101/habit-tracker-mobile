@@ -28,10 +28,8 @@ import {
   QuickNoteModal,
   ConfirmationDialog,
 } from '@/components/HabitModals';
-import { useMascot, useMascotCustomization } from '@/context/MascotContext';
-import { MascotDisplay } from '@/components/mascot';
-import type { HabiMascotRef } from '@/components/mascot/HabiMascot';
-import { MascotCelebration, DraggableHabitList } from '@/components';
+import { useMascot } from '@/context/MascotContext';
+import { Mascot, MascotCelebration, DraggableHabitList } from '@/components';
 import { User } from 'lucide-react-native';
 import { TimeFilter } from '@/components/filters/TimeFilter';
 
@@ -101,7 +99,6 @@ const HomeScreen: React.FC = () => {
   const { subscription } = useSubscription();
   const { triggerReaction, getMascotForProgress, setMood, settings: mascotSettings, toggleMascot, petMascot } = useMascot();
   const dateScrollRef = useRef<ScrollView>(null);
-  const mascotRef = useRef<HabiMascotRef>(null);
 
   const { fadeAnim, slideAnim, fabScale } = useScreenAnimation({ enableFAB: true });
 
@@ -650,9 +647,8 @@ const HomeScreen: React.FC = () => {
           </ScrollView>
         </Animated.View>
 
-        {/* Mascot Companion - Hero Display - DISABLED */}
-        {/* TODO: Re-enable when mascot is ready for production */}
-        {/* {mascotSettings.enabled ? (
+        {/* Mascot Companion - Hero Display */}
+        {mascotSettings.enabled ? (
           <Animated.View
             style={[
               styles.mascotCard,
@@ -679,10 +675,8 @@ const HomeScreen: React.FC = () => {
                 Hide
               </Text>
             </TouchableOpacity>
-            <MascotDisplay
-              ref={mascotRef}
-              size={126}
-              showName
+            <Mascot
+              compact={mascotSettings.displayMode === 'compact'}
               showMessage
               onPress={petMascot}
             />
@@ -713,7 +707,7 @@ const HomeScreen: React.FC = () => {
               Show Habi
             </Text>
           </TouchableOpacity>
-        )} */}
+        )}
 
         {/* Progress Card - Always show if there are habits for the day */}
         {dateFilteredHabits.length > 0 && (
@@ -1063,15 +1057,16 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   mascotCard: {
-    borderRadius: 24,
+    borderRadius: 16,
     borderWidth: 1,
-    marginBottom: 20,
-    paddingVertical: 8,
+    marginBottom: 12,
+    paddingVertical: 4,
+    paddingHorizontal: 4,
     shadowColor: '#6366F1',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 3,
     position: 'relative',
   },
   mascotToggleButton: {
