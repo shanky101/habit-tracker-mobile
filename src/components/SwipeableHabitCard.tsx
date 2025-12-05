@@ -20,8 +20,8 @@ import { Habit, useHabits } from '@/hooks/useHabits';
 const RIGHT_ACTIONS_WIDTH = 210; // 70px per action × 3 actions
 const SWIPE_THRESHOLD = 40;
 const VELOCITY_THRESHOLD = 400;
-const CARD_HEIGHT_SINGLE = 60; // Height for single completion habits
-const CARD_HEIGHT_MULTIPLE = 80; // Taller height for multi-completion habits (extra space for progress bars)
+const CARD_HEIGHT_SINGLE = 72; // Taller for more substantial feel
+const CARD_HEIGHT_MULTIPLE = 96; // Extra space for progress bars
 
 interface SwipeableHabitCardProps {
   habit: Habit;
@@ -318,18 +318,15 @@ const SwipeableHabitCard: React.FC<SwipeableHabitCardProps> = ({
           style={[
             styles.habitCard,
             {
-              backgroundColor: theme.colors.surfaceSecondary, // Use secondary surface for better contrast
+              backgroundColor: theme.colors.surface,
               height: cardHeight,
               transform: [{ translateX }],
-              // Modern layered shadow for depth
-              shadowColor: isCompleted ? theme.colors.primary : '#000',
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: isCompleted ? 0.15 : 0.08,
-              shadowRadius: isCompleted ? 8 : 4,
-              elevation: isCompleted ? 4 : 2,
-              // Subtle border for themes with low contrast
-              borderWidth: 1,
-              borderColor: theme.colors.borderLight,
+              // Enhanced shadow for premium depth
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.08,
+              shadowRadius: 12,
+              elevation: 3,
             },
           ]}>
           {/* Subtle gradient overlay for completed cards */}
@@ -461,10 +458,9 @@ const SwipeableHabitCard: React.FC<SwipeableHabitCardProps> = ({
 
 const styles = StyleSheet.create({
   swipeableContainer: {
-    marginBottom: 12, // Increased from 8 for better floating card separation
-    marginHorizontal: 2, // Add slight horizontal margin for shadow visibility
+    marginBottom: 12,
+    marginHorizontal: 0, // Edge-to-edge
     position: 'relative',
-    // Height is set dynamically via style prop
   },
   leftAction: {
     position: 'absolute',
@@ -472,7 +468,7 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     width: 100,
-    borderRadius: 14, // Slightly larger radius for smoother feel
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -499,7 +495,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: RIGHT_ACTIONS_WIDTH,
     flexDirection: 'row',
-    borderRadius: 14,
+    borderRadius: 20,
     overflow: 'hidden',
   },
   actionButton: {
@@ -527,11 +523,9 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   habitCard: {
-    borderRadius: 16, // Increased from 12 for more modern feel
-    overflow: 'hidden', // For gradient overlay
-    // Height is set dynamically via style prop
-    // Border removed for cleaner look
-    // Shadow properties set inline for dynamic values
+    borderRadius: 20, // Larger radius for modern feel
+    overflow: 'hidden',
+    // No border - shadows define edges
   },
   gradientOverlay: {
     position: 'absolute',
@@ -539,31 +533,31 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    pointerEvents: 'none', // Don't block touch events
+    pointerEvents: 'none',
   },
   cardContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16, // Increased from 14 for better spacing
-    paddingVertical: 14, // Increased from 12 for more breathing room
+    paddingHorizontal: 20, // Increased for airy feel
+    paddingVertical: 16, // More breathing room
     height: '100%',
   },
   emojiContainer: {
-    width: 32, // Reduced from 40 to 32
-    height: 32, // Reduced from 40 to 32
-    borderRadius: 16, // Reduced from 20 to 16
-    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    width: 44, // Larger for balance
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(59, 130, 246, 0.08)', // Subtle background
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 10, // Reduced from 12 to 10
+    marginRight: 14,
   },
   habitEmoji: {
-    fontSize: 18, // Reduced from 20 to 18
+    fontSize: 22, // Larger emoji
   },
   habitInfo: {
     flex: 1,
     justifyContent: 'center',
-    paddingVertical: 2, // Add small vertical padding to prevent overlap
+    paddingVertical: 2,
   },
   habitName: {
     marginBottom: 2, // Space between habit name and progress bars/subtext
@@ -576,38 +570,38 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   progressBar: {
-    width: 3, // Increased from 2 to 3 for better visibility
-    height: 16, // Increased from 12 to 16 for more prominence
-    borderRadius: 1.5, // Proportional to width
-    // Add subtle shadow for filled bars (applied via inline style in component)
+    width: 4, // Thicker bars
+    height: 18, // Taller bars
+    borderRadius: 2,
   },
   habitSubtext: {
-    opacity: 0.7,
+    opacity: 0.6,
+    marginTop: 2,
   },
   checkbox: {
-    width: 24, // Reduced from 28 to 24
-    height: 24, // Reduced from 28 to 24
-    borderRadius: 12, // Circle - half of width/height
+    width: 28, // Larger touch target
+    height: 28,
+    borderRadius: 14,
     borderWidth: 2,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 10, // Reduced from 12 to 10
+    marginLeft: 12,
   },
   checkmark: {
-    fontSize: 12, // Reduced from 14 to 12
+    fontSize: 14,
     fontWeight: 'bold',
   },
   checkInButton: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     borderWidth: 2,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 10,
+    marginLeft: 12,
   },
   checkInButtonIcon: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
   },
 });
