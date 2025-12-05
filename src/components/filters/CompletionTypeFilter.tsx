@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Animated, ScrollView } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '@/theme';
 
@@ -74,13 +74,17 @@ export const CompletionTypeFilter: React.FC<CompletionTypeFilterProps> = ({
             style={[
                 styles.container,
                 {
-                    backgroundColor: theme.colors.surfaceSecondary,
                     opacity: fadeAnim,
                     transform: [{ translateY: slideAnim }],
                 },
             ]}
         >
-            <View style={styles.innerContainer}>
+            <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.scrollContent}
+                decelerationRate="fast"
+            >
                 {FILTER_OPTIONS.map((option) => {
                     const isSelected = selected === option.value;
 
@@ -114,20 +118,18 @@ export const CompletionTypeFilter: React.FC<CompletionTypeFilterProps> = ({
                         </TouchableOpacity>
                     );
                 })}
-            </View>
+            </ScrollView>
         </Animated.View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        paddingHorizontal: 8,
         paddingVertical: 8,
     },
-    innerContainer: {
-        flexDirection: 'row',
+    scrollContent: {
         gap: 8,
-        paddingHorizontal: 8,
+        paddingHorizontal: 24,
     },
     pill: {
         height: 36,

@@ -17,7 +17,13 @@ interface TimePeriodSelectorProps {
     timeRanges: TimeRangeSettings;
 }
 
-const TIME_PERIODS: HabitTimePeriod[] = ['morning', 'afternoon', 'evening', 'night', 'anytime'];
+const TIME_PERIODS: { value: HabitTimePeriod; label: string; icon: string }[] = [
+    { value: 'allday', label: 'All Day', icon: 'sunny' },
+    { value: 'morning', label: 'Morning', icon: 'sunny-outline' },
+    { value: 'afternoon', label: 'Afternoon', icon: 'partly-sunny-outline' },
+    { value: 'evening', label: 'Evening', icon: 'moon-outline' },
+    { value: 'night', label: 'Night', icon: 'moon' },
+];
 
 /**
  * Time Period Selector Component
@@ -48,15 +54,15 @@ export const TimePeriodSelector: React.FC<TimePeriodSelectorProps> = ({
 
             <View style={styles.optionsContainer}>
                 {TIME_PERIODS.map((period) => {
-                    const isSelected = selected === period;
-                    const iconName = getTimePeriodIcon(period);
-                    const label = getTimePeriodLabel(period);
-                    const range = getTimePeriodRange(period, timeRanges);
-                    const iconColor = getTimePeriodColor(period, theme.name === 'Dark Mode');
+                    const isSelected = selected === period.value;
+                    const iconName = getTimePeriodIcon(period.value);
+                    const label = getTimePeriodLabel(period.value);
+                    const range = getTimePeriodRange(period.value, timeRanges);
+                    const iconColor = getTimePeriodColor(period.value, theme.name === 'Dark Mode');
 
                     return (
                         <TouchableOpacity
-                            key={period}
+                            key={period.value}
                             style={[
                                 styles.optionCard,
                                 {
@@ -66,7 +72,7 @@ export const TimePeriodSelector: React.FC<TimePeriodSelectorProps> = ({
                                     ...theme.shadows[isSelected ? 'shadowMD' : 'shadowSM'],
                                 },
                             ]}
-                            onPress={() => handleSelect(period)}
+                            onPress={() => handleSelect(period.value)}
                             activeOpacity={0.7}
                         >
                             <View style={styles.optionContent}>

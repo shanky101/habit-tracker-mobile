@@ -17,7 +17,13 @@ interface TimeFilterProps {
     timeRanges: TimeRangeSettings;
 }
 
-const TIME_PERIODS: ('all' | HabitTimePeriod)[] = ['all', 'morning', 'afternoon', 'evening', 'night', 'anytime'];
+const TIME_PERIODS: Array<HabitTimePeriod | 'all'> = [
+    'allday',
+    'morning',
+    'afternoon',
+    'evening',
+    'night',
+];
 
 /**
  * Time Filter Component (Tier 1)
@@ -40,14 +46,16 @@ export const TimeFilter: React.FC<TimeFilterProps> = ({
     };
 
     return (
-        <View style={[styles.container, { backgroundColor: theme.colors.surface, borderBottomColor: theme.colors.border }]}>
+        <View style={styles.container}>
             <ScrollView
                 ref={scrollViewRef}
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.scrollContent}
+                decelerationRate="fast"
+                snapToInterval={undefined}
             >
-                {TIME_PERIODS.map((period) => {
+                {TIME_PERIODS.map((period, index) => {
                     const isSelected = selected === period;
                     const count = counts[period] || 0;
                     const label = period === 'all' ? 'All' : getTimePeriodLabel(period);
@@ -124,13 +132,11 @@ export const TimeFilter: React.FC<TimeFilterProps> = ({
 
 const styles = StyleSheet.create({
     container: {
-        borderBottomWidth: 1,
-        paddingHorizontal: 16,
         paddingVertical: 12,
     },
     scrollContent: {
         gap: 8,
-        paddingRight: 16,
+        paddingHorizontal: 24,
     },
     chip: {
         height: 40,

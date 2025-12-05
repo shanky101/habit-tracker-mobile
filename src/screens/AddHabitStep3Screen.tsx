@@ -54,7 +54,7 @@ const AddHabitStep3Screen: React.FC = () => {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [notes, setNotes] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [timePeriod, setTimePeriod] = useState<HabitTimePeriod>('anytime');
+  const [timePeriod, setTimePeriod] = useState<HabitTimePeriod>('allday'); // Default to All Day
 
   // Get time ranges from settings store
   const { timeRanges } = useSettingsStore();

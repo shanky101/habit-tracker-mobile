@@ -1,7 +1,7 @@
 // Habit data types
 
 // Time period types for habit scheduling
-export type HabitTimePeriod = 'anytime' | 'morning' | 'afternoon' | 'evening' | 'night';
+export type HabitTimePeriod = 'morning' | 'afternoon' | 'evening' | 'night' | 'allday';
 
 export interface TimeRangeSettings {
     morning: { start: string; end: string };      // e.g., "05:00" - "12:00"

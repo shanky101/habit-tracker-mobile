@@ -1057,6 +1057,9 @@ const HabitDetailScreen: React.FC = () => {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
+          scrollEnabled={true}
+          decelerationRate="fast"
+          snapToInterval={142}
           style={styles.statsScroll}
           contentContainerStyle={styles.statsContainer}
         >

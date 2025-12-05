@@ -47,7 +47,7 @@ const DEFAULT_HABITS: Habit[] = [
     frequencyType: 'multiple',
     targetCompletionsPerDay: 8,
     selectedDays: [0, 1, 2, 3, 4, 5, 6],
-    timePeriod: 'anytime',
+    timePeriod: 'allday',
     reminderEnabled: true,
     reminderTime: '09:00',
     isDefault: true,
@@ -73,7 +73,7 @@ const DEFAULT_HABITS: Habit[] = [
 ];
 
 // Schema SQL
-const SCHEMA_VERSION = 2; // Increment version for migration
+const SCHEMA_VERSION = 4; // Increment version for migration
 
 const SCHEMA_SQL = `
 -- Habits Table
@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS habits (
   frequency_type TEXT NOT NULL DEFAULT 'single' CHECK (frequency_type IN ('single', 'multiple')),
   target_per_day INTEGER NOT NULL DEFAULT 1,
   selected_days TEXT NOT NULL,
-  time_period TEXT NOT NULL DEFAULT 'anytime' CHECK (time_period IN ('anytime', 'morning', 'afternoon', 'evening', 'night')),
+  time_period TEXT NOT NULL DEFAULT 'allday' CHECK (time_period IN ('allday', 'morning', 'afternoon', 'evening', 'night')),
   reminder_enabled INTEGER NOT NULL DEFAULT 0,
   reminder_time TEXT,
   notification_ids TEXT,
@@ -98,6 +98,12 @@ CREATE TABLE IF NOT EXISTS habits (
   sort_order INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
+);
+
+-- App Metadata Table
+CREATE TABLE IF NOT EXISTS app_metadata (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL
 );
 
 -- Completions Table
@@ -206,6 +212,87 @@ const runMigrations = (): void => {
       // Update version
       db.runSync('UPDATE schema_version SET version = 2');
       console.log('[DB] Migration to version 2 complete');
+    }
+
+    // Migration to version 3: Fix existing seed habits to have is_default=1
+    if (currentVersion < 3) {
+      console.log('[DB] Migrating to version 3: Fixing seed habits is_default flag');
+      // Update the 5 seed habits (IDs 1-5) to mark them as default
+      db.runSync(`
+        UPDATE habits 
+        SET is_default = 1 
+        WHERE id IN ('1', '2', '3', '4', '5')
+      `);
+      console.log('[DB] Marked seed habits as default');
+
+      // Update version
+      db.runSync('UPDATE schema_version SET version = 3');
+      console.log('[DB] Migration to version 3 complete');
+    }
+
+    // Migration to version 4: Fix CHECK constraint for time_period (anytime -> allday)
+    if (currentVersion < 4) {
+      console.log('[DB] Migrating to version 4: Updating time_period constraint');
+
+      db.withTransactionSync(() => {
+        // 1. Rename existing table
+        db.runSync('ALTER TABLE habits RENAME TO habits_old');
+
+        // 2. Create new table with correct constraint
+        db.runSync(`
+          CREATE TABLE habits (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            emoji TEXT NOT NULL,
+            streak INTEGER NOT NULL DEFAULT 0,
+            category TEXT NOT NULL,
+            color TEXT NOT NULL,
+            frequency TEXT NOT NULL,
+            frequency_type TEXT NOT NULL DEFAULT 'single',
+            target_per_day INTEGER NOT NULL DEFAULT 1,
+            selected_days TEXT NOT NULL,
+            time_period TEXT NOT NULL DEFAULT 'allday' CHECK (time_period IN ('allday', 'morning', 'afternoon', 'evening', 'night')),
+            reminder_enabled INTEGER NOT NULL DEFAULT 0,
+            reminder_time TEXT,
+            notification_ids TEXT,
+            notes TEXT,
+            is_default INTEGER NOT NULL DEFAULT 0,
+            archived INTEGER NOT NULL DEFAULT 0,
+            sort_order INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+          )
+        `);
+
+        // 3. Copy data, converting 'anytime' to 'allday'
+        db.runSync(`
+          INSERT INTO habits (
+            id, name, emoji, streak, category, color, frequency, frequency_type,
+            target_per_day, selected_days, time_period, reminder_enabled, reminder_time,
+            notification_ids, notes, is_default, archived, sort_order, created_at, updated_at
+          )
+          SELECT 
+            id, name, emoji, streak, category, color, frequency, frequency_type,
+            target_per_day, selected_days, 
+            CASE WHEN time_period = 'anytime' THEN 'allday' ELSE time_period END,
+            reminder_enabled, reminder_time,
+            notification_ids, notes, is_default, archived, sort_order, created_at, updated_at
+          FROM habits_old
+        `);
+
+        // 4. Drop old table
+        db.runSync('DROP TABLE habits_old');
+
+        // 5. Recreate indexes
+        db.runSync('CREATE INDEX IF NOT EXISTS idx_habits_archived ON habits(archived)');
+        db.runSync('CREATE INDEX IF NOT EXISTS idx_habits_sort_order ON habits(sort_order)');
+      });
+
+      console.log('[DB] Updated habits table with correct constraint');
+
+      // Update version
+      db.runSync('UPDATE schema_version SET version = 4');
+      console.log('[DB] Migration to version 4 complete');
     }
 
     if (currentVersion < SCHEMA_VERSION) {
@@ -323,15 +410,26 @@ CREATE TABLE IF NOT EXISTS habits (
     // Run migrations for existing databases
     runMigrations();
 
+    // Check if we've already seeded
+    const seedCheck = db.getFirstSync<{ value: string }>('SELECT value FROM app_metadata WHERE key = ?', ['initial_seed_done']);
+    const isSeeded = seedCheck?.value === 'true';
+
     // Check if database is empty (no habits)
     const result = db.getFirstSync<{ count: number }>('SELECT COUNT(*) as count FROM habits');
     const habitCount = result?.count ?? 0;
 
-    if (habitCount === 0) {
-      console.log('[DB] Database is empty, seeding default habits...');
-      await seedDefaultHabits();
+    if (!isSeeded) {
+      if (habitCount === 0) {
+        console.log('[DB] Database is empty and not seeded, seeding default habits...');
+        await seedDefaultHabits();
+      } else {
+        console.log(`[DB] Database already has ${habitCount} habits, marking as seeded`);
+      }
+
+      // Mark as seeded
+      db.runSync('INSERT OR REPLACE INTO app_metadata (key, value) VALUES (?, ?)', ['initial_seed_done', 'true']);
     } else {
-      console.log(`[DB] Database already has ${habitCount} habits`);
+      console.log('[DB] Database already seeded, skipping');
     }
 
     console.log('[DB] Initialization complete');

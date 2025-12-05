@@ -2,6 +2,48 @@ import { HabitTimePeriod, TimeRangeSettings } from '@/types/habit';
 import { Ionicons } from '@expo/vector-icons';
 
 /**
+ * Get display label for time period
+ */
+export const getTimePeriodLabel = (period: HabitTimePeriod): string => {
+    const labels: Record<HabitTimePeriod, string> = {
+        morning: 'Morning',
+        afternoon: 'Afternoon',
+        evening: 'Evening',
+        night: 'Night',
+        allday: 'All Day',
+    };
+    return labels[period];
+};
+
+/**
+ * Get icon name for time period (Ionicons)
+ */
+export const getTimePeriodIcon = (period: HabitTimePeriod): string => {
+    const icons: Record<HabitTimePeriod, string> = {
+        morning: 'sunny-outline',
+        afternoon: 'partly-sunny-outline',
+        evening: 'moon-outline',
+        night: 'moon',
+        allday: 'sunny',
+    };
+    return icons[period];
+};
+
+/**
+ * Get color for time period
+ */
+export const getTimePeriodColor = (period: HabitTimePeriod): string => {
+    const colors: Record<HabitTimePeriod, string> = {
+        morning: '#F59E0B', // Amber
+        afternoon: '#FB923C', // Orange
+        evening: '#8B5CF6', // Purple
+        night: '#6366F1', // Indigo
+        allday: '#FBBF24', // Bright Amber/Gold
+    };
+    return colors[period];
+};
+
+/**
  * Get the current time period based on current time and settings
  */
 export function getCurrentTimePeriod(
@@ -20,7 +62,7 @@ export function getCurrentTimePeriod(
         }
     }
 
-    return 'anytime';
+    return 'allday';
 }
 
 /**
@@ -32,7 +74,7 @@ export function isTimeInPeriod(
     period: HabitTimePeriod,
     timeRanges: TimeRangeSettings
 ): boolean {
-    if (period === 'anytime') return true;
+    if (period === 'allday') return true;
 
     const range = timeRanges[period as keyof TimeRangeSettings];
     if (!range) return false;
@@ -58,51 +100,13 @@ function timeStringToMinutes(time: string): number {
 }
 
 /**
- * Get icon name for time period (Ionicons)
- */
-export function getTimePeriodIcon(period: HabitTimePeriod): keyof typeof Ionicons.glyphMap {
-    switch (period) {
-        case 'morning':
-            return 'sunny-outline';
-        case 'afternoon':
-            return 'sunny';
-        case 'evening':
-            return 'moon-outline';
-        case 'night':
-            return 'moon';
-        case 'anytime':
-        default:
-            return 'time-outline';
-    }
-}
-
-/**
- * Get display label for time period
- */
-export function getTimePeriodLabel(period: HabitTimePeriod): string {
-    switch (period) {
-        case 'morning':
-            return 'Morning';
-        case 'afternoon':
-            return 'Afternoon';
-        case 'evening':
-            return 'Evening';
-        case 'night':
-            return 'Night';
-        case 'anytime':
-        default:
-            return 'Anytime';
-    }
-}
-
-/**
  * Get time range display string
  */
 export function getTimePeriodRange(
     period: HabitTimePeriod,
     timeRanges: TimeRangeSettings
 ): string {
-    if (period === 'anytime') {
+    if (period === 'allday') {
         return 'No specific time';
     }
 
@@ -125,7 +129,7 @@ function formatTime(time: string): string {
 /**
  * Get color for time period icon (light theme)
  */
-export function getTimePeriodColor(period: HabitTimePeriod, isDark: boolean = false): string {
+export function getTimePeriodColorWithTheme(period: HabitTimePeriod, isDark: boolean = false): string {
     if (isDark) {
         switch (period) {
             case 'morning':
@@ -136,7 +140,7 @@ export function getTimePeriodColor(period: HabitTimePeriod, isDark: boolean = fa
                 return '#a78bfa';
             case 'night':
                 return '#6366f1';
-            case 'anytime':
+            case 'allday':
             default:
                 return '#9ca3af';
         }
@@ -152,7 +156,7 @@ export function getTimePeriodColor(period: HabitTimePeriod, isDark: boolean = fa
             return '#8b5cf6';
         case 'night':
             return '#4f46e5';
-        case 'anytime':
+        case 'allday':
         default:
             return '#6b7280';
     }

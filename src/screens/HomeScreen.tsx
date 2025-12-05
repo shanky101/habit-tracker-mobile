@@ -122,7 +122,7 @@ const HomeScreen: React.FC = () => {
   const [habitToDelete, setHabitToDelete] = useState<Habit | null>(null);
   const [pendingAllComplete, setPendingAllComplete] = useState(false); // Track if celebration is pending
   const [frequencyFilter, setFrequencyFilter] = useState<'all' | 'single' | 'multiple'>('all'); // Filter for single vs multiple frequency habits
-  const [timePeriodFilter, setTimePeriodFilter] = useState<'all' | HabitTimePeriod>('all'); // Filter by time period
+  const [timePeriodFilter, setTimePeriodFilter] = useState<'all' | HabitTimePeriod>('allday'); // Filter by time period
   const [completionTypeFilter, setCompletionTypeFilter] = useState<CompletionFilterType>('all'); // Filter by single/multiple
 
   // Get time ranges from settings store
@@ -213,17 +213,20 @@ const HomeScreen: React.FC = () => {
     afternoon: dateFilteredHabits.filter(h => h.timePeriod === 'afternoon').length,
     evening: dateFilteredHabits.filter(h => h.timePeriod === 'evening').length,
     night: dateFilteredHabits.filter(h => h.timePeriod === 'night').length,
-    anytime: dateFilteredHabits.filter(h => h.timePeriod === 'anytime').length,
+    allday: dateFilteredHabits.filter(h => h.timePeriod === 'allday').length,
   };
 
-  // Calculate completion count based on selected date
-  const completedCount = activeHabits.filter((h) => isHabitCompletedForDate(h.id, selectedDateISO)).length;
-  const totalCount = activeHabits.length;
+  // Calculate completion count for THE ENTIRE DAY (not just filtered habits)
+  // This ensures X/Y Done shows progress across all time periods
+  const completedCount = dateFilteredHabits.filter((h) => isHabitCompletedForDate(h.id, selectedDateISO)).length;
+  const totalCount = dateFilteredHabits.length;
   const progressPercentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
   const handleAddHabit = () => {
     // Check free tier limit
-    if (!subscription.isPremium && activeHabits.length >= FREE_HABIT_LIMIT) {
+    // Check free tier limit - exclude default/seed habits
+    const totalHabits = habits.filter(h => !h.archived && !h.isDefault).length;
+    if (!subscription.isPremium && totalHabits >= FREE_HABIT_LIMIT) {
       navigation.navigate('Profile', { screen: 'Paywall' });
       return;
     }
@@ -240,7 +243,8 @@ const HomeScreen: React.FC = () => {
 
   // Update mascot mood based on progress (only when counts change)
   useEffect(() => {
-    const hasStreakAtRisk = activeHabits.some(h => h.streak > 3 && !isHabitCompletedForDate(h.id, selectedDateISO));
+    // Check ALL habits for the day for streak risk, not just filtered view
+    const hasStreakAtRisk = dateFilteredHabits.some(h => h.streak > 3 && !isHabitCompletedForDate(h.id, selectedDateISO));
     const newMood = getMascotForProgress(completedCount, totalCount, hasStreakAtRisk);
     setMood(newMood);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -536,29 +540,8 @@ const HomeScreen: React.FC = () => {
           },
         ]}
       >
-        Add your first habit to begin tracking your progress
+        Add a habit to begin tracking your progress
       </Text>
-      <TouchableOpacity
-        style={[
-          styles.emptyButton,
-          { backgroundColor: theme.colors.primary },
-        ]}
-        onPress={handleAddHabit}
-        activeOpacity={0.8}
-      >
-        <Text
-          style={[
-            styles.emptyButtonText,
-            {
-              color: theme.colors.white,
-              fontFamily: theme.typography.fontFamilyBodySemibold,
-              fontSize: theme.typography.fontSizeMD,
-            },
-          ]}
-        >
-          Add Your First Habit
-        </Text>
-      </TouchableOpacity>
     </View>
   );
 
@@ -683,7 +666,7 @@ const HomeScreen: React.FC = () => {
             {/* Customized Habi with interaction support */}
             <MascotDisplay
               ref={mascotRef}
-              size={180}
+              size={126}
               showName
               showMessage
               onPress={petMascot}
@@ -718,8 +701,8 @@ const HomeScreen: React.FC = () => {
           </TouchableOpacity>
         )}
 
-        {/* Progress Card */}
-        {activeHabits.length > 0 && (
+        {/* Progress Card - Always show if there are habits for the day */}
+        {dateFilteredHabits.length > 0 && (
           <Animated.View
             style={[
               styles.progressCard,
@@ -815,17 +798,19 @@ const HomeScreen: React.FC = () => {
             {getSectionTitle()}
           </Text>
 
-          <TimeFilter
-            selected={timePeriodFilter}
-            onSelect={setTimePeriodFilter}
-            counts={habitCounts}
-            timeRanges={timeRanges}
-          />
-          <CompletionTypeFilter
-            selected={completionTypeFilter}
-            onSelect={setCompletionTypeFilter}
-            visible={timePeriodFilter !== 'all'}
-          />
+          <View style={{ marginHorizontal: -24 }}>
+            <TimeFilter
+              selected={timePeriodFilter}
+              onSelect={setTimePeriodFilter}
+              counts={habitCounts}
+              timeRanges={timeRanges}
+            />
+            <CompletionTypeFilter
+              selected={completionTypeFilter}
+              onSelect={setCompletionTypeFilter}
+              visible={true}
+            />
+          </View>
         </View>
 
         {/* Habits List */}
@@ -877,7 +862,7 @@ const HomeScreen: React.FC = () => {
                     },
                   ]}
                 >
-                  {activeHabits.length}/{FREE_HABIT_LIMIT} free habits used
+                  {habits.filter(h => !h.archived && !h.isDefault).length}/{FREE_HABIT_LIMIT} free habits used
                 </Text>
                 <Text
                   style={[
