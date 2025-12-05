@@ -154,6 +154,18 @@ export const initializeDatabase = async (): Promise<void> => {
         updated_at TEXT NOT NULL
       );
 
+      -- Streak Badges Table
+      CREATE TABLE IF NOT EXISTS streak_badges (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        badge_id TEXT NOT NULL,
+        days_required INTEGER NOT NULL,
+        unlocked_at TEXT NOT NULL,
+        streak_count INTEGER NOT NULL,
+        shared_count INTEGER NOT NULL DEFAULT 0,
+        UNIQUE(user_id, badge_id)
+      );
+
       -- Indexes
       CREATE INDEX IF NOT EXISTS idx_completions_habit_id ON completions(habit_id);
       CREATE INDEX IF NOT EXISTS idx_completions_date ON completions(date);
@@ -161,6 +173,8 @@ export const initializeDatabase = async (): Promise<void> => {
       CREATE INDEX IF NOT EXISTS idx_entries_date ON entries(date);
       CREATE INDEX IF NOT EXISTS idx_habits_archived ON habits(archived);
       CREATE INDEX IF NOT EXISTS idx_habits_sort_order ON habits(sort_order);
+      CREATE INDEX IF NOT EXISTS idx_streak_badges_user ON streak_badges(user_id);
+      CREATE INDEX IF NOT EXISTS idx_streak_badges_unlocked ON streak_badges(unlocked_at);
     `);
 
     console.log('[DB] Schema created successfully');
@@ -184,6 +198,14 @@ export const initializeDatabase = async (): Promise<void> => {
 
         // Mark as seeded
         db.runSync('INSERT OR REPLACE INTO app_metadata (key, value) VALUES (?, ?)', ['initial_seed_done', 'true']);
+
+        // Initialize streak metadata keys
+        db.runSync('INSERT OR IGNORE INTO app_metadata (key, value) VALUES (?, ?)', ['global_streak_current', '0']);
+        db.runSync('INSERT OR IGNORE INTO app_metadata (key, value) VALUES (?, ?)', ['global_streak_longest', '0']);
+        db.runSync('INSERT OR IGNORE INTO app_metadata (key, value) VALUES (?, ?)', ['global_streak_last_updated', '']);
+        db.runSync('INSERT OR IGNORE INTO app_metadata (key, value) VALUES (?, ?)', ['last_badge_unlocked_id', '']);
+        db.runSync('INSERT OR IGNORE INTO app_metadata (key, value) VALUES (?, ?)', ['last_badge_unlocked_at', '']);
+        console.log('[DB] Initialized streak metadata keys');
       } else {
         console.log('[DB] Database already seeded, skipping');
       }
@@ -192,6 +214,13 @@ export const initializeDatabase = async (): Promise<void> => {
       try {
         await seedDefaultHabits();
         db.runSync('INSERT OR REPLACE INTO app_metadata (key, value) VALUES (?, ?)', ['initial_seed_done', 'true']);
+
+        // Initialize streak metadata keys
+        db.runSync('INSERT OR IGNORE INTO app_metadata (key, value) VALUES (?, ?)', ['global_streak_current', '0']);
+        db.runSync('INSERT OR IGNORE INTO app_metadata (key, value) VALUES (?, ?)', ['global_streak_longest', '0']);
+        db.runSync('INSERT OR IGNORE INTO app_metadata (key, value) VALUES (?, ?)', ['global_streak_last_updated', '']);
+        db.runSync('INSERT OR IGNORE INTO app_metadata (key, value) VALUES (?, ?)', ['last_badge_unlocked_id', '']);
+        db.runSync('INSERT OR IGNORE INTO app_metadata (key, value) VALUES (?, ?)', ['last_badge_unlocked_at', '']);
       } catch (e) {
         console.warn('[DB] Seed failed (may already exist):', e);
       }
