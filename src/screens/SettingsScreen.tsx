@@ -298,7 +298,7 @@ const SettingsScreen: React.FC = () => {
           </TouchableOpacity>
         </Animated.View>
 
-        {/* Celebrations Section */}
+        {/* Habi & Celebrations Section */}
         <Animated.View
           style={[
             styles.section,
@@ -319,8 +319,48 @@ const SettingsScreen: React.FC = () => {
               },
             ]}
           >
-            CELEBRATIONS
+            HABI & CELEBRATIONS
           </Text>
+
+          <View style={[styles.settingRow, { borderBottomColor: theme.colors.border }]}>
+            <View style={styles.settingInfo}>
+              <View style={styles.settingIconContainer}>
+                <Sparkles size={22} color={theme.colors.primary} strokeWidth={2} />
+              </View>
+              <View style={styles.settingTextContainer}>
+                <Text
+                  style={[
+                    styles.settingLabel,
+                    {
+                      color: theme.colors.text,
+                      fontFamily: theme.typography.fontFamilyBodyMedium,
+                      fontSize: theme.typography.fontSizeMD,
+                    },
+                  ]}
+                >
+                  Show {MASCOT_NAME}
+                </Text>
+                <Text
+                  style={[
+                    styles.settingValue,
+                    {
+                      color: theme.colors.textSecondary,
+                      fontFamily: theme.typography.fontFamilyBody,
+                      fontSize: theme.typography.fontSizeSM,
+                    },
+                  ]}
+                >
+                  Your friendly habit companion
+                </Text>
+              </View>
+            </View>
+            <Switch
+              value={mascotSettings.enabled}
+              onValueChange={toggleMascot}
+              trackColor={{ false: theme.colors.border, true: theme.colors.primary + '60' }}
+              thumbColor={mascotSettings.enabled ? theme.colors.primary : theme.colors.surface}
+            />
+          </View>
 
           <View style={[styles.settingRow, { borderBottomWidth: 0 }]}>
             <View style={styles.settingInfo}>

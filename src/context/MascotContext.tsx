@@ -21,10 +21,6 @@ export const MASCOT_MESSAGES: Record<MascotMood, string[]> = {
     "You've got this! I believe in you!",
     "Ready to make today awesome?",
     "Together we're unstoppable!",
-    "Hey there, habit hero!",
-    "One step at a time! 🌟",
-    "You're amazing, you know that?",
-    "Feeling good today!",
   ],
   ecstatic: [
     "AMAZING! You did it all! 🎉",
@@ -37,18 +33,12 @@ export const MASCOT_MESSAGES: Record<MascotMood, string[]> = {
     "You're doing wonderfully!",
     "Look at you crushing it!",
     "I knew you could do it!",
-    "You're on fire! 🔥",
-    "Wow! Impressive work!",
-    "That's my habit hero!",
   ],
   encouraging: [
     "Every small step counts!",
     "You can do this! Start with one!",
     "Progress, not perfection!",
     "I'm here cheering you on!",
-    "Small habits, big changes!",
-    "Just one more! You got this!",
-    "Believe in yourself like I do!",
   ],
   sleepy: [
     "*yawns* Good morning! Ready to start?",
@@ -85,12 +75,6 @@ export const MASCOT_MESSAGES: Record<MascotMood, string[]> = {
     "Hi friend! Great to see you!",
     "Hello! Ready for today?",
     "👋 I missed you!",
-    "Tap me again! I like that! 😄",
-    "Wheee! That tickles!",
-    "Hehe, that was fun!",
-    "More taps = more energy!",
-    "I'm bouncy today!",
-    "You're the best!",
   ],
 };
 
