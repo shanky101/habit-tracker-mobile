@@ -66,7 +66,7 @@ const denormalize = (
     frequencyType: habitRow.frequency_type,
     targetCompletionsPerDay: habitRow.target_per_day,
     selectedDays,
-    timePeriod: (habitRow.time_period as any) || 'anytime',
+    timePeriod: (habitRow.time_period as any) || 'allday',
     reminderEnabled: habitRow.reminder_enabled === 1,
     reminderTime: habitRow.reminder_time || undefined,
     notificationIds,
@@ -182,7 +182,7 @@ export const habitRepository = {
               habit.frequencyType || 'single',
               habit.targetCompletionsPerDay,
               JSON.stringify(habit.selectedDays),
-              habit.timePeriod || 'anytime',
+              habit.timePeriod || 'allday',
               habit.reminderEnabled ? 1 : 0,
               habit.reminderTime || null,
               habit.notificationIds ? JSON.stringify(habit.notificationIds) : null,
@@ -225,7 +225,7 @@ export const habitRepository = {
       console.log(`[Repository] Synced ${habits.length} habits to database`);
     } catch (error) {
       console.error('[Repository] syncAll failed:', error);
-      throw error;
+      // Don't throw - this would crash the app on every state change
     }
   },
 

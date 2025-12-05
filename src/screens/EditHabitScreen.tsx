@@ -38,6 +38,8 @@ type EditHabitScreenRouteProp = RouteProp<
         notes?: string;
         streak?: number;
         completed?: boolean;
+        targetCompletionsPerDay?: number;
+        frequencyType?: 'single' | 'multiple';
       };
     };
   },
@@ -58,6 +60,7 @@ const EditHabitScreen: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState(habitData.category);
   const [selectedColor, setSelectedColor] = useState(habitData.color);
   const [frequency, setFrequency] = useState(habitData.frequency);
+  const [targetCompletionsPerDay, setTargetCompletionsPerDay] = useState(habitData.targetCompletionsPerDay || 1);
   const [selectedDays, setSelectedDays] = useState(habitData.selectedDays);
   const [reminderEnabled, setReminderEnabled] = useState(habitData.reminderEnabled);
   const [reminderTime, setReminderTime] = useState(habitData.reminderTime || '09:00');
@@ -107,6 +110,8 @@ const EditHabitScreen: React.FC = () => {
       category: selectedCategory,
       color: selectedColor,
       frequency,
+      frequencyType: targetCompletionsPerDay > 1 ? 'multiple' : 'single',
+      targetCompletionsPerDay,
       selectedDays: frequency === 'daily' ? [0, 1, 2, 3, 4, 5, 6] : selectedDays,
       reminderEnabled,
       reminderTime: reminderEnabled ? reminderTime : null,
@@ -435,6 +440,79 @@ const EditHabitScreen: React.FC = () => {
                 ))}
               </View>
             )}
+          </View>
+
+          {/* Target Count Input - Always visible */}
+          <View style={styles.section}>
+            <Text
+              style={[
+                styles.sectionLabel,
+                {
+                  color: theme.colors.text,
+                  fontSize: theme.typography.fontSizeSM,
+                  fontFamily: theme.typography.fontFamilyBodySemibold,
+                },
+              ]}
+            >
+              Daily Target
+            </Text>
+
+            <View style={styles.targetCountContainer}>
+              <View style={styles.targetCountInputRow}>
+                <TouchableOpacity
+                  style={[
+                    styles.targetCountButton,
+                    { backgroundColor: theme.colors.backgroundSecondary, borderColor: theme.colors.border },
+                  ]}
+                  onPress={() => setTargetCompletionsPerDay(Math.max(1, targetCompletionsPerDay - 1))}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.targetCountButtonText, { color: theme.colors.text }]}>−</Text>
+                </TouchableOpacity>
+
+                <TextInput
+                  style={[
+                    styles.targetCountInput,
+                    {
+                      backgroundColor: theme.colors.backgroundSecondary,
+                      color: theme.colors.text,
+                      fontFamily: theme.typography.fontFamilyDisplayBold,
+                    },
+                  ]}
+                  value={targetCompletionsPerDay.toString()}
+                  onChangeText={(text) => {
+                    const val = parseInt(text.replace(/[^0-9]/g, ''), 10);
+                    if (!isNaN(val) && val > 0) {
+                      setTargetCompletionsPerDay(val);
+                    }
+                  }}
+                  keyboardType="number-pad"
+                  maxLength={3}
+                />
+
+                <TouchableOpacity
+                  style={[
+                    styles.targetCountButton,
+                    { backgroundColor: theme.colors.backgroundSecondary, borderColor: theme.colors.border },
+                  ]}
+                  onPress={() => setTargetCompletionsPerDay(targetCompletionsPerDay + 1)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.targetCountButtonText, { color: theme.colors.text }]}>+</Text>
+                </TouchableOpacity>
+              </View>
+              <Text
+                style={[
+                  styles.targetCountHelper,
+                  {
+                    color: theme.colors.textSecondary,
+                    fontFamily: theme.typography.fontFamilyBody,
+                  },
+                ]}
+              >
+                {targetCompletionsPerDay === 1 ? 'Once a day' : `${targetCompletionsPerDay} times a day`}
+              </Text>
+            </View>
           </View>
 
           {/* Reminder */}
@@ -897,6 +975,40 @@ const styles = StyleSheet.create({
   },
   deleteButtonText: {
     //styles from theme
+  },
+  targetCountContainer: {
+    marginTop: 12,
+  },
+  targetCountInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 16,
+    marginBottom: 8,
+  },
+  targetCountButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  targetCountButtonText: {
+    fontSize: 24,
+    fontWeight: '300',
+    lineHeight: 28,
+  },
+  targetCountInput: {
+    width: 80,
+    height: 56,
+    borderRadius: 16,
+    textAlign: 'center',
+    fontSize: 24,
+  },
+  targetCountHelper: {
+    textAlign: 'center',
+    fontSize: 14,
   },
 });
 

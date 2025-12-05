@@ -130,16 +130,6 @@ const HabitDeepDiveScreen: React.FC = () => {
   const totalCompletions = stats.totalCompletions;
   const completionRate = stats.completionRate;
 
-  // Mock completion by hour data
-  const completionByHour = [
-    { hour: '6am', value: 15 },
-    { hour: '9am', value: 85 },
-    { hour: '12pm', value: 45 },
-    { hour: '3pm', value: 25 },
-    { hour: '6pm', value: 55 },
-    { hour: '9pm', value: 35 },
-  ];
-  const maxHourValue = Math.max(...completionByHour.map((h) => h.value));
 
   // Calculate real day of week breakdown
   const calculateDayOfWeekStats = () => {
@@ -282,12 +272,6 @@ const HabitDeepDiveScreen: React.FC = () => {
 
   const milestones = calculateMilestones();
 
-  // Mock patterns
-  const patterns = [
-    "You complete this habit most on weekday mornings",
-    "Your success rate is higher on Mondays (95%)",
-    "You tend to skip this habit on weekends",
-  ];
 
   // Get real notes from habit completions
   const getRecentNotes = () => {

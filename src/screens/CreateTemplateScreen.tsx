@@ -472,9 +472,6 @@ const HabitModal: React.FC<HabitModalProps> = ({ visible, onClose, onSave, initi
   );
   const [habitNotes, setHabitNotes] = useState(initialHabit?.notes || '');
   const [frequency, setFrequency] = useState<'daily' | 'weekly'>(initialHabit?.frequency || 'daily');
-  const [frequencyType, setFrequencyType] = useState<'single' | 'multiple'>(
-    initialHabit?.frequencyType || 'single'
-  );
   const [targetCount, setTargetCount] = useState(initialHabit?.targetCompletionsPerDay || 1);
   const [selectedDays, setSelectedDays] = useState<number[]>(
     initialHabit?.selectedDays || [0, 1, 2, 3, 4, 5, 6]
@@ -499,8 +496,8 @@ const HabitModal: React.FC<HabitModalProps> = ({ visible, onClose, onSave, initi
       category: habitCategory,
       notes: habitNotes,
       frequency,
-      frequencyType,
-      targetCompletionsPerDay: frequencyType === 'multiple' ? targetCount : 1,
+      frequencyType: targetCount > 1 ? 'multiple' : 'single',
+      targetCompletionsPerDay: targetCount,
       selectedDays: frequency === 'daily' ? [0, 1, 2, 3, 4, 5, 6] : selectedDays,
       reminderEnabled: false,
       reminderTime: null,
@@ -656,55 +653,25 @@ const HabitModal: React.FC<HabitModalProps> = ({ visible, onClose, onSave, initi
               </View>
             )}
 
-            {/* Frequency Type */}
+            {/* Target Count */}
             <View style={styles.modalSection}>
-              <Text style={[styles.modalLabel, { color: theme.colors.text }]}>Times per Day</Text>
-              <View style={styles.buttonRow}>
+              <Text style={[styles.modalLabel, { color: theme.colors.text }]}>Target per Day</Text>
+              <View style={styles.counterRow}>
                 <TouchableOpacity
-                  style={[
-                    styles.optionButton,
-                    { backgroundColor: frequencyType === 'single' ? theme.colors.primary : theme.colors.surface }
-                  ]}
-                  onPress={() => setFrequencyType('single')}
+                  style={[styles.counterButton, { backgroundColor: theme.colors.surface }]}
+                  onPress={() => setTargetCount(Math.max(1, targetCount - 1))}
                 >
-                  <Text style={[styles.optionButtonText, { color: frequencyType === 'single' ? '#fff' : theme.colors.text }]}>
-                    Once
-                  </Text>
+                  <Minus size={20} color={theme.colors.text} strokeWidth={2} />
                 </TouchableOpacity>
+                <Text style={[styles.counterValue, { color: theme.colors.text }]}>{targetCount}x</Text>
                 <TouchableOpacity
-                  style={[
-                    styles.optionButton,
-                    { backgroundColor: frequencyType === 'multiple' ? theme.colors.primary : theme.colors.surface }
-                  ]}
-                  onPress={() => setFrequencyType('multiple')}
+                  style={[styles.counterButton, { backgroundColor: theme.colors.surface }]}
+                  onPress={() => setTargetCount(Math.min(20, targetCount + 1))}
                 >
-                  <Text style={[styles.optionButtonText, { color: frequencyType === 'multiple' ? '#fff' : theme.colors.text }]}>
-                    Multiple
-                  </Text>
+                  <Plus size={20} color={theme.colors.text} strokeWidth={2} />
                 </TouchableOpacity>
               </View>
             </View>
-
-            {/* Target Count */}
-            {frequencyType === 'multiple' && (
-              <View style={styles.modalSection}>
-                <Text style={[styles.modalLabel, { color: theme.colors.text }]}>Target per Day</Text>
-                <View style={styles.counterRow}>
-                  <TouchableOpacity
-                    style={[styles.counterButton, { backgroundColor: theme.colors.surface }]}
-                    onPress={() => setTargetCount(Math.max(2, targetCount - 1))}
-                  >
-                    <Minus size={20} color={theme.colors.text} strokeWidth={2} />
-                  </TouchableOpacity>
-                  <Text style={[styles.counterValue, { color: theme.colors.text }]}>{targetCount}x</Text>
-                  <TouchableOpacity
-                    style={[styles.counterButton, { backgroundColor: theme.colors.surface }]}
-                    onPress={() => setTargetCount(Math.min(20, targetCount + 1))}
-                  >
-                    <Plus size={20} color={theme.colors.text} strokeWidth={2} />
-                  </TouchableOpacity>
-                </View>
-              </View>
             )}
 
             {/* Notes */}

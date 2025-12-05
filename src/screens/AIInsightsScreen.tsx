@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
+import { useHabits } from '@/hooks/useHabits';
 import {
   ArrowLeft,
   RefreshCw,
@@ -47,60 +48,147 @@ const AIInsightsScreen: React.FC = () => {
   const navigation = useNavigation<AIInsightsNavigationProp>();
   const { theme } = useTheme();
   const { fadeAnim, slideAnim } = useScreenAnimation();
+  const { habits } = useHabits();
 
   const [question, setQuestion] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [questionsRemaining] = useState(5);
 
-  // Mock AI insights data
-  const insights: InsightCard[] = [
-    {
+  // Generate real insights from habit data
+  const insights = useMemo(() => {
+    const activeHabits = habits.filter(h => !h.archived);
+    const insightCards: InsightCard[] = [];
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+
+    // Weekly Summary - calculate real completion rate
+    const weekAgo = new Date(today);
+    weekAgo.setDate(weekAgo.getDate() - 7);
+
+    let weeklyScheduled = 0;
+    let weeklyCompleted = 0;
+
+    activeHabits.forEach(habit => {
+      const completions = habit.completions || {};
+      const currentDate = new Date(weekAgo);
+
+      while (currentDate <= today) {
+        const dayOfWeek = currentDate.getDay();
+        const dateStr = currentDate.toISOString().split('T')[0];
+
+        if (habit.selectedDays.includes(dayOfWeek)) {
+          weeklyScheduled++;
+          const completion = completions[dateStr];
+          if (completion && completion.completionCount >= completion.targetCount) {
+            weeklyCompleted++;
+          }
+        }
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+    });
+
+    const weeklyRate = weeklyScheduled > 0 ? Math.round((weeklyCompleted / weeklyScheduled) * 100) : 0;
+
+    insightCards.push({
       id: '1',
       type: 'weekly',
       title: 'Weekly Summary',
-      content: 'This week you completed 18 of 21 habits (86%). That\'s 5% better than last week! Keep it up!',
+      content: weeklyScheduled > 0
+        ? `This week you completed ${weeklyCompleted} of ${weeklyScheduled} scheduled habits (${weeklyRate}%).`
+        : 'Complete some habits this week to see your summary!',
       IconComponent: BarChart3,
       actionLabel: 'View Details',
-    },
-    {
-      id: '2',
-      type: 'recommendation',
-      title: 'Habit Recommendation',
-      content: 'Based on your morning routine success, consider adding "Stretch for 5 minutes" before breakfast.',
-      IconComponent: Lightbulb,
-      actionLabel: 'Add Habit',
-    },
-    {
-      id: '3',
-      type: 'alert',
-      title: 'Streak Risk Alert',
-      content: 'You haven\'t checked in "Meditate" yet today. Don\'t break your 24-day streak!',
-      IconComponent: AlertTriangle,
-      urgency: 'high',
-      actionLabel: 'Check in now',
-    },
-    {
-      id: '4',
-      type: 'pattern',
-      title: 'Pattern Discovery',
-      content: 'You\'re 3x more likely to exercise when you complete your morning routine first. Try habit stacking!',
-      IconComponent: Search,
-    },
-    {
+    });
+
+    // Streak Risk Alert - find habits not completed today with active streaks
+    const habitsAtRisk = activeHabits.filter(habit => {
+      if (habit.streak < 3) return false;
+      const todayDayOfWeek = today.getDay();
+      if (!habit.selectedDays.includes(todayDayOfWeek)) return false;
+
+      const completion = habit.completions?.[todayStr];
+      return !completion || completion.completionCount < completion.targetCount;
+    });
+
+    if (habitsAtRisk.length > 0) {
+      const topRiskHabit = habitsAtRisk.reduce((a, b) => a.streak > b.streak ? a : b);
+      insightCards.push({
+        id: '2',
+        type: 'alert',
+        title: 'Streak Risk Alert',
+        content: `You haven't completed "${topRiskHabit.name}" today. Don't break your ${topRiskHabit.streak}-day streak!`,
+        IconComponent: AlertTriangle,
+        urgency: 'high',
+        actionLabel: 'Check in now',
+      });
+    }
+
+    // Best Day Pattern - find which day has highest completion rate
+    const dayStats = Array(7).fill(null).map(() => ({ scheduled: 0, completed: 0 }));
+
+    activeHabits.forEach(habit => {
+      const completions = habit.completions || {};
+      Object.entries(completions).forEach(([dateStr, completion]) => {
+        const dayOfWeek = new Date(dateStr).getDay();
+        if (habit.selectedDays.includes(dayOfWeek)) {
+          dayStats[dayOfWeek].scheduled++;
+          if (completion && completion.completionCount >= completion.targetCount) {
+            dayStats[dayOfWeek].completed++;
+          }
+        }
+      });
+    });
+
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const bestDay = dayStats.reduce((best, stat, index) => {
+      const rate = stat.scheduled > 0 ? stat.completed / stat.scheduled : 0;
+      const bestRate = best.stat.scheduled > 0 ? best.stat.completed / best.stat.scheduled : 0;
+      return rate > bestRate ? { index, stat } : best;
+    }, { index: 0, stat: dayStats[0] });
+
+    const bestDayRate = bestDay.stat.scheduled > 0
+      ? Math.round((bestDay.stat.completed / bestDay.stat.scheduled) * 100)
+      : 0;
+
+    if (bestDayRate > 0) {
+      insightCards.push({
+        id: '3',
+        type: 'pattern',
+        title: 'Pattern Discovery',
+        content: `${dayNames[bestDay.index]} is your best day with ${bestDayRate}% completion rate. Schedule important habits then!`,
+        IconComponent: Search,
+      });
+    }
+
+    // Top Streak Milestone
+    const habitsWithStreaks = activeHabits.filter(h => h.streak > 0);
+    if (habitsWithStreaks.length > 0) {
+      const topStreakHabit = habitsWithStreaks.reduce((a, b) => a.streak > b.streak ? a : b);
+      const daysToMilestone = [7, 14, 30, 60, 90, 100].find(m => m > topStreakHabit.streak);
+
+      if (daysToMilestone) {
+        const daysLeft = daysToMilestone - topStreakHabit.streak;
+        insightCards.push({
+          id: '4',
+          type: 'milestone',
+          title: 'Milestone Prediction',
+          content: `"${topStreakHabit.name}" is on a ${topStreakHabit.streak}-day streak! ${daysLeft} more days to reach ${daysToMilestone}!`,
+          IconComponent: Trophy,
+        });
+      }
+    }
+
+    // Motivation tip (static but useful)
+    insightCards.push({
       id: '5',
       type: 'motivation',
       title: 'Tip of the Day',
       content: 'Struggling with consistency? Try the "2-minute rule" - start with just 2 minutes and build from there.',
       IconComponent: Target,
-    },
-    {
-      id: '6',
-      type: 'milestone',
-      title: 'Milestone Prediction',
-      content: 'At your current pace, you\'ll hit 100 days on "Read 20 pages" in 12 days!',
-      IconComponent: Trophy,
-    },
-  ];
+    });
+
+    return insightCards;
+  }, [habits]);
 
   const handleRefresh = () => {
     setIsLoading(true);
