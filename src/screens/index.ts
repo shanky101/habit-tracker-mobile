@@ -29,3 +29,4 @@ export { default as PaywallScreen } from './PaywallScreen';
 export { default as AboutScreen } from './AboutScreen';
 export { default as DataPrivacyScreen } from './DataPrivacyScreen';
 export { default as ChangePasswordScreen } from './ChangePasswordScreen';
+export { default as StreakBadgesScreen } from './StreakBadgesScreen';
