@@ -13,3 +13,4 @@ export * from './badgeMilestones';
 // Core services
 export { StreakCalculator, DateUtils } from './StreakCalculator';
 export { BadgeManager } from './BadgeManager';
+export { StreakTracker } from './StreakTracker';
