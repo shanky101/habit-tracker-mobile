@@ -234,61 +234,79 @@ const runMigrations = (): void => {
     if (currentVersion < 4) {
       console.log('[DB] Migrating to version 4: Updating time_period constraint');
 
-      db.withTransactionSync(() => {
-        // 1. Rename existing table
-        db.runSync('ALTER TABLE habits RENAME TO habits_old');
+      // Check if habits_old exists (from interrupted migration)
+      const tables = db.getAllSync<{ name: string }>("SELECT name FROM sqlite_master WHERE type='table' AND name='habits_old'");
 
-        // 2. Create new table with correct constraint
-        db.runSync(`
-          CREATE TABLE habits (
-            id TEXT PRIMARY KEY,
-            name TEXT NOT NULL,
-            emoji TEXT NOT NULL,
-            streak INTEGER NOT NULL DEFAULT 0,
-            category TEXT NOT NULL,
-            color TEXT NOT NULL,
-            frequency TEXT NOT NULL,
-            frequency_type TEXT NOT NULL DEFAULT 'single',
-            target_per_day INTEGER NOT NULL DEFAULT 1,
-            selected_days TEXT NOT NULL,
-            time_period TEXT NOT NULL DEFAULT 'allday' CHECK (time_period IN ('allday', 'morning', 'afternoon', 'evening', 'night')),
-            reminder_enabled INTEGER NOT NULL DEFAULT 0,
-            reminder_time TEXT,
-            notification_ids TEXT,
-            notes TEXT,
-            is_default INTEGER NOT NULL DEFAULT 0,
-            archived INTEGER NOT NULL DEFAULT 0,
-            sort_order INTEGER NOT NULL DEFAULT 0,
-            created_at TEXT NOT NULL,
-            updated_at TEXT NOT NULL
-          )
-        `);
+      if (tables.length > 0) {
+        console.log('[DB] Found existing habits_old table from interrupted migration, cleaning up...');
+        db.runSync('DROP TABLE IF EXISTS habits_old');
+      }
 
-        // 3. Copy data, converting 'anytime' to 'allday'
-        db.runSync(`
-          INSERT INTO habits (
-            id, name, emoji, streak, category, color, frequency, frequency_type,
-            target_per_day, selected_days, time_period, reminder_enabled, reminder_time,
-            notification_ids, notes, is_default, archived, sort_order, created_at, updated_at
-          )
-          SELECT 
-            id, name, emoji, streak, category, color, frequency, frequency_type,
-            target_per_day, selected_days, 
-            CASE WHEN time_period = 'anytime' THEN 'allday' ELSE time_period END,
-            reminder_enabled, reminder_time,
-            notification_ids, notes, is_default, archived, sort_order, created_at, updated_at
-          FROM habits_old
-        `);
+      // Check if habits table has time_period column
+      const columns = db.getAllSync<{ name: string }>('PRAGMA table_info(habits)');
+      const hasTimePeriod = columns.some(col => col.name === 'time_period');
 
-        // 4. Drop old table
-        db.runSync('DROP TABLE habits_old');
+      if (hasTimePeriod) {
+        // Migration already done or partial, just mark as complete
+        console.log('[DB] time_period column already exists, skipping migration');
+      } else {
+        // Do the migration
+        db.withTransactionSync(() => {
+          // 1. Rename existing table
+          db.runSync('ALTER TABLE habits RENAME TO habits_old');
 
-        // 5. Recreate indexes
-        db.runSync('CREATE INDEX IF NOT EXISTS idx_habits_archived ON habits(archived)');
-        db.runSync('CREATE INDEX IF NOT EXISTS idx_habits_sort_order ON habits(sort_order)');
-      });
+          // 2. Create new table with correct constraint
+          db.runSync(`
+            CREATE TABLE habits (
+              id TEXT PRIMARY KEY,
+              name TEXT NOT NULL,
+              emoji TEXT NOT NULL,
+              streak INTEGER NOT NULL DEFAULT 0,
+              category TEXT NOT NULL,
+              color TEXT NOT NULL,
+              frequency TEXT NOT NULL,
+              frequency_type TEXT NOT NULL DEFAULT 'single',
+              target_per_day INTEGER NOT NULL DEFAULT 1,
+              selected_days TEXT NOT NULL,
+              time_period TEXT NOT NULL DEFAULT 'allday' CHECK (time_period IN ('allday', 'morning', 'afternoon', 'evening', 'night')),
+              reminder_enabled INTEGER NOT NULL DEFAULT 0,
+              reminder_time TEXT,
+              notification_ids TEXT,
+              notes TEXT,
+              is_default INTEGER NOT NULL DEFAULT 0,
+              archived INTEGER NOT NULL DEFAULT 0,
+              sort_order INTEGER NOT NULL DEFAULT 0,
+              created_at TEXT NOT NULL,
+              updated_at TEXT NOT NULL
+            )
+          `);
 
-      console.log('[DB] Updated habits table with correct constraint');
+          // 3. Copy data, adding 'allday' as default time_period
+          db.runSync(`
+            INSERT INTO habits (
+              id, name, emoji, streak, category, color, frequency, frequency_type,
+              target_per_day, selected_days, time_period, reminder_enabled, reminder_time,
+              notification_ids, notes, is_default, archived, sort_order, created_at, updated_at
+            )
+            SELECT
+              id, name, emoji, streak, category, color, frequency, frequency_type,
+              target_per_day, selected_days,
+              'allday',
+              reminder_enabled, reminder_time,
+              notification_ids, notes, is_default, archived, sort_order, created_at, updated_at
+            FROM habits_old
+          `);
+
+          // 4. Drop old table
+          db.runSync('DROP TABLE habits_old');
+
+          // 5. Recreate indexes
+          db.runSync('CREATE INDEX IF NOT EXISTS idx_habits_archived ON habits(archived)');
+          db.runSync('CREATE INDEX IF NOT EXISTS idx_habits_sort_order ON habits(sort_order)');
+        });
+
+        console.log('[DB] Updated habits table with correct constraint');
+      }
 
       // Update version
       db.runSync('UPDATE schema_version SET version = 4');
@@ -328,6 +346,7 @@ CREATE TABLE IF NOT EXISTS habits (
   frequency_type TEXT NOT NULL DEFAULT 'single' CHECK (frequency_type IN ('single', 'multiple')),
   target_per_day INTEGER NOT NULL DEFAULT 1,
   selected_days TEXT NOT NULL,
+  time_period TEXT NOT NULL DEFAULT 'allday' CHECK (time_period IN ('allday', 'morning', 'afternoon', 'evening', 'night')),
   reminder_enabled INTEGER NOT NULL DEFAULT 0,
   reminder_time TEXT,
   notification_ids TEXT,
@@ -337,6 +356,12 @@ CREATE TABLE IF NOT EXISTS habits (
   sort_order INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
+);
+
+-- App Metadata Table
+CREATE TABLE IF NOT EXISTS app_metadata (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL
 );
     `);
 

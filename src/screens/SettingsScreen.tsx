@@ -298,7 +298,7 @@ const SettingsScreen: React.FC = () => {
           </TouchableOpacity>
         </Animated.View>
 
-        {/* Mascot Section */}
+        {/* Celebrations Section */}
         <Animated.View
           style={[
             styles.section,
@@ -319,50 +319,10 @@ const SettingsScreen: React.FC = () => {
               },
             ]}
           >
-            {MASCOT_NAME.toUpperCase()} MASCOT
+            CELEBRATIONS
           </Text>
 
-          <View style={[styles.settingRow, { borderBottomColor: theme.colors.border }]}>
-            <View style={styles.settingInfo}>
-              <View style={styles.settingIconContainer}>
-                <Sparkles size={22} color={theme.colors.primary} strokeWidth={2} />
-              </View>
-              <View style={styles.settingTextContainer}>
-                <Text
-                  style={[
-                    styles.settingLabel,
-                    {
-                      color: theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBodyMedium,
-                      fontSize: theme.typography.fontSizeMD,
-                    },
-                  ]}
-                >
-                  Show {MASCOT_NAME}
-                </Text>
-                <Text
-                  style={[
-                    styles.settingValue,
-                    {
-                      color: theme.colors.textSecondary,
-                      fontFamily: theme.typography.fontFamilyBody,
-                      fontSize: theme.typography.fontSizeSM,
-                    },
-                  ]}
-                >
-                  Your friendly habit companion
-                </Text>
-              </View>
-            </View>
-            <Switch
-              value={mascotSettings.enabled}
-              onValueChange={toggleMascot}
-              trackColor={{ false: theme.colors.border, true: theme.colors.primary + '60' }}
-              thumbColor={mascotSettings.enabled ? theme.colors.primary : theme.colors.surface}
-            />
-          </View>
-
-          <View style={[styles.settingRow, { borderBottomWidth: 0, opacity: mascotSettings.enabled ? 1 : 0.5 }]}>
+          <View style={[styles.settingRow, { borderBottomWidth: 0 }]}>
             <View style={styles.settingInfo}>
               <View style={styles.settingIconContainer}>
                 <PartyPopper size={22} color={theme.colors.primary} strokeWidth={2} />
@@ -378,7 +338,7 @@ const SettingsScreen: React.FC = () => {
                     },
                   ]}
                 >
-                  Celebrations
+                  Show Celebrations
                 </Text>
                 <Text
                   style={[
@@ -390,16 +350,15 @@ const SettingsScreen: React.FC = () => {
                     },
                   ]}
                 >
-                  Show {MASCOT_NAME} when completing all habits
+                  Celebrate when completing all habits
                 </Text>
               </View>
             </View>
             <Switch
               value={mascotSettings.showCelebrations}
               onValueChange={toggleCelebrations}
-              disabled={!mascotSettings.enabled}
               trackColor={{ false: theme.colors.border, true: theme.colors.primary + '60' }}
-              thumbColor={mascotSettings.showCelebrations && mascotSettings.enabled ? theme.colors.primary : theme.colors.surface}
+              thumbColor={mascotSettings.showCelebrations ? theme.colors.primary : theme.colors.surface}
             />
           </View>
         </Animated.View>

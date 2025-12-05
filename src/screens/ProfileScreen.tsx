@@ -540,30 +540,7 @@ const ProfileScreen: React.FC = () => {
           </View>
 
           {/* Menu Items */}
-          <View
-            style={[
-              styles.menuSection,
-              {
-                backgroundColor: theme.colors.backgroundSecondary,
-                borderColor: theme.colors.border,
-              },
-            ]}
-          >
-            <Text
-              style={[
-                styles.menuSectionTitle,
-                {
-                  color: theme.colors.textSecondary,
-                  fontFamily: theme.typography.fontFamilyBodySemibold,
-                  fontSize: theme.typography.fontSizeXS,
-                },
-              ]}
-            >
-              PERSONALIZATION
-            </Text>
-            {renderMenuItem(Sparkles, 'Customize Habi', () => navigation.navigate('CustomizeHabi'), false)}
-          </View>
-
+          {/* PERSONALIZATION section removed - mascot disabled */}
           <View
             style={[
               styles.menuSection,

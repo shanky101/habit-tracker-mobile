@@ -22,6 +22,9 @@ export const SpeechBubble: React.FC<SpeechBubbleProps> = ({
     const scale = useRef(new Animated.Value(0.8)).current;
     const wobble = useRef(new Animated.Value(0)).current;
 
+    // Check if using brutalist theme
+    const isBrutalist = theme.name === 'Brutalist';
+
     useEffect(() => {
         if (visible) {
             // Entrance animation
@@ -102,7 +105,8 @@ export const SpeechBubble: React.FC<SpeechBubbleProps> = ({
         outputRange: ['-2deg', '2deg'],
     });
 
-    if (!visible && opacity._value === 0) {
+    // Check if animation is complete before hiding
+    if (!visible) {
         return null;
     }
 
@@ -119,16 +123,27 @@ export const SpeechBubble: React.FC<SpeechBubbleProps> = ({
                 },
             ]}
         >
-            {/* Triangle tail pointing up to Habi */}
-            <View
-                style={[
-                    styles.tail,
-                    {
-                        borderBottomColor: theme.colors.surface,
-                        shadowColor: theme.colors.shadow,
-                    },
-                ]}
-            />
+            {/* Triangle tail - Brutalist version has border */}
+            {isBrutalist ? (
+                <View style={styles.brutalistTailContainer}>
+                    {/* Shadow tail */}
+                    <View style={[styles.brutalistTailShadow, { borderTopColor: '#000000' }]} />
+                    {/* Border tail */}
+                    <View style={[styles.brutalistTailBorder, { borderTopColor: theme.colors.border }]} />
+                    {/* Inner tail */}
+                    <View style={[styles.brutalistTailInner, { borderTopColor: theme.colors.surface }]} />
+                </View>
+            ) : (
+                <View
+                    style={[
+                        styles.tail,
+                        {
+                            borderBottomColor: theme.colors.surface,
+                            shadowColor: '#000000',
+                        },
+                    ]}
+                />
+            )}
 
             {/* Bubble content */}
             <View
@@ -136,11 +151,27 @@ export const SpeechBubble: React.FC<SpeechBubbleProps> = ({
                     styles.bubble,
                     {
                         backgroundColor: theme.colors.surface,
-                        shadowColor: theme.colors.shadow,
+                        shadowColor: '#000000',
+                        // Brutalist styling
+                        ...(isBrutalist && {
+                            borderWidth: 4,
+                            borderColor: theme.colors.border,
+                            shadowOffset: { width: 5, height: 5 },
+                            shadowOpacity: 1,
+                            shadowRadius: 0,
+                        }),
                     },
                 ]}
             >
-                <Text style={[styles.message, { color: theme.colors.text }]}>
+                <Text style={[
+                    styles.message,
+                    {
+                        color: theme.colors.text,
+                        fontFamily: isBrutalist
+                            ? theme.typography.fontFamilyBodyMedium
+                            : undefined,
+                    },
+                ]}>
                     {message}
                 </Text>
             </View>
@@ -167,6 +198,50 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 8,
         elevation: 4,
+    },
+    // Brutalist tail styles
+    brutalistTailContainer: {
+        position: 'relative',
+        width: 0,
+        height: 0,
+        marginTop: -16,
+        marginBottom: -2,
+    },
+    brutalistTailShadow: {
+        position: 'absolute',
+        top: 5,
+        left: -15 + 5,
+        width: 0,
+        height: 0,
+        borderLeftWidth: 15,
+        borderRightWidth: 15,
+        borderTopWidth: 12,
+        borderLeftColor: 'transparent',
+        borderRightColor: 'transparent',
+    },
+    brutalistTailBorder: {
+        position: 'absolute',
+        top: 0,
+        left: -15,
+        width: 0,
+        height: 0,
+        borderLeftWidth: 15,
+        borderRightWidth: 15,
+        borderTopWidth: 12,
+        borderLeftColor: 'transparent',
+        borderRightColor: 'transparent',
+    },
+    brutalistTailInner: {
+        position: 'absolute',
+        top: -2,
+        left: -12,
+        width: 0,
+        height: 0,
+        borderLeftWidth: 12,
+        borderRightWidth: 12,
+        borderTopWidth: 10,
+        borderLeftColor: 'transparent',
+        borderRightColor: 'transparent',
     },
     bubble: {
         paddingVertical: 12,

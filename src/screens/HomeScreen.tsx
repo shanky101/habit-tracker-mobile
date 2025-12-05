@@ -634,8 +634,9 @@ const HomeScreen: React.FC = () => {
           </ScrollView>
         </Animated.View>
 
-        {/* Mascot Companion - Hero Display */}
-        {mascotSettings.enabled ? (
+        {/* Mascot Companion - Hero Display - DISABLED */}
+        {/* TODO: Re-enable when mascot is ready for production */}
+        {/* {mascotSettings.enabled ? (
           <Animated.View
             style={[
               styles.mascotCard,
@@ -647,7 +648,6 @@ const HomeScreen: React.FC = () => {
               },
             ]}
           >
-            {/* Hide mascot button - subtle, top right */}
             <TouchableOpacity
               style={[
                 styles.mascotToggleButton,
@@ -663,7 +663,6 @@ const HomeScreen: React.FC = () => {
                 Hide
               </Text>
             </TouchableOpacity>
-            {/* Customized Habi with interaction support */}
             <MascotDisplay
               ref={mascotRef}
               size={126}
@@ -673,7 +672,6 @@ const HomeScreen: React.FC = () => {
             />
           </Animated.View>
         ) : (
-          /* Show Habi pill when mascot is hidden */
           <TouchableOpacity
             style={[
               styles.showMascotPill,
@@ -699,7 +697,7 @@ const HomeScreen: React.FC = () => {
               Show Habi
             </Text>
           </TouchableOpacity>
-        )}
+        )} */}
 
         {/* Progress Card - Always show if there are habits for the day */}
         {dateFilteredHabits.length > 0 && (
