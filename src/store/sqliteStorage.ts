@@ -4,16 +4,36 @@ import { initializeDatabase } from '../data/database/initialize';
 
 // Track if database has been initialized
 let dbInitialized = false;
+let dbInitializing = false;
 
 /**
  * Ensure database is initialized before any operations
+ * Uses a flag to prevent race conditions with multiple calls
  */
 const ensureDbInitialized = async (): Promise<void> => {
-  if (!dbInitialized) {
+  if (dbInitialized) return;
+
+  // Prevent multiple simultaneous initializations
+  if (dbInitializing) {
+    // Wait for existing initialization to complete
+    while (dbInitializing) {
+      await new Promise(resolve => setTimeout(resolve, 50));
+    }
+    return;
+  }
+
+  dbInitializing = true;
+  try {
     console.log('[SQLiteStorage] Initializing database on first access');
     await initializeDatabase();
     dbInitialized = true;
+  } catch (error) {
+    console.error('[SQLiteStorage] Database initialization failed:', error);
+    // Reset flag so it can be retried
+    dbInitializing = false;
+    throw error;
   }
+  dbInitializing = false;
 };
 
 /**
@@ -44,7 +64,14 @@ export const sqliteStorage: StateStorage = {
       return JSON.stringify(state);
     } catch (error) {
       console.error('[SQLiteStorage] getItem error:', error);
-      throw error; // Let it crash in dev for visibility
+      // Return empty state instead of crashing
+      return JSON.stringify({
+        state: {
+          habits: [],
+          isHydrated: false,
+        },
+        version: 1,
+      });
     }
   },
 
@@ -54,15 +81,23 @@ export const sqliteStorage: StateStorage = {
    */
   setItem: async (name: string, value: string): Promise<void> => {
     try {
+      // Ensure DB is ready
+      await ensureDbInitialized();
+
       console.log('[SQLiteStorage] setItem called');
       const parsed = JSON.parse(value);
       const { state } = parsed;
+
+      if (!state?.habits || !Array.isArray(state.habits)) {
+        console.warn('[SQLiteStorage] Invalid state, skipping sync');
+        return;
+      }
 
       // Full sync to database
       await habitRepository.syncAll(state.habits);
     } catch (error) {
       console.error('[SQLiteStorage] setItem error:', error);
-      throw error; // Let it crash in dev for visibility
+      // Don't throw - this would crash the app on every state change
     }
   },
 
@@ -72,11 +107,12 @@ export const sqliteStorage: StateStorage = {
    */
   removeItem: async (name: string): Promise<void> => {
     try {
+      await ensureDbInitialized();
       console.log('[SQLiteStorage] removeItem called');
       await habitRepository.deleteAll();
     } catch (error) {
       console.error('[SQLiteStorage] removeItem error:', error);
-      throw error; // Let it crash in dev for visibility
+      // Don't throw
     }
   },
 };

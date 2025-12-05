@@ -34,7 +34,7 @@ import type { HabiMascotRef } from '@/components/mascot/HabiMascot';
 import { MascotCelebration, DraggableHabitList } from '@/components';
 import { User } from 'lucide-react-native';
 import { TimeFilter } from '@/components/filters/TimeFilter';
-import { CompletionTypeFilter, CompletionFilterType } from '@/components/filters/CompletionTypeFilter';
+
 import { useSettingsStore } from '@/store/settingsStore';
 
 type HomeScreenNavigationProp = StackNavigationProp<any, 'Home'>;
@@ -123,7 +123,7 @@ const HomeScreen: React.FC = () => {
   const [pendingAllComplete, setPendingAllComplete] = useState(false); // Track if celebration is pending
   const [frequencyFilter, setFrequencyFilter] = useState<'all' | 'single' | 'multiple'>('all'); // Filter for single vs multiple frequency habits
   const [timePeriodFilter, setTimePeriodFilter] = useState<'all' | HabitTimePeriod>('allday'); // Filter by time period
-  const [completionTypeFilter, setCompletionTypeFilter] = useState<CompletionFilterType>('all'); // Filter by single/multiple
+
 
   // Get time ranges from settings store
   const { timeRanges } = useSettingsStore();
@@ -196,15 +196,24 @@ const HomeScreen: React.FC = () => {
   // Filter out archived habits and filter by selected date
   const dateFilteredHabits = getHabitsForDate(selectedDate);
 
-  // Apply time period filter
-  const timePeriodFilteredHabits = timePeriodFilter === 'all'
+  // Filter logic
+  const isSpecificPeriod = timePeriodFilter !== 'all' && timePeriodFilter !== 'allday';
+
+  // Habits matching the specific filter (or all if 'all')
+  const periodHabits = timePeriodFilter === 'all'
     ? dateFilteredHabits
     : dateFilteredHabits.filter((h) => h.timePeriod === timePeriodFilter);
 
-  // Apply completion type filter (single vs multiple) - only when time period is selected
-  const activeHabits = completionTypeFilter === 'all'
-    ? timePeriodFilteredHabits
-    : timePeriodFilteredHabits.filter((h) => h.frequencyType === completionTypeFilter);
+  // Habits matching 'allday' (only relevant if filter is specific)
+  const allDayHabits = isSpecificPeriod
+    ? dateFilteredHabits.filter((h) => h.timePeriod === 'allday')
+    : [];
+
+  const activePeriodHabits = periodHabits;
+  const activeAllDayHabits = allDayHabits;
+
+  // Combined list for counts and other logic
+  const activeHabits = [...activePeriodHabits, ...activeAllDayHabits];
 
   // Calculate habit counts per time period for filter badges
   const habitCounts: Record<HabitTimePeriod | 'all', number> = {
@@ -349,12 +358,11 @@ const HomeScreen: React.FC = () => {
     navigation.navigate('HabitDetail', { habitId: habit.id, habitData: habit });
   };
 
-  // Handle habit reorder - convert from activeHabits index to full habits index
-  const handleReorderHabits = (fromIndex: number, toIndex: number) => {
-    // Get the actual indices in the full habits array
-    const activeHabitIds = activeHabits.map(h => h.id);
-    const fromHabitId = activeHabitIds[fromIndex];
-    const toHabitId = activeHabitIds[toIndex];
+  // Handle habit reorder - convert from list index to full habits index
+  const handleReorderList = (list: Habit[], fromIndex: number, toIndex: number) => {
+    const listIds = list.map(h => h.id);
+    const fromHabitId = listIds[fromIndex];
+    const toHabitId = listIds[toIndex];
 
     // Find actual indices in the full array
     const actualFromIndex = habits.findIndex(h => h.id === fromHabitId);
@@ -363,6 +371,14 @@ const HomeScreen: React.FC = () => {
     if (actualFromIndex !== -1 && actualToIndex !== -1) {
       reorderHabits(actualFromIndex, actualToIndex);
     }
+  };
+
+  const handleReorderPeriodHabits = (fromIndex: number, toIndex: number) => {
+    handleReorderList(activePeriodHabits, fromIndex, toIndex);
+  };
+
+  const handleReorderAllDayHabits = (fromIndex: number, toIndex: number) => {
+    handleReorderList(activeAllDayHabits, fromIndex, toIndex);
   };
 
   // Handle share all complete
@@ -803,14 +819,11 @@ const HomeScreen: React.FC = () => {
               counts={habitCounts}
               timeRanges={timeRanges}
             />
-            <CompletionTypeFilter
-              selected={completionTypeFilter}
-              onSelect={setCompletionTypeFilter}
-              visible={true}
-            />
+
           </View>
         </View>
 
+        {/* Habits List */}
         {/* Habits List */}
         {activeHabits.length > 0 ? (
           <Animated.View
@@ -819,16 +832,48 @@ const HomeScreen: React.FC = () => {
               { opacity: fadeAnim },
             ]}
           >
-            <DraggableHabitList
-              habits={activeHabits}
-              selectedDate={selectedDateISO}
-              onToggle={handleToggleHabit}
-              onPress={handleHabitPress}
-              onEdit={handleEditHabit}
-              onArchive={handleArchiveHabit}
-              onDelete={handleDeleteHabit}
-              onReorder={handleReorderHabits}
-            />
+            {/* Period Habits */}
+            {activePeriodHabits.length > 0 && (
+              <DraggableHabitList
+                habits={activePeriodHabits}
+                selectedDate={selectedDateISO}
+                onToggle={handleToggleHabit}
+                onPress={handleHabitPress}
+                onEdit={handleEditHabit}
+                onArchive={handleArchiveHabit}
+                onDelete={handleDeleteHabit}
+                onReorder={handleReorderPeriodHabits}
+              />
+            )}
+
+            {/* All Day Habits Section */}
+            {activeAllDayHabits.length > 0 && (
+              <>
+                {activePeriodHabits.length > 0 && (
+                  <View style={styles.sectionHeaderContainer}>
+                    <Text style={[
+                      styles.sectionHeaderText,
+                      {
+                        color: theme.colors.textSecondary,
+                        fontFamily: theme.typography.fontFamilyBodySemibold,
+                      }
+                    ]}>
+                      ALL DAY
+                    </Text>
+                  </View>
+                )}
+                <DraggableHabitList
+                  habits={activeAllDayHabits}
+                  selectedDate={selectedDateISO}
+                  onToggle={handleToggleHabit}
+                  onPress={handleHabitPress}
+                  onEdit={handleEditHabit}
+                  onArchive={handleArchiveHabit}
+                  onDelete={handleDeleteHabit}
+                  onReorder={handleReorderAllDayHabits}
+                />
+              </>
+            )}
           </Animated.View>
         ) : (
           renderEmptyState()
@@ -1115,6 +1160,16 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     marginBottom: 16,
+  },
+  sectionHeaderContainer: {
+    marginTop: 24,
+    marginBottom: 12,
+    paddingHorizontal: 4,
+  },
+  sectionHeaderText: {
+    fontSize: 12,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   filtersContainer: {
     marginBottom: 16,

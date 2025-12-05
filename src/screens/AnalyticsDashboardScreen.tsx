@@ -42,7 +42,6 @@ const AnalyticsDashboardScreen: React.FC = () => {
   const { fadeAnim, slideAnim } = useScreenAnimation();
 
   const [selectedRange, setSelectedRange] = useState<'7 days' | '30 days' | '90 days' | 'All time'>('30 days');
-  const [isPremium] = useState(true); // For demo, set to true
 
   // Filter out archived habits
   const activeHabits = habits.filter(h => !h.archived);
@@ -204,48 +203,77 @@ const AnalyticsDashboardScreen: React.FC = () => {
       }));
     };
 
-    // Trend percentages by range
-    const trendPercentages: Record<string, string> = {
-      '7 days': '+18%',
-      '30 days': '+12%',
-      '90 days': '+8%',
-      'All time': '+5%',
+    // Calculate real trend: compare current period to previous period
+    const calculateTrend = () => {
+      const now = new Date();
+      const currentStart = getStartDateForRange(selectedRange);
+      const periodLength = Math.ceil((now.getTime() - currentStart.getTime()) / (1000 * 60 * 60 * 24));
+
+      const previousEnd = new Date(currentStart);
+      previousEnd.setDate(previousEnd.getDate() - 1);
+      const previousStart = new Date(previousEnd);
+      previousStart.setDate(previousStart.getDate() - periodLength);
+
+      // Calculate completions for previous period
+      const previousCompletions = activeHabits.reduce((sum, habit) => {
+        const completions = habit.completions || {};
+        return sum + Object.keys(completions).filter(dateStr => {
+          const d = new Date(dateStr);
+          return d >= previousStart && d <= previousEnd;
+        }).reduce((dateSum, dateStr) => {
+          return dateSum + (completions[dateStr]?.completionCount || 0);
+        }, 0);
+      }, 0);
+
+      if (previousCompletions === 0) return totalCompletions > 0 ? '+100%' : '0%';
+      const change = Math.round(((totalCompletions - previousCompletions) / previousCompletions) * 100);
+      return change >= 0 ? `+${change}%` : `${change}%`;
     };
 
-    // Best day insight by range
-    const bestDayInsights: Record<string, string> = {
-      '7 days': "You're crushing it on Mondays & Thursdays this week!",
-      '30 days': "You're most productive on Mondays!",
-      '90 days': "Monday has been your most consistent day",
-      'All time': "Mondays have historically been your best days",
-    };
+    // Generate real AI insights from habit data
+    const generateRealInsights = () => {
+      const insights: string[] = [];
 
-    // AI insights by range
-    const aiInsightsByRange: Record<string, string[]> = {
-      '7 days': [
-        "100% completion on Monday and Thursday this week",
-        "Weekend habits need attention",
-        "Current streak: You're on fire!",
-      ],
-      '30 days': [
-        "Your morning habits have 92% completion rate",
-        "You're 3x more likely to meditate after exercising",
-        "Best streak: 58 days on 'Read 20 pages'",
-      ],
-      '90 days': [
-        "Weekday habits are 35% more consistent than weekends",
-        "Exercise correlates with better sleep habits",
-        "You've improved consistency by 15% over last quarter",
-      ],
-      'All time': [
-        "Total habits tracked: " + habits.length,
-        "Average habit lifespan: 67 days",
-        "Most successful category: Health & Fitness",
-      ],
+      // Best day insight
+      const bestDay = dayOfWeekData.reduce((best, current) =>
+        current.value > best.value ? current : best
+        , dayOfWeekData[0]);
+      if (bestDay.value > 0) {
+        insights.push(`${bestDay.day} is your best day with ${bestDay.value}% completion rate`);
+      }
+
+      // Streak insights
+      const habitsWithStreaks = activeHabits.filter(h => h.streak > 3);
+      if (habitsWithStreaks.length > 0) {
+        const topStreak = habitsWithStreaks.reduce((a, b) => a.streak > b.streak ? a : b);
+        insights.push(`"${topStreak.name}" has a ${topStreak.streak} day streak - keep it going!`);
+      }
+
+      // Consistency insight
+      if (consistencyScore >= 80) {
+        insights.push(`${consistencyScore}% consistency - you're crushing it!`);
+      } else if (consistencyScore >= 50) {
+        insights.push(`${consistencyScore}% consistency - room for improvement`);
+      } else if (consistencyScore > 0) {
+        insights.push(`${consistencyScore}% consistency - try starting smaller`);
+      }
+
+      // Habits at risk (low completion)
+      const lowCompletionHabits = activeHabits.filter(h => {
+        const rate = calculateCompletionRate(h);
+        return rate < 50 && rate > 0;
+      });
+      if (lowCompletionHabits.length > 0) {
+        insights.push(`${lowCompletionHabits.length} habit(s) need attention`);
+      }
+
+      return insights.length > 0 ? insights : ['Complete more habits to see insights'];
     };
 
     const consistencyScore = calculateConsistencyScore();
     const dayOfWeekData = calculateDayOfWeekData();
+    const trendPercentage = calculateTrend();
+    const aiInsights = generateRealInsights();
 
     // Find best day from real data
     const bestDay = dayOfWeekData.reduce((best, current) =>
@@ -260,9 +288,9 @@ const AnalyticsDashboardScreen: React.FC = () => {
       totalCompletions,
       consistencyScore,
       dayOfWeekData,
-      trendPercentage: trendPercentages[selectedRange] || '+12%',
+      trendPercentage,
       bestDayInsight,
-      aiInsights: aiInsightsByRange[selectedRange] || aiInsightsByRange['30 days'],
+      aiInsights,
     };
   }, [selectedRange, activeHabits, habits.length]);
 
@@ -271,6 +299,9 @@ const AnalyticsDashboardScreen: React.FC = () => {
     : 0;
 
   const maxDayValue = Math.max(...analyticsData.dayOfWeekData.map((d) => d.value));
+
+  // Use real subscription status
+  const isPremium = subscription.isPremium;
 
   if (!isPremium) {
     // Premium Gate Screen
