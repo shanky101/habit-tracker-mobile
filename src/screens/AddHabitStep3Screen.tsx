@@ -19,6 +19,9 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { CATEGORIES } from './AddHabitStep2Screen';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
+import { HabitTimePeriod } from '@/types/habit';
+import { TimePeriodSelector } from '@/components/TimePeriodSelector';
+import { useSettingsStore } from '@/store/settingsStore';
 
 type AddHabitStep3ScreenNavigationProp = StackNavigationProp<any, 'AddHabitStep3'>;
 type AddHabitStep3ScreenRouteProp = RouteProp<
@@ -51,6 +54,10 @@ const AddHabitStep3Screen: React.FC = () => {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [notes, setNotes] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [timePeriod, setTimePeriod] = useState<HabitTimePeriod>('anytime');
+
+  // Get time ranges from settings store
+  const { timeRanges } = useSettingsStore();
 
   // Use custom animation hook
   const { fadeAnim, slideAnim } = useScreenAnimation();
@@ -118,6 +125,7 @@ const AddHabitStep3Screen: React.FC = () => {
       frequencyType,
       targetCompletionsPerDay,
       selectedDays: frequency === 'daily' ? [0, 1, 2, 3, 4, 5, 6] : selectedDays,
+      timePeriod,
       reminderEnabled,
       reminderTime: reminderEnabled ? reminderTime : null,
       notes: notes.trim() || undefined,
@@ -531,6 +539,13 @@ const AddHabitStep3Screen: React.FC = () => {
               </View>
             )}
           </View>
+
+          {/* Time Period Section */}
+          <TimePeriodSelector
+            selected={timePeriod}
+            onSelect={setTimePeriod}
+            timeRanges={timeRanges}
+          />
 
           {/* Reminder Section */}
           <View style={styles.section}>

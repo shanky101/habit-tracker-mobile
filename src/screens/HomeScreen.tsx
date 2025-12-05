@@ -11,27 +11,31 @@ import {
   Share,
 } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
+import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '@/theme';
-import { useHabits, Habit } from '@/hooks/useHabits';
+import { useHabits } from '@/hooks/useHabits';
+import { useSubscription } from '@/context/SubscriptionContext';
+import { useScreenAnimation } from '@/hooks/useScreenAnimation';
+import { Habit, HabitTimePeriod } from '@/types/habit';
 import CelebrationModal from '@/components/CelebrationModal';
 import {
   AllHabitsCompleteModal,
   QuickNoteModal,
-  StreakBrokenModal,
   ConfirmationDialog,
 } from '@/components/HabitModals';
-import { useScreenAnimation } from '@/hooks/useScreenAnimation';
-import { useSubscription } from '@/context/SubscriptionContext';
-import { useMascot } from '@/context/MascotContext';
+import { useMascot, useMascotCustomization } from '@/context/MascotContext';
 import { MascotDisplay } from '@/components/mascot';
 import type { HabiMascotRef } from '@/components/mascot/HabiMascot';
 import { MascotCelebration, DraggableHabitList } from '@/components';
 import { User } from 'lucide-react-native';
+import { TimeFilter } from '@/components/filters/TimeFilter';
+import { CompletionTypeFilter, CompletionFilterType } from '@/components/filters/CompletionTypeFilter';
+import { useSettingsStore } from '@/store/settingsStore';
 
 type HomeScreenNavigationProp = StackNavigationProp<any, 'Home'>;
 type HomeScreenRouteProp = RouteProp<{ Home: { newHabit?: any } }, 'Home'>;
@@ -118,6 +122,11 @@ const HomeScreen: React.FC = () => {
   const [habitToDelete, setHabitToDelete] = useState<Habit | null>(null);
   const [pendingAllComplete, setPendingAllComplete] = useState(false); // Track if celebration is pending
   const [frequencyFilter, setFrequencyFilter] = useState<'all' | 'single' | 'multiple'>('all'); // Filter for single vs multiple frequency habits
+  const [timePeriodFilter, setTimePeriodFilter] = useState<'all' | HabitTimePeriod>('all'); // Filter by time period
+  const [completionTypeFilter, setCompletionTypeFilter] = useState<CompletionFilterType>('all'); // Filter by single/multiple
+
+  // Get time ranges from settings store
+  const { timeRanges } = useSettingsStore();
 
   // Load user name - refresh every time screen comes into focus
   useFocusEffect(
@@ -187,10 +196,25 @@ const HomeScreen: React.FC = () => {
   // Filter out archived habits and filter by selected date
   const dateFilteredHabits = getHabitsForDate(selectedDate);
 
-  // Apply frequency type filter (single vs multiple)
-  const activeHabits = frequencyFilter === 'all'
+  // Apply time period filter
+  const timePeriodFilteredHabits = timePeriodFilter === 'all'
     ? dateFilteredHabits
-    : dateFilteredHabits.filter((h) => h.frequencyType === frequencyFilter);
+    : dateFilteredHabits.filter((h) => h.timePeriod === timePeriodFilter);
+
+  // Apply completion type filter (single vs multiple) - only when time period is selected
+  const activeHabits = completionTypeFilter === 'all'
+    ? timePeriodFilteredHabits
+    : timePeriodFilteredHabits.filter((h) => h.frequencyType === completionTypeFilter);
+
+  // Calculate habit counts per time period for filter badges
+  const habitCounts: Record<HabitTimePeriod | 'all', number> = {
+    all: dateFilteredHabits.length,
+    morning: dateFilteredHabits.filter(h => h.timePeriod === 'morning').length,
+    afternoon: dateFilteredHabits.filter(h => h.timePeriod === 'afternoon').length,
+    evening: dateFilteredHabits.filter(h => h.timePeriod === 'evening').length,
+    night: dateFilteredHabits.filter(h => h.timePeriod === 'night').length,
+    anytime: dateFilteredHabits.filter(h => h.timePeriod === 'anytime').length,
+  };
 
   // Calculate completion count based on selected date
   const completedCount = activeHabits.filter((h) => isHabitCompletedForDate(h.id, selectedDateISO)).length;
@@ -776,6 +800,34 @@ const HomeScreen: React.FC = () => {
           </Animated.View>
         )}
 
+        {/* Time-Based Filters - Always Visible */}
+        <View style={styles.filtersContainer}>
+          <Text
+            style={[
+              styles.sectionTitle,
+              {
+                color: theme.colors.text,
+                fontFamily: theme.typography.fontFamilyDisplayBold,
+                fontSize: theme.typography.fontSizeLG,
+              },
+            ]}
+          >
+            {getSectionTitle()}
+          </Text>
+
+          <TimeFilter
+            selected={timePeriodFilter}
+            onSelect={setTimePeriodFilter}
+            counts={habitCounts}
+            timeRanges={timeRanges}
+          />
+          <CompletionTypeFilter
+            selected={completionTypeFilter}
+            onSelect={setCompletionTypeFilter}
+            visible={timePeriodFilter !== 'all'}
+          />
+        </View>
+
         {/* Habits List */}
         {activeHabits.length > 0 ? (
           <Animated.View
@@ -784,97 +836,6 @@ const HomeScreen: React.FC = () => {
               { opacity: fadeAnim },
             ]}
           >
-            <Text
-              style={[
-                styles.sectionTitle,
-                {
-                  color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplayBold,
-                  fontSize: theme.typography.fontSizeLG,
-                },
-              ]}
-            >
-              {getSectionTitle()}
-            </Text>
-
-            {/* Frequency Filter Chips */}
-            <View style={styles.filterChipsContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.filterChip,
-                  {
-                    backgroundColor: frequencyFilter === 'all' ? theme.colors.primary : theme.colors.surface,
-                    borderColor: frequencyFilter === 'all' ? theme.colors.primary : theme.colors.border,
-                  },
-                ]}
-                onPress={() => setFrequencyFilter('all')}
-                activeOpacity={0.7}
-              >
-                <Text
-                  style={[
-                    styles.filterChipText,
-                    {
-                      color: frequencyFilter === 'all' ? theme.colors.white : theme.colors.textSecondary,
-                      fontFamily: theme.typography.fontFamilyBodyMedium,
-                      fontSize: theme.typography.fontSizeXS,
-                    },
-                  ]}
-                >
-                  All
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.filterChip,
-                  {
-                    backgroundColor: frequencyFilter === 'single' ? theme.colors.primary : theme.colors.surface,
-                    borderColor: frequencyFilter === 'single' ? theme.colors.primary : theme.colors.border,
-                  },
-                ]}
-                onPress={() => setFrequencyFilter('single')}
-                activeOpacity={0.7}
-              >
-                <Text
-                  style={[
-                    styles.filterChipText,
-                    {
-                      color: frequencyFilter === 'single' ? theme.colors.white : theme.colors.textSecondary,
-                      fontFamily: theme.typography.fontFamilyBodyMedium,
-                      fontSize: theme.typography.fontSizeXS,
-                    },
-                  ]}
-                >
-                  Single
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.filterChip,
-                  {
-                    backgroundColor: frequencyFilter === 'multiple' ? theme.colors.primary : theme.colors.surface,
-                    borderColor: frequencyFilter === 'multiple' ? theme.colors.primary : theme.colors.border,
-                  },
-                ]}
-                onPress={() => setFrequencyFilter('multiple')}
-                activeOpacity={0.7}
-              >
-                <Text
-                  style={[
-                    styles.filterChipText,
-                    {
-                      color: frequencyFilter === 'multiple' ? theme.colors.white : theme.colors.textSecondary,
-                      fontFamily: theme.typography.fontFamilyBodyMedium,
-                      fontSize: theme.typography.fontSizeXS,
-                    },
-                  ]}
-                >
-                  Multiple
-                </Text>
-              </TouchableOpacity>
-            </View>
-
             <DraggableHabitList
               habits={activeHabits}
               selectedDate={selectedDateISO}
@@ -1170,6 +1131,9 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   sectionTitle: {
+    marginBottom: 16,
+  },
+  filtersContainer: {
     marginBottom: 16,
   },
   filterChipsContainer: {

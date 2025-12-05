@@ -13,6 +13,7 @@ export interface HabitRow {
   frequency_type: 'single' | 'multiple';
   target_per_day: number;
   selected_days: string; // JSON string
+  time_period: string; // 'anytime' | 'morning' | 'afternoon' | 'evening' | 'night'
   reminder_enabled: number; // SQLite boolean (0 or 1)
   reminder_time: string | null;
   notification_ids: string | null; // JSON string or null

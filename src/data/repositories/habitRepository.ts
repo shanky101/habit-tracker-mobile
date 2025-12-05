@@ -66,8 +66,9 @@ const denormalize = (
     frequencyType: habitRow.frequency_type,
     targetCompletionsPerDay: habitRow.target_per_day,
     selectedDays,
+    timePeriod: (habitRow.time_period as any) || 'anytime',
     reminderEnabled: habitRow.reminder_enabled === 1,
-    reminderTime: habitRow.reminder_time,
+    reminderTime: habitRow.reminder_time || undefined,
     notificationIds,
     notes: habitRow.notes || undefined,
     completions,
@@ -166,10 +167,10 @@ export const habitRepository = {
           db.runSync(
             `INSERT INTO habits (
               id, name, emoji, streak, category, color,
-              frequency, frequency_type, target_per_day, selected_days,
+              frequency, frequency_type, target_per_day, selected_days, time_period,
               reminder_enabled, reminder_time, notification_ids, notes,
               is_default, archived, sort_order, created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
               habit.id,
               habit.name,
@@ -181,8 +182,9 @@ export const habitRepository = {
               habit.frequencyType || 'single',
               habit.targetCompletionsPerDay,
               JSON.stringify(habit.selectedDays),
+              habit.timePeriod || 'anytime',
               habit.reminderEnabled ? 1 : 0,
-              habit.reminderTime,
+              habit.reminderTime || null,
               habit.notificationIds ? JSON.stringify(habit.notificationIds) : null,
               habit.notes || null,
               habit.isDefault ? 1 : 0,
