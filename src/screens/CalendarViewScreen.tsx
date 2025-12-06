@@ -12,8 +12,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
+import { format } from 'date-fns';
 import { useTheme } from '@/theme';
-import { useHabits } from '@/contexts/HabitsContext';
+import { useHabits } from '@/hooks/useHabits';
 import { useSubscription } from '@/context/SubscriptionContext';
 
 const { width } = Dimensions.get('window');
@@ -23,7 +24,7 @@ const DAY_SIZE = (width - CALENDAR_PADDING * 2) / 7;
 const CalendarViewScreen: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<any>>();
   const { theme } = useTheme();
-  const { habits, toggleHabit } = useHabits();
+  const { habits, completeHabit, uncompleteHabit, isHabitCompletedForDate } = useHabits();
   const { subscription } = useSubscription();
 
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -62,7 +63,15 @@ const CalendarViewScreen: React.FC = () => {
       return;
     }
     // Toggle habit for the past date
-    toggleHabit(habitId);
+    const dateStr = format(date, 'yyyy-MM-dd');
+    const isCompleted = isHabitCompletedForDate(habitId, dateStr);
+
+    if (isCompleted) {
+      uncompleteHabit(habitId, dateStr);
+    } else {
+      completeHabit(habitId, dateStr);
+    }
+
     Alert.alert('Check-in Updated', `Habit marked for ${date.toLocaleDateString()}`);
   };
 
@@ -92,11 +101,19 @@ const CalendarViewScreen: React.FC = () => {
 
   const days = getDaysInMonth(currentDate);
 
-  // Mock function to get completion data for a day
+  // Get real completion data for a day
   const getDayCompletionData = (date: Date) => {
-    const totalHabits = activeHabits.length;
-    // Mock: 70% chance of completion for each habit
-    const completedHabits = Math.floor(Math.random() * (totalHabits + 1));
+    const dateStr = format(date, 'yyyy-MM-dd');
+    const totalHabits = filteredHabits.length;
+
+    // Count how many habits were completed on this date
+    const completedHabits = filteredHabits.filter(habit => {
+      const completion = habit.completions?.[dateStr];
+      if (!completion) return false;
+
+      // Check if habit was completed (met target)
+      return completion.completionCount >= completion.targetCount;
+    }).length;
 
     return {
       total: totalHabits,
@@ -277,7 +294,10 @@ const CalendarViewScreen: React.FC = () => {
             {/* Habit List */}
             <ScrollView style={styles.habitsList} showsVerticalScrollIndicator={false}>
               {filteredHabits.map((habit, index) => {
-                const completed = Math.random() > 0.3; // Mock completion
+                // Get real completion status for this habit on selected day
+                const dateStr = selectedDay ? format(selectedDay, 'yyyy-MM-dd') : '';
+                const completion = habit.completions?.[dateStr];
+                const completed = completion ? completion.completionCount >= completion.targetCount : false;
 
                 return (
                   <TouchableOpacity

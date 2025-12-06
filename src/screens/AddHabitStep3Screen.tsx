@@ -19,6 +19,9 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { CATEGORIES } from './AddHabitStep2Screen';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
+import { HabitTimePeriod } from '@/types/habit';
+import { TimePeriodSelector } from '@/components/TimePeriodSelector';
+import { useSettingsStore } from '@/store/settingsStore';
 
 type AddHabitStep3ScreenNavigationProp = StackNavigationProp<any, 'AddHabitStep3'>;
 type AddHabitStep3ScreenRouteProp = RouteProp<
@@ -43,7 +46,7 @@ const AddHabitStep3Screen: React.FC = () => {
   const { habitName, category, color } = route.params;
 
   const [frequency, setFrequency] = useState<'daily' | 'weekly'>('daily');
-  const [frequencyType, setFrequencyType] = useState<'single' | 'multiple'>('single'); // single = once per day, multiple = multiple times per day
+  // frequencyType is derived from targetCompletionsPerDay
   const [targetCompletionsPerDay, setTargetCompletionsPerDay] = useState<number>(1); // How many times per day
   const [selectedDays, setSelectedDays] = useState<number[]>([0, 1, 2, 3, 4, 5, 6]);
   const [reminderEnabled, setReminderEnabled] = useState(false);
@@ -51,6 +54,10 @@ const AddHabitStep3Screen: React.FC = () => {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [notes, setNotes] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [timePeriod, setTimePeriod] = useState<HabitTimePeriod>('allday'); // Default to All Day
+
+  // Get time ranges from settings store
+  const { timeRanges } = useSettingsStore();
 
   // Use custom animation hook
   const { fadeAnim, slideAnim } = useScreenAnimation();
@@ -115,9 +122,11 @@ const AddHabitStep3Screen: React.FC = () => {
       category,
       color,
       frequency,
-      frequencyType,
+      frequency,
+      frequencyType: targetCompletionsPerDay > 1 ? 'multiple' : 'single',
       targetCompletionsPerDay,
       selectedDays: frequency === 'daily' ? [0, 1, 2, 3, 4, 5, 6] : selectedDays,
+      timePeriod,
       reminderEnabled,
       reminderTime: reminderEnabled ? reminderTime : null,
       notes: notes.trim() || undefined,
@@ -372,165 +381,86 @@ const AddHabitStep3Screen: React.FC = () => {
               Choose if this habit needs to be done once or multiple times per day
             </Text>
 
-            {/* Single vs Multiple Toggle */}
-            <View style={styles.frequencyTypeContainer}>
-              <TouchableOpacity
+            {/* Target Count Input - Always visible now */}
+            <View style={styles.targetCountContainer}>
+              <Text
                 style={[
-                  styles.radioOption,
+                  styles.targetCountLabel,
                   {
-                    backgroundColor: theme.colors.backgroundSecondary,
-                    borderColor: frequencyType === 'single' ? theme.colors.primary : theme.colors.border,
-                    borderWidth: frequencyType === 'single' ? 2 : 1,
+                    color: theme.colors.text,
+                    fontFamily: theme.typography.fontFamilyBody,
+                    fontSize: theme.typography.fontSizeSM,
                   },
                 ]}
-                onPress={() => {
-                  setFrequencyType('single');
-                  setTargetCompletionsPerDay(1);
-                }}
-                activeOpacity={0.7}
               >
-                <View style={styles.radioContent}>
-                  <View
-                    style={[
-                      styles.radio,
-                      {
-                        borderColor: frequencyType === 'single' ? theme.colors.primary : theme.colors.border,
-                      },
-                    ]}
-                  >
-                    {frequencyType === 'single' && (
-                      <View style={[styles.radioSelected, { backgroundColor: theme.colors.primary }]} />
-                    )}
-                  </View>
-                  <Text
-                    style={[
-                      styles.radioLabel,
-                      {
-                        color: theme.colors.text,
-                        fontFamily: theme.typography.fontFamilyBodyMedium,
-                        fontSize: theme.typography.fontSizeMD,
-                      },
-                    ]}
-                  >
-                    Once per day
-                  </Text>
-                </View>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.radioOption,
-                  {
-                    backgroundColor: theme.colors.backgroundSecondary,
-                    borderColor: frequencyType === 'multiple' ? theme.colors.primary : theme.colors.border,
-                    borderWidth: frequencyType === 'multiple' ? 2 : 1,
-                  },
-                ]}
-                onPress={() => setFrequencyType('multiple')}
-                activeOpacity={0.7}
-              >
-                <View style={styles.radioContent}>
-                  <View
-                    style={[
-                      styles.radio,
-                      {
-                        borderColor: frequencyType === 'multiple' ? theme.colors.primary : theme.colors.border,
-                      },
-                    ]}
-                  >
-                    {frequencyType === 'multiple' && (
-                      <View style={[styles.radioSelected, { backgroundColor: theme.colors.primary }]} />
-                    )}
-                  </View>
-                  <Text
-                    style={[
-                      styles.radioLabel,
-                      {
-                        color: theme.colors.text,
-                        fontFamily: theme.typography.fontFamilyBodyMedium,
-                        fontSize: theme.typography.fontSizeMD,
-                      },
-                    ]}
-                  >
-                    Multiple times per day
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            </View>
-
-            {/* Target Count Input */}
-            {frequencyType === 'multiple' && (
-              <View style={styles.targetCountContainer}>
-                <Text
+                How many times per day?
+              </Text>
+              <View style={styles.targetCountInputRow}>
+                <TouchableOpacity
                   style={[
-                    styles.targetCountLabel,
+                    styles.targetCountButton,
+                    { backgroundColor: theme.colors.backgroundSecondary, borderColor: theme.colors.border },
+                  ]}
+                  onPress={() => setTargetCompletionsPerDay(Math.max(1, targetCompletionsPerDay - 1))}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.targetCountButtonText, { color: theme.colors.text }]}>−</Text>
+                </TouchableOpacity>
+
+                <TextInput
+                  style={[
+                    styles.targetCountInput,
                     {
+                      backgroundColor: theme.colors.backgroundSecondary,
                       color: theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBody,
-                      fontSize: theme.typography.fontSizeSM,
+                      fontFamily: theme.typography.fontFamilyDisplayBold,
                     },
                   ]}
-                >
-                  How many times per day?
-                </Text>
-                <View style={styles.targetCountInputRow}>
-                  <TouchableOpacity
-                    style={[
-                      styles.targetCountButton,
-                      { backgroundColor: theme.colors.backgroundSecondary, borderColor: theme.colors.border },
-                    ]}
-                    onPress={() => setTargetCompletionsPerDay(Math.max(2, targetCompletionsPerDay - 1))}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={[styles.targetCountButtonText, { color: theme.colors.text }]}>−</Text>
-                  </TouchableOpacity>
+                  value={targetCompletionsPerDay.toString()}
+                  onChangeText={(text) => {
+                    const val = parseInt(text.replace(/[^0-9]/g, ''), 10);
+                    if (!isNaN(val) && val > 0) {
+                      setTargetCompletionsPerDay(val);
+                    } else if (text === '') {
+                      // Allow empty while typing, but handle blur?
+                      // For now just don't update if invalid
+                    }
+                  }}
+                  keyboardType="number-pad"
+                  maxLength={3}
+                />
 
-                  <TextInput
-                    style={[
-                      styles.targetCountInput,
-                      {
-                        backgroundColor: theme.colors.backgroundSecondary,
-                        borderColor: theme.colors.primary,
-                        color: theme.colors.primary,
-                        fontFamily: theme.typography.fontFamilyDisplayBold,
-                      },
-                    ]}
-                    value={targetCompletionsPerDay.toString()}
-                    onChangeText={(text) => {
-                      const num = parseInt(text) || 2;
-                      setTargetCompletionsPerDay(Math.max(2, Math.min(20, num)));
-                    }}
-                    keyboardType="number-pad"
-                    maxLength={2}
-                  />
-
-                  <TouchableOpacity
-                    style={[
-                      styles.targetCountButton,
-                      { backgroundColor: theme.colors.backgroundSecondary, borderColor: theme.colors.border },
-                    ]}
-                    onPress={() => setTargetCompletionsPerDay(Math.min(20, targetCompletionsPerDay + 1))}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={[styles.targetCountButtonText, { color: theme.colors.text }]}>+</Text>
-                  </TouchableOpacity>
-                </View>
-
-                <Text
+                <TouchableOpacity
                   style={[
-                    styles.targetCountHint,
-                    {
-                      color: theme.colors.textSecondary,
-                      fontFamily: theme.typography.fontFamilyBody,
-                      fontSize: theme.typography.fontSizeXS,
-                    },
+                    styles.targetCountButton,
+                    { backgroundColor: theme.colors.backgroundSecondary, borderColor: theme.colors.border },
                   ]}
+                  onPress={() => setTargetCompletionsPerDay(targetCompletionsPerDay + 1)}
+                  activeOpacity={0.7}
                 >
-                  You'll track {targetCompletionsPerDay} completions per day
-                </Text>
+                  <Text style={[styles.targetCountButtonText, { color: theme.colors.text }]}>+</Text>
+                </TouchableOpacity>
               </View>
-            )}
+              <Text
+                style={[
+                  styles.targetCountHelper,
+                  {
+                    color: theme.colors.textSecondary,
+                    fontFamily: theme.typography.fontFamilyBody,
+                  },
+                ]}
+              >
+                {targetCompletionsPerDay === 1 ? 'Once a day' : `${targetCompletionsPerDay} times a day`}
+              </Text>
+            </View>
           </View>
+
+          {/* Time Period Section */}
+          <TimePeriodSelector
+            selected={timePeriod}
+            onSelect={setTimePeriod}
+            timeRanges={timeRanges}
+          />
 
           {/* Reminder Section */}
           <View style={styles.section}>
@@ -611,39 +541,63 @@ const AddHabitStep3Screen: React.FC = () => {
 
             {reminderEnabled && showTimePicker && (
               <View style={styles.timePickerContainer}>
-                <DateTimePicker
-                  value={(() => {
-                    const [hours, minutes] = reminderTime.split(':');
-                    const date = new Date();
-                    date.setHours(parseInt(hours, 10));
-                    date.setMinutes(parseInt(minutes, 10));
-                    return date;
-                  })()}
-                  mode="time"
-                  is24Hour={false}
-                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                  onChange={handleTimeChange}
-                />
                 {Platform.OS === 'ios' && (
-                  <TouchableOpacity
-                    style={[
-                      styles.doneButton,
-                      { backgroundColor: theme.colors.primary }
-                    ]}
-                    onPress={handleTimePickerDismiss}
-                  >
-                    <Text
+                  <View style={[styles.iosTimePickerModal, { backgroundColor: theme.colors.backgroundSecondary }]}>
+                    <View style={[styles.iosPickerHeader, { borderBottomColor: theme.colors.border }]}>
+                      <Text style={[styles.iosPickerTitle, { color: theme.colors.text, fontFamily: theme.typography.fontFamilyBodySemibold }]}>
+                        Select Time
+                      </Text>
+                    </View>
+                    <DateTimePicker
+                      value={(() => {
+                        const [hours, minutes] = reminderTime.split(':');
+                        const date = new Date();
+                        date.setHours(parseInt(hours, 10));
+                        date.setMinutes(parseInt(minutes, 10));
+                        return date;
+                      })()}
+                      mode="time"
+                      is24Hour={false}
+                      display="spinner"
+                      onChange={handleTimeChange}
+                      textColor={theme.colors.text}
+                      style={styles.iosTimePicker}
+                    />
+                    <TouchableOpacity
                       style={[
-                        styles.doneButtonText,
-                        {
-                          color: theme.colors.white,
-                          fontFamily: theme.typography.fontFamilyBodySemibold,
-                        }
+                        styles.doneButton,
+                        { backgroundColor: theme.colors.primary }
                       ]}
+                      onPress={handleTimePickerDismiss}
                     >
-                      Done
-                    </Text>
-                  </TouchableOpacity>
+                      <Text
+                        style={[
+                          styles.doneButtonText,
+                          {
+                            color: theme.colors.white,
+                            fontFamily: theme.typography.fontFamilyBodySemibold,
+                          }
+                        ]}
+                      >
+                        Done
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+                {Platform.OS === 'android' && (
+                  <DateTimePicker
+                    value={(() => {
+                      const [hours, minutes] = reminderTime.split(':');
+                      const date = new Date();
+                      date.setHours(parseInt(hours, 10));
+                      date.setMinutes(parseInt(minutes, 10));
+                      return date;
+                    })()}
+                    mode="time"
+                    is24Hour={false}
+                    display="default"
+                    onChange={handleTimeChange}
+                  />
                 )}
               </View>
             )}
@@ -939,12 +893,36 @@ const styles = StyleSheet.create({
     marginTop: 16,
     alignItems: 'center',
   },
+  iosTimePickerModal: {
+    borderRadius: 16,
+    padding: 20,
+    marginTop: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  iosPickerHeader: {
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    marginBottom: 16,
+    alignItems: 'center',
+  },
+  iosPickerTitle: {
+    fontSize: 18,
+  },
+  iosTimePicker: {
+    height: 180,
+    marginVertical: 8,
+  },
   doneButton: {
-    marginTop: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 32,
+    width: '100%',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
     borderRadius: 12,
     alignItems: 'center',
+    marginTop: 16,
   },
   doneButtonText: {
     fontSize: 16,

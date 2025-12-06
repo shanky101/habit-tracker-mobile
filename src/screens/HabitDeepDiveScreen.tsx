@@ -13,7 +13,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
-import { Habit, HabitEntry, useHabits } from '@/contexts/HabitsContext';
+import { Habit, HabitEntry, useHabits } from '@/hooks/useHabits';
 
 type HabitDeepDiveNavigationProp = StackNavigationProp<any, 'HabitDeepDive'>;
 type HabitDeepDiveRouteProp = RouteProp<
@@ -39,48 +39,239 @@ const HabitDeepDiveScreen: React.FC = () => {
   // Get the latest habit data from context (includes updated entries)
   const habitData = habits.find(h => h.id === habitId) || route.params.habitData;
 
-  // Mock data
-  const currentStreak = habitData.streak;
-  const longestStreak = Math.max(currentStreak + 24, 58);
-  const totalCompletions = 142;
-  const completionRate = 86;
+  // Calculate real stats from completion data
+  const calculateBasicStats = () => {
+    const completions = habitData.completions || {};
+    const completionDates = Object.keys(completions);
 
-  // Mock completion by hour data
-  const completionByHour = [
-    { hour: '6am', value: 15 },
-    { hour: '9am', value: 85 },
-    { hour: '12pm', value: 45 },
-    { hour: '3pm', value: 25 },
-    { hour: '6pm', value: 55 },
-    { hour: '9pm', value: 35 },
-  ];
-  const maxHourValue = Math.max(...completionByHour.map((h) => h.value));
+    // Current streak (already real)
+    const currentStreak = habitData.streak || 0;
 
-  // Mock day of week breakdown
-  const dayOfWeekData = [
-    { day: 'Mon', value: 95 },
-    { day: 'Tue', value: 90 },
-    { day: 'Wed', value: 82 },
-    { day: 'Thu', value: 88 },
-    { day: 'Fri', value: 85 },
-    { day: 'Sat', value: 65 },
-    { day: 'Sun', value: 60 },
-  ];
+    // Total completions: sum all completion counts
+    const totalCompletions = completionDates.reduce((sum, date) => {
+      return sum + (completions[date]?.completionCount || 0);
+    }, 0);
 
-  // Mock milestones
-  const milestones = [
-    { date: 'Oct 15, 2024', event: 'Habit Created', icon: '🌱' },
-    { date: 'Oct 22, 2024', event: '7 Day Streak', icon: '🔥' },
-    { date: 'Nov 15, 2024', event: '30 Day Streak', icon: '🏆' },
-    { date: 'Nov 20, 2024', event: '100th Completion', icon: '💯' },
-  ];
+    // Longest streak: calculate from completion history
+    const calculateLongestStreak = (): number => {
+      if (completionDates.length === 0) return 0;
 
-  // Mock patterns
-  const patterns = [
-    "You complete this habit most on weekday mornings",
-    "Your success rate is higher on Mondays (95%)",
-    "You tend to skip this habit on weekends",
-  ];
+      const sortedDates = completionDates.sort();
+      let longestStreak = 0;
+      let currentStreakLength = 0;
+
+      for (let i = 0; i < sortedDates.length; i++) {
+        const currentDate = new Date(sortedDates[i]);
+        const completion = completions[sortedDates[i]];
+
+        // Check if this day was completed (met target)
+        if (completion && completion.completionCount >= completion.targetCount) {
+          if (i === 0) {
+            currentStreakLength = 1;
+          } else {
+            const prevDate = new Date(sortedDates[i - 1]);
+            const daysDiff = Math.floor((currentDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
+
+            // Consecutive day
+            if (daysDiff === 1) {
+              currentStreakLength++;
+            } else {
+              currentStreakLength = 1;
+            }
+          }
+
+          longestStreak = Math.max(longestStreak, currentStreakLength);
+        } else {
+          currentStreakLength = 0;
+        }
+      }
+
+      return longestStreak;
+    };
+
+    // Completion rate for last 30 days
+    const calculateCompletionRate = (): number => {
+      const today = new Date();
+      const thirtyDaysAgo = new Date(today);
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      let scheduledDays = 0;
+      let completedDays = 0;
+      const currentDate = new Date(thirtyDaysAgo);
+
+      while (currentDate <= today) {
+        const dayOfWeek = currentDate.getDay();
+        const dateStr = currentDate.toISOString().split('T')[0];
+
+        if (habitData.selectedDays.includes(dayOfWeek)) {
+          scheduledDays++;
+          const completion = completions[dateStr];
+          if (completion && completion.completionCount >= completion.targetCount) {
+            completedDays++;
+          }
+        }
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+
+      return scheduledDays > 0 ? Math.round((completedDays / scheduledDays) * 100) : 0;
+    };
+
+    return {
+      currentStreak,
+      longestStreak: calculateLongestStreak(),
+      totalCompletions,
+      completionRate: calculateCompletionRate(),
+    };
+  };
+
+  const stats = calculateBasicStats();
+  const currentStreak = stats.currentStreak;
+  const longestStreak = stats.longestStreak;
+  const totalCompletions = stats.totalCompletions;
+  const completionRate = stats.completionRate;
+
+
+  // Calculate real day of week breakdown
+  const calculateDayOfWeekStats = () => {
+    const completions = habitData.completions || {};
+    const dayStats = Array(7).fill(null).map(() => ({ scheduled: 0, completed: 0 }));
+
+    Object.entries(completions).forEach(([dateStr, completion]) => {
+      const dayOfWeek = new Date(dateStr).getDay();
+      dayStats[dayOfWeek].scheduled++;
+      if (completion && completion.completionCount >= completion.targetCount) {
+        dayStats[dayOfWeek].completed++;
+      }
+    });
+
+    return dayStats.map((stat, index) => ({
+      day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][index],
+      value: stat.scheduled > 0
+        ? Math.round((stat.completed / stat.scheduled) * 100)
+        : 0
+    }));
+  };
+
+  const dayOfWeekData = calculateDayOfWeekStats();
+
+  // Calculate real milestones from habit history
+  const calculateMilestones = () => {
+    const milestones: Array<{ date: string; event: string; icon: string }> = [];
+    const completions = habitData.completions || {};
+    const completionDates = Object.keys(completions).sort();
+
+    // 1. Habit Created milestone
+    if (habitData.createdAt) {
+      const createdDate = new Date(habitData.createdAt);
+      milestones.push({
+        date: createdDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        event: 'Habit Created',
+        icon: '🌱',
+      });
+    }
+
+    // 2. Completion count milestones (10th, 25th, 50th, 100th, 200th, 500th, 1000th)
+    const completionMilestones = [10, 25, 50, 100, 200, 500, 1000];
+    const completionMilestoneIcons: { [key: number]: string } = {
+      10: '⭐',
+      25: '🎯',
+      50: '🏅',
+      100: '💯',
+      200: '🎖️',
+      500: '👑',
+      1000: '🏆',
+    };
+
+    let cumulativeCompletions = 0;
+    const milestoneTracker = new Set<number>();
+
+    for (const dateStr of completionDates) {
+      const completion = completions[dateStr];
+      cumulativeCompletions += completion?.completionCount || 0;
+
+      // Check if we've crossed any milestone thresholds
+      for (const milestone of completionMilestones) {
+        if (cumulativeCompletions >= milestone && !milestoneTracker.has(milestone)) {
+          milestoneTracker.add(milestone);
+          const milestoneDate = new Date(dateStr);
+          milestones.push({
+            date: milestoneDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            event: `${milestone}${milestone === 100 ? 'th' : milestone === 1000 ? 'th' : milestone === 10 ? 'th' : milestone === 25 ? 'th' : milestone === 50 ? 'th' : 'th'} Completion`,
+            icon: completionMilestoneIcons[milestone] || '🎉',
+          });
+        }
+      }
+    }
+
+    // 3. Streak milestones (7, 14, 30, 60, 90, 180, 365 days)
+    const streakMilestones = [7, 14, 30, 60, 90, 180, 365];
+    const streakMilestoneIcons: { [key: number]: string } = {
+      7: '🔥',
+      14: '💪',
+      30: '🏆',
+      60: '⚡',
+      90: '🌟',
+      180: '💎',
+      365: '👑',
+    };
+
+    let currentStreakLength = 0;
+    let streakStartDate: string | null = null;
+    const streakMilestoneTracker = new Set<number>();
+
+    for (let i = 0; i < completionDates.length; i++) {
+      const currentDate = new Date(completionDates[i]);
+      const completion = completions[completionDates[i]];
+
+      // Check if this day was completed (met target)
+      if (completion && completion.completionCount >= completion.targetCount) {
+        if (i === 0) {
+          currentStreakLength = 1;
+          streakStartDate = completionDates[i];
+        } else {
+          const prevDate = new Date(completionDates[i - 1]);
+          const daysDiff = Math.floor((currentDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
+
+          if (daysDiff === 1) {
+            currentStreakLength++;
+          } else {
+            // Streak broken, reset
+            currentStreakLength = 1;
+            streakStartDate = completionDates[i];
+            streakMilestoneTracker.clear();
+          }
+        }
+
+        // Check if current streak has reached any milestone
+        for (const milestone of streakMilestones) {
+          if (currentStreakLength === milestone && !streakMilestoneTracker.has(milestone)) {
+            streakMilestoneTracker.add(milestone);
+            const milestoneDate = new Date(completionDates[i]);
+            milestones.push({
+              date: milestoneDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+              event: `${milestone} Day Streak`,
+              icon: streakMilestoneIcons[milestone] || '🔥',
+            });
+          }
+        }
+      } else {
+        // Day not completed, streak broken
+        currentStreakLength = 0;
+        streakStartDate = null;
+        streakMilestoneTracker.clear();
+      }
+    }
+
+    // Sort milestones chronologically (oldest first)
+    return milestones.sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      return dateA.getTime() - dateB.getTime();
+    });
+  };
+
+  const milestones = calculateMilestones();
+
 
   // Get real notes from habit completions
   const getRecentNotes = () => {
@@ -402,7 +593,10 @@ const HabitDeepDiveScreen: React.FC = () => {
           </View>
         </Animated.View>
 
-        {/* Completion by Hour */}
+        {/* Completion by Hour - DISABLED (requires timestamp tracking)
+         Feature disabled: Time-of-day analytics require timestamp data which is not currently tracked.
+         To enable this feature, update the data model to store completion timestamps.
+        
         <Animated.View
           style={[
             styles.chartSection,
@@ -501,8 +695,12 @@ const HabitDeepDiveScreen: React.FC = () => {
             </Text>
           </View>
         </Animated.View>
+        */}
 
-        {/* Pattern Recognition */}
+        {/* Pattern Recognition - DISABLED (requires ML/pattern detection algorithms)
+         Feature disabled: AI pattern insights require complex analytics or ML models.
+         Consider implementing simple rule-based insights in the future.
+         
         <Animated.View
           style={[
             styles.patternsSection,
@@ -546,6 +744,7 @@ const HabitDeepDiveScreen: React.FC = () => {
             </View>
           ))}
         </Animated.View>
+        */}
 
         {/* Milestones Timeline */}
         <Animated.View

@@ -72,9 +72,9 @@ const Mascot: React.FC<MascotProps> = ({
     ]).start();
   }, [entranceAnim, bubbleAnim]);
 
-  // Glow pulse animation for hero variant
+  // Glow pulse animation for hero variant and compact variant
   useEffect(() => {
-    if (variant === 'hero') {
+    if (variant === 'hero' || compact) {
       const glowPulse = Animated.loop(
         Animated.sequence([
           Animated.timing(glowAnim, {
@@ -94,7 +94,7 @@ const Mascot: React.FC<MascotProps> = ({
       glowPulse.start();
       return () => glowPulse.stop();
     }
-  }, [variant, glowAnim]);
+  }, [variant, compact, glowAnim]);
 
   // Float animation for floating variant
   useEffect(() => {
@@ -180,6 +180,25 @@ const Mascot: React.FC<MascotProps> = ({
         activeOpacity={0.8}
         style={styles.compactContainer}
       >
+        {/* Animated glowing background */}
+        <Animated.View
+          style={[
+            styles.compactGlow,
+            {
+              backgroundColor: getGlowColor(mascot.mood),
+              opacity: glowAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0.2, 0.4],
+              }),
+              transform: [{
+                scale: glowAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [1, 1.2],
+                })
+              }],
+            },
+          ]}
+        />
         <Animated.View
           style={[
             styles.compactCharacter,
@@ -235,10 +254,12 @@ const Mascot: React.FC<MascotProps> = ({
             {
               backgroundColor: getGlowColor(mascot.mood),
               opacity: glowOpacity,
-              transform: [{ scale: glowAnim.interpolate({
-                inputRange: [0, 1],
-                outputRange: [1, 1.3],
-              })}],
+              transform: [{
+                scale: glowAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [1, 1.3],
+                })
+              }],
             },
           ]}
         />
@@ -277,10 +298,12 @@ const Mascot: React.FC<MascotProps> = ({
                 opacity: bubbleOpacity,
                 transform: [
                   { scale: bubbleScale },
-                  { translateY: bubbleAnim.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [20, 0],
-                  })},
+                  {
+                    translateY: bubbleAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [20, 0],
+                    })
+                  },
                 ],
               },
             ]}
@@ -416,10 +439,12 @@ const Mascot: React.FC<MascotProps> = ({
               opacity: bubbleOpacity,
               transform: [
                 { scale: bubbleScale },
-                { translateY: bubbleAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [-20, 0],
-                })},
+                {
+                  translateY: bubbleAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [-20, 0],
+                  })
+                },
               ],
             },
           ]}
@@ -537,10 +562,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 12,
     gap: 12,
+    position: 'relative',
+  },
+  compactGlow: {
+    position: 'absolute',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    left: 6,
   },
   compactCharacter: {
     width: 50,
     height: 55,
+    zIndex: 1,
   },
   compactMessage: {
     flex: 1,

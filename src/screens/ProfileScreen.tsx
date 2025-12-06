@@ -16,6 +16,7 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
+import { useHabits } from '@/hooks/useHabits';
 import { useSubscription, formatPlanName } from '@/context/SubscriptionContext';
 import {
   Settings,
@@ -35,6 +36,8 @@ import {
   X,
   Cloud,
   ChevronRight,
+  Palette,
+  Sparkles,
 } from 'lucide-react-native';
 
 type ProfileNavigationProp = StackNavigationProp<any, 'Profile'>;
@@ -48,18 +51,84 @@ const ProfileScreen: React.FC = () => {
   const { fadeAnim, slideAnim } = useScreenAnimation();
   const { subscription } = useSubscription();
 
+  const { habits } = useHabits();
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const isPremium = subscription.isPremium;
 
-  // Mock stats data
-  const stats = {
-    totalHabits: 5,
-    totalCompletions: 142,
-    longestStreak: 24,
-    activeStreaks: 3,
-    memberSince: 'October 2024',
+  // Calculate real user-level stats from all habits
+  const calculateUserStats = () => {
+    const activeHabits = habits.filter(h => !h.archived);
+
+    // Total habits
+    const totalHabits = activeHabits.length;
+
+    // Total completions across all habits
+    const totalCompletions = activeHabits.reduce((total, habit) => {
+      const habitCompletions = Object.values(habit.completions || {}).reduce((sum, completion) => {
+        return sum + (completion?.completionCount || 0);
+      }, 0);
+      return total + habitCompletions;
+    }, 0);
+
+    // Longest streak across all habits
+    const longestStreak = activeHabits.reduce((maxStreak, habit) => {
+      const completions = habit.completions || {};
+      const completionDates = Object.keys(completions).sort();
+
+      let habitLongestStreak = 0;
+      let currentStreakLength = 0;
+
+      for (let i = 0; i < completionDates.length; i++) {
+        const currentDate = new Date(completionDates[i]);
+        const completion = completions[completionDates[i]];
+
+        if (completion && completion.completionCount >= completion.targetCount) {
+          if (i === 0) {
+            currentStreakLength = 1;
+          } else {
+            const prevDate = new Date(completionDates[i - 1]);
+            const daysDiff = Math.floor((currentDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
+
+            if (daysDiff === 1) {
+              currentStreakLength++;
+            } else {
+              currentStreakLength = 1;
+            }
+          }
+          habitLongestStreak = Math.max(habitLongestStreak, currentStreakLength);
+        } else {
+          currentStreakLength = 0;
+        }
+      }
+
+      return Math.max(maxStreak, habitLongestStreak);
+    }, 0);
+
+    // Active streaks (habits with current streak > 0)
+    const activeStreaks = activeHabits.filter(h => (h.streak || 0) > 0).length;
+
+    // Member since (oldest habit creation date)
+    const oldestHabit = activeHabits.reduce((oldest: Date | null, habit) => {
+      if (!habit.createdAt) return oldest;
+      const createdDate = new Date(habit.createdAt);
+      return !oldest || createdDate < oldest ? createdDate : oldest;
+    }, null);
+
+    const memberSince = oldestHabit
+      ? oldestHabit.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+      : new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+    return {
+      totalHabits,
+      totalCompletions,
+      longestStreak,
+      activeStreaks,
+      memberSince,
+    };
   };
+
+  const stats = calculateUserStats();
 
   useEffect(() => {
     loadUserData();
@@ -371,8 +440,8 @@ const ProfileScreen: React.FC = () => {
                       {subscription.plan === 'lifetime'
                         ? 'Lifetime access'
                         : subscription.expiresAt
-                        ? `Renews: ${new Date(subscription.expiresAt).toLocaleDateString()}`
-                        : formatPlanName(subscription.plan)}
+                          ? `Renews: ${new Date(subscription.expiresAt).toLocaleDateString()}`
+                          : formatPlanName(subscription.plan)}
                     </Text>
                   </View>
                 </View>
@@ -471,6 +540,7 @@ const ProfileScreen: React.FC = () => {
           </View>
 
           {/* Menu Items */}
+          {/* PERSONALIZATION section removed - mascot disabled */}
           <View
             style={[
               styles.menuSection,

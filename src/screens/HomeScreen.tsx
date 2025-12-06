@@ -11,25 +11,29 @@ import {
   Share,
 } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
+import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '@/theme';
-import { useHabits, Habit } from '@/contexts/HabitsContext';
+import { useHabits } from '@/hooks/useHabits';
+import { useSubscription } from '@/context/SubscriptionContext';
+import { useScreenAnimation } from '@/hooks/useScreenAnimation';
+import { Habit, HabitTimePeriod } from '@/types/habit';
 import CelebrationModal from '@/components/CelebrationModal';
 import {
   AllHabitsCompleteModal,
   QuickNoteModal,
-  StreakBrokenModal,
   ConfirmationDialog,
 } from '@/components/HabitModals';
-import { useScreenAnimation } from '@/hooks/useScreenAnimation';
-import { useSubscription } from '@/context/SubscriptionContext';
 import { useMascot } from '@/context/MascotContext';
 import { Mascot, MascotCelebration, DraggableHabitList } from '@/components';
 import { User } from 'lucide-react-native';
+import { TimeFilter } from '@/components/filters/TimeFilter';
+
+import { useSettingsStore } from '@/store/settingsStore';
 
 type HomeScreenNavigationProp = StackNavigationProp<any, 'Home'>;
 type HomeScreenRouteProp = RouteProp<{ Home: { newHabit?: any } }, 'Home'>;
@@ -84,15 +88,16 @@ const HomeScreen: React.FC = () => {
     addHabit,
     deleteHabit,
     updateHabit,
-    reorderHabits,
     completeHabit,
     uncompleteHabit,
     resetHabitForDate,
-    isHabitCompletedForDate,
+    addNoteToCompletion,
     getCompletionProgress,
+    isHabitCompletedForDate,
+    reorderHabits,
   } = useHabits();
   const { subscription } = useSubscription();
-  const { triggerReaction, getMascotForProgress, setMood, settings: mascotSettings, toggleMascot } = useMascot();
+  const { triggerReaction, getMascotForProgress, setMood, settings: mascotSettings, toggleMascot, petMascot } = useMascot();
   const dateScrollRef = useRef<ScrollView>(null);
 
   const { fadeAnim, slideAnim, fabScale } = useScreenAnimation({ enableFAB: true });
@@ -114,6 +119,11 @@ const HomeScreen: React.FC = () => {
   const [habitToDelete, setHabitToDelete] = useState<Habit | null>(null);
   const [pendingAllComplete, setPendingAllComplete] = useState(false); // Track if celebration is pending
   const [frequencyFilter, setFrequencyFilter] = useState<'all' | 'single' | 'multiple'>('all'); // Filter for single vs multiple frequency habits
+  const [timePeriodFilter, setTimePeriodFilter] = useState<'all' | HabitTimePeriod>('allday'); // Filter by time period
+
+
+  // Get time ranges from settings store
+  const { timeRanges } = useSettingsStore();
 
   // Load user name - refresh every time screen comes into focus
   useFocusEffect(
@@ -183,19 +193,46 @@ const HomeScreen: React.FC = () => {
   // Filter out archived habits and filter by selected date
   const dateFilteredHabits = getHabitsForDate(selectedDate);
 
-  // Apply frequency type filter (single vs multiple)
-  const activeHabits = frequencyFilter === 'all'
-    ? dateFilteredHabits
-    : dateFilteredHabits.filter((h) => h.frequencyType === frequencyFilter);
+  // Filter logic
+  const isSpecificPeriod = timePeriodFilter !== 'all' && timePeriodFilter !== 'allday';
 
-  // Calculate completion count based on selected date
-  const completedCount = activeHabits.filter((h) => isHabitCompletedForDate(h.id, selectedDateISO)).length;
-  const totalCount = activeHabits.length;
+  // Habits matching the specific filter (or all if 'all')
+  const periodHabits = timePeriodFilter === 'all'
+    ? dateFilteredHabits
+    : dateFilteredHabits.filter((h) => h.timePeriod === timePeriodFilter);
+
+  // Habits matching 'allday' (only relevant if filter is specific)
+  const allDayHabits = isSpecificPeriod
+    ? dateFilteredHabits.filter((h) => h.timePeriod === 'allday')
+    : [];
+
+  const activePeriodHabits = periodHabits;
+  const activeAllDayHabits = allDayHabits;
+
+  // Combined list for counts and other logic
+  const activeHabits = [...activePeriodHabits, ...activeAllDayHabits];
+
+  // Calculate habit counts per time period for filter badges
+  const habitCounts: Record<HabitTimePeriod | 'all', number> = {
+    all: dateFilteredHabits.length,
+    morning: dateFilteredHabits.filter(h => h.timePeriod === 'morning').length,
+    afternoon: dateFilteredHabits.filter(h => h.timePeriod === 'afternoon').length,
+    evening: dateFilteredHabits.filter(h => h.timePeriod === 'evening').length,
+    night: dateFilteredHabits.filter(h => h.timePeriod === 'night').length,
+    allday: dateFilteredHabits.filter(h => h.timePeriod === 'allday').length,
+  };
+
+  // Calculate completion count for THE ENTIRE DAY (not just filtered habits)
+  // This ensures X/Y Done shows progress across all time periods
+  const completedCount = dateFilteredHabits.filter((h) => isHabitCompletedForDate(h.id, selectedDateISO)).length;
+  const totalCount = dateFilteredHabits.length;
   const progressPercentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
   const handleAddHabit = () => {
     // Check free tier limit
-    if (!subscription.isPremium && activeHabits.length >= FREE_HABIT_LIMIT) {
+    // Check free tier limit - exclude default/seed habits
+    const totalHabits = habits.filter(h => !h.archived && !h.isDefault).length;
+    if (!subscription.isPremium && totalHabits >= FREE_HABIT_LIMIT) {
       navigation.navigate('Profile', { screen: 'Paywall' });
       return;
     }
@@ -212,7 +249,8 @@ const HomeScreen: React.FC = () => {
 
   // Update mascot mood based on progress (only when counts change)
   useEffect(() => {
-    const hasStreakAtRisk = activeHabits.some(h => h.streak > 3 && !isHabitCompletedForDate(h.id, selectedDateISO));
+    // Check ALL habits for the day for streak risk, not just filtered view
+    const hasStreakAtRisk = dateFilteredHabits.some(h => h.streak > 3 && !isHabitCompletedForDate(h.id, selectedDateISO));
     const newMood = getMascotForProgress(completedCount, totalCount, hasStreakAtRisk);
     setMood(newMood);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -255,28 +293,16 @@ const HomeScreen: React.FC = () => {
       // Check if all habits will be complete
       const willAllBeComplete = completedCount + 1 === totalCount;
 
-      // Show quick note modal occasionally (first time or every 5th check-in)
-      const shouldShowNote = Math.random() < 0.2; // 20% chance
-      if (shouldShowNote) {
-        setQuickNoteHabitId(habitId);
-        setShowQuickNoteModal(true);
-        // If all complete, mark as pending so celebration shows after modal closes
-        if (willAllBeComplete) {
-          setPendingAllComplete(true);
-        }
-      } else if (willAllBeComplete) {
-        // No quick note modal, show celebration directly
-        if (mascotSettings.enabled) {
-          triggerReaction('ecstatic', "YOU DID IT! All habits complete! 🎉🎊");
-        }
-        // Show mascot celebration overlay - brings Habi to the user!
-        if (mascotSettings.enabled && mascotSettings.showCelebrations) {
-          setTimeout(() => setShowMascotCelebration(true), 300);
-        } else {
-          // No mascot, show share modal directly
-          setTimeout(() => setShowAllCompleteModal(true), 300);
-        }
+      // Always show quick note modal when completing a habit
+      setQuickNoteHabitId(habitId);
+      setShowQuickNoteModal(true);
+      // If all complete, mark as pending so celebration shows after modal closes
+      if (willAllBeComplete) {
+        setPendingAllComplete(true);
       }
+      // The original `else if (willAllBeComplete)` block is now handled by `pendingAllComplete`
+      // and the quick note modal's `handleSaveQuickNote` or `handleSkipQuickNote`
+      // So, we remove the direct celebration trigger here.
 
       // Check for streak milestones
       if (habit.streak === 6 || habit.streak === 29 || habit.streak === 99) {
@@ -329,12 +355,11 @@ const HomeScreen: React.FC = () => {
     navigation.navigate('HabitDetail', { habitId: habit.id, habitData: habit });
   };
 
-  // Handle habit reorder - convert from activeHabits index to full habits index
-  const handleReorderHabits = (fromIndex: number, toIndex: number) => {
-    // Get the actual indices in the full habits array
-    const activeHabitIds = activeHabits.map(h => h.id);
-    const fromHabitId = activeHabitIds[fromIndex];
-    const toHabitId = activeHabitIds[toIndex];
+  // Handle habit reorder - convert from list index to full habits index
+  const handleReorderList = (list: Habit[], fromIndex: number, toIndex: number) => {
+    const listIds = list.map(h => h.id);
+    const fromHabitId = listIds[fromIndex];
+    const toHabitId = listIds[toIndex];
 
     // Find actual indices in the full array
     const actualFromIndex = habits.findIndex(h => h.id === fromHabitId);
@@ -343,6 +368,14 @@ const HomeScreen: React.FC = () => {
     if (actualFromIndex !== -1 && actualToIndex !== -1) {
       reorderHabits(actualFromIndex, actualToIndex);
     }
+  };
+
+  const handleReorderPeriodHabits = (fromIndex: number, toIndex: number) => {
+    handleReorderList(activePeriodHabits, fromIndex, toIndex);
+  };
+
+  const handleReorderAllDayHabits = (fromIndex: number, toIndex: number) => {
+    handleReorderList(activeAllDayHabits, fromIndex, toIndex);
   };
 
   // Handle share all complete
@@ -359,12 +392,11 @@ const HomeScreen: React.FC = () => {
 
   // Handle quick note save
   const handleSaveQuickNote = (note: string, mood?: string) => {
-    // TODO: This needs to be refactored to add the note/mood to the completion record
-    // For now, just close the modal since the habit was already completed
-    // In the future, we should pass mood/note directly to completeHabit
     if (quickNoteHabitId) {
-      console.log('Note/mood captured:', note, mood, 'for habit:', quickNoteHabitId);
-      // This would need to update the completion entry for today's date
+      const today = new Date().toISOString().split('T')[0];
+      // Add the note/mood to today's completion
+      addNoteToCompletion(quickNoteHabitId, today, { mood, note });
+      console.log('Note/mood saved:', note, mood, 'for habit:', quickNoteHabitId);
     }
 
     setShowQuickNoteModal(false);
@@ -521,29 +553,8 @@ const HomeScreen: React.FC = () => {
           },
         ]}
       >
-        Add your first habit to begin tracking your progress
+        Add a habit to begin tracking your progress
       </Text>
-      <TouchableOpacity
-        style={[
-          styles.emptyButton,
-          { backgroundColor: theme.colors.primary },
-        ]}
-        onPress={handleAddHabit}
-        activeOpacity={0.8}
-      >
-        <Text
-          style={[
-            styles.emptyButtonText,
-            {
-              color: theme.colors.white,
-              fontFamily: theme.typography.fontFamilyBodySemibold,
-              fontSize: theme.typography.fontSizeMD,
-            },
-          ]}
-        >
-          Add Your First Habit
-        </Text>
-      </TouchableOpacity>
     </View>
   );
 
@@ -649,7 +660,6 @@ const HomeScreen: React.FC = () => {
               },
             ]}
           >
-            {/* Hide mascot button - subtle, top right */}
             <TouchableOpacity
               style={[
                 styles.mascotToggleButton,
@@ -665,10 +675,13 @@ const HomeScreen: React.FC = () => {
                 Hide
               </Text>
             </TouchableOpacity>
-            <Mascot variant="hero" size="medium" showName />
+            <Mascot
+              compact={mascotSettings.displayMode === 'compact'}
+              showMessage
+              onPress={petMascot}
+            />
           </Animated.View>
         ) : (
-          /* Show Habi pill when mascot is hidden */
           <TouchableOpacity
             style={[
               styles.showMascotPill,
@@ -696,8 +709,8 @@ const HomeScreen: React.FC = () => {
           </TouchableOpacity>
         )}
 
-        {/* Progress Card */}
-        {activeHabits.length > 0 && (
+        {/* Progress Card - Always show if there are habits for the day */}
+        {dateFilteredHabits.length > 0 && (
           <Animated.View
             style={[
               styles.progressCard,
@@ -778,6 +791,33 @@ const HomeScreen: React.FC = () => {
           </Animated.View>
         )}
 
+        {/* Time-Based Filters - Always Visible */}
+        <View style={styles.filtersContainer}>
+          <Text
+            style={[
+              styles.sectionTitle,
+              {
+                color: theme.colors.text,
+                fontFamily: theme.typography.fontFamilyDisplayBold,
+                fontSize: theme.typography.fontSizeLG,
+              },
+            ]}
+          >
+            {getSectionTitle()}
+          </Text>
+
+          <View style={{ marginHorizontal: -24 }}>
+            <TimeFilter
+              selected={timePeriodFilter}
+              onSelect={setTimePeriodFilter}
+              counts={habitCounts}
+              timeRanges={timeRanges}
+            />
+
+          </View>
+        </View>
+
+        {/* Habits List */}
         {/* Habits List */}
         {activeHabits.length > 0 ? (
           <Animated.View
@@ -786,107 +826,48 @@ const HomeScreen: React.FC = () => {
               { opacity: fadeAnim },
             ]}
           >
-            <Text
-              style={[
-                styles.sectionTitle,
-                {
-                  color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplayBold,
-                  fontSize: theme.typography.fontSizeLG,
-                },
-              ]}
-            >
-              {getSectionTitle()}
-            </Text>
+            {/* Period Habits */}
+            {activePeriodHabits.length > 0 && (
+              <DraggableHabitList
+                habits={activePeriodHabits}
+                selectedDate={selectedDateISO}
+                onToggle={handleToggleHabit}
+                onPress={handleHabitPress}
+                onEdit={handleEditHabit}
+                onArchive={handleArchiveHabit}
+                onDelete={handleDeleteHabit}
+                onReorder={handleReorderPeriodHabits}
+              />
+            )}
 
-            {/* Frequency Filter Chips */}
-            <View style={styles.filterChipsContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.filterChip,
-                  {
-                    backgroundColor: frequencyFilter === 'all' ? theme.colors.primary : theme.colors.surface,
-                    borderColor: frequencyFilter === 'all' ? theme.colors.primary : theme.colors.border,
-                  },
-                ]}
-                onPress={() => setFrequencyFilter('all')}
-                activeOpacity={0.7}
-              >
-                <Text
-                  style={[
-                    styles.filterChipText,
-                    {
-                      color: frequencyFilter === 'all' ? theme.colors.white : theme.colors.textSecondary,
-                      fontFamily: theme.typography.fontFamilyBodyMedium,
-                      fontSize: theme.typography.fontSizeXS,
-                    },
-                  ]}
-                >
-                  All
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.filterChip,
-                  {
-                    backgroundColor: frequencyFilter === 'single' ? theme.colors.primary : theme.colors.surface,
-                    borderColor: frequencyFilter === 'single' ? theme.colors.primary : theme.colors.border,
-                  },
-                ]}
-                onPress={() => setFrequencyFilter('single')}
-                activeOpacity={0.7}
-              >
-                <Text
-                  style={[
-                    styles.filterChipText,
-                    {
-                      color: frequencyFilter === 'single' ? theme.colors.white : theme.colors.textSecondary,
-                      fontFamily: theme.typography.fontFamilyBodyMedium,
-                      fontSize: theme.typography.fontSizeXS,
-                    },
-                  ]}
-                >
-                  Single
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.filterChip,
-                  {
-                    backgroundColor: frequencyFilter === 'multiple' ? theme.colors.primary : theme.colors.surface,
-                    borderColor: frequencyFilter === 'multiple' ? theme.colors.primary : theme.colors.border,
-                  },
-                ]}
-                onPress={() => setFrequencyFilter('multiple')}
-                activeOpacity={0.7}
-              >
-                <Text
-                  style={[
-                    styles.filterChipText,
-                    {
-                      color: frequencyFilter === 'multiple' ? theme.colors.white : theme.colors.textSecondary,
-                      fontFamily: theme.typography.fontFamilyBodyMedium,
-                      fontSize: theme.typography.fontSizeXS,
-                    },
-                  ]}
-                >
-                  Multiple
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <DraggableHabitList
-              habits={activeHabits}
-              selectedDate={selectedDateISO}
-              onToggle={handleToggleHabit}
-              onPress={handleHabitPress}
-              onEdit={handleEditHabit}
-              onArchive={handleArchiveHabit}
-              onDelete={handleDeleteHabit}
-              onReorder={handleReorderHabits}
-            />
+            {/* All Day Habits Section */}
+            {activeAllDayHabits.length > 0 && (
+              <>
+                {activePeriodHabits.length > 0 && (
+                  <View style={styles.sectionHeaderContainer}>
+                    <Text style={[
+                      styles.sectionHeaderText,
+                      {
+                        color: theme.colors.textSecondary,
+                        fontFamily: theme.typography.fontFamilyBodySemibold,
+                      }
+                    ]}>
+                      ALL DAY
+                    </Text>
+                  </View>
+                )}
+                <DraggableHabitList
+                  habits={activeAllDayHabits}
+                  selectedDate={selectedDateISO}
+                  onToggle={handleToggleHabit}
+                  onPress={handleHabitPress}
+                  onEdit={handleEditHabit}
+                  onArchive={handleArchiveHabit}
+                  onDelete={handleDeleteHabit}
+                  onReorder={handleReorderAllDayHabits}
+                />
+              </>
+            )}
           </Animated.View>
         ) : (
           renderEmptyState()
@@ -918,7 +899,7 @@ const HomeScreen: React.FC = () => {
                     },
                   ]}
                 >
-                  {activeHabits.length}/{FREE_HABIT_LIMIT} free habits used
+                  {habits.filter(h => !h.archived && !h.isDefault).length}/{FREE_HABIT_LIMIT} free habits used
                 </Text>
                 <Text
                   style={[
@@ -986,7 +967,10 @@ const HomeScreen: React.FC = () => {
         message={`You completed all ${totalCount} habits today! ${userName ? userName + ', you' : 'You'}'re absolutely crushing it!`}
         onDismiss={() => {
           setShowMascotCelebration(false);
-          // Optionally show share modal after
+          setCelebrationType('allComplete');
+          // Trigger mascot celebration animation
+          // TODO: Re-add celebration animation after implementing differently
+          // setTimeout(() => mascotRef.current?.celebrate(), 100);
           setTimeout(() => setShowAllCompleteModal(true), 300);
         }}
       />
@@ -1073,15 +1057,16 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   mascotCard: {
-    borderRadius: 24,
+    borderRadius: 16,
     borderWidth: 1,
-    marginBottom: 20,
-    paddingVertical: 8,
+    marginBottom: 12,
+    paddingVertical: 4,
+    paddingHorizontal: 4,
     shadowColor: '#6366F1',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 3,
     position: 'relative',
   },
   mascotToggleButton: {
@@ -1169,6 +1154,19 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   sectionTitle: {
+    marginBottom: 16,
+  },
+  sectionHeaderContainer: {
+    marginTop: 24,
+    marginBottom: 12,
+    paddingHorizontal: 4,
+  },
+  sectionHeaderText: {
+    fontSize: 12,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+  },
+  filtersContainer: {
     marginBottom: 16,
   },
   filterChipsContainer: {

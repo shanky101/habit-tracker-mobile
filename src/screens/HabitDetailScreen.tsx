@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
-import { useHabits, Habit, HabitEntry } from '@/contexts/HabitsContext';
+import { useHabits, Habit, HabitEntry } from '@/hooks/useHabits';
 import { ExportManager, ExportFormat } from '@/utils/exportManager';
 import {
   ArrowLeft,
@@ -24,6 +24,9 @@ import {
   FileText,
   Check,
   X,
+  Edit3,
+  Upload,
+  Share2,
 } from 'lucide-react-native';
 
 type HabitDetailRouteProp = RouteProp<
@@ -63,31 +66,133 @@ const HabitDetailScreen: React.FC = () => {
   const isCompletedToday = isHabitCompletedForDate(habitId, todayISO);
   const todayProgress = getCompletionProgress(habitId, todayISO);
 
-  // Mock data for stats - in production, this would come from stored history
-  const stats = {
-    currentStreak: habitData.streak || 0,
-    longestStreak: (habitData.streak || 0) + 10,
-    totalCompletions: Math.floor((habitData.streak || 0) * 1.5) || 42,
-    completionRate: 86,
+  // Calculate real stats from completion data
+  const calculateStats = () => {
+    const completions = habitData.completions || {};
+    const completionDates = Object.keys(completions);
+
+    // Total completions: sum of all completion counts
+    const totalCompletions = completionDates.reduce((sum, date) => {
+      return sum + (completions[date]?.completionCount || 0);
+    }, 0);
+
+    // Longest streak: calculate from completion history
+    const calculateLongestStreak = (): number => {
+      if (completionDates.length === 0) return 0;
+
+      const sortedDates = completionDates.sort();
+      let longestStreak = 0;
+      let currentStreakLength = 0;
+
+      for (let i = 0; i < sortedDates.length; i++) {
+        const currentDate = new Date(sortedDates[i]);
+        const completion = completions[sortedDates[i]];
+
+        // Check if this day was completed (met target)
+        if (completion && completion.completionCount >= completion.targetCount) {
+          if (i === 0) {
+            currentStreakLength = 1;
+          } else {
+            const prevDate = new Date(sortedDates[i - 1]);
+            const daysDiff = Math.floor((currentDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
+
+            // Consecutive day (considering selectedDays)
+            if (daysDiff === 1) {
+              currentStreakLength++;
+            } else {
+              currentStreakLength = 1;
+            }
+          }
+
+          longestStreak = Math.max(longestStreak, currentStreakLength);
+        } else {
+          currentStreakLength = 0;
+        }
+      }
+
+      return longestStreak;
+    };
+
+    // Completion rate: % of scheduled days that were completed
+    const calculateCompletionRate = (): number => {
+      if (!habitData.createdAt) return 0;
+
+      const createdDate = new Date(habitData.createdAt);
+      const today = new Date();
+      const daysSinceCreation = Math.floor((today.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24));
+
+      if (daysSinceCreation === 0) return 0;
+
+      // Count how many days this habit was scheduled for
+      let scheduledDays = 0;
+      const currentDate = new Date(createdDate);
+
+      while (currentDate <= today) {
+        const dayOfWeek = currentDate.getDay();
+        if (habitData.selectedDays.includes(dayOfWeek)) {
+          scheduledDays++;
+        }
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+
+      if (scheduledDays === 0) return 0;
+
+      // Count completed days (met target)
+      const completedDays = completionDates.filter(date => {
+        const completion = completions[date];
+        return completion && completion.completionCount >= completion.targetCount;
+      }).length;
+
+      return Math.round((completedDays / scheduledDays) * 100);
+    };
+
+    return {
+      currentStreak: habitData.streak || 0,
+      longestStreak: calculateLongestStreak(),
+      totalCompletions,
+      completionRate: calculateCompletionRate(),
+    };
   };
 
-  // Generate mock calendar data for the past 90 days
+  const stats = calculateStats();
+
+  // Generate calendar data from actual completion records
   const generateCalendarData = () => {
     const days = [];
     const today = new Date();
 
-    for (let i = 89; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
+    // Determine the start date (habit creation date or 90 days ago, whichever is more recent)
+    const ninetyDaysAgo = new Date(today);
+    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 89);
 
-      // Mock completion pattern - 80% completion rate
-      const completed = Math.random() > 0.2;
+    // Use habit creation date if available (from habitData.createdAt)
+    // If no createdAt, default to showing the last 90 days
+    const habitCreatedAt = (habitData as any).createdAt ? new Date((habitData as any).createdAt) : ninetyDaysAgo;
+    const startDate = habitCreatedAt > ninetyDaysAgo ? habitCreatedAt : ninetyDaysAgo;
 
-      days.push({
-        date: date.toISOString().split('T')[0],
-        completed,
-        hasNote: completed && Math.random() > 0.8,
-      });
+    // Generate array of dates from start date to today
+    const currentDate = new Date(startDate);
+    while (currentDate <= today) {
+      const dateStr = currentDate.toISOString().split('T')[0];
+      const completion = habitData.completions?.[dateStr];
+
+      // Check if this date is a selected day for the habit
+      const dayOfWeek = currentDate.getDay();
+      const isSelectedDay = habitData.selectedDays.includes(dayOfWeek);
+
+      // Only include days that are part of the habit's schedule
+      if (isSelectedDay) {
+        const completed = completion ? completion.completionCount >= completion.targetCount : false;
+        const hasNote = completion?.entries?.some(e => e.note || e.mood) || false;
+
+        days.push({
+          date: dateStr,
+          completed,
+          hasNote,
+        });
+      }
+
+      currentDate.setDate(currentDate.getDate() + 1);
     }
 
     return days;
@@ -680,16 +785,48 @@ const HabitDetailScreen: React.FC = () => {
   );
 
   const renderMoodNoteHistory = () => {
-    // Get all entries from all daily completions
-    const allEntries: HabitEntry[] = [];
-    Object.values(habitData.completions || {}).forEach(completion => {
-      allEntries.push(...completion.entries);
-    });
+    // Get all entries with notes/moods from completions
+    const getAllEntriesWithNotes = () => {
+      const entries: Array<{
+        id: string;
+        date: string;
+        mood?: string;
+        note?: string;
+      }> = [];
 
-    if (allEntries.length === 0) return null;
+      const completions = habitData.completions || {};
 
-    // Sort entries by timestamp (newest first)
-    const sortedEntries = [...allEntries].sort((a, b) => b.timestamp - a.timestamp);
+      // Iterate through all completion dates
+      Object.keys(completions).forEach((dateStr) => {
+        const completion = completions[dateStr];
+        if (completion?.entries && completion.entries.length > 0) {
+          completion.entries.forEach((entry, index) => {
+            // Only include entries that have a note or mood
+            if (entry.note || entry.mood) {
+              entries.push({
+                id: `${dateStr}-${index}`,
+                date: dateStr,
+                mood: entry.mood,
+                note: entry.note,
+              });
+            }
+          });
+        }
+      });
+
+      return entries;
+    };
+
+    const allEntries = getAllEntriesWithNotes();
+
+    // Sort by date (most recent first) and limit to 100
+    const sortedEntries = allEntries
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, 100);
+
+    if (sortedEntries.length === 0) {
+      return null;
+    }
 
     return (
       <View style={styles.moodNoteContainer}>
@@ -703,78 +840,84 @@ const HabitDetailScreen: React.FC = () => {
             },
           ]}
         >
-          Mood & Notes History
+          Recent Notes ({sortedEntries.length})
         </Text>
-        {sortedEntries.slice(0, 10).map((entry, index) => {
-          const date = new Date(entry.date);
-          const today = new Date();
-          const yesterday = new Date(today);
-          yesterday.setDate(yesterday.getDate() - 1);
+        <ScrollView
+          style={styles.notesScrollView}
+          showsVerticalScrollIndicator={true}
+          nestedScrollEnabled={true}
+        >
+          {sortedEntries.map((entry, index) => {
+            const date = new Date(entry.date);
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
 
-          let dateLabel = entry.date;
-          if (entry.date === today.toISOString().split('T')[0]) {
-            dateLabel = 'Today';
-          } else if (entry.date === yesterday.toISOString().split('T')[0]) {
-            dateLabel = 'Yesterday';
-          } else {
-            const daysAgo = Math.floor(
-              (today.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)
-            );
-            if (daysAgo < 30) {
-              dateLabel = `${daysAgo} days ago`;
+            let dateLabel = entry.date;
+            if (entry.date === today.toISOString().split('T')[0]) {
+              dateLabel = 'Today';
+            } else if (entry.date === yesterday.toISOString().split('T')[0]) {
+              dateLabel = 'Yesterday';
             } else {
-              const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-              dateLabel = `${months[date.getMonth()]} ${date.getDate()}`;
+              const daysAgo = Math.floor(
+                (today.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)
+              );
+              if (daysAgo < 30) {
+                dateLabel = `${daysAgo} days ago`;
+              } else {
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                dateLabel = `${months[date.getMonth()]} ${date.getDate()}`;
+              }
             }
-          }
 
-          return (
-            <View
-              key={entry.id}
-              style={[
-                styles.moodNoteItem,
-                {
-                  backgroundColor: theme.colors.surface,
-                  borderColor: theme.colors.border,
-                },
-                index === sortedEntries.length - 1 && { borderBottomWidth: 0 },
-              ]}
-            >
-              <View style={styles.moodNoteHeader}>
-                {entry.mood && (
-                  <Text style={styles.moodEmoji}>{entry.mood}</Text>
+            return (
+              <View
+                key={entry.id}
+                style={[
+                  styles.moodNoteItem,
+                  {
+                    backgroundColor: theme.colors.surface,
+                    borderColor: theme.colors.border,
+                  },
+                  index === sortedEntries.length - 1 && { borderBottomWidth: 0 },
+                ]}
+              >
+                <View style={styles.moodNoteHeader}>
+                  {entry.mood && (
+                    <Text style={styles.moodEmoji}>{entry.mood}</Text>
+                  )}
+                  <Text
+                    style={[
+                      styles.moodNoteDate,
+                      {
+                        color: theme.colors.textSecondary,
+                        fontFamily: theme.typography.fontFamilyBody,
+                        fontSize: theme.typography.fontSizeXS,
+                      },
+                    ]}
+                  >
+                    {dateLabel}
+                  </Text>
+                </View>
+                {entry.note && (
+                  <Text
+                    style={[
+                      styles.moodNoteText,
+                      {
+                        color: theme.colors.text,
+                        fontFamily: theme.typography.fontFamilyBody,
+                        fontSize: theme.typography.fontSizeSM,
+                        lineHeight: theme.typography.fontSizeSM * theme.typography.lineHeightRelaxed,
+                      },
+                    ]}
+                  >
+                    {entry.note}
+                  </Text>
                 )}
-                <Text
-                  style={[
-                    styles.moodNoteDate,
-                    {
-                      color: theme.colors.textSecondary,
-                      fontFamily: theme.typography.fontFamilyBody,
-                      fontSize: theme.typography.fontSizeXS,
-                    },
-                  ]}
-                >
-                  {dateLabel}
-                </Text>
               </View>
-              {entry.note && (
-                <Text
-                  style={[
-                    styles.moodNoteText,
-                    {
-                      color: theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBody,
-                      fontSize: theme.typography.fontSizeSM,
-                      lineHeight: theme.typography.fontSizeSM * theme.typography.lineHeightRelaxed,
-                    },
-                  ]}
-                >
-                  {entry.note}
-                </Text>
-              )}
-            </View>
-          );
-        })}
+            );
+          })}
+        </ScrollView>
       </View>
     );
   };
@@ -843,7 +986,7 @@ const HabitDetailScreen: React.FC = () => {
           onPress={handleEdit}
           activeOpacity={0.7}
         >
-          <Text style={styles.editIcon}>✏️</Text>
+          <Edit3 size={20} color={theme.colors.primary} strokeWidth={2} />
         </TouchableOpacity>
       </View>
 
@@ -914,6 +1057,9 @@ const HabitDetailScreen: React.FC = () => {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
+          scrollEnabled={true}
+          decelerationRate="fast"
+          snapToInterval={142}
           style={styles.statsScroll}
           contentContainerStyle={styles.statsContainer}
         >
@@ -941,8 +1087,7 @@ const HabitDetailScreen: React.FC = () => {
             style={[
               styles.actionButton,
               {
-                backgroundColor: theme.colors.backgroundSecondary,
-                borderColor: theme.colors.border,
+                backgroundColor: theme.colors.primary,
                 opacity: isExporting ? 0.5 : 1,
               },
             ]}
@@ -951,41 +1096,42 @@ const HabitDetailScreen: React.FC = () => {
             disabled={isExporting}
           >
             {isExporting ? (
-              <ActivityIndicator size="small" color={theme.colors.primary} />
+              <ActivityIndicator size="small" color={theme.colors.white} />
             ) : (
-              <Text style={styles.actionEmoji}>📤</Text>
+              <>
+                <Upload size={18} color={theme.colors.white} strokeWidth={2.5} />
+                <Text
+                  style={[
+                    styles.actionText,
+                    {
+                      color: theme.colors.white,
+                      fontSize: theme.typography.fontSizeSM,
+                      fontFamily: theme.typography.fontFamilyBodyMedium,
+                    },
+                  ]}
+                >
+                  {isExporting ? 'Exporting...' : 'Export Data'}
+                </Text>
+              </>
             )}
-            <Text
-              style={[
-                styles.actionText,
-                {
-                  color: theme.colors.text,
-                  fontSize: theme.typography.fontSizeSM,
-                  fontFamily: theme.typography.fontFamilyBodyMedium,
-                },
-              ]}
-            >
-              {isExporting ? 'Exporting...' : 'Export Data'}
-            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[
               styles.actionButton,
               {
-                backgroundColor: theme.colors.backgroundSecondary,
-                borderColor: theme.colors.border,
+                backgroundColor: theme.colors.success,
               },
             ]}
             onPress={handleShareStreak}
             activeOpacity={0.7}
           >
-            <Text style={styles.actionEmoji}>🎉</Text>
+            <Share2 size={18} color={theme.colors.white} strokeWidth={2.5} />
             <Text
               style={[
                 styles.actionText,
                 {
-                  color: theme.colors.text,
+                  color: theme.colors.white,
                   fontSize: theme.typography.fontSizeSM,
                   fontFamily: theme.typography.fontFamilyBodyMedium,
                 },
@@ -1264,6 +1410,10 @@ const styles = StyleSheet.create({
     marginTop: 24,
     paddingHorizontal: 24,
   },
+  notesScrollView: {
+    maxHeight: 400,
+    marginTop: 12,
+  },
   moodNoteItem: {
     padding: 16,
     borderRadius: 12,
@@ -1286,22 +1436,28 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   actionsContainer: {
-    marginTop: 24,
-    paddingHorizontal: 24,
+    flexDirection: 'row',
     gap: 12,
+    paddingHorizontal: 24,
+    marginTop: 24,
   },
   actionButton: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    borderRadius: 16,
-    borderWidth: 1,
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 12,
   },
   actionEmoji: {
     fontSize: 24,
-    marginRight: 12,
+    marginRight: 8,
   },
-  actionText: {},
+  actionText: {
+    // styles from theme
+  },
 });
 
 export default HabitDetailScreen;

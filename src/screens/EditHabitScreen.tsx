@@ -17,7 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
-import { useHabits } from '@/contexts/HabitsContext';
+import { useHabits } from '@/hooks/useHabits';
 import { CATEGORIES, COLORS } from './AddHabitStep2Screen';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 
@@ -38,6 +38,8 @@ type EditHabitScreenRouteProp = RouteProp<
         notes?: string;
         streak?: number;
         completed?: boolean;
+        targetCompletionsPerDay?: number;
+        frequencyType?: 'single' | 'multiple';
       };
     };
   },
@@ -58,6 +60,7 @@ const EditHabitScreen: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState(habitData.category);
   const [selectedColor, setSelectedColor] = useState(habitData.color);
   const [frequency, setFrequency] = useState(habitData.frequency);
+  const [targetCompletionsPerDay, setTargetCompletionsPerDay] = useState(habitData.targetCompletionsPerDay || 1);
   const [selectedDays, setSelectedDays] = useState(habitData.selectedDays);
   const [reminderEnabled, setReminderEnabled] = useState(habitData.reminderEnabled);
   const [reminderTime, setReminderTime] = useState(habitData.reminderTime || '09:00');
@@ -107,6 +110,8 @@ const EditHabitScreen: React.FC = () => {
       category: selectedCategory,
       color: selectedColor,
       frequency,
+      frequencyType: targetCompletionsPerDay > 1 ? 'multiple' : 'single',
+      targetCompletionsPerDay,
       selectedDays: frequency === 'daily' ? [0, 1, 2, 3, 4, 5, 6] : selectedDays,
       reminderEnabled,
       reminderTime: reminderEnabled ? reminderTime : null,
@@ -437,6 +442,79 @@ const EditHabitScreen: React.FC = () => {
             )}
           </View>
 
+          {/* Target Count Input - Always visible */}
+          <View style={styles.section}>
+            <Text
+              style={[
+                styles.sectionLabel,
+                {
+                  color: theme.colors.text,
+                  fontSize: theme.typography.fontSizeSM,
+                  fontFamily: theme.typography.fontFamilyBodySemibold,
+                },
+              ]}
+            >
+              Daily Target
+            </Text>
+
+            <View style={styles.targetCountContainer}>
+              <View style={styles.targetCountInputRow}>
+                <TouchableOpacity
+                  style={[
+                    styles.targetCountButton,
+                    { backgroundColor: theme.colors.backgroundSecondary, borderColor: theme.colors.border },
+                  ]}
+                  onPress={() => setTargetCompletionsPerDay(Math.max(1, targetCompletionsPerDay - 1))}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.targetCountButtonText, { color: theme.colors.text }]}>−</Text>
+                </TouchableOpacity>
+
+                <TextInput
+                  style={[
+                    styles.targetCountInput,
+                    {
+                      backgroundColor: theme.colors.backgroundSecondary,
+                      color: theme.colors.text,
+                      fontFamily: theme.typography.fontFamilyDisplayBold,
+                    },
+                  ]}
+                  value={targetCompletionsPerDay.toString()}
+                  onChangeText={(text) => {
+                    const val = parseInt(text.replace(/[^0-9]/g, ''), 10);
+                    if (!isNaN(val) && val > 0) {
+                      setTargetCompletionsPerDay(val);
+                    }
+                  }}
+                  keyboardType="number-pad"
+                  maxLength={3}
+                />
+
+                <TouchableOpacity
+                  style={[
+                    styles.targetCountButton,
+                    { backgroundColor: theme.colors.backgroundSecondary, borderColor: theme.colors.border },
+                  ]}
+                  onPress={() => setTargetCompletionsPerDay(targetCompletionsPerDay + 1)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.targetCountButtonText, { color: theme.colors.text }]}>+</Text>
+                </TouchableOpacity>
+              </View>
+              <Text
+                style={[
+                  styles.targetCountHelper,
+                  {
+                    color: theme.colors.textSecondary,
+                    fontFamily: theme.typography.fontFamilyBody,
+                  },
+                ]}
+              >
+                {targetCompletionsPerDay === 1 ? 'Once a day' : `${targetCompletionsPerDay} times a day`}
+              </Text>
+            </View>
+          </View>
+
           {/* Reminder */}
           <View style={styles.section}>
             <View style={styles.reminderHeader}>
@@ -516,39 +594,63 @@ const EditHabitScreen: React.FC = () => {
 
             {reminderEnabled && showTimePicker && (
               <View style={styles.timePickerContainer}>
-                <DateTimePicker
-                  value={(() => {
-                    const [hours, minutes] = reminderTime.split(':');
-                    const date = new Date();
-                    date.setHours(parseInt(hours, 10));
-                    date.setMinutes(parseInt(minutes, 10));
-                    return date;
-                  })()}
-                  mode="time"
-                  is24Hour={false}
-                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                  onChange={handleTimeChange}
-                />
                 {Platform.OS === 'ios' && (
-                  <TouchableOpacity
-                    style={[
-                      styles.doneButton,
-                      { backgroundColor: theme.colors.primary }
-                    ]}
-                    onPress={handleTimePickerDismiss}
-                  >
-                    <Text
+                  <View style={[styles.iosTimePickerModal, { backgroundColor: theme.colors.backgroundSecondary }]}>
+                    <View style={[styles.iosPickerHeader, { borderBottomColor: theme.colors.border }]}>
+                      <Text style={[styles.iosPickerTitle, { color: theme.colors.text, fontFamily: theme.typography.fontFamilyBodySemibold }]}>
+                        Select Time
+                      </Text>
+                    </View>
+                    <DateTimePicker
+                      value={(() => {
+                        const [hours, minutes] = reminderTime.split(':');
+                        const date = new Date();
+                        date.setHours(parseInt(hours, 10));
+                        date.setMinutes(parseInt(minutes, 10));
+                        return date;
+                      })()}
+                      mode="time"
+                      is24Hour={false}
+                      display="spinner"
+                      onChange={handleTimeChange}
+                      textColor={theme.colors.text}
+                      style={styles.iosTimePicker}
+                    />
+                    <TouchableOpacity
                       style={[
-                        styles.doneButtonText,
-                        {
-                          color: theme.colors.white,
-                          fontFamily: theme.typography.fontFamilyBodySemibold,
-                        }
+                        styles.doneButton,
+                        { backgroundColor: theme.colors.primary }
                       ]}
+                      onPress={handleTimePickerDismiss}
                     >
-                      Done
-                    </Text>
-                  </TouchableOpacity>
+                      <Text
+                        style={[
+                          styles.doneButtonText,
+                          {
+                            color: theme.colors.white,
+                            fontFamily: theme.typography.fontFamilyBodySemibold,
+                          }
+                        ]}
+                      >
+                        Done
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+                {Platform.OS === 'android' && (
+                  <DateTimePicker
+                    value={(() => {
+                      const [hours, minutes] = reminderTime.split(':');
+                      const date = new Date();
+                      date.setHours(parseInt(hours, 10));
+                      date.setMinutes(parseInt(minutes, 10));
+                      return date;
+                    })()}
+                    mode="time"
+                    is24Hour={false}
+                    display="default"
+                    onChange={handleTimeChange}
+                  />
                 )}
               </View>
             )}
@@ -615,21 +717,21 @@ const EditHabitScreen: React.FC = () => {
             </Text>
           </View>
 
-          {/* Destructive Actions */}
+          {/* Action Buttons Section */}
           <View style={styles.destructiveSection}>
             <TouchableOpacity
               style={[
-                styles.archiveButton,
+                styles.saveButton,
                 {
                   backgroundColor: theme.colors.primary,
                 },
               ]}
-              onPress={handleArchive}
+              onPress={handleSave}
               activeOpacity={0.7}
             >
               <Text
                 style={[
-                  styles.archiveButtonText,
+                  styles.saveButtonText,
                   {
                     color: theme.colors.white,
                     fontSize: theme.typography.fontSizeMD,
@@ -637,7 +739,7 @@ const EditHabitScreen: React.FC = () => {
                   },
                 ]}
               >
-                Archive Habit
+                Save Changes
               </Text>
             </TouchableOpacity>
 
@@ -801,12 +903,36 @@ const styles = StyleSheet.create({
     marginTop: 16,
     alignItems: 'center',
   },
+  iosTimePickerModal: {
+    borderRadius: 16,
+    padding: 20,
+    marginTop: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  iosPickerHeader: {
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    marginBottom: 16,
+    alignItems: 'center',
+  },
+  iosPickerTitle: {
+    fontSize: 18,
+  },
+  iosTimePicker: {
+    height: 180,
+    marginVertical: 8,
+  },
   doneButton: {
-    marginTop: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 32,
+    width: '100%',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
     borderRadius: 12,
     alignItems: 'center',
+    marginTop: 16,
   },
   doneButtonText: {
     fontSize: 16,
@@ -827,7 +953,7 @@ const styles = StyleSheet.create({
   destructiveSection: {
     marginTop: 24,
   },
-  archiveButton: {
+  saveButton: {
     width: '100%',
     paddingVertical: 16,
     paddingHorizontal: 24,
@@ -836,7 +962,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 12,
   },
-  archiveButtonText: {
+  saveButtonText: {
     // styles from theme
   },
   deleteButton: {
@@ -848,7 +974,41 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   deleteButtonText: {
-    // styles from theme
+    //styles from theme
+  },
+  targetCountContainer: {
+    marginTop: 12,
+  },
+  targetCountInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 16,
+    marginBottom: 8,
+  },
+  targetCountButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  targetCountButtonText: {
+    fontSize: 24,
+    fontWeight: '300',
+    lineHeight: 28,
+  },
+  targetCountInput: {
+    width: 80,
+    height: 56,
+    borderRadius: 16,
+    textAlign: 'center',
+    fontSize: 24,
+  },
+  targetCountHelper: {
+    textAlign: 'center',
+    fontSize: 14,
   },
 });
 

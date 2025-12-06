@@ -24,7 +24,7 @@ import {
 } from 'lucide-react-native';
 import { useTheme } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
-import { useHabits } from '@/contexts/HabitsContext';
+import { useHabits } from '@/hooks/useHabits';
 import { ExportManager, ExportFormat as EMExportFormat } from '@/utils/exportManager';
 
 type ExportDataNavigationProp = StackNavigationProp<any, 'ExportData'>;

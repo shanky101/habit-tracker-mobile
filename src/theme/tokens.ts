@@ -1,6 +1,6 @@
 // Design Tokens for all theme variants
 
-export type ThemeVariant = 'default' | 'dark' | 'zen' | 'neon' | 'retro' | 'minimalist';
+export type ThemeVariant = 'default' | 'dark' | 'zen' | 'neon' | 'retro' | 'minimalist' | 'brutalist';
 
 export interface ColorTokens {
   primary: string;
@@ -372,6 +372,35 @@ const minimalistColors: ColorTokens = {
   black: '#000000',
 };
 
+// 🔥 BRUTALIST THEME - Neo-brutalist playful design 🔥
+// Bold, chunky, high-contrast with funky colors
+const brutalistColors: ColorTokens = {
+  primary: '#FF6B35',        // Punchy orange
+  primaryDark: '#E85A2A',    // Deep orange
+  primaryLight: '#FF8F66',   // Soft orange
+  secondary: '#FFD23F',      // Bright yellow
+  secondaryLight: '#FFE380', // Light yellow
+  accent1: '#00D9FF',        // Cyber cyan
+  accent2: '#FF3BD9',        // Hot pink
+  accent3: '#00FF85',        // Electric green
+  background: '#FFFEF2',     // Warm off-white
+  backgroundSecondary: '#FFF9E3', // Light cream
+  surface: '#FFFFFF',        // Pure white
+  surfaceSecondary: '#FFFDFA',
+  text: '#1A1A1A',          // Almost black
+  textSecondary: '#4A4A4A',  // Dark gray
+  textTertiary: '#7A7A7A',   // Medium gray
+  success: '#00FF85',        // Electric green
+  successLight: '#CCFFE5',   // Pale green
+  warning: '#FFD23F',        // Bright yellow
+  error: '#FF3366',          // Hot red
+  errorLight: '#FFE6ED',     // Pale red
+  border: '#1A1A1A',         // BLACK borders (key!)
+  borderLight: '#4A4A4A',    // Dark gray borders
+  white: '#FFFFFF',
+  black: '#000000',
+};
+
 // Shadow definitions
 const baseShadows: ShadowTokens = {
   shadowSM: {
@@ -404,6 +433,38 @@ const baseShadows: ShadowTokens = {
   },
 };
 
+// 🎨 Brutalist Shadows - Hard, offset box shadows (no blur!)
+const brutalistShadows: ShadowTokens = {
+  shadowSM: {
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 2 },  // Hard offset
+    shadowOpacity: 1,                        // Solid black
+    shadowRadius: 0,                         // NO BLUR
+    elevation: 0,
+  },
+  shadowMD: {
+    shadowColor: '#000',
+    shadowOffset: { width: 4, height: 4 },  // Bigger offset
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 0,
+  },
+  shadowLG: {
+    shadowColor: '#000',
+    shadowOffset: { width: 6, height: 6 },  // Even bigger
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 0,
+  },
+  shadowXL: {
+    shadowColor: '#000',
+    shadowOffset: { width: 8, height: 8 },  // CHUNKY!
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 0,
+  },
+};
+
 // Animation tokens
 const baseAnimation: AnimationTokens = {
   durationFast: 150,
@@ -412,6 +473,16 @@ const baseAnimation: AnimationTokens = {
   easingDefault: 'ease-in-out',
   easingBounce: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
   easingSmooth: 'cubic-bezier(0.4, 0, 0.2, 1)',
+};
+
+// 🚀 Brutalist Animations - Snappy, bouncy, playful!
+const brutalistAnimation: AnimationTokens = {
+  durationFast: 100,   // SUPER snappy
+  durationNormal: 200, // Quick
+  durationSlow: 300,   // Still fast
+  easingDefault: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)', // Bouncy!
+  easingBounce: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',  // VERY bouncy
+  easingSmooth: 'cubic-bezier(0.34, 1.56, 0.64, 1)',       // Elastic
 };
 
 // Theme exports
@@ -476,6 +547,24 @@ export const themes: Record<ThemeVariant, ThemeTokens> = {
     shadows: baseShadows,
     animation: baseAnimation,
   },
+  brutalist: {
+    name: 'Brutalist',
+    isPremium: false,
+    colors: brutalistColors,
+    typography: baseTypography,
+    spacing: baseSpacing,
+    radius: {
+      radiusXS: 0,      // NO CURVES (mostly)
+      radiusSM: 4,      // Tiny bit for small elements
+      radiusMD: 8,      // Some roundness
+      radiusLG: 12,     // Chunky but rounded
+      radiusXL: 16,     // Big chunky
+      radius2XL: 20,    // Bigger
+      radiusFull: 9999, // Still need full for pills
+    },
+    shadows: brutalistShadows,
+    animation: brutalistAnimation,
+  },
 };
 
 // Theme metadata for UI display
@@ -503,6 +592,10 @@ export const themeMetadata: Record<ThemeVariant, { description: string; previewC
   minimalist: {
     description: 'Clean black and white simplicity',
     previewColors: ['#000000', '#ffffff', '#666666', '#e0e0e0'],
+  },
+  brutalist: {
+    description: '🔥 Bold, chunky, playful & funky!',
+    previewColors: ['#FF6B35', '#FFD23F', '#00D9FF', '#FF3BD9'],
   },
 };
 

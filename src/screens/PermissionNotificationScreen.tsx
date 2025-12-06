@@ -55,21 +55,24 @@ const PermissionNotificationScreen: React.FC = () => {
           }),
         });
 
-        // Navigate to Welcome screen
-        navigation.navigate('Welcome');
+        // Continue to main app
+        navigation.navigate('MainApp');
       } else {
-        // Permission denied
+        // Permission denied, still continue to main app
         Alert.alert(
           'Permission Required',
           'Please enable notifications in your device settings to receive habit reminders.',
           [
-            { text: 'Continue', onPress: () => navigation.navigate('Welcome'), style: 'cancel' },
+            { text: 'OK' },
+            { text: 'Continue', onPress: () => navigation.navigate('MainApp'), style: 'cancel' },
           ]
         );
       }
     } catch (error) {
       console.error('Error requesting notification permission:', error);
       Alert.alert('Error', 'Failed to request notification permissions. Please try again.');
+      // On error, still proceed
+      navigation.navigate('MainApp');
     } finally {
       setIsRequesting(false);
     }

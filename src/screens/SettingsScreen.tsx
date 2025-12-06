@@ -28,7 +28,7 @@ const SettingsScreen: React.FC = () => {
   const navigation = useNavigation<SettingsNavigationProp>();
   const { theme, themeVariant, themeMode } = useTheme();
   const { fadeAnim, slideAnim } = useScreenAnimation();
-  const { settings: mascotSettings, toggleMascot, toggleCelebrations } = useMascot();
+  const { settings: mascotSettings, toggleMascot, toggleCelebrations, toggleDisplayMode } = useMascot();
 
   const [userName, setUserName] = useState('');
   const [isEditingName, setIsEditingName] = useState(false);
@@ -298,7 +298,7 @@ const SettingsScreen: React.FC = () => {
           </TouchableOpacity>
         </Animated.View>
 
-        {/* Mascot Section */}
+        {/* Habi & Celebrations Section */}
         <Animated.View
           style={[
             styles.section,
@@ -319,7 +319,7 @@ const SettingsScreen: React.FC = () => {
               },
             ]}
           >
-            {MASCOT_NAME.toUpperCase()} MASCOT
+            HABI & CELEBRATIONS
           </Text>
 
           <View style={[styles.settingRow, { borderBottomColor: theme.colors.border }]}>
@@ -362,7 +362,7 @@ const SettingsScreen: React.FC = () => {
             />
           </View>
 
-          <View style={[styles.settingRow, { borderBottomWidth: 0, opacity: mascotSettings.enabled ? 1 : 0.5 }]}>
+          <View style={[styles.settingRow, { borderBottomWidth: 0 }]}>
             <View style={styles.settingInfo}>
               <View style={styles.settingIconContainer}>
                 <PartyPopper size={22} color={theme.colors.primary} strokeWidth={2} />
@@ -378,7 +378,7 @@ const SettingsScreen: React.FC = () => {
                     },
                   ]}
                 >
-                  Celebrations
+                  Show Celebrations
                 </Text>
                 <Text
                   style={[
@@ -390,17 +390,99 @@ const SettingsScreen: React.FC = () => {
                     },
                   ]}
                 >
-                  Show {MASCOT_NAME} when completing all habits
+                  Celebrate when completing all habits
                 </Text>
               </View>
             </View>
             <Switch
               value={mascotSettings.showCelebrations}
               onValueChange={toggleCelebrations}
-              disabled={!mascotSettings.enabled}
               trackColor={{ false: theme.colors.border, true: theme.colors.primary + '60' }}
-              thumbColor={mascotSettings.showCelebrations && mascotSettings.enabled ? theme.colors.primary : theme.colors.surface}
+              thumbColor={mascotSettings.showCelebrations ? theme.colors.primary : theme.colors.surface}
             />
+          </View>
+
+          {/* Habi Display Mode Option */}
+          <View style={[styles.settingRow, { borderBottomWidth: 0, borderTopWidth: 1, borderTopColor: theme.colors.border, marginTop: 12, paddingTop: 16 }]}>
+            <View style={styles.settingInfo}>
+              <View style={styles.settingIconContainer}>
+                <Text style={{ fontSize: 20 }}>🎨</Text>
+              </View>
+              <View style={styles.settingTextContainer}>
+                <Text
+                  style={[
+                    styles.settingLabel,
+                    {
+                      color: theme.colors.text,
+                      fontFamily: theme.typography.fontFamilyBodyMedium,
+                      fontSize: theme.typography.fontSizeMD,
+                    },
+                  ]}
+                >
+                  {MASCOT_NAME} Display Mode
+                </Text>
+                <Text
+                  style={[
+                    styles.settingValue,
+                    {
+                      color: theme.colors.textSecondary,
+                      fontFamily: theme.typography.fontFamilyBody,
+                      fontSize: theme.typography.fontSizeSM,
+                    },
+                  ]}
+                >
+                  Choose between compact and default
+                </Text>
+              </View>
+            </View>
+            <View style={{ flexDirection: 'row', gap: 8 }}>
+              <TouchableOpacity
+                style={[
+                  styles.displayModeButton,
+                  {
+                    backgroundColor: mascotSettings.displayMode === 'compact' ? theme.colors.primary : theme.colors.surface,
+                    borderColor: theme.colors.border,
+                  },
+                ]}
+                onPress={() => toggleDisplayMode('compact')}
+                activeOpacity={0.7}
+              >
+                <Text
+                  style={[
+                    styles.displayModeText,
+                    {
+                      color: mascotSettings.displayMode === 'compact' ? '#FFF' : theme.colors.text,
+                      fontFamily: theme.typography.fontFamilyBodyMedium,
+                    },
+                  ]}
+                >
+                  Compact
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.displayModeButton,
+                  {
+                    backgroundColor: mascotSettings.displayMode === 'default' ? theme.colors.primary : theme.colors.surface,
+                    borderColor: theme.colors.border,
+                  },
+                ]}
+                onPress={() => toggleDisplayMode('default')}
+                activeOpacity={0.7}
+              >
+                <Text
+                  style={[
+                    styles.displayModeText,
+                    {
+                      color: mascotSettings.displayMode === 'default' ? '#FFF' : theme.colors.text,
+                      fontFamily: theme.typography.fontFamilyBodyMedium,
+                    },
+                  ]}
+                >
+                  Default
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </Animated.View>
 
@@ -583,9 +665,16 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   editButton: {
-    paddingVertical: 8,
+    padding: 8,
+  },
+  displayModeButton: {
     paddingHorizontal: 16,
-    borderRadius: 8,
+    paddingVertical: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  displayModeText: {
+    fontSize: 13,
   },
 });
 
