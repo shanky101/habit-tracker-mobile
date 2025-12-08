@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -17,11 +17,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
-import { CATEGORIES } from './AddHabitStep2Screen';
+import { CATEGORIES, COLORS } from '@/data/habitOptions';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 import { HabitTimePeriod } from '@/types/habit';
 import { TimePeriodSelector } from '@/components/TimePeriodSelector';
 import { useSettingsStore } from '@/store/settingsStore';
+import { Calendar, Clock, Sun, Moon, Check, ArrowRight } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 type AddHabitStep3ScreenNavigationProp = StackNavigationProp<any, 'AddHabitStep3'>;
 type AddHabitStep3ScreenRouteProp = RouteProp<
@@ -37,7 +39,6 @@ type AddHabitStep3ScreenRouteProp = RouteProp<
 >;
 
 const DAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 const AddHabitStep3Screen: React.FC = () => {
   const navigation = useNavigation<AddHabitStep3ScreenNavigationProp>();
@@ -47,29 +48,21 @@ const AddHabitStep3Screen: React.FC = () => {
   const { habitName, habitType, category, color } = route.params;
 
   const [frequency, setFrequency] = useState<'daily' | 'weekly'>('daily');
-  // frequencyType is derived from targetCompletionsPerDay
-  const [targetCompletionsPerDay, setTargetCompletionsPerDay] = useState<number>(1); // How many times per day
+  const [targetCompletionsPerDay, setTargetCompletionsPerDay] = useState<number>(1);
   const [selectedDays, setSelectedDays] = useState<number[]>([0, 1, 2, 3, 4, 5, 6]);
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [reminderTime, setReminderTime] = useState('09:00');
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [notes, setNotes] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [timePeriod, setTimePeriod] = useState<HabitTimePeriod>('allday'); // Default to All Day
+  const [timePeriod, setTimePeriod] = useState<HabitTimePeriod>('allday');
 
-  // Get time ranges from settings store
   const { timeRanges } = useSettingsStore();
-
-  // Use custom animation hook
   const { fadeAnim, slideAnim } = useScreenAnimation();
 
-  const handleBack = () => {
-    navigation.goBack();
-  };
-
   const handleDayToggle = (dayIndex: number) => {
+    Haptics.selectionAsync();
     if (selectedDays.includes(dayIndex)) {
-      // Must have at least one day selected
       if (selectedDays.length > 1) {
         setSelectedDays(selectedDays.filter((d) => d !== dayIndex));
       }
@@ -79,7 +72,6 @@ const AddHabitStep3Screen: React.FC = () => {
   };
 
   const handleTimeChange = (event: any, selectedDate?: Date) => {
-    // On Android, close picker immediately
     if (Platform.OS === 'android') {
       setShowTimePicker(false);
     }
@@ -91,35 +83,32 @@ const AddHabitStep3Screen: React.FC = () => {
     }
   };
 
-  const handleTimePickerDismiss = () => {
-    // For iOS, add a dismiss button
-    if (Platform.OS === 'ios') {
-      setShowTimePicker(false);
-    }
-  };
-
-  const handleTimePickerPress = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setShowTimePicker(true);
-  };
-
   const handleCreateHabit = async () => {
     setIsLoading(true);
-
-    // Haptic feedback for creating habit
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    // Get category icon
-    const categoryIcon = CATEGORIES.find((c) => c.id === category)?.icon || '⭐';
+    // Map category to a fallback emoji string for storage/types
+    const getCategoryEmoji = (catId: string) => {
+      switch (catId) {
+        case 'health': return '❤️';
+        case 'fitness': return '💪';
+        case 'productivity': return '✅';
+        case 'mindfulness': return '🧘';
+        case 'learning': return '📚';
+        case 'social': return '👥';
+        case 'finance': return '💰';
+        case 'creativity': return '🎨';
+        default: return '⭐';
+      }
+    };
 
-    // In a real app, save to local storage and/or cloud
     const newHabit = {
       id: Date.now().toString(),
       name: habitName,
-      emoji: categoryIcon,
+      emoji: getCategoryEmoji(category), // Store string for type compatibility
       category,
       color,
       frequency,
@@ -136,17 +125,15 @@ const AddHabitStep3Screen: React.FC = () => {
       createdAt: new Date().toISOString(),
     };
 
-    console.log('Creating habit:', newHabit);
-
     setIsLoading(false);
-
-    // Navigate back to Home with the new habit
     navigation.navigate('HomeMain', { newHabit });
   };
 
-  const getCategoryLabel = () => {
-    return CATEGORIES.find((c) => c.id === category)?.label || 'Other';
+  const getSelectedColorValue = () => {
+    return COLORS.find((c: any) => c.id === color)?.value || theme.colors.primary;
   };
+
+  const activeColor = getSelectedColorValue();
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
@@ -165,157 +152,64 @@ const AddHabitStep3Screen: React.FC = () => {
         >
           {/* Header */}
           <View style={styles.header}>
-            <TouchableOpacity
-              onPress={handleBack}
-              style={styles.backButton}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.backButtonText, { color: theme.colors.primary, fontFamily: theme.typography.fontFamilyBodySemibold }]}>
-                ← Back
-              </Text>
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+              <Text style={[styles.backText, { color: theme.colors.textSecondary }]}>Back</Text>
             </TouchableOpacity>
-          </View>
-
-          {/* Progress Indicator */}
-          <View style={styles.progressContainer}>
-            <View style={styles.progressBar}>
-              <View
-                style={[
-                  styles.progressFill,
-                  {
-                    backgroundColor: theme.colors.primary,
-                    width: '100%',
-                  },
-                ]}
-              />
+            <View style={styles.stepIndicator}>
+              <View style={[styles.stepDot, { backgroundColor: theme.colors.primary }]} />
+              <View style={[styles.stepDot, { backgroundColor: theme.colors.primary }]} />
+              <View style={[styles.stepDot, { backgroundColor: theme.colors.primary }]} />
             </View>
-            <Text
-              style={[
-                styles.stepText,
-                {
-                  color: theme.colors.textSecondary,
-                  fontFamily: theme.typography.fontFamilyBody,
-                  fontSize: theme.typography.fontSizeXS,
-                },
-              ]}
-            >
-              Step 3 of 3
-            </Text>
           </View>
 
           {/* Title */}
-          <Text
-            style={[
-              styles.title,
-              {
-                color: theme.colors.text,
-                fontFamily: theme.typography.fontFamilyDisplayBold,
-                fontSize: theme.typography.fontSize2XL,
-              },
-            ]}
-          >
-            Set Schedule
-          </Text>
-
-          {/* Frequency Section */}
-          <View style={styles.section}>
-            <Text
-              style={[
-                styles.sectionTitle,
-                {
-                  color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplayBold,
-                  fontSize: theme.typography.fontSizeLG,
-                },
-              ]}
-            >
-              How often? 📅
+          <View style={styles.titleContainer}>
+            <Text style={[styles.title, { color: theme.colors.text }]}>
+              The Routine 📅
             </Text>
+            <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
+              Set your schedule for success.
+            </Text>
+          </View>
 
-            <TouchableOpacity
-              style={[
-                styles.radioOption,
-                {
-                  backgroundColor: theme.colors.backgroundSecondary,
-                  borderColor: frequency === 'daily' ? theme.colors.primary : theme.colors.border,
-                  borderWidth: frequency === 'daily' ? 2 : 1,
-                },
-              ]}
-              onPress={() => {
-                setFrequency('daily');
-                setSelectedDays([0, 1, 2, 3, 4, 5, 6]);
-              }}
-              activeOpacity={0.7}
-            >
-              <View style={styles.radioContent}>
-                <View
-                  style={[
-                    styles.radio,
-                    {
-                      borderColor: frequency === 'daily' ? theme.colors.primary : theme.colors.border,
-                    },
-                  ]}
-                >
-                  {frequency === 'daily' && (
-                    <View style={[styles.radioSelected, { backgroundColor: theme.colors.primary }]} />
-                  )}
-                </View>
-                <Text
-                  style={[
-                    styles.radioLabel,
-                    {
-                      color: theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBodyMedium,
-                      fontSize: theme.typography.fontSizeMD,
-                    },
-                  ]}
-                >
-                  Every day
-                </Text>
-              </View>
-            </TouchableOpacity>
+          {/* Frequency */}
+          <View style={styles.section}>
+            <Text style={[styles.sectionLabel, { color: theme.colors.textSecondary }]}>FREQUENCY</Text>
 
-            <TouchableOpacity
-              style={[
-                styles.radioOption,
-                {
-                  backgroundColor: theme.colors.backgroundSecondary,
-                  borderColor: frequency === 'weekly' ? theme.colors.primary : theme.colors.border,
-                  borderWidth: frequency === 'weekly' ? 2 : 1,
-                },
-              ]}
-              onPress={() => setFrequency('weekly')}
-              activeOpacity={0.7}
-            >
-              <View style={styles.radioContent}>
-                <View
-                  style={[
-                    styles.radio,
-                    {
-                      borderColor: frequency === 'weekly' ? theme.colors.primary : theme.colors.border,
-                    },
-                  ]}
-                >
-                  {frequency === 'weekly' && (
-                    <View style={[styles.radioSelected, { backgroundColor: theme.colors.primary }]} />
-                  )}
-                </View>
-                <Text
-                  style={[
-                    styles.radioLabel,
-                    {
-                      color: theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBodyMedium,
-                      fontSize: theme.typography.fontSizeMD,
-                    },
-                  ]}
-                >
-                  Specific days
-                </Text>
-              </View>
-            </TouchableOpacity>
+            <View style={styles.frequencyToggle}>
+              <TouchableOpacity
+                style={[
+                  styles.freqOption,
+                  frequency === 'daily' && { backgroundColor: activeColor }
+                ]}
+                onPress={() => {
+                  setFrequency('daily');
+                  setSelectedDays([0, 1, 2, 3, 4, 5, 6]);
+                  Haptics.selectionAsync();
+                }}
+              >
+                <Text style={[
+                  styles.freqText,
+                  { color: frequency === 'daily' ? '#FFF' : theme.colors.textSecondary }
+                ]}>Every Day</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.freqOption,
+                  frequency === 'weekly' && { backgroundColor: activeColor }
+                ]}
+                onPress={() => {
+                  setFrequency('weekly');
+                  Haptics.selectionAsync();
+                }}
+              >
+                <Text style={[
+                  styles.freqText,
+                  { color: frequency === 'weekly' ? '#FFF' : theme.colors.textSecondary }
+                ]}>Specific Days</Text>
+              </TouchableOpacity>
+            </View>
 
-            {/* Day Picker */}
             {frequency === 'weekly' && (
               <View style={styles.dayPicker}>
                 {DAYS.map((day, index) => (
@@ -324,439 +218,155 @@ const AddHabitStep3Screen: React.FC = () => {
                     style={[
                       styles.dayButton,
                       {
-                        backgroundColor: selectedDays.includes(index)
-                          ? theme.colors.primary
-                          : theme.colors.backgroundSecondary,
-                        borderColor: selectedDays.includes(index)
-                          ? theme.colors.primary
-                          : theme.colors.border,
-                      },
+                        backgroundColor: selectedDays.includes(index) ? activeColor : theme.colors.backgroundSecondary,
+                        borderColor: selectedDays.includes(index) ? activeColor : theme.colors.border
+                      }
                     ]}
                     onPress={() => handleDayToggle(index)}
-                    activeOpacity={0.7}
                   >
-                    <Text
-                      style={[
-                        styles.dayText,
-                        {
-                          color: selectedDays.includes(index)
-                            ? theme.colors.white
-                            : theme.colors.text,
-                          fontFamily: theme.typography.fontFamilyBodySemibold,
-                          fontSize: theme.typography.fontSizeSM,
-                        },
-                      ]}
-                    >
-                      {day}
-                    </Text>
+                    <Text style={[
+                      styles.dayText,
+                      { color: selectedDays.includes(index) ? '#FFF' : theme.colors.text }
+                    ]}>{day}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
             )}
           </View>
 
-          {/* Completion Frequency Section */}
+          {/* Time Period */}
           <View style={styles.section}>
-            <Text
-              style={[
-                styles.sectionTitle,
-                {
-                  color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplayBold,
-                  fontSize: theme.typography.fontSizeLG,
-                },
-              ]}
-            >
-              {habitType === 'positive' ? 'How often per day? 🔄' : 'Daily Limit 🛑'}
-            </Text>
-            <Text
-              style={[
-                styles.sectionSubtitle,
-                {
-                  color: theme.colors.textSecondary,
-                  fontFamily: theme.typography.fontFamilyBody,
-                  fontSize: theme.typography.fontSizeSM,
-                },
-              ]}
-            >
-              {habitType === 'positive'
-                ? 'Choose if this habit needs to be done once or multiple times per day'
-                : 'Set a limit for how many times you want to allow this habit'}
-            </Text>
-
-            {/* Target Count Input - Always visible now */}
-            <View style={styles.targetCountContainer}>
-              <Text
-                style={[
-                  styles.targetCountLabel,
-                  {
-                    color: theme.colors.text,
-                    fontFamily: theme.typography.fontFamilyBody,
-                    fontSize: theme.typography.fontSizeSM,
-                  },
-                ]}
-              >
-                {habitType === 'positive' ? 'How many times per day?' : 'Maximum allowed times:'}
-              </Text>
-              <View style={styles.targetCountInputRow}>
-                <TouchableOpacity
-                  style={[
-                    styles.targetCountButton,
-                    { backgroundColor: theme.colors.backgroundSecondary, borderColor: theme.colors.border },
-                  ]}
-                  onPress={() => setTargetCompletionsPerDay(Math.max(1, targetCompletionsPerDay - 1))}
-                  activeOpacity={0.7}
-                >
-                  <Text style={[styles.targetCountButtonText, { color: theme.colors.text }]}>−</Text>
-                </TouchableOpacity>
-
-                <TextInput
-                  style={[
-                    styles.targetCountInput,
-                    {
-                      backgroundColor: theme.colors.backgroundSecondary,
-                      color: theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyDisplayBold,
-                    },
-                  ]}
-                  value={targetCompletionsPerDay.toString()}
-                  onChangeText={(text) => {
-                    const val = parseInt(text.replace(/[^0-9]/g, ''), 10);
-                    if (!isNaN(val) && val > 0) {
-                      setTargetCompletionsPerDay(val);
-                    } else if (text === '') {
-                      // Allow empty while typing, but handle blur?
-                      // For now just don't update if invalid
-                    }
-                  }}
-                  keyboardType="number-pad"
-                  maxLength={3}
-                />
-
-                <TouchableOpacity
-                  style={[
-                    styles.targetCountButton,
-                    { backgroundColor: theme.colors.backgroundSecondary, borderColor: theme.colors.border },
-                  ]}
-                  onPress={() => setTargetCompletionsPerDay(targetCompletionsPerDay + 1)}
-                  activeOpacity={0.7}
-                >
-                  <Text style={[styles.targetCountButtonText, { color: theme.colors.text }]}>+</Text>
-                </TouchableOpacity>
-              </View>
-              <Text
-                style={[
-                  styles.targetCountHelper,
-                  {
-                    color: theme.colors.textSecondary,
-                    fontFamily: theme.typography.fontFamilyBody,
-                  },
-                ]}
-              >
-                {targetCompletionsPerDay === 1 ? (habitType === 'positive' ? 'Once a day' : 'Limit: 1 time') : (habitType === 'positive' ? `${targetCompletionsPerDay} times a day` : `Limit: ${targetCompletionsPerDay} times`)}
-              </Text>
-            </View>
+            <Text style={[styles.sectionLabel, { color: theme.colors.textSecondary }]}>TIME OF DAY</Text>
+            <TimePeriodSelector
+              selected={timePeriod}
+              onSelect={setTimePeriod}
+              timeRanges={timeRanges}
+            />
           </View>
 
-          {/* Time Period Section */}
-          <TimePeriodSelector
-            selected={timePeriod}
-            onSelect={setTimePeriod}
-            timeRanges={timeRanges}
-          />
-
-          {/* Reminder Section */}
+          {/* Reminders */}
           <View style={styles.section}>
-            <View style={styles.reminderHeader}>
-              <Text
-                style={[
-                  styles.sectionTitle,
-                  {
-                    color: theme.colors.text,
-                    fontFamily: theme.typography.fontFamilyDisplayBold,
-                    fontSize: theme.typography.fontSizeLG,
-                  },
-                ]}
-              >
-                Reminder? ⏰
-              </Text>
+            <TouchableOpacity
+              style={[
+                styles.reminderToggleCard,
+                {
+                  backgroundColor: reminderEnabled ? activeColor + '15' : theme.colors.backgroundSecondary,
+                  borderColor: reminderEnabled ? activeColor : 'transparent',
+                  borderWidth: 1,
+                }
+              ]}
+              onPress={() => {
+                setReminderEnabled(!reminderEnabled);
+                Haptics.selectionAsync();
+              }}
+              activeOpacity={0.8}
+            >
+              <View style={styles.reminderInfo}>
+                <View style={[styles.reminderIcon, { backgroundColor: reminderEnabled ? activeColor : theme.colors.border }]}>
+                  <Clock size={20} color="#FFF" />
+                </View>
+                <View>
+                  <Text style={[styles.reminderTitle, { color: theme.colors.text }]}>Reminders</Text>
+                  <Text style={[styles.reminderSubtitle, { color: theme.colors.textSecondary }]}>
+                    {reminderEnabled ? 'On' : 'Off'}
+                  </Text>
+                </View>
+              </View>
               <Switch
                 value={reminderEnabled}
-                onValueChange={setReminderEnabled}
-                trackColor={{
-                  false: theme.colors.border,
-                  true: theme.colors.primary,
+                onValueChange={(val) => {
+                  setReminderEnabled(val);
+                  Haptics.selectionAsync();
                 }}
-                thumbColor={Platform.OS === 'ios' ? theme.colors.white : theme.colors.white}
+                trackColor={{ false: theme.colors.border, true: activeColor }}
               />
-            </View>
+            </TouchableOpacity>
 
             {reminderEnabled && (
               <TouchableOpacity
-                style={[
-                  styles.reminderTimeContainer,
-                  {
-                    backgroundColor: theme.colors.backgroundSecondary,
-                    borderColor: theme.colors.border,
-                  },
-                ]}
-                onPress={handleTimePickerPress}
-                activeOpacity={0.7}
+                style={[styles.timeCard, { backgroundColor: theme.colors.backgroundSecondary }]}
+                onPress={() => setShowTimePicker(true)}
               >
-                <Text
-                  style={[
-                    styles.reminderLabel,
-                    {
-                      color: theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBody,
-                      fontSize: theme.typography.fontSizeSM,
-                    },
-                  ]}
-                >
-                  Remind me at
-                </Text>
-                <Text
-                  style={[
-                    styles.reminderTimeText,
-                    {
-                      color: theme.colors.primary,
-                      fontFamily: theme.typography.fontFamilyDisplayBold,
-                      fontSize: theme.typography.fontSizeXL,
-                    },
-                  ]}
-                >
+                <Clock size={24} color={activeColor} />
+                <Text style={[styles.timeDisplay, { color: theme.colors.text }]}>
                   {reminderTime}
                 </Text>
-                <Text
-                  style={[
-                    styles.reminderHint,
-                    {
-                      color: theme.colors.textSecondary,
-                      fontFamily: theme.typography.fontFamilyBody,
-                      fontSize: theme.typography.fontSizeXS,
-                    },
-                  ]}
-                >
-                  Tap to change time 🕐
-                </Text>
+                <Text style={[styles.timeHint, { color: theme.colors.textSecondary }]}>Tap to change</Text>
               </TouchableOpacity>
             )}
 
-            {reminderEnabled && showTimePicker && (
-              <View style={styles.timePickerContainer}>
-                {Platform.OS === 'ios' && (
-                  <View style={[styles.iosTimePickerModal, { backgroundColor: theme.colors.backgroundSecondary }]}>
-                    <View style={[styles.iosPickerHeader, { borderBottomColor: theme.colors.border }]}>
-                      <Text style={[styles.iosPickerTitle, { color: theme.colors.text, fontFamily: theme.typography.fontFamilyBodySemibold }]}>
-                        Select Time
-                      </Text>
-                    </View>
-                    <DateTimePicker
-                      value={(() => {
-                        const [hours, minutes] = reminderTime.split(':');
-                        const date = new Date();
-                        date.setHours(parseInt(hours, 10));
-                        date.setMinutes(parseInt(minutes, 10));
-                        return date;
-                      })()}
-                      mode="time"
-                      is24Hour={false}
-                      display="spinner"
-                      onChange={handleTimeChange}
-                      textColor={theme.colors.text}
-                      style={styles.iosTimePicker}
-                    />
-                    <TouchableOpacity
-                      style={[
-                        styles.doneButton,
-                        { backgroundColor: theme.colors.primary }
-                      ]}
-                      onPress={handleTimePickerDismiss}
-                    >
-                      <Text
-                        style={[
-                          styles.doneButtonText,
-                          {
-                            color: theme.colors.white,
-                            fontFamily: theme.typography.fontFamilyBodySemibold,
-                          }
-                        ]}
-                      >
-                        Done
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
-                {Platform.OS === 'android' && (
-                  <DateTimePicker
-                    value={(() => {
-                      const [hours, minutes] = reminderTime.split(':');
-                      const date = new Date();
-                      date.setHours(parseInt(hours, 10));
-                      date.setMinutes(parseInt(minutes, 10));
-                      return date;
-                    })()}
-                    mode="time"
-                    is24Hour={false}
-                    display="default"
-                    onChange={handleTimeChange}
-                  />
-                )}
-              </View>
+            {showTimePicker && (
+              <DateTimePicker
+                value={(() => {
+                  const [h, m] = reminderTime.split(':');
+                  const d = new Date();
+                  d.setHours(parseInt(h));
+                  d.setMinutes(parseInt(m));
+                  return d;
+                })()}
+                mode="time"
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                onChange={handleTimeChange}
+              />
+            )}
+            {Platform.OS === 'ios' && showTimePicker && (
+              <TouchableOpacity
+                style={[styles.doneButton, { backgroundColor: activeColor }]}
+                onPress={() => setShowTimePicker(false)}
+              >
+                <Text style={styles.doneButtonText}>Done</Text>
+              </TouchableOpacity>
             )}
           </View>
 
-          {/* Notes Section */}
+          {/* Notes */}
           <View style={styles.section}>
-            <Text
-              style={[
-                styles.sectionTitle,
-                {
-                  color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplayBold,
-                  fontSize: theme.typography.fontSizeLG,
-                },
-              ]}
-            >
-              Notes 📝
-            </Text>
-            <Text
-              style={[
-                styles.sectionSubtitle,
-                {
-                  color: theme.colors.textSecondary,
-                  fontFamily: theme.typography.fontFamilyBody,
-                  fontSize: theme.typography.fontSizeSM,
-                },
-              ]}
-            >
-              Add motivation or tips for this habit (optional)
-            </Text>
+            <Text style={[styles.sectionLabel, { color: theme.colors.textSecondary }]}>NOTES (OPTIONAL)</Text>
             <TextInput
               style={[
                 styles.notesInput,
                 {
                   backgroundColor: theme.colors.backgroundSecondary,
-                  borderColor: theme.colors.border,
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyBody,
-                  fontSize: theme.typography.fontSizeMD,
-                },
+                  borderColor: theme.colors.border
+                }
               ]}
-              placeholder="e.g., Why this habit matters to me..."
+              placeholder="Why do you want to build this habit?"
               placeholderTextColor={theme.colors.textSecondary}
               value={notes}
               onChangeText={setNotes}
               multiline
-              numberOfLines={3}
               maxLength={200}
-              textAlignVertical="top"
             />
-            <Text
-              style={[
-                styles.characterCount,
-                {
-                  color: theme.colors.textSecondary,
-                  fontFamily: theme.typography.fontFamilyBody,
-                  fontSize: theme.typography.fontSizeXS,
-                },
-              ]}
-            >
-              {notes.length}/200
-            </Text>
           </View>
 
-          {/* Summary Section */}
-          <View style={styles.section}>
-            <Text
-              style={[
-                styles.sectionTitle,
-                {
-                  color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplayBold,
-                  fontSize: theme.typography.fontSizeLG,
-                },
-              ]}
-            >
-              Your habit ✨
-            </Text>
-            <View
-              style={[
-                styles.summaryCard,
-                {
-                  backgroundColor: theme.colors.backgroundSecondary,
-                  borderColor: theme.colors.border,
-                },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.summaryText,
-                  {
-                    color: theme.colors.text,
-                    fontFamily: theme.typography.fontFamilyBody,
-                    fontSize: theme.typography.fontSizeMD,
-                  },
-                ]}
-              >
-                <Text style={{ fontFamily: theme.typography.fontFamilyBodyBold, fontSize: 18 }}>
-                  {habitName}
-                </Text>
-                {'\n\n'}
-                <Text style={{ color: theme.colors.textSecondary }}>
-                  📅 {frequency === 'daily' ? 'Every day' : `${selectedDays.length} days per week`}
-                </Text>
-                {'\n'}
-                {reminderEnabled && (
-                  <Text style={{ color: theme.colors.textSecondary }}>
-                    ⏰ Daily reminder at {reminderTime}
-                  </Text>
-                )}
-                {reminderEnabled && '\n'}
-                <Text style={{ color: theme.colors.textSecondary }}>
-                  🏷️ {getCategoryLabel()}
-                </Text>
-              </Text>
-            </View>
-          </View>
-
-          {/* Create Button */}
-          <TouchableOpacity
-            style={[
-              styles.createButton,
-              {
-                backgroundColor: theme.colors.primary,
-                shadowColor: theme.shadows.shadowMD.shadowColor,
-                shadowOffset: theme.shadows.shadowMD.shadowOffset,
-                shadowOpacity: theme.shadows.shadowMD.shadowOpacity,
-                shadowRadius: theme.shadows.shadowMD.shadowRadius,
-                elevation: theme.shadows.shadowMD.elevation,
-              },
-              isLoading && { opacity: 0.7 },
-            ]}
-            onPress={handleCreateHabit}
-            activeOpacity={0.8}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator color={theme.colors.white} />
-            ) : (
-              <Text
-                style={[
-                  styles.createButtonText,
-                  {
-                    color: theme.colors.white,
-                    fontFamily: theme.typography.fontFamilyBodySemibold,
-                    fontSize: theme.typography.fontSizeMD,
-                  },
-                ]}
-              >
-                Create Habit
-              </Text>
-            )}
-          </TouchableOpacity>
         </Animated.View>
       </ScrollView>
+
+      {/* Footer */}
+      <View style={[styles.footer, { backgroundColor: theme.colors.background }]}>
+        <TouchableOpacity
+          style={[
+            styles.createButton,
+            {
+              backgroundColor: activeColor,
+              shadowColor: activeColor,
+            },
+            isLoading && { opacity: 0.7 }
+          ]}
+          onPress={handleCreateHabit}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <ActivityIndicator color="#FFF" />
+          ) : (
+            <>
+              <Text style={styles.createButtonText}>Start Habit</Text>
+              <Check color="#FFF" size={24} strokeWidth={3} />
+            </>
+          )}
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };
@@ -767,203 +377,135 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
+    paddingBottom: 40, // Reduced from 100
   },
   content: {
-    paddingHorizontal: 24,
-    paddingTop: 60,
-    paddingBottom: 40,
+    padding: 24,
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
-    marginBottom: 24,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 32,
   },
   backButton: {
-    paddingVertical: 8,
+    padding: 8,
   },
-  backButtonText: {
+  backText: {
     fontSize: 16,
+    fontWeight: '500',
   },
-  progressContainer: {
+  stepIndicator: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  stepDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  titleContainer: {
     marginBottom: 32,
-  },
-  progressBar: {
-    height: 4,
-    backgroundColor: '#E5E7EB',
-    borderRadius: 2,
-    marginBottom: 8,
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: 2,
-  },
-  stepText: {
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
   },
   title: {
-    marginBottom: 32,
+    fontSize: 32,
+    fontWeight: '800',
+    marginBottom: 8,
+    letterSpacing: -0.5,
+  },
+  subtitle: {
+    fontSize: 16,
   },
   section: {
-    marginBottom: 36,
+    marginBottom: 32,
   },
   sectionLabel: {
-    marginBottom: 12,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 1,
+    marginBottom: 16,
+    opacity: 0.7,
   },
-  sectionTitle: {
+  frequencyToggle: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(0,0,0,0.05)',
+    borderRadius: 16,
+    padding: 4,
     marginBottom: 16,
   },
-  sectionSubtitle: {
-    marginBottom: 12,
-  },
-  notesInput: {
-    borderRadius: 12,
-    borderWidth: 1,
-    padding: 16,
-    minHeight: 80,
-    marginTop: 8,
-  },
-  characterCount: {
-    textAlign: 'right',
-    marginTop: 6,
-  },
-  radioOption: {
-    borderRadius: 16,
-    padding: 18,
-    marginBottom: 12,
-  },
-  radioContent: {
-    flexDirection: 'row',
+  freqOption: {
+    flex: 1,
+    paddingVertical: 12,
     alignItems: 'center',
-  },
-  radio: {
-    width: 24,
-    height: 24,
     borderRadius: 12,
-    borderWidth: 2,
-    marginRight: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
-  radioSelected: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-  },
-  radioLabel: {
-    // styles from theme
+  freqText: {
+    fontWeight: '600',
   },
   dayPicker: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 16,
   },
   dayButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    borderWidth: 2,
-    alignItems: 'center',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
   },
   dayText: {
-    // styles from theme
+    fontWeight: '600',
   },
-  reminderHeader: {
+  reminderToggleCard: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  reminderTimeContainer: {
-    borderRadius: 16,
-    borderWidth: 1,
-    padding: 20,
-    marginTop: 16,
-    alignItems: 'center',
-  },
-  reminderLabel: {
-    marginBottom: 8,
-  },
-  reminderTimeText: {
-    marginBottom: 8,
-  },
-  reminderHint: {
-    textAlign: 'center',
-  },
-  timePickerContainer: {
-    marginTop: 16,
-    alignItems: 'center',
-  },
-  iosTimePickerModal: {
-    borderRadius: 16,
-    padding: 20,
-    marginTop: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  iosPickerHeader: {
-    paddingBottom: 16,
-    borderBottomWidth: 1,
-    marginBottom: 16,
-    alignItems: 'center',
-  },
-  iosPickerTitle: {
-    fontSize: 18,
-  },
-  iosTimePicker: {
-    height: 180,
-    marginVertical: 8,
-  },
-  doneButton: {
-    width: '100%',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 16,
-  },
-  doneButtonText: {
-    fontSize: 16,
-  },
-  frequencyTypeContainer: {
-    marginTop: 16,
-  },
-  targetCountContainer: {
-    marginTop: 16,
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 20,
+    marginBottom: 16,
   },
-  targetCountLabel: {
-    marginBottom: 12,
-  },
-  targetCountInputRow: {
+  reminderInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
     gap: 12,
   },
-  targetCountButton: {
-    width: 48,
-    height: 48,
+  reminderIcon: {
+    width: 40,
+    height: 40,
     borderRadius: 12,
-    borderWidth: 1,
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
   },
-  targetCountButtonText: {
-    fontSize: 24,
-    fontWeight: 'bold',
+  reminderTitle: {
+    fontSize: 16,
+    fontWeight: '600',
   },
-  targetCountInput: {
-    width: 80,
-    height: 60,
+  reminderSubtitle: {
+    fontSize: 13,
+  },
+  timeCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
+    borderRadius: 20,
+    gap: 16,
+  },
+  timeDisplay: {
+    fontSize: 32,
+    fontWeight: '700',
+    flex: 1,
+  },
+  timeHint: {
+    fontSize: 12,
+  },
+  doneButton: {
+    marginTop: 16,
+    padding: 12,
     borderRadius: 12,
-    borderWidth: 2,
+    alignItems: 'center',
+  },
+  doneButtonText: {
     textAlign: 'center',
     fontSize: 28,
   },
@@ -975,6 +517,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     textAlign: 'center',
     fontSize: 14,
+    color: '#888',
   },
   summaryCard: {
     borderRadius: 16,
@@ -992,9 +535,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 24,
+    flexDirection: 'row', // Ensure row layout
+    gap: 12, // Add gap between text and icon
   },
   createButtonText: {
-    // styles from theme
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  notesInput: {
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    minHeight: 100,
+    textAlignVertical: 'top',
+  },
+  footer: {
+    padding: 24,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.05)',
   },
 });
 

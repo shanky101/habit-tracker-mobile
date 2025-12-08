@@ -34,11 +34,11 @@ export const getTimePeriodIcon = (period: HabitTimePeriod): string => {
  */
 export const getTimePeriodColor = (period: HabitTimePeriod): string => {
     const colors: Record<HabitTimePeriod, string> = {
-        morning: '#F59E0B', // Amber
-        afternoon: '#FB923C', // Orange
-        evening: '#8B5CF6', // Purple
-        night: '#6366F1', // Indigo
-        allday: '#FBBF24', // Bright Amber/Gold
+        morning: '#FDE047', // Pastel Yellow
+        afternoon: '#F59E0B', // Darker Yellow/Gold
+        evening: '#FB923C', // Pastel Orange
+        night: '#312E81', // Charcoal/Dark Blue
+        allday: '#9CA3AF', // Neutral/Gray
     };
     return colors[period];
 };

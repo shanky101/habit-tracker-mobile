@@ -1,12 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { useTheme } from '@/theme';
+import { View, StyleSheet, FlatList } from 'react-native';
 import { Habit } from '@/hooks/useHabits';
-import SwipeableHabitCard from './SwipeableHabitCard';
+import PremiumHabitCard from './PremiumHabitCard';
+import { useTheme } from '@/theme';
 
 interface DraggableHabitListProps {
   habits: Habit[];
-  selectedDate: string; // ISO date string (YYYY-MM-DD)
+  selectedDate: string;
   onToggle: (id: string) => void;
   onPress: (habit: Habit) => void;
   onEdit: (habit: Habit) => void;
@@ -15,7 +15,7 @@ interface DraggableHabitListProps {
   onReorder: (fromIndex: number, toIndex: number) => void;
 }
 
-const DraggableHabitList: React.FC<DraggableHabitListProps> = ({
+export const DraggableHabitList: React.FC<DraggableHabitListProps> = ({
   habits,
   selectedDate,
   onToggle,
@@ -23,25 +23,15 @@ const DraggableHabitList: React.FC<DraggableHabitListProps> = ({
   onEdit,
   onArchive,
   onDelete,
+  onReorder,
 }) => {
   const { theme } = useTheme();
 
-  if (habits.length === 0) {
+  const renderItem = ({ item }: { item: Habit }) => {
     return (
-      <View style={styles.emptyContainer}>
-        <Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>
-          No habits yet. Add your first habit!
-        </Text>
-      </View>
-    );
-  }
-
-  return (
-    <View style={styles.container}>
-      {habits.map((habit) => (
-        <SwipeableHabitCard
-          key={habit.id}
-          habit={habit}
+      <View style={styles.itemContainer}>
+        <PremiumHabitCard
+          habit={item}
           selectedDate={selectedDate}
           onToggle={onToggle}
           onPress={onPress}
@@ -49,21 +39,26 @@ const DraggableHabitList: React.FC<DraggableHabitListProps> = ({
           onArchive={onArchive}
           onDelete={onDelete}
         />
-      ))}
+      </View>
+    );
+  };
+
+  return (
+    <View style={{ flex: 1 }}>
+      <FlatList
+        data={habits}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        contentContainerStyle={{ paddingBottom: 20 }}
+        scrollEnabled={false}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    paddingVertical: 4,
-  },
-  emptyContainer: {
-    paddingVertical: 40,
-    alignItems: 'center',
-  },
-  emptyText: {
-    fontSize: 14,
+  itemContainer: {
+    marginBottom: 4,
   },
 });
 

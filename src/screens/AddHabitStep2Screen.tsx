@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,38 +6,23 @@ import {
   TouchableOpacity,
   Animated,
   ScrollView,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
+import { ArrowRight, Check, Heart, Dumbbell, Briefcase, Brain, BookOpen, Users, Wallet, Palette, Star, Music, Coffee, Sun, Moon, Zap } from 'lucide-react-native';
 
 type AddHabitStep2ScreenNavigationProp = StackNavigationProp<any, 'AddHabitStep2'>;
 type AddHabitStep2ScreenRouteProp = RouteProp<{ AddHabitStep2: { habitName: string; habitType: 'positive' | 'negative' } }, 'AddHabitStep2'>;
 
-export const CATEGORIES = [
-  { id: 'health', label: 'Health', icon: '❤️', gradient: ['#FF6B6B', '#EE5A6F'] },
-  { id: 'fitness', label: 'Fitness', icon: '💪', gradient: ['#4ECDC4', '#44A08D'] },
-  { id: 'productivity', label: 'Productivity', icon: '✅', gradient: ['#A8E6CF', '#3DDC97'] },
-  { id: 'mindfulness', label: 'Mindfulness', icon: '🧘', gradient: ['#B4A7D6', '#8E7CC3'] },
-  { id: 'learning', label: 'Learning', icon: '📚', gradient: ['#FFD93D', '#F6C23E'] },
-  { id: 'social', label: 'Social', icon: '👥', gradient: ['#95E1D3', '#38E4AE'] },
-  { id: 'finance', label: 'Finance', icon: '💰', gradient: ['#F38181', '#AA4465'] },
-  { id: 'creativity', label: 'Creativity', icon: '🎨', gradient: ['#FDA7DF', '#B565D8'] },
-  { id: 'other', label: 'Other', icon: '⭐', gradient: ['#FEC8D8', '#957DAD'] },
-];
+import { CATEGORIES, COLORS } from '@/data/habitOptions';
 
-export const COLORS = [
-  { id: 'red', value: '#EF4444', name: 'Red' },
-  { id: 'orange', value: '#F97316', name: 'Orange' },
-  { id: 'yellow', value: '#EAB308', name: 'Yellow' },
-  { id: 'green', value: '#22C55E', name: 'Green' },
-  { id: 'teal', value: '#14B8A6', name: 'Teal' },
-  { id: 'blue', value: '#3B82F6', name: 'Blue' },
-  { id: 'indigo', value: '#6366F1', name: 'Indigo' },
-  { id: 'purple', value: '#A855F7', name: 'Purple' },
-];
+const { width } = Dimensions.get('window');
 
 const AddHabitStep2Screen: React.FC = () => {
   const navigation = useNavigation<AddHabitStep2ScreenNavigationProp>();
@@ -46,38 +31,40 @@ const AddHabitStep2Screen: React.FC = () => {
 
   const { habitName, habitType } = route.params;
 
-  const [selectedCategory, setSelectedCategory] = useState('other');
+  const [selectedCategory, setSelectedCategory] = useState('health');
   const [selectedColor, setSelectedColor] = useState('blue');
 
-  // Use custom animation hook
+  // Animations
   const { fadeAnim, slideAnim } = useScreenAnimation();
-  const scrollViewRef = useRef<ScrollView>(null);
+  const bgAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    // Animate background color change
+    Animated.timing(bgAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: false, // Color interpolation doesn't support native driver
+    }).start(() => {
+      bgAnim.setValue(0);
+    });
+  }, [selectedColor]);
 
   const handleCategorySelect = (categoryId: string) => {
-    setSelectedCategory(categoryId);
-
-    // Auto-scroll to color section after a short delay
-    setTimeout(() => {
-      scrollViewRef.current?.scrollTo({
-        y: 400,
-        animated: true,
-      });
-    }, 300);
+    if (selectedCategory !== categoryId) {
+      Haptics.selectionAsync();
+      setSelectedCategory(categoryId);
+    }
   };
 
   const handleColorSelect = (colorId: string) => {
-    setSelectedColor(colorId);
-
-    // Auto-scroll to preview section
-    setTimeout(() => {
-      scrollViewRef.current?.scrollTo({
-        y: 650,
-        animated: true,
-      });
-    }, 300);
+    if (selectedColor !== colorId) {
+      Haptics.selectionAsync();
+      setSelectedColor(colorId);
+    }
   };
 
   const handleNext = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     navigation.navigate('AddHabitStep3', {
       habitName,
       habitType,
@@ -86,22 +73,20 @@ const AddHabitStep2Screen: React.FC = () => {
     });
   };
 
-  const handleBack = () => {
-    navigation.goBack();
+  const getSelectedColorValue = () => {
+    return COLORS.find((c) => c.id === selectedColor)?.value || '#EF4444';
   };
 
-  const getSelectedColor = () => {
-    return COLORS.find((c) => c.id === selectedColor)?.value || '#3B82F6';
-  };
-
-  const getSelectedCategoryIcon = () => {
-    return CATEGORIES.find((c) => c.id === selectedCategory)?.icon || '⭐';
+  const getBackgroundColor = () => {
+    // Create a subtle version of the selected color for the background
+    return getSelectedColorValue() + '10'; // 10% opacity
   };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: getBackgroundColor(), opacity: 1 }]} />
+
       <ScrollView
-        ref={scrollViewRef}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
@@ -116,72 +101,29 @@ const AddHabitStep2Screen: React.FC = () => {
         >
           {/* Header */}
           <View style={styles.header}>
-            <TouchableOpacity
-              onPress={handleBack}
-              style={styles.backButton}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.backButtonText, { color: theme.colors.primary, fontFamily: theme.typography.fontFamilyBodySemibold }]}>
-                ← Back
-              </Text>
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+              <Text style={[styles.backText, { color: theme.colors.textSecondary }]}>Back</Text>
             </TouchableOpacity>
-          </View>
-
-          {/* Progress Indicator */}
-          <View style={styles.progressContainer}>
-            <View style={styles.progressBar}>
-              <View
-                style={[
-                  styles.progressFill,
-                  {
-                    backgroundColor: theme.colors.primary,
-                    width: '66%',
-                  },
-                ]}
-              />
+            <View style={styles.stepIndicator}>
+              <View style={[styles.stepDot, { backgroundColor: theme.colors.primary }]} />
+              <View style={[styles.stepDot, { backgroundColor: theme.colors.primary }]} />
+              <View style={[styles.stepDot, { backgroundColor: theme.colors.border }]} />
             </View>
-            <Text
-              style={[
-                styles.stepText,
-                {
-                  color: theme.colors.textSecondary,
-                  fontFamily: theme.typography.fontFamilyBody,
-                  fontSize: theme.typography.fontSizeXS,
-                },
-              ]}
-            >
-              Step 2 of 3
-            </Text>
           </View>
 
           {/* Title */}
-          <Text
-            style={[
-              styles.title,
-              {
-                color: theme.colors.text,
-                fontFamily: theme.typography.fontFamilyDisplayBold,
-                fontSize: theme.typography.fontSize2XL,
-              },
-            ]}
-          >
-            Personalize
-          </Text>
-
-          {/* Category Selection */}
-          <View style={styles.section}>
-            <Text
-              style={[
-                styles.sectionTitle,
-                {
-                  color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplayBold,
-                  fontSize: theme.typography.fontSizeLG,
-                },
-              ]}
-            >
-              Pick a vibe ✨
+          <View style={styles.titleContainer}>
+            <Text style={[styles.title, { color: theme.colors.text }]}>
+              The Vibe 🎨
             </Text>
+            <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
+              Make "{habitName}" look good.
+            </Text>
+          </View>
+
+          {/* Category Grid */}
+          <View style={styles.section}>
+            <Text style={[styles.sectionLabel, { color: theme.colors.textSecondary }]}>CATEGORY</Text>
             <View style={styles.categoryGrid}>
               {CATEGORIES.map((category) => {
                 const isSelected = selectedCategory === category.id;
@@ -190,33 +132,28 @@ const AddHabitStep2Screen: React.FC = () => {
                     key={category.id}
                     style={[
                       styles.categoryCard,
+                      isSelected && styles.selectedCategoryCard,
                       {
-                        backgroundColor: isSelected ? category.gradient[0] + '30' : theme.colors.backgroundSecondary,
-                        borderColor: isSelected ? category.gradient[0] : theme.colors.border,
-                        borderWidth: isSelected ? 2.5 : 1,
-                      },
+                        backgroundColor: isSelected ? theme.colors.surface : 'rgba(255,255,255,0.5)',
+                        borderColor: isSelected ? getSelectedColorValue() : 'transparent'
+                      }
                     ]}
                     onPress={() => handleCategorySelect(category.id)}
-                    activeOpacity={0.7}
+                    activeOpacity={0.8}
                   >
-                    <View style={styles.categoryContent}>
-                      <Text style={styles.categoryIcon}>{category.icon}</Text>
-                      <Text
-                        style={[
-                          styles.categoryLabel,
-                          {
-                            color: theme.colors.text,
-                            fontSize: theme.typography.fontSizeXS,
-                            fontFamily: isSelected ? theme.typography.fontFamilyBodyBold : theme.typography.fontFamilyBodyMedium,
-                          },
-                        ]}
-                      >
-                        {category.label}
-                      </Text>
-                    </View>
+                    <category.icon size={32} color={isSelected ? getSelectedColorValue() : theme.colors.textSecondary} strokeWidth={1.5} style={{ marginBottom: 8 }} />
+                    <Text style={[
+                      styles.categoryLabel,
+                      {
+                        color: isSelected ? theme.colors.text : theme.colors.textSecondary,
+                        fontWeight: isSelected ? '700' : '500'
+                      }
+                    ]}>
+                      {category.label}
+                    </Text>
                     {isSelected && (
-                      <View style={[styles.selectedBadge, { backgroundColor: category.gradient[0] }]}>
-                        <Text style={styles.selectedBadgeText}>✓</Text>
+                      <View style={[styles.checkBadge, { backgroundColor: getSelectedColorValue() }]}>
+                        <Check size={10} color="#FFF" strokeWidth={4} />
                       </View>
                     )}
                   </TouchableOpacity>
@@ -227,157 +164,76 @@ const AddHabitStep2Screen: React.FC = () => {
 
           {/* Color Picker */}
           <View style={styles.section}>
-            <Text
-              style={[
-                styles.sectionTitle,
-                {
-                  color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplayBold,
-                  fontSize: theme.typography.fontSizeLG,
-                },
-              ]}
-            >
-              Choose your color 🎨
-            </Text>
-            <View style={styles.colorPalette}>
+            <Text style={[styles.sectionLabel, { color: theme.colors.textSecondary }]}>COLOR THEME</Text>
+            <View style={styles.colorGrid}>
               {COLORS.map((color) => {
                 const isSelected = selectedColor === color.id;
                 return (
                   <TouchableOpacity
                     key={color.id}
-                    style={styles.colorOption}
+                    style={[
+                      styles.colorOption,
+                      isSelected && { transform: [{ scale: 1.1 }] }
+                    ]}
                     onPress={() => handleColorSelect(color.id)}
-                    activeOpacity={0.7}
                   >
-                    <View
-                      style={[
-                        styles.colorSwatch,
-                        {
-                          backgroundColor: color.value,
-                          transform: [{ scale: isSelected ? 1.1 : 1 }],
-                          borderWidth: isSelected ? 3 : 0,
-                          borderColor: theme.colors.background,
-                        },
-                      ]}
-                    >
-                      {isSelected && <Text style={styles.colorCheck}>✓</Text>}
+                    <View style={[styles.colorCircle, { backgroundColor: color.value }]}>
+                      {isSelected && <Check size={16} color="#FFF" strokeWidth={3} />}
                     </View>
-                    <Text
-                      style={[
-                        styles.colorName,
-                        {
-                          color: isSelected ? theme.colors.text : theme.colors.textSecondary,
-                          fontSize: theme.typography.fontSizeXS,
-                          fontFamily: isSelected ? theme.typography.fontFamilyBodyBold : theme.typography.fontFamilyBodyMedium,
-                        },
-                      ]}
-                    >
-                      {color.name}
-                    </Text>
                   </TouchableOpacity>
                 );
               })}
             </View>
           </View>
 
-          {/* Preview */}
-          <View style={styles.previewSection}>
-            <Text
-              style={[
-                styles.sectionTitle,
-                {
-                  color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplayBold,
-                  fontSize: theme.typography.fontSizeLG,
-                },
-              ]}
-            >
-              How it looks 👀
-            </Text>
-            <View
-              style={[
-                styles.previewCard,
-                {
-                  backgroundColor: theme.colors.backgroundSecondary,
-                  borderColor: theme.colors.border,
-                  borderLeftColor: getSelectedColor(),
-                },
-              ]}
-            >
-              <View style={styles.previewContent}>
-                <Text style={styles.previewIcon}>{getSelectedCategoryIcon()}</Text>
-                <View style={styles.previewDetails}>
-                  <Text
-                    style={[
-                      styles.previewName,
-                      {
-                        color: theme.colors.text,
-                        fontFamily: theme.typography.fontFamilyBodySemibold,
-                        fontSize: theme.typography.fontSizeLG,
-                      },
-                    ]}
-                  >
-                    {habitName}
+          {/* Preview Card */}
+          <View style={styles.section}>
+            <Text style={[styles.sectionLabel, { color: theme.colors.textSecondary }]}>PREVIEW</Text>
+            <View style={[styles.previewCard, { shadowColor: getSelectedColorValue() }]}>
+              <LinearGradient
+                colors={[getSelectedColorValue() + '15', getSelectedColorValue() + '05']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={[styles.previewGradient, { borderColor: getSelectedColorValue() }]}
+              >
+                <View style={[styles.previewIconContainer, { backgroundColor: getSelectedColorValue() + '20' }]}>
+                  <Text style={styles.previewIcon}>
+                    {(() => {
+                      const CatIcon = CATEGORIES.find(c => c.id === selectedCategory)?.icon || Star;
+                      return <CatIcon size={24} color={theme.colors.text} />;
+                    })()}
                   </Text>
-                  <View style={styles.previewMeta}>
-                    <View
-                      style={[
-                        styles.categoryBadge,
-                        {
-                          backgroundColor: `${getSelectedColor()}20`,
-                        },
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.categoryBadgeText,
-                          {
-                            color: getSelectedColor(),
-                            fontFamily: theme.typography.fontFamilyBodySemibold,
-                            fontSize: theme.typography.fontSizeXS,
-                          },
-                        ]}
-                      >
-                        {CATEGORIES.find((c) => c.id === selectedCategory)?.label}
-                      </Text>
-                    </View>
-                  </View>
                 </View>
-              </View>
+                <View style={styles.previewTextContainer}>
+                  <Text style={[styles.previewTitle, { color: theme.colors.text }]}>{habitName}</Text>
+                  <Text style={[styles.previewSubtitle, { color: theme.colors.textSecondary }]}>
+                    0 streak • 0/1 today
+                  </Text>
+                </View>
+                <View style={[styles.previewCheck, { borderColor: theme.colors.border }]} />
+              </LinearGradient>
             </View>
           </View>
 
-          {/* Next Button */}
-          <TouchableOpacity
-            style={[
-              styles.nextButton,
-              {
-                backgroundColor: theme.colors.primary,
-                shadowColor: theme.shadows.shadowMD.shadowColor,
-                shadowOffset: theme.shadows.shadowMD.shadowOffset,
-                shadowOpacity: theme.shadows.shadowMD.shadowOpacity,
-                shadowRadius: theme.shadows.shadowMD.shadowRadius,
-                elevation: theme.shadows.shadowMD.elevation,
-              },
-            ]}
-            onPress={handleNext}
-            activeOpacity={0.8}
-          >
-            <Text
-              style={[
-                styles.nextButtonText,
-                {
-                  color: theme.colors.white,
-                  fontFamily: theme.typography.fontFamilyBodySemibold,
-                  fontSize: theme.typography.fontSizeMD,
-                },
-              ]}
-            >
-              Next
-            </Text>
-          </TouchableOpacity>
         </Animated.View>
       </ScrollView>
+
+      {/* Footer */}
+      <View style={[styles.footer, { backgroundColor: theme.colors.background }]}>
+        <TouchableOpacity
+          style={[
+            styles.nextButton,
+            {
+              backgroundColor: getSelectedColorValue(),
+              shadowColor: getSelectedColorValue(),
+            }
+          ]}
+          onPress={handleNext}
+        >
+          <Text style={styles.nextButtonText}>Continue</Text>
+          <ArrowRight color="#FFF" size={20} />
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };
@@ -388,162 +244,176 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
+    paddingBottom: 40, // Reduced from 100
   },
   content: {
-    paddingHorizontal: 24,
-    paddingTop: 20,
-    paddingBottom: 40,
+    padding: 24,
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
-    marginBottom: 24,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 32,
   },
   backButton: {
-    paddingVertical: 8,
+    padding: 8,
   },
-  backButtonText: {
+  backText: {
     fontSize: 16,
+    fontWeight: '500',
   },
-  progressContainer: {
+  stepIndicator: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  stepDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  titleContainer: {
     marginBottom: 32,
-  },
-  progressBar: {
-    height: 4,
-    backgroundColor: '#E5E7EB',
-    borderRadius: 2,
-    marginBottom: 8,
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: 2,
-  },
-  stepText: {
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
   },
   title: {
-    marginBottom: 32,
+    fontSize: 32,
+    fontWeight: '800',
+    marginBottom: 8,
+    letterSpacing: -0.5,
+  },
+  subtitle: {
+    fontSize: 16,
   },
   section: {
-    marginBottom: 36,
+    marginBottom: 32,
   },
-  sectionTitle: {
+  sectionLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 1,
     marginBottom: 16,
+    opacity: 0.7,
   },
   categoryGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginHorizontal: -5,
+    gap: 12,
   },
   categoryCard: {
-    width: '31%',
-    margin: 5,
-    borderRadius: 16,
-    padding: 12,
-    minHeight: 90,
-    position: 'relative',
-  },
-  categoryContent: {
-    alignItems: 'center',
+    width: (width - 48 - 24) / 3, // 3 columns
+    aspectRatio: 1,
+    borderRadius: 20,
     justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  selectedCategoryCard: {
+    backgroundColor: '#FFF',
   },
   categoryIcon: {
-    fontSize: 36,
-    marginBottom: 6,
-  },
-  categoryLabel: {
-    textAlign: 'center',
-    fontSize: 11,
-  },
-  selectedBadge: {
-    position: 'absolute',
-    top: 4,
-    right: 4,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  selectedBadgeText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-  },
-  colorPalette: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  colorOption: {
-    width: '23%',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  colorSwatch: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 6,
-  },
-  colorCheck: {
-    color: '#FFFFFF',
-    fontSize: 20,
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
-  colorName: {
-    textAlign: 'center',
-  },
-  previewSection: {
-    marginBottom: 32,
-  },
-  previewCard: {
-    borderRadius: 16,
-    borderWidth: 1,
-    borderLeftWidth: 5,
-    padding: 18,
-  },
-  previewContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  previewIcon: {
-    fontSize: 40,
-    marginRight: 16,
-  },
-  previewDetails: {
-    flex: 1,
-  },
-  previewName: {
+    fontSize: 32,
     marginBottom: 8,
   },
-  previewMeta: {
+  categoryLabel: {
+    fontSize: 12,
+  },
+  checkBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  colorGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 16,
+    justifyContent: 'center',
+  },
+  colorOption: {
+    padding: 4,
+  },
+  colorCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  previewCard: {
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 8,
+    borderRadius: 24,
+    backgroundColor: '#FFF',
+  },
+  previewGradient: {
     flexDirection: 'row',
     alignItems: 'center',
+    padding: 16,
+    borderRadius: 24,
+    borderWidth: 1.5,
   },
-  categoryBadge: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 14,
+  previewIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
   },
-  categoryBadgeText: {
-    // fontFamily from theme
+  previewIcon: {
+    fontSize: 24,
+  },
+  previewTextContainer: {
+    flex: 1,
+  },
+  previewTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  previewSubtitle: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  previewCheck: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 2,
+    opacity: 0.3,
+  },
+  footer: {
+    padding: 24,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.05)',
   },
   nextButton: {
-    width: '100%',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 16,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 24,
+    paddingVertical: 18,
+    borderRadius: 20,
+    gap: 8,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   nextButtonText: {
-    // styles from theme
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: '700',
   },
 });
 
