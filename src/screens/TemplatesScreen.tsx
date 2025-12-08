@@ -347,18 +347,11 @@ const TemplatesScreen: React.FC = () => {
   const filteredTemplates = getFilteredTemplates();
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      {/* Header */}
-      <Animated.View
-        style={[
-          styles.header,
-          {
-            borderBottomColor: theme.colors.border,
-            opacity: fadeAnim,
-            transform: [{ translateY: slideAnim }],
-          },
-        ]}
-      >
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      edges={['top', 'left', 'right']}
+    >
+      <View style={styles.header}>
         <Text
           style={[
             styles.headerTitle,
@@ -397,7 +390,7 @@ const TemplatesScreen: React.FC = () => {
             <Text style={[styles.headerButtonText, { color: theme.colors.white }]}>Create</Text>
           </TouchableOpacity>
         </View>
-      </Animated.View>
+      </View>
 
       {/* Search */}
       <View style={styles.searchContainer}>

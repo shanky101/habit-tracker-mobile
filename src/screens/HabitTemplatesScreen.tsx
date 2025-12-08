@@ -297,6 +297,7 @@ const HabitTemplatesScreen: React.FC = () => {
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: theme.colors.background }]}
+      edges={['top', 'left', 'right']}
     >
       {/* Header */}
       <View
@@ -415,7 +416,7 @@ const HabitTemplatesScreen: React.FC = () => {
       {/* Templates Grid */}
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 }]}
         showsVerticalScrollIndicator={false}
       >
         {filteredTemplates.length > 0 ? (

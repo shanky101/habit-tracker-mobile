@@ -7,6 +7,7 @@ import {
   ScrollView,
   Animated,
   Dimensions,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -42,6 +43,15 @@ const AnalyticsDashboardScreen: React.FC = () => {
   const { fadeAnim, slideAnim } = useScreenAnimation();
 
   const [selectedRange, setSelectedRange] = useState<'7 days' | '30 days' | '90 days' | 'All time'>('30 days');
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    // Simulate refresh or refetch data if needed
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
   // Filter out archived habits
   const activeHabits = habits.filter(h => !h.archived);
@@ -306,84 +316,95 @@ const AnalyticsDashboardScreen: React.FC = () => {
   if (!isPremium) {
     // Premium Gate Screen
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-        <View style={styles.premiumGate}>
-          <View style={styles.blurOverlay}>
-            <View style={styles.lockIconContainer}>
-              <Lock size={64} color={theme.colors.primary} strokeWidth={2} />
-            </View>
-            <Text
-              style={[
-                styles.gateTitle,
-                {
-                  color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplayBold,
-                  fontSize: theme.typography.fontSize2XL,
-                },
-              ]}
-            >
-              Unlock Analytics with Premium
-            </Text>
-            <View style={styles.featureList}>
-              {['Advanced statistics', 'AI-powered insights', 'Habit correlations', 'Export reports'].map(
-                (feature, index) => (
-                  <View key={index} style={styles.featureItem}>
-                    <Check size={18} color="#22C55E" strokeWidth={2.5} />
-                    <Text
-                      style={[
-                        styles.featureText,
-                        {
-                          color: theme.colors.textSecondary,
-                          fontFamily: theme.typography.fontFamilyBody,
-                          fontSize: theme.typography.fontSizeMD,
-                        },
-                      ]}
-                    >
-                      {feature}
-                    </Text>
-                  </View>
-                )
-              )}
-            </View>
-            <TouchableOpacity
-              style={[styles.upgradeButton, { backgroundColor: theme.colors.primary }]}
-              onPress={() => navigation.navigate('Subscription')}
-              activeOpacity={0.8}
-            >
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: theme.colors.background }]}
+        edges={['top', 'left', 'right']}
+      >
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 }]}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          <View style={styles.premiumGate}>
+            <View style={styles.blurOverlay}>
+              <View style={styles.lockIconContainer}>
+                <Lock size={64} color={theme.colors.primary} strokeWidth={2} />
+              </View>
               <Text
                 style={[
-                  styles.upgradeButtonText,
+                  styles.gateTitle,
                   {
-                    color: theme.colors.white,
-                    fontFamily: theme.typography.fontFamilyBodySemibold,
-                    fontSize: theme.typography.fontSizeMD,
+                    color: theme.colors.text,
+                    fontFamily: theme.typography.fontFamilyDisplayBold,
+                    fontSize: theme.typography.fontSize2XL,
                   },
                 ]}
               >
-                Upgrade Now
+                Unlock Analytics with Premium
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.gateBackButton}
-              onPress={() => navigation.goBack()}
-              activeOpacity={0.7}
-            >
-              <Text
-                style={[
-                  styles.gateBackButtonText,
-                  {
-                    color: theme.colors.textSecondary,
-                    fontFamily: theme.typography.fontFamilyBody,
-                    fontSize: theme.typography.fontSizeSM,
-                  },
-                ]}
+              <View style={styles.featureList}>
+                {['Advanced statistics', 'AI-powered insights', 'Habit correlations', 'Export reports'].map(
+                  (feature, index) => (
+                    <View key={index} style={styles.featureItem}>
+                      <Check size={18} color="#22C55E" strokeWidth={2.5} />
+                      <Text
+                        style={[
+                          styles.featureText,
+                          {
+                            color: theme.colors.textSecondary,
+                            fontFamily: theme.typography.fontFamilyBody,
+                            fontSize: theme.typography.fontSizeMD,
+                          },
+                        ]}
+                      >
+                        {feature}
+                      </Text>
+                    </View>
+                  )
+                )}
+              </View>
+              <TouchableOpacity
+                style={[styles.upgradeButton, { backgroundColor: theme.colors.primary }]}
+                onPress={() => navigation.navigate('Subscription')}
+                activeOpacity={0.8}
               >
-                Back
-              </Text>
-            </TouchableOpacity>
+                <Text
+                  style={[
+                    styles.upgradeButtonText,
+                    {
+                      color: theme.colors.white,
+                      fontFamily: theme.typography.fontFamilyBodySemibold,
+                      fontSize: theme.typography.fontSizeMD,
+                    },
+                  ]}
+                >
+                  Upgrade Now
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.gateBackButton}
+                onPress={() => navigation.goBack()}
+                activeOpacity={0.7}
+              >
+                <Text
+                  style={[
+                    styles.gateBackButtonText,
+                    {
+                      color: theme.colors.textSecondary,
+                      fontFamily: theme.typography.fontFamilyBody,
+                      fontSize: theme.typography.fontSizeSM,
+                    },
+                  ]}
+                >
+                  Back
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </SafeAreaView>
+        </ScrollView>
+      </SafeAreaView >
     );
   }
 

@@ -324,7 +324,10 @@ const HabitDeepDiveScreen: React.FC = () => {
   const recentNotes = getRecentNotes();
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      edges={['top', 'left', 'right']}
+    >
       {/* Header */}
       <Animated.View
         style={[
@@ -385,7 +388,7 @@ const HabitDeepDiveScreen: React.FC = () => {
 
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 }]}
         showsVerticalScrollIndicator={false}
       >
         {/* Date Range Selector */}
