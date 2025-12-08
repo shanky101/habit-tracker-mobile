@@ -1,6 +1,6 @@
 // Design Tokens for all theme variants
 
-export type ThemeVariant = 'default' | 'dark' | 'zen' | 'neon' | 'retro' | 'minimalist' | 'brutalist';
+export type ThemeVariant = 'default' | 'dark' | 'zen' | 'neon' | 'retro' | 'minimalist' | 'brutalist' | 'retro-pacman';
 
 export interface ColorTokens {
   primary: string;
@@ -401,6 +401,34 @@ const brutalistColors: ColorTokens = {
   black: '#000000',
 };
 
+// 🕹️ RETRO PACMAN THEME - Arcade Nostalgia 🕹️
+const retroPacmanColors: ColorTokens = {
+  primary: '#FFFF00',        // Pacman Yellow
+  primaryDark: '#D4D400',    // Darker Yellow
+  primaryLight: '#FFFF33',   // Lighter Yellow
+  secondary: '#0000FF',      // Ghost Blue (Inky)
+  secondaryLight: '#3333FF',
+  accent1: '#FF0000',        // Ghost Red (Blinky)
+  accent2: '#FFB8FF',        // Ghost Pink (Pinky)
+  accent3: '#FFB852',        // Ghost Orange (Clyde)
+  background: '#000000',     // Deep Black
+  backgroundSecondary: '#121212', // Slightly lighter black
+  surface: '#000000',        // Black surface
+  surfaceSecondary: '#1A1A1A',
+  text: '#FFFF00',           // Yellow text (terminal style)
+  textSecondary: '#CCCCCC',  // Light gray
+  textTertiary: '#888888',
+  success: '#00FF00',        // Arcade Green
+  successLight: '#003300',
+  warning: '#FFB852',        // Orange
+  error: '#FF0000',          // Red
+  errorLight: '#330000',
+  border: '#0000FF',         // Blue borders (maze walls)
+  borderLight: '#0000AA',
+  white: '#FFFFFF',
+  black: '#000000',
+};
+
 // Shadow definitions
 const baseShadows: ShadowTokens = {
   shadowSM: {
@@ -565,6 +593,28 @@ export const themes: Record<ThemeVariant, ThemeTokens> = {
     shadows: brutalistShadows,
     animation: brutalistAnimation,
   },
+  'retro-pacman': {
+    name: 'Retro Pacman',
+    isPremium: true,
+    colors: retroPacmanColors,
+    typography: {
+      ...baseTypography,
+      fontFamilyDisplay: baseTypography.fontFamilyMono,
+      fontFamilyBody: baseTypography.fontFamilyMono,
+    },
+    spacing: baseSpacing,
+    radius: {
+      ...baseRadius,
+      radiusXS: 0,
+      radiusSM: 0,
+      radiusMD: 0,
+      radiusLG: 0,
+      radiusXL: 0,
+      radius2XL: 0,
+    },
+    shadows: baseShadows,
+    animation: baseAnimation,
+  },
 };
 
 // Theme metadata for UI display
@@ -596,6 +646,10 @@ export const themeMetadata: Record<ThemeVariant, { description: string; previewC
   brutalist: {
     description: '🔥 Bold, chunky, playful & funky!',
     previewColors: ['#FF6B35', '#FFD23F', '#00D9FF', '#FF3BD9'],
+  },
+  'retro-pacman': {
+    description: 'Waka waka! Arcade nostalgia.',
+    previewColors: ['#FFFF00', '#000000', '#0000FF', '#FF0000'],
   },
 };
 

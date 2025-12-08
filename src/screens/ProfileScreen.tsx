@@ -324,7 +324,7 @@ const ProfileScreen: React.FC = () => {
             </View>
 
             {/* Level / XP Bar */}
-            <View style={[styles.levelContainer, { backgroundColor: theme.colors.surface }]}>
+            <View style={[styles.levelContainer, { backgroundColor: theme.colors.surface, borderRadius: theme.styles.cardBorderRadius }]}>
               <View style={styles.levelInfo}>
                 <View style={styles.levelBadge}>
                   <Text style={styles.levelText}>LVL {level}</Text>
@@ -349,7 +349,7 @@ const ProfileScreen: React.FC = () => {
 
           {/* Bento Grid Stats */}
           <View style={styles.bentoGrid}>
-            <View style={[styles.bentoCard, styles.bentoCardLarge, { backgroundColor: theme.colors.surface }]}>
+            <View style={[styles.bentoCard, styles.bentoCardLarge, { backgroundColor: theme.colors.surface, borderRadius: theme.styles.cardBorderRadius }]}>
               <View style={[styles.iconCircle, { backgroundColor: theme.colors.primary + '15' }]}>
                 <Flame size={24} color={theme.colors.primary} fill={theme.colors.primary} />
               </View>
@@ -360,12 +360,12 @@ const ProfileScreen: React.FC = () => {
             </View>
 
             <View style={styles.bentoColumn}>
-              <View style={[styles.bentoCard, styles.bentoCardSmall, { backgroundColor: theme.colors.surface }]}>
+              <View style={[styles.bentoCard, styles.bentoCardSmall, { backgroundColor: theme.colors.surface, borderRadius: theme.styles.cardBorderRadius }]}>
                 <Check size={20} color={theme.colors.success} style={{ marginBottom: 8 }} />
                 <Text style={[styles.bentoValueSmall, { color: theme.colors.text }]}>{stats.totalCompletions}</Text>
                 <Text style={[styles.bentoLabelSmall, { color: theme.colors.textSecondary }]}>Done</Text>
               </View>
-              <View style={[styles.bentoCard, styles.bentoCardSmall, { backgroundColor: theme.colors.surface }]}>
+              <View style={[styles.bentoCard, styles.bentoCardSmall, { backgroundColor: theme.colors.surface, borderRadius: theme.styles.cardBorderRadius }]}>
                 <BarChart3 size={20} color={theme.colors.secondary} style={{ marginBottom: 8 }} />
                 <Text style={[styles.bentoValueSmall, { color: theme.colors.text }]}>{stats.totalHabits}</Text>
                 <Text style={[styles.bentoLabelSmall, { color: theme.colors.textSecondary }]}>Habits</Text>
@@ -382,7 +382,7 @@ const ProfileScreen: React.FC = () => {
               colors={isPremium ? ['#F59E0B', '#D97706'] : [theme.colors.primary, theme.colors.secondary]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              style={styles.premiumBanner}
+              style={[styles.premiumBanner, { borderRadius: theme.styles.cardBorderRadius }]}
             >
               <View style={styles.premiumContent}>
                 <View style={[styles.premiumIconCircle, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
@@ -411,7 +411,7 @@ const ProfileScreen: React.FC = () => {
             >
               {/* Habi Customization Card */}
               <TouchableOpacity
-                style={[styles.featureCard, { backgroundColor: theme.colors.surface }]}
+                style={[styles.featureCard, { backgroundColor: theme.colors.surface, borderRadius: theme.styles.cardBorderRadius }]}
                 onPress={() => setIsHabiSheetVisible(true)}
               >
                 <LinearGradient
@@ -516,7 +516,7 @@ const ProfileScreen: React.FC = () => {
               <TouchableOpacity
                 style={[
                   styles.signUpButton,
-                  { backgroundColor: theme.colors.primary },
+                  { backgroundColor: theme.colors.primary, borderRadius: theme.styles.buttonBorderRadius },
                 ]}
                 activeOpacity={0.8}
               >
@@ -544,6 +544,7 @@ const ProfileScreen: React.FC = () => {
                 {
                   backgroundColor: theme.colors.backgroundSecondary,
                   borderColor: theme.colors.border,
+                  borderRadius: theme.styles.buttonBorderRadius,
                 },
               ]}
               activeOpacity={0.7}

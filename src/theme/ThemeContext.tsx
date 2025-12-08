@@ -1,19 +1,20 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ThemeVariant, ThemeTokens, themes } from './tokens';
+import { ExtendedTheme } from './types';
+import { themeVariants, ThemeVariantKey } from './variants';
 
 const THEME_STORAGE_KEY = '@habit_tracker_theme';
 const AUTO_THEME_KEY = '@habit_tracker_auto_theme';
 
-type ThemeMode = ThemeVariant | 'auto';
+type ThemeMode = ThemeVariantKey | 'auto';
 
 interface ThemeContextType {
-  theme: ThemeTokens;
-  themeVariant: ThemeVariant;
+  theme: ExtendedTheme;
+  themeVariant: ThemeVariantKey;
   themeMode: ThemeMode;
   setTheme: (mode: ThemeMode) => void;
-  availableThemes: ThemeVariant[];
+  availableThemes: ThemeVariantKey[];
   isAutoMode: boolean;
   isLoading: boolean;
 }
@@ -44,7 +45,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       if (isAuto === 'true') {
         setThemeMode('auto');
       } else if (savedTheme && isValidTheme(savedTheme)) {
-        setThemeMode(savedTheme as ThemeVariant);
+        setThemeMode(savedTheme as ThemeVariantKey);
       }
     } catch (error) {
       console.error('Error loading theme:', error);
@@ -54,7 +55,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   };
 
   const isValidTheme = (theme: string): boolean => {
-    return Object.keys(themes).includes(theme);
+    return Object.keys(themeVariants).includes(theme);
   };
 
   const setTheme = async (mode: ThemeMode) => {
@@ -74,21 +75,24 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   };
 
   // Determine the actual theme variant based on mode and system preference
-  const getActiveThemeVariant = (): ThemeVariant => {
+  const getActiveThemeVariant = (): ThemeVariantKey => {
     if (themeMode === 'auto') {
-      return systemColorScheme === 'dark' ? 'dark' : 'default';
+      // For now, map dark mode to default since we haven't implemented a dark variant yet
+      // In future: return systemColorScheme === 'dark' ? 'dark' : 'default';
+      return 'default';
     }
     return themeMode;
   };
 
   const activeVariant = getActiveThemeVariant();
+  const activeTheme = themeVariants[activeVariant];
 
   const value: ThemeContextType = {
-    theme: themes[activeVariant],
+    theme: activeTheme,
     themeVariant: activeVariant,
     themeMode,
     setTheme,
-    availableThemes: Object.keys(themes) as ThemeVariant[],
+    availableThemes: Object.keys(themeVariants) as ThemeVariantKey[],
     isAutoMode: themeMode === 'auto',
     isLoading,
   };

@@ -153,53 +153,147 @@ const PremiumHabitCard: React.FC<PremiumHabitCardProps> = ({
     };
 
     // Dynamic Styles
-    const getCardColors = () => {
+    const getCardColors = (): [string, string] => {
         if (isNegative) {
             if (isLimitReached) return ['#FEF2F2', '#FEE2E2']; // Light Red
             return ['#FFFFFF', '#F9FAFB']; // White/Gray
         }
         if (isCompleted) {
-            return [theme.colors.primary + '15', theme.colors.primary + '05']; // Subtle Primary
+            // Sophisticated gradient for completed state
+            return [theme.colors.surface, theme.colors.surfaceSecondary];
         }
-        return [theme.colors.surface, theme.colors.surface]; // Default Surface
+        return [theme.colors.surface, theme.colors.surface];
     };
 
-    const getBorderColor = () => {
-        if (isNegative && isLimitReached) return theme.colors.error;
-        if (isCompleted) return theme.colors.primary;
-        return 'transparent';
-    };
+    const CategoryIcon = CATEGORIES.find(c => c.id === habit.category)?.icon;
+
+    // Removed opacity animation - actions are always rendered behind the card
+    // The card sliding reveals them naturally, eliminating flicker
+
+    const styles = StyleSheet.create({
+        container: {
+            marginBottom: 12,
+            width: '100%', // Fill available space
+            height: 84,
+            position: 'relative',
+        },
+        actionsContainer: {
+            position: 'absolute',
+            right: 0,
+            top: 0,
+            bottom: 0,
+            width: RIGHT_ACTIONS_WIDTH,
+            flexDirection: 'row',
+            borderRadius: 28,
+            overflow: 'hidden'
+        },
+        actionButton: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        cardWrapper: {
+            flex: 1,
+            borderRadius: 28,
+            backgroundColor: theme.colors.surface,
+            borderWidth: 0,
+            shadowColor: theme.shadows.shadowMD.shadowColor,
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.08,
+            shadowRadius: 12,
+            elevation: 4,
+        },
+        cardContent: {
+            flex: 1,
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingHorizontal: 18, // More breathing room
+            paddingVertical: 12,
+            borderRadius: 28,
+            overflow: 'hidden',
+        },
+        iconContainer: {
+            width: 44, // Slightly smaller
+            height: 44,
+            borderRadius: 22, // Fully round
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginRight: 14,
+        },
+        textContainer: {
+            flex: 1,
+            justifyContent: 'center',
+        },
+        habitName: {
+            fontSize: 17, // Slightly refined
+            fontWeight: '600',
+            marginBottom: 2,
+            fontFamily: theme.styles.fontFamilyDisplay || theme.typography.fontFamilyDisplaySemibold,
+            letterSpacing: -0.3,
+        },
+        streakContainer: {
+            flexDirection: 'row',
+            alignItems: 'center',
+        },
+        streakText: {
+            fontSize: 12,
+            marginLeft: 4,
+            fontWeight: '500',
+            fontFamily: theme.styles.fontFamilyBody || theme.typography.fontFamilyBodyMedium,
+            opacity: 0.8,
+        },
+        checkboxContainer: {
+            marginLeft: 12,
+        },
+        checkbox: {
+            width: 32,
+            height: 32,
+            borderRadius: 16, // Fully round
+            borderWidth: 0, // No border for cleaner look
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        progressBar: {
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            height: 3,
+            backgroundColor: theme.colors.primary,
+        },
+    });
 
     return (
         <View style={styles.container}>
-            {/* Background Actions */}
+            {/* Background Actions - always rendered, card slides to reveal */}
             <View style={styles.actionsContainer}>
-                {/* Left Action (Check-in Hint) */}
-                <View style={[styles.actionLeft, { backgroundColor: theme.colors.success }]}>
-                    <Check color="#FFF" size={24} />
-                </View>
-
-                {/* Right Actions */}
-                <View style={styles.actionsRight}>
-                    <TouchableOpacity
-                        style={[styles.actionBtn, { backgroundColor: theme.colors.textSecondary }]}
-                        onPress={() => { closeActions(); onEdit(habit); }}
-                    >
-                        <Edit2 color="#FFF" size={20} />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={[styles.actionBtn, { backgroundColor: theme.colors.warning }]}
-                        onPress={() => { closeActions(); onArchive(habit); }}
-                    >
-                        <Archive color="#FFF" size={20} />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={[styles.actionBtn, { backgroundColor: theme.colors.error }]}
-                        onPress={() => { closeActions(); onDelete(habit); }}
-                    >
-                        <Trash2 color="#FFF" size={20} />
-                    </TouchableOpacity>
-                </View>
+                <TouchableOpacity
+                    style={[styles.actionButton, { backgroundColor: theme.colors.primary }]}
+                    onPress={() => {
+                        closeActions();
+                        // Delay navigation to allow swipe animation to complete
+                        setTimeout(() => onEdit(habit), 300);
+                    }}
+                >
+                    <Edit2 size={20} color={theme.colors.white} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={[styles.actionButton, { backgroundColor: theme.colors.secondary }]}
+                    onPress={() => {
+                        closeActions();
+                        setTimeout(() => onArchive(habit), 300);
+                    }}
+                >
+                    <Archive size={20} color={theme.colors.white} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={[styles.actionButton, { backgroundColor: theme.colors.error }]}
+                    onPress={() => {
+                        closeActions();
+                        setTimeout(() => onDelete(habit), 300);
+                    }}
+                >
+                    <Trash2 size={20} color={theme.colors.white} />
+                </TouchableOpacity>
             </View>
 
             {/* Main Card */}
@@ -209,92 +303,104 @@ const PremiumHabitCard: React.FC<PremiumHabitCardProps> = ({
                         styles.cardWrapper,
                         {
                             transform: [{ translateX }, { scale }],
-                            backgroundColor: theme.colors.surface, // Fix transparency issue
-                        }
+                        },
                     ]}
+                    shouldRasterizeIOS
+                    renderToHardwareTextureAndroid
                 >
                     <TouchableOpacity
                         activeOpacity={1}
                         onPress={() => onPress(habit)}
-                        onPressIn={handlePressIn}
-                        onPressOut={handlePressOut}
+                        style={{ flex: 1 }}
                     >
                         <LinearGradient
-                            colors={getCardColors() as [string, string, ...string[]]}
+                            colors={getCardColors()}
+                            style={styles.cardContent}
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 1 }}
-                            style={[
-                                styles.card,
-                                {
-                                    borderColor: getBorderColor(),
-                                    borderWidth: isCompleted || isLimitReached ? 1.5 : 0,
-                                }
-                            ]}
                         >
-                            {/* Content */}
-                            <View style={styles.content}>
-                                {/* Icon/Emoji */}
-                                <View style={[styles.iconContainer, { backgroundColor: habit.color ? habit.color + '20' : theme.colors.primary + '20' }]}>
-                                    {(() => {
-                                        const categoryData = CATEGORIES.find(c => c.id === habit.category);
-                                        const IconComponent = categoryData?.icon;
-                                        if (IconComponent) {
-                                            return <IconComponent size={24} color={habit.color || theme.colors.primary} />;
-                                        }
-                                        return <Text style={styles.emoji}>{habit.emoji || '📝'}</Text>;
-                                    })()}
-                                </View>
-
-                                {/* Text Info */}
-                                <View style={styles.textContainer}>
-                                    <Text style={[styles.title, { color: theme.colors.text, textDecorationLine: isCompleted ? 'line-through' : 'none', opacity: isCompleted ? 0.7 : 1 }]}>
-                                        {habit.name}
-                                    </Text>
-                                    <View style={styles.statsRow}>
-                                        <View style={styles.statBadge}>
-                                            <Flame size={12} color={theme.colors.warning} />
-                                            <Text style={[styles.statText, { color: theme.colors.textSecondary }]}>{habit.streak}</Text>
-                                        </View>
-                                        <Text style={[styles.progressText, { color: theme.colors.textSecondary }]}>
-                                            {progress.current}/{progress.target}
-                                        </Text>
-                                    </View>
-                                </View>
-
-                                {/* Check Button */}
-                                <TouchableOpacity
-                                    onPress={handleToggle}
-                                    style={[
-                                        styles.checkButton,
-                                        {
-                                            backgroundColor: isCompleted ? theme.colors.primary : theme.colors.background,
-                                            borderColor: isCompleted ? theme.colors.primary : theme.colors.border,
-                                        }
-                                    ]}
-                                >
-                                    <Animated.View style={{ transform: [{ scale: checkScale }] }}>
-                                        {isCompleted ? (
-                                            <Check size={20} color="#FFF" strokeWidth={3} />
-                                        ) : (
-                                            <View style={[styles.checkRing, { borderColor: theme.colors.border }]} />
-                                        )}
-                                    </Animated.View>
-                                </TouchableOpacity>
+                            {/* Icon */}
+                            <View style={[styles.iconContainer, { backgroundColor: habit.color + '15' }]}>
+                                {CategoryIcon ? (
+                                    <CategoryIcon size={22} color={habit.color} />
+                                ) : (
+                                    <Text style={{ fontSize: 22 }}>{habit.emoji}</Text>
+                                )}
                             </View>
 
-                            {/* Progress Bar (Bottom) */}
-                            {habit.targetCompletionsPerDay > 1 && (
-                                <View style={styles.progressBarContainer}>
-                                    <View
-                                        style={[
-                                            styles.progressBarFill,
-                                            {
-                                                width: `${(progress.current / progress.target) * 100}%`,
-                                                backgroundColor: isNegative ? theme.colors.error : theme.colors.primary
-                                            }
-                                        ]}
+                            {/* Text Info */}
+                            <View style={styles.textContainer}>
+                                <Text
+                                    style={[
+                                        styles.habitName,
+                                        {
+                                            color: isCompleted ? theme.colors.textSecondary : theme.colors.text,
+                                            textDecorationLine: isCompleted ? 'line-through' : 'none',
+                                            opacity: isCompleted ? 0.7 : 1,
+                                        },
+                                    ]}
+                                    numberOfLines={1}
+                                >
+                                    {habit.name}
+                                </Text>
+                                <View style={styles.streakContainer}>
+                                    <Flame
+                                        size={12}
+                                        color={habit.streak > 0 ? theme.colors.primary : theme.colors.textTertiary}
+                                        fill={habit.streak > 0 ? theme.colors.primary : 'none'}
                                     />
+                                    <Text
+                                        style={[
+                                            styles.streakText,
+                                            { color: theme.colors.textSecondary },
+                                        ]}
+                                    >
+                                        {habit.streak} day streak
+                                    </Text>
                                 </View>
+                            </View>
+
+                            {/* Checkbox */}
+                            <TouchableOpacity
+                                onPress={handleToggle}
+                                style={styles.checkboxContainer}
+                            >
+                                <Animated.View
+                                    style={[
+                                        styles.checkbox,
+                                        {
+                                            // Pastel shade of primary color when checked
+                                            backgroundColor: isCompleted ? theme.colors.primary + '30' : theme.colors.backgroundSecondary,
+                                            transform: [{ scale: checkScale }],
+                                        },
+                                    ]}
+                                >
+                                    {isCompleted ? (
+                                        <Check size={16} color={theme.colors.primary} strokeWidth={3} />
+                                    ) : (
+                                        <View style={{
+                                            width: 12,
+                                            height: 12,
+                                            borderRadius: 6,
+                                            borderWidth: 2,
+                                            borderColor: theme.colors.textTertiary,
+                                            opacity: 0.5
+                                        }} />
+                                    )}
+                                </Animated.View>
+                            </TouchableOpacity>
+
+                            {/* Progress Bar (if partially complete) */}
+                            {!isCompleted && progress.current > 0 && (
+                                <View
+                                    style={[
+                                        styles.progressBar,
+                                        {
+                                            width: `${(progress.current / progress.target) * 100}%`,
+                                            backgroundColor: habit.color,
+                                        },
+                                    ]}
+                                />
                             )}
                         </LinearGradient>
                     </TouchableOpacity>
@@ -304,129 +410,5 @@ const PremiumHabitCard: React.FC<PremiumHabitCardProps> = ({
     );
 };
 
-const styles = StyleSheet.create({
-    container: {
-        marginBottom: 12,
-        position: 'relative',
-    },
-    actionsContainer: {
-        ...StyleSheet.absoluteFillObject,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderRadius: 20,
-        overflow: 'hidden',
-        backgroundColor: '#F3F4F6',
-    },
-    actionLeft: {
-        width: 80,
-        height: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingLeft: 20,
-    },
-    actionsRight: {
-        flexDirection: 'row',
-        height: '100%',
-        width: RIGHT_ACTIONS_WIDTH,
-        justifyContent: 'flex-end',
-    },
-    actionBtn: {
-        width: 60,
-        height: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    cardWrapper: {
-        borderRadius: 20,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.08,
-        shadowRadius: 12,
-        elevation: 5,
-        backgroundColor: 'transparent',
-        zIndex: 10, // Ensure card always overlays action buttons
-    },
-    card: {
-        borderRadius: 20,
-        overflow: 'hidden',
-        padding: 16,
-        minHeight: 80,
-    },
-    content: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    iconContainer: {
-        width: 48,
-        height: 48,
-        borderRadius: 16,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 16,
-    },
-    emoji: {
-        fontSize: 24,
-    },
-    textContainer: {
-        flex: 1,
-        justifyContent: 'center',
-    },
-    title: {
-        fontSize: 17,
-        fontWeight: '700',
-        marginBottom: 6,
-        letterSpacing: -0.3,
-    },
-    statsRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 12,
-    },
-    statBadge: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 4,
-        backgroundColor: 'rgba(0,0,0,0.04)',
-        paddingHorizontal: 6,
-        paddingVertical: 2,
-        borderRadius: 8,
-    },
-    statText: {
-        fontSize: 12,
-        fontWeight: '600',
-    },
-    progressText: {
-        fontSize: 12,
-        fontWeight: '500',
-    },
-    checkButton: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 2,
-        marginLeft: 12,
-    },
-    checkRing: {
-        width: 16,
-        height: 16,
-        borderRadius: 8,
-        borderWidth: 2,
-        opacity: 0.3,
-    },
-    progressBarContainer: {
-        height: 4,
-        backgroundColor: 'rgba(0,0,0,0.05)',
-        borderRadius: 2,
-        marginTop: 12,
-        overflow: 'hidden',
-    },
-    progressBarFill: {
-        height: '100%',
-        borderRadius: 2,
-    },
-});
 
 export default PremiumHabitCard;

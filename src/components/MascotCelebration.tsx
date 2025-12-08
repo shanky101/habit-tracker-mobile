@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { useTheme } from '@/theme';
 import { useMascot, MASCOT_NAME } from '@/context/MascotContext';
-import MascotCharacter from './MascotCharacter';
+import MascotRenderer from './MascotRenderer';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -294,7 +294,7 @@ const MascotCelebration: React.FC<MascotCelebrationProps> = ({
           >
             <Animated.View style={{ transform: [{ translateY: bounceAnim }] }}>
               <TouchableOpacity activeOpacity={0.9} onPress={handleDismiss}>
-                <MascotCharacter
+                <MascotRenderer
                   mood={type === 'allComplete' ? 'ecstatic' : mascot.mood}
                   size={140}
                   isAnimating

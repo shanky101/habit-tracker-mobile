@@ -14,7 +14,7 @@ import {
   MASCOT_NAME,
   MascotMood,
 } from '@/context/MascotContext';
-import MascotCharacter from './MascotCharacter';
+import MascotRenderer from './MascotRenderer';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -210,7 +210,7 @@ const Mascot: React.FC<MascotProps> = ({
             },
           ]}
         >
-          <MascotCharacter
+          <MascotRenderer
             mood={mascot.mood}
             size={44}
             isAnimating={mascot.isAnimating}
@@ -278,7 +278,7 @@ const Mascot: React.FC<MascotProps> = ({
               ],
             }}
           >
-            <MascotCharacter
+            <MascotRenderer
               mood={mascot.mood}
               size={dimensions.character}
               isAnimating={mascot.isAnimating}
@@ -384,7 +384,7 @@ const Mascot: React.FC<MascotProps> = ({
                 { backgroundColor: getGlowColor(mascot.mood) + '40' },
               ]}
             />
-            <MascotCharacter
+            <MascotRenderer
               mood={mascot.mood}
               size={dimensions.character}
               isAnimating={mascot.isAnimating}
@@ -487,7 +487,7 @@ const Mascot: React.FC<MascotProps> = ({
             ],
           }}
         >
-          <MascotCharacter
+          <MascotRenderer
             mood={mascot.mood}
             size={dimensions.character}
             isAnimating={mascot.isAnimating}

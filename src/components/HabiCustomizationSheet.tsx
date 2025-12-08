@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useTheme } from '@/theme';
 import { useMascot, MASCOT_NAME } from '@/context/MascotContext';
+import MascotRenderer from './MascotRenderer';
 import { X, Check, Sparkles, Maximize2, Minimize2 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -82,6 +83,141 @@ const HabiCustomizationSheet: React.FC<HabiCustomizationSheetProps> = ({ visible
         ]).start(() => onClose());
     };
 
+    const styles = StyleSheet.create({
+        overlay: {
+            flex: 1,
+            justifyContent: 'flex-end',
+        },
+        backdrop: {
+            ...StyleSheet.absoluteFillObject,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+        },
+        sheet: {
+            borderTopLeftRadius: theme.styles.cardBorderRadius * 2,
+            borderTopRightRadius: theme.styles.cardBorderRadius * 2,
+            padding: 24,
+            paddingBottom: Platform.OS === 'ios' ? 40 : 24,
+            minHeight: 500,
+        },
+        handle: {
+            width: 40,
+            height: 4,
+            backgroundColor: theme.colors.border,
+            borderRadius: 2,
+            alignSelf: 'center',
+            marginBottom: 24,
+        },
+        header: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 8,
+        },
+        title: {
+            fontSize: 24,
+            fontWeight: '700',
+            fontFamily: theme.styles.fontFamilyDisplay || theme.typography.fontFamilyDisplayBold,
+        },
+        closeButton: {
+            padding: 4,
+        },
+        subtitle: {
+            fontSize: 16,
+            marginBottom: 32,
+            lineHeight: 24,
+            fontFamily: theme.styles.fontFamilyBody || theme.typography.fontFamilyBody,
+        },
+        optionsContainer: {
+            gap: 16,
+            marginBottom: 32,
+        },
+        optionCard: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            padding: 16,
+            borderRadius: theme.styles.cardBorderRadius,
+            gap: 16,
+        },
+        previewBox: {
+            width: 80,
+            height: 80,
+            borderRadius: theme.styles.buttonBorderRadius,
+            justifyContent: 'center',
+            alignItems: 'center',
+            overflow: 'hidden',
+        },
+        mascotPreviewLarge: {
+            width: 48,
+            height: 48,
+            borderRadius: 24,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginBottom: 4,
+        },
+        bubblePreview: {
+            padding: 4,
+            borderRadius: 8,
+            gap: 2,
+        },
+        compactRow: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 8,
+            paddingHorizontal: 8,
+        },
+        mascotPreviewSmall: {
+            width: 32,
+            height: 32,
+            borderRadius: 16,
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        bubblePreviewSmall: {
+            padding: 4,
+            borderRadius: 4,
+        },
+        line: {
+            height: 2,
+            borderRadius: 1,
+        },
+        optionContent: {
+            flex: 1,
+        },
+        optionHeader: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginBottom: 4,
+        },
+        optionTitle: {
+            fontSize: 18,
+            fontWeight: '600',
+            fontFamily: theme.styles.fontFamilyDisplay || theme.typography.fontFamilyDisplaySemibold,
+        },
+        optionDescription: {
+            fontSize: 13,
+            lineHeight: 18,
+            fontFamily: theme.styles.fontFamilyBody || theme.typography.fontFamilyBody,
+        },
+        checkCircle: {
+            width: 24,
+            height: 24,
+            borderRadius: 12,
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        doneButton: {
+            paddingVertical: 16,
+            borderRadius: theme.styles.buttonBorderRadius,
+            alignItems: 'center',
+        },
+        doneButtonText: {
+            color: '#FFF',
+            fontSize: 16,
+            fontWeight: '600',
+            fontFamily: theme.styles.fontFamilyBody || theme.typography.fontFamilyBodySemibold,
+        },
+    });
+
     if (!visible) return null;
 
     return (
@@ -134,7 +270,7 @@ const HabiCustomizationSheet: React.FC<HabiCustomizationSheetProps> = ({ visible
                         >
                             <View style={[styles.previewBox, { backgroundColor: theme.colors.backgroundSecondary }]}>
                                 <View style={[styles.mascotPreviewLarge, { backgroundColor: theme.colors.primary }]}>
-                                    <Text style={{ fontSize: 32 }}>😊</Text>
+                                    <MascotRenderer mood="happy" size={48} />
                                 </View>
                                 <View style={[styles.bubblePreview, { backgroundColor: theme.colors.surface }]}>
                                     <View style={[styles.line, { width: 40, backgroundColor: theme.colors.textTertiary }]} />
@@ -175,7 +311,7 @@ const HabiCustomizationSheet: React.FC<HabiCustomizationSheetProps> = ({ visible
                             <View style={[styles.previewBox, { backgroundColor: theme.colors.backgroundSecondary }]}>
                                 <View style={styles.compactRow}>
                                     <View style={[styles.mascotPreviewSmall, { backgroundColor: theme.colors.primary }]}>
-                                        <Text style={{ fontSize: 20 }}>😊</Text>
+                                        <MascotRenderer mood="happy" size={32} />
                                     </View>
                                     <View style={[styles.bubblePreviewSmall, { backgroundColor: theme.colors.surface }]}>
                                         <View style={[styles.line, { width: 60, backgroundColor: theme.colors.textTertiary }]} />
@@ -213,134 +349,6 @@ const HabiCustomizationSheet: React.FC<HabiCustomizationSheetProps> = ({ visible
     );
 };
 
-const styles = StyleSheet.create({
-    overlay: {
-        flex: 1,
-        justifyContent: 'flex-end',
-    },
-    backdrop: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-    },
-    sheet: {
-        borderTopLeftRadius: 32,
-        borderTopRightRadius: 32,
-        padding: 24,
-        paddingBottom: Platform.OS === 'ios' ? 40 : 24,
-        minHeight: 500,
-    },
-    handle: {
-        width: 40,
-        height: 4,
-        backgroundColor: '#E5E7EB',
-        borderRadius: 2,
-        alignSelf: 'center',
-        marginBottom: 24,
-    },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: '700',
-    },
-    closeButton: {
-        padding: 4,
-    },
-    subtitle: {
-        fontSize: 16,
-        marginBottom: 32,
-        lineHeight: 24,
-    },
-    optionsContainer: {
-        gap: 16,
-        marginBottom: 32,
-    },
-    optionCard: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 16,
-        borderRadius: 20,
-        gap: 16,
-    },
-    previewBox: {
-        width: 80,
-        height: 80,
-        borderRadius: 12,
-        justifyContent: 'center',
-        alignItems: 'center',
-        overflow: 'hidden',
-    },
-    mascotPreviewLarge: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 4,
-    },
-    bubblePreview: {
-        padding: 4,
-        borderRadius: 8,
-        gap: 2,
-    },
-    compactRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-        paddingHorizontal: 8,
-    },
-    mascotPreviewSmall: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    bubblePreviewSmall: {
-        padding: 4,
-        borderRadius: 4,
-    },
-    line: {
-        height: 2,
-        borderRadius: 1,
-    },
-    optionContent: {
-        flex: 1,
-    },
-    optionHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 4,
-    },
-    optionTitle: {
-        fontSize: 18,
-        fontWeight: '600',
-    },
-    optionDescription: {
-        fontSize: 13,
-        lineHeight: 18,
-    },
-    checkCircle: {
-        width: 24,
-        height: 24,
-        borderRadius: 12,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    doneButton: {
-        paddingVertical: 16,
-        borderRadius: 16,
-        alignItems: 'center',
-    },
-    doneButtonText: {
-        color: '#FFF',
-        fontSize: 16,
-        fontWeight: '600',
-    },
-});
+
 
 export default HabiCustomizationSheet;

@@ -44,14 +44,22 @@ export const DraggableHabitList: React.FC<DraggableHabitListProps> = ({
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <FlatList
-        data={habits}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={{ paddingBottom: 20 }}
-        scrollEnabled={false}
-      />
+    <View style={{ flex: 1, overflow: 'visible' }}>
+      <View style={{ paddingBottom: 20, overflow: 'visible' }}>
+        {habits.map((item) => (
+          <View key={item.id} style={styles.itemContainer}>
+            <PremiumHabitCard
+              habit={item}
+              selectedDate={selectedDate}
+              onToggle={onToggle}
+              onPress={onPress}
+              onEdit={onEdit}
+              onArchive={onArchive}
+              onDelete={onDelete}
+            />
+          </View>
+        ))}
+      </View>
     </View>
   );
 };
