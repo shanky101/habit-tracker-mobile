@@ -345,6 +345,7 @@ const styles = StyleSheet.create({
         shadowRadius: 12,
         elevation: 5,
         backgroundColor: 'transparent',
+        zIndex: 10, // Ensure card always overlays action buttons
     },
     card: {
         borderRadius: 20,

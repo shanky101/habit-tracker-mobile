@@ -551,7 +551,8 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   footer: {
-    padding: 24,
+    padding: 16,
+    paddingBottom: Platform.OS === 'ios' ? 16 : 24,
     borderTopWidth: 1,
     borderTopColor: 'rgba(0,0,0,0.05)',
   },

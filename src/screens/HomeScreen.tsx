@@ -1222,19 +1222,22 @@ const styles = StyleSheet.create({
   },
   fabContainer: {
     position: 'absolute',
-    bottom: 32,
+    bottom: 90,
     right: 24,
+    zIndex: 100,
   },
   fab: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 56, // Reduced from likely 64
+    height: 56,
+    borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
   },
   fabText: {
-    fontSize: 32,
-    fontWeight: '300',
+    fontSize: 28, // Reduced from likely 32
+    fontWeight: '400',
+    lineHeight: 28, // Ensure proper centering
+    textAlign: 'center',
   },
   limitBanner: {
     flexDirection: 'row',

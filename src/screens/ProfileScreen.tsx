@@ -15,6 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '@/theme';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 import { useHabits } from '@/hooks/useHabits';
 import { useSubscription, formatPlanName } from '@/context/SubscriptionContext';
@@ -38,7 +39,11 @@ import {
   ChevronRight,
   Palette,
   Sparkles,
+  Database,
+  ArrowRight
 } from 'lucide-react-native';
+
+import HabiCustomizationSheet from '@/components/HabiCustomizationSheet';
 
 type ProfileNavigationProp = StackNavigationProp<any, 'Profile'>;
 
@@ -54,6 +59,7 @@ const ProfileScreen: React.FC = () => {
   const { habits } = useHabits();
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
+  const [isHabiSheetVisible, setIsHabiSheetVisible] = useState(false);
   const isPremium = subscription.isPremium;
 
   // Calculate real user-level stats from all habits
@@ -129,6 +135,15 @@ const ProfileScreen: React.FC = () => {
   };
 
   const stats = calculateUserStats();
+
+  // Gamification Logic
+  const calculateLevel = (completions: number) => {
+    const level = Math.floor(completions / 10) + 1;
+    const progress = (completions % 10) / 10;
+    return { level, progress };
+  };
+
+  const { level, progress } = calculateLevel(stats.totalCompletions);
 
   useEffect(() => {
     loadUserData();
@@ -209,49 +224,7 @@ const ProfileScreen: React.FC = () => {
     return userName[0].toUpperCase();
   };
 
-  const renderStatCard = (
-    IconComponent: React.ComponentType<any>,
-    value: string | number,
-    label: string
-  ) => (
-    <View
-      style={[
-        styles.statCard,
-        {
-          backgroundColor: theme.colors.surface,
-          borderColor: theme.colors.border,
-        },
-      ]}
-    >
-      <View style={styles.statIconContainer}>
-        <IconComponent size={24} color={theme.colors.primary} strokeWidth={2} />
-      </View>
-      <Text
-        style={[
-          styles.statValue,
-          {
-            color: theme.colors.text,
-            fontFamily: theme.typography.fontFamilyDisplayBold,
-            fontSize: theme.typography.fontSizeXL,
-          },
-        ]}
-      >
-        {value}
-      </Text>
-      <Text
-        style={[
-          styles.statLabel,
-          {
-            color: theme.colors.textSecondary,
-            fontFamily: theme.typography.fontFamilyBody,
-            fontSize: theme.typography.fontSizeXS,
-          },
-        ]}
-      >
-        {label}
-      </Text>
-    </View>
-  );
+
 
   const renderMenuItem = (
     IconComponent: React.ComponentType<any>,
@@ -310,293 +283,196 @@ const ProfileScreen: React.FC = () => {
             },
           ]}
         >
-          {/* Profile Header */}
-          <View style={styles.profileHeader}>
-            <View
-              style={[
-                styles.avatarContainer,
-                {
-                  backgroundColor: theme.colors.primary,
-                  borderColor: theme.colors.primaryLight,
-                },
-              ]}
-            >
-              <Text
+          {/* Immersive Header */}
+          <View style={styles.headerContainer}>
+            <View style={styles.headerTop}>
+              <View style={{ width: 44 }} />
+              <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Profile</Text>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('Settings')}
                 style={[
-                  styles.avatarText,
+                  styles.settingsButton,
                   {
-                    color: theme.colors.white,
-                    fontFamily: theme.typography.fontFamilyDisplayBold,
-                    fontSize: 32,
-                  },
+                    backgroundColor: theme.colors.surface,
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 4,
+                    elevation: 3,
+                    borderWidth: 1,
+                    borderColor: theme.colors.border
+                  }
                 ]}
               >
-                {getInitials()}
-              </Text>
-              {isPremium && (
-                <View
-                  style={[
-                    styles.premiumBadge,
-                    { backgroundColor: theme.colors.accent1 },
-                  ]}
-                >
-                  <Text style={styles.premiumBadgeText}>PRO</Text>
-                </View>
-              )}
+                <Settings size={22} color={theme.colors.text} />
+              </TouchableOpacity>
             </View>
 
-            <Text
-              style={[
-                styles.userName,
-                {
-                  color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplayBold,
-                  fontSize: theme.typography.fontSize2XL,
-                },
-              ]}
-            >
-              {userName || 'Guest User'}
-            </Text>
-
-            {userEmail ? (
-              <Text
-                style={[
-                  styles.userEmail,
-                  {
-                    color: theme.colors.textSecondary,
-                    fontFamily: theme.typography.fontFamilyBody,
-                    fontSize: theme.typography.fontSizeSM,
-                  },
-                ]}
-              >
-                {userEmail}
-              </Text>
-            ) : (
-              <Text
-                style={[
-                  styles.userEmail,
-                  {
-                    color: theme.colors.textSecondary,
-                    fontFamily: theme.typography.fontFamilyBody,
-                    fontSize: theme.typography.fontSizeSM,
-                  },
-                ]}
-              >
+            <View style={styles.profileInfo}>
+              <View style={[styles.avatarContainer, { borderColor: theme.colors.primary }]}>
+                <Text style={[styles.avatarText, { color: theme.colors.white }]}>{getInitials()}</Text>
+                {isPremium && (
+                  <View style={[styles.premiumBadge, { backgroundColor: '#FFD700' }]}>
+                    <Crown size={12} color="#000" fill="#000" />
+                  </View>
+                )}
+              </View>
+              <Text style={[styles.userName, { color: theme.colors.text }]}>{userName || 'Guest User'}</Text>
+              <Text style={[styles.memberSince, { color: theme.colors.textSecondary }]}>
                 Member since {stats.memberSince}
               </Text>
-            )}
+            </View>
+
+            {/* Level / XP Bar */}
+            <View style={[styles.levelContainer, { backgroundColor: theme.colors.surface }]}>
+              <View style={styles.levelInfo}>
+                <View style={styles.levelBadge}>
+                  <Text style={styles.levelText}>LVL {level}</Text>
+                </View>
+                <Text style={[styles.xpText, { color: theme.colors.textSecondary }]}>
+                  {stats.totalCompletions % 10} / 10 XP to Level {level + 1}
+                </Text>
+              </View>
+              <View style={[styles.progressBarBg, { backgroundColor: theme.colors.border }]}>
+                <View
+                  style={[
+                    styles.progressBarFill,
+                    {
+                      width: `${progress * 100}%`,
+                      backgroundColor: theme.colors.primary
+                    }
+                  ]}
+                />
+              </View>
+            </View>
           </View>
 
-          {/* Stats Summary */}
-          <View style={styles.statsContainer}>
+          {/* Bento Grid Stats */}
+          <View style={styles.bentoGrid}>
+            <View style={[styles.bentoCard, styles.bentoCardLarge, { backgroundColor: theme.colors.surface }]}>
+              <View style={[styles.iconCircle, { backgroundColor: theme.colors.primary + '15' }]}>
+                <Flame size={24} color={theme.colors.primary} fill={theme.colors.primary} />
+              </View>
+              <View>
+                <Text style={[styles.bentoValue, { color: theme.colors.text }]}>{stats.longestStreak}</Text>
+                <Text style={[styles.bentoLabel, { color: theme.colors.textSecondary }]}>Best Streak</Text>
+              </View>
+            </View>
+
+            <View style={styles.bentoColumn}>
+              <View style={[styles.bentoCard, styles.bentoCardSmall, { backgroundColor: theme.colors.surface }]}>
+                <Check size={20} color={theme.colors.success} style={{ marginBottom: 8 }} />
+                <Text style={[styles.bentoValueSmall, { color: theme.colors.text }]}>{stats.totalCompletions}</Text>
+                <Text style={[styles.bentoLabelSmall, { color: theme.colors.textSecondary }]}>Done</Text>
+              </View>
+              <View style={[styles.bentoCard, styles.bentoCardSmall, { backgroundColor: theme.colors.surface }]}>
+                <BarChart3 size={20} color={theme.colors.secondary} style={{ marginBottom: 8 }} />
+                <Text style={[styles.bentoValueSmall, { color: theme.colors.text }]}>{stats.totalHabits}</Text>
+                <Text style={[styles.bentoLabelSmall, { color: theme.colors.textSecondary }]}>Habits</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* Premium Banner */}
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => navigation.navigate(isPremium ? 'Subscription' : 'Paywall')}
+          >
+            <LinearGradient
+              colors={isPremium ? ['#F59E0B', '#D97706'] : [theme.colors.primary, theme.colors.secondary]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.premiumBanner}
+            >
+              <View style={styles.premiumContent}>
+                <View style={[styles.premiumIconCircle, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
+                  <Crown size={24} color="#FFF" fill={isPremium ? "#FFF" : "none"} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.premiumTitle}>
+                    {isPremium ? 'Premium Member' : 'Upgrade to Premium'}
+                  </Text>
+                  <Text style={styles.premiumSubtitle}>
+                    {isPremium ? 'You have access to all features' : 'Unlock unlimited habits & AI insights'}
+                  </Text>
+                </View>
+                <ChevronRight size={20} color="#FFF" />
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          {/* Premium Features Carousel */}
+          <View style={styles.carouselContainer}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>PREMIUM FEATURES</Text>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.statsScroll}
+              contentContainerStyle={styles.carouselContent}
             >
-              {renderStatCard(BarChart3, stats.totalHabits, 'Habits')}
-              {renderStatCard(Check, stats.totalCompletions, 'Completions')}
-              {renderStatCard(Trophy, stats.longestStreak, 'Best Streak')}
-              {renderStatCard(Flame, stats.activeStreaks, 'Active')}
+              {/* Habi Customization Card */}
+              <TouchableOpacity
+                style={[styles.featureCard, { backgroundColor: theme.colors.surface }]}
+                onPress={() => setIsHabiSheetVisible(true)}
+              >
+                <LinearGradient
+                  colors={['#EC4899', '#DB2777']}
+                  style={styles.featureCardGradient}
+                >
+                  <Sparkles size={24} color="#FFF" />
+                </LinearGradient>
+                <View style={styles.featureCardContent}>
+                  <Text style={[styles.featureCardTitle, { color: theme.colors.text }]}>Habi Style</Text>
+                  <Text style={[styles.featureCardSubtitle, { color: theme.colors.textSecondary }]}>Customize your companion</Text>
+                </View>
+              </TouchableOpacity>
+
+              {/* Themes Card */}
+              <TouchableOpacity
+                style={[styles.featureCard, { backgroundColor: theme.colors.surface }]}
+                onPress={() => navigation.navigate('ThemePicker')}
+              >
+                <LinearGradient
+                  colors={['#8B5CF6', '#7C3AED']}
+                  style={styles.featureCardGradient}
+                >
+                  <Palette size={24} color="#FFF" />
+                </LinearGradient>
+                <View style={styles.featureCardContent}>
+                  <Text style={[styles.featureCardTitle, { color: theme.colors.text }]}>Themes</Text>
+                  <Text style={[styles.featureCardSubtitle, { color: theme.colors.textSecondary }]}>Paint your journey</Text>
+                </View>
+              </TouchableOpacity>
+
+              {/* Data Export Card */}
+              <TouchableOpacity
+                style={[styles.featureCard, { backgroundColor: theme.colors.surface }]}
+                onPress={() => navigation.navigate('ExportData')}
+              >
+                <LinearGradient
+                  colors={['#3B82F6', '#2563EB']}
+                  style={styles.featureCardGradient}
+                >
+                  <Database size={24} color="#FFF" />
+                </LinearGradient>
+                <View style={styles.featureCardContent}>
+                  <Text style={[styles.featureCardTitle, { color: theme.colors.text }]}>Data Freedom</Text>
+                  <Text style={[styles.featureCardSubtitle, { color: theme.colors.textSecondary }]}>Your data, your rules</Text>
+                </View>
+              </TouchableOpacity>
             </ScrollView>
-          </View>
-
-          {/* Subscription Status */}
-          <View
-            style={[
-              styles.subscriptionCard,
-              {
-                backgroundColor: isPremium ? theme.colors.primaryLight + '20' : theme.colors.backgroundSecondary,
-                borderColor: isPremium ? theme.colors.primary : theme.colors.border,
-              },
-            ]}
-          >
-            {isPremium ? (
-              <>
-                <View style={styles.subscriptionHeader}>
-                  <View style={styles.subscriptionIconContainer}>
-                    <Crown size={32} color={theme.colors.primary} strokeWidth={2} />
-                  </View>
-                  <View>
-                    <Text
-                      style={[
-                        styles.subscriptionTitle,
-                        {
-                          color: theme.colors.primary,
-                          fontFamily: theme.typography.fontFamilyDisplayBold,
-                          fontSize: theme.typography.fontSizeLG,
-                        },
-                      ]}
-                    >
-                      Premium Member
-                    </Text>
-                    <Text
-                      style={[
-                        styles.subscriptionSubtitle,
-                        {
-                          color: theme.colors.textSecondary,
-                          fontFamily: theme.typography.fontFamilyBody,
-                          fontSize: theme.typography.fontSizeXS,
-                        },
-                      ]}
-                    >
-                      {subscription.plan === 'lifetime'
-                        ? 'Lifetime access'
-                        : subscription.expiresAt
-                          ? `Renews: ${new Date(subscription.expiresAt).toLocaleDateString()}`
-                          : formatPlanName(subscription.plan)}
-                    </Text>
-                  </View>
-                </View>
-                <TouchableOpacity
-                  style={[styles.manageButton, { borderColor: theme.colors.primary }]}
-                  onPress={() => navigation.navigate('Subscription')}
-                  activeOpacity={0.7}
-                >
-                  <Text
-                    style={[
-                      styles.manageButtonText,
-                      {
-                        color: theme.colors.primary,
-                        fontFamily: theme.typography.fontFamilyBodySemibold,
-                        fontSize: theme.typography.fontSizeSM,
-                      },
-                    ]}
-                  >
-                    Manage Subscription
-                  </Text>
-                </TouchableOpacity>
-              </>
-            ) : (
-              <>
-                <View style={styles.freeHeader}>
-                  <Text
-                    style={[
-                      styles.freePlanTitle,
-                      {
-                        color: theme.colors.text,
-                        fontFamily: theme.typography.fontFamilyDisplayBold,
-                        fontSize: theme.typography.fontSizeLG,
-                      },
-                    ]}
-                  >
-                    Free Plan
-                  </Text>
-                  <Text
-                    style={[
-                      styles.habitCount,
-                      {
-                        color: theme.colors.textSecondary,
-                        fontFamily: theme.typography.fontFamilyBody,
-                        fontSize: theme.typography.fontSizeSM,
-                      },
-                    ]}
-                  >
-                    {stats.totalHabits}/5 habits used
-                  </Text>
-                </View>
-
-                <View style={styles.premiumFeatures}>
-                  <View style={styles.featureRow}>
-                    <X size={16} color={theme.colors.error} strokeWidth={2.5} />
-                    <Text style={[styles.featureText, { color: theme.colors.textSecondary, fontFamily: theme.typography.fontFamilyBody }]}>
-                      Cloud sync
-                    </Text>
-                  </View>
-                  <View style={styles.featureRow}>
-                    <X size={16} color={theme.colors.error} strokeWidth={2.5} />
-                    <Text style={[styles.featureText, { color: theme.colors.textSecondary, fontFamily: theme.typography.fontFamilyBody }]}>
-                      Unlimited habits
-                    </Text>
-                  </View>
-                  <View style={styles.featureRow}>
-                    <X size={16} color={theme.colors.error} strokeWidth={2.5} />
-                    <Text style={[styles.featureText, { color: theme.colors.textSecondary, fontFamily: theme.typography.fontFamilyBody }]}>
-                      AI insights
-                    </Text>
-                  </View>
-                </View>
-
-                <TouchableOpacity
-                  style={[
-                    styles.upgradeButton,
-                    { backgroundColor: theme.colors.primary },
-                  ]}
-                  onPress={() => navigation.navigate('Paywall')}
-                  activeOpacity={0.8}
-                >
-                  <Text
-                    style={[
-                      styles.upgradeButtonText,
-                      {
-                        color: theme.colors.white,
-                        fontFamily: theme.typography.fontFamilyBodySemibold,
-                        fontSize: theme.typography.fontSizeMD,
-                      },
-                    ]}
-                  >
-                    Upgrade to Premium
-                  </Text>
-                </TouchableOpacity>
-              </>
-            )}
           </View>
 
           {/* Menu Items */}
           {/* PERSONALIZATION section removed - mascot disabled */}
-          <View
-            style={[
-              styles.menuSection,
-              {
-                backgroundColor: theme.colors.backgroundSecondary,
-                borderColor: theme.colors.border,
-              },
-            ]}
-          >
-            <Text
-              style={[
-                styles.menuSectionTitle,
-                {
-                  color: theme.colors.textSecondary,
-                  fontFamily: theme.typography.fontFamilyBodySemibold,
-                  fontSize: theme.typography.fontSizeXS,
-                },
-              ]}
-            >
-              ACCOUNT
-            </Text>
-            {renderMenuItem(Settings, 'Settings', () => navigation.navigate('Settings'))}
-            {renderMenuItem(Bell, 'Notifications', () => navigation.navigate('NotificationsSettings'))}
-            {renderMenuItem(Lock, 'Account', () => navigation.navigate('AccountSettings'))}
-            {renderMenuItem(Shield, 'Data & Privacy', () => navigation.navigate('DataPrivacy'))}
-            {renderMenuItem(Upload, 'Export Data', () => navigation.navigate('ExportData'), false)}
-          </View>
-
-          <View
-            style={[
-              styles.menuSection,
-              {
-                backgroundColor: theme.colors.backgroundSecondary,
-                borderColor: theme.colors.border,
-              },
-            ]}
-          >
-            <Text
-              style={[
-                styles.menuSectionTitle,
-                {
-                  color: theme.colors.textSecondary,
-                  fontFamily: theme.typography.fontFamilyBodySemibold,
-                  fontSize: theme.typography.fontSizeXS,
-                },
-              ]}
-            >
-              SUPPORT
-            </Text>
-            {renderMenuItem(HelpCircle, 'Help & Support', handleHelpSupport)}
-            {renderMenuItem(Star, 'Rate the App', handleRateApp)}
-            {renderMenuItem(Megaphone, 'Share App', handleShareApp)}
-            {renderMenuItem(Info, 'About', () => navigation.navigate('About'), false)}
+          {/* Menu Items - Simplified */}
+          <View style={styles.menuContainer}>
+            {/* Support Section */}
+            <Text style={[styles.menuSectionTitle, { color: theme.colors.textSecondary }]}>SUPPORT</Text>
+            <View style={[styles.menuGroup, { backgroundColor: theme.colors.surface }]}>
+              {renderMenuItem(HelpCircle, 'Help & Support', handleHelpSupport, true)}
+              {renderMenuItem(Star, 'Rate the App', handleRateApp, true)}
+              {renderMenuItem(Megaphone, 'Share App', handleShareApp, false)}
+            </View>
           </View>
 
           {/* Sign Up Prompt (for anonymous users) */}
@@ -701,6 +577,11 @@ const ProfileScreen: React.FC = () => {
           </Text>
         </Animated.View>
       </ScrollView>
+
+      <HabiCustomizationSheet
+        visible={isHabiSheetVisible}
+        onClose={() => setIsHabiSheetVisible(false)}
+      />
     </SafeAreaView>
   );
 };
@@ -719,89 +600,208 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 20,
   },
-  profileHeader: {
+  headerContainer: {
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    marginBottom: 24,
+  },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  settingsButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileInfo: {
     alignItems: 'center',
     marginBottom: 24,
   },
   avatarContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    backgroundColor: '#3B82F6',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 4,
-    marginBottom: 16,
+    marginBottom: 12,
     position: 'relative',
   },
-  avatarText: {},
+  avatarText: {
+    fontSize: 32,
+    fontWeight: '700',
+  },
   premiumBadge: {
     position: 'absolute',
-    bottom: 0,
-    right: 0,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 10,
-  },
-  premiumBadgeText: {
-    color: '#fff',
-    fontSize: 10,
-    fontWeight: 'bold',
+    bottom: -4,
+    right: -4,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#FFF',
   },
   userName: {
+    fontSize: 24,
+    fontWeight: '700',
     marginBottom: 4,
-    textAlign: 'center',
   },
-  userEmail: {
-    textAlign: 'center',
+  memberSince: {
+    fontSize: 14,
   },
-  statsContainer: {
-    marginBottom: 24,
-  },
-  statsScroll: {
-    gap: 12,
-  },
-  statCard: {
-    paddingVertical: 16,
-    paddingHorizontal: 20,
+  levelContainer: {
+    padding: 16,
     borderRadius: 16,
-    borderWidth: 1,
-    alignItems: 'center',
-    minWidth: 100,
   },
-  statIconContainer: {
+  levelInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 8,
   },
-  statValue: {
-    marginBottom: 4,
+  levelBadge: {
+    backgroundColor: '#3B82F6',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
   },
-  statLabel: {
-    textAlign: 'center',
+  levelText: {
+    color: '#FFF',
+    fontSize: 12,
+    fontWeight: '700',
   },
-  subscriptionCard: {
-    borderRadius: 16,
-    borderWidth: 1,
-    padding: 20,
+  xpText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  progressBarBg: {
+    height: 6,
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    borderRadius: 3,
+  },
+  bentoGrid: {
+    flexDirection: 'row',
+    gap: 12,
+    paddingHorizontal: 24,
     marginBottom: 24,
   },
-  subscriptionHeader: {
+  bentoCard: {
+    borderRadius: 20,
+    padding: 16,
+  },
+  bentoCardLarge: {
+    flex: 1,
+    justifyContent: 'space-between',
+    aspectRatio: 0.85,
+  },
+  bentoColumn: {
+    flex: 1,
+    gap: 12,
+  },
+  bentoCardSmall: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  iconCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  bentoValue: {
+    fontSize: 32,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  bentoLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  bentoValueSmall: {
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  bentoLabelSmall: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  premiumBanner: {
+    marginHorizontal: 24,
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 32,
+  },
+  premiumContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    gap: 16,
   },
-  subscriptionIconContainer: {
-    marginRight: 12,
-  },
-  subscriptionTitle: {},
-  subscriptionSubtitle: {
-    marginTop: 2,
-  },
-  manageButton: {
-    borderWidth: 1,
-    borderRadius: 12,
-    paddingVertical: 12,
+  premiumIconCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  manageButtonText: {},
+  premiumTitle: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  premiumSubtitle: {
+    color: 'rgba(255,255,255,0.9)',
+    fontSize: 13,
+  },
+  menuContainer: {
+    paddingHorizontal: 24,
+    marginBottom: 32,
+  },
+  menuSectionTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    marginBottom: 12,
+    marginLeft: 4,
+  },
+  menuGroup: {
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+  },
+  menuItemLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  menuIconContainer: {
+    width: 32,
+    alignItems: 'center',
+  },
+  menuLabel: {
+    fontSize: 16,
+  },
   freeHeader: {
     marginBottom: 16,
   },
@@ -827,33 +827,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   upgradeButtonText: {},
-  menuSection: {
-    borderRadius: 16,
-    borderWidth: 1,
-    marginBottom: 16,
-    overflow: 'hidden',
-  },
-  menuSectionTitle: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 8,
-    letterSpacing: 1,
-  },
-  menuItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-  },
-  menuItemLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  menuIconContainer: {
-    marginRight: 12,
-  },
-  menuLabel: {},
+
   signUpPrompt: {
     borderRadius: 16,
     borderWidth: 1,
@@ -886,6 +860,53 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   logOutText: {},
+  carouselContainer: {
+    marginBottom: 32,
+  },
+  sectionTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 1,
+    marginLeft: 28,
+    marginBottom: 16,
+  },
+  carouselContent: {
+    paddingHorizontal: 24,
+    gap: 16,
+  },
+  featureCard: {
+    width: 160,
+    borderRadius: 20,
+    padding: 16,
+    alignItems: 'center',
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  featureCardGradient: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  featureCardContent: {
+    alignItems: 'center',
+  },
+  featureCardTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  featureCardSubtitle: {
+    fontSize: 12,
+    textAlign: 'center',
+    lineHeight: 16,
+  },
   versionText: {
     textAlign: 'center',
     marginBottom: 24,

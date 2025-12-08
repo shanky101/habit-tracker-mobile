@@ -18,7 +18,25 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme, themes, themeMetadata } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 import { useMascot, MASCOT_NAME } from '@/context/MascotContext';
-import { User, Palette, Sparkles, PartyPopper, Smartphone, Lightbulb, ChevronRight } from 'lucide-react-native';
+import { useSubscription } from '@/context/SubscriptionContext';
+import { LinearGradient } from 'expo-linear-gradient';
+import {
+  User,
+  Palette,
+  Sparkles,
+  PartyPopper,
+  Smartphone,
+  Lightbulb,
+  ChevronRight,
+  Bell,
+  Lock,
+  Shield,
+  Upload,
+  Cloud,
+  LogOut,
+  Crown,
+  Mail
+} from 'lucide-react-native';
 
 type SettingsNavigationProp = StackNavigationProp<any, 'Settings'>;
 
@@ -28,7 +46,9 @@ const SettingsScreen: React.FC = () => {
   const navigation = useNavigation<SettingsNavigationProp>();
   const { theme, themeVariant, themeMode } = useTheme();
   const { fadeAnim, slideAnim } = useScreenAnimation();
-  const { settings: mascotSettings, toggleMascot, toggleCelebrations, toggleDisplayMode } = useMascot();
+  const { settings: mascotSettings, toggleMascot, toggleCelebrations } = useMascot();
+  const { subscription } = useSubscription();
+  const isPremium = subscription.isPremium;
 
   const [userName, setUserName] = useState('');
   const [isEditingName, setIsEditingName] = useState(false);
@@ -126,41 +146,48 @@ const SettingsScreen: React.FC = () => {
         contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 }]}
         showsVerticalScrollIndicator={false}
       >
-        {/* Profile Section */}
-        <Animated.View
-          style={[
-            styles.section,
-            {
-              backgroundColor: theme.colors.backgroundSecondary,
-              borderColor: theme.colors.border,
-              opacity: fadeAnim,
-            },
-          ]}
-        >
-          <Text
-            style={[
-              styles.sectionTitle,
-              {
-                color: theme.colors.textSecondary,
-                fontFamily: theme.typography.fontFamilyBodySemibold,
-                fontSize: theme.typography.fontSizeXS,
-              },
-            ]}
-          >
-            PROFILE
-          </Text>
+        {/* Premium Nudge (if free) */}
+        {!isPremium && (
+          <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={() => navigation.navigate('Paywall')}
+              style={styles.premiumNudge}
+            >
+              <LinearGradient
+                colors={[theme.colors.primary, theme.colors.secondary]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.premiumGradient}
+              >
+                <View style={styles.premiumIcon}>
+                  <Crown size={20} color="#FFF" fill="#FFF" />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.nudgeTitle}>Upgrade to Premium</Text>
+                  <Text style={styles.nudgeSubtitle}>Unlock unlimited habits & cloud sync</Text>
+                </View>
+                <ChevronRight size={20} color="#FFF" />
+              </LinearGradient>
+            </TouchableOpacity>
+          </Animated.View>
+        )}
 
+        {/* Account Section */}
+        <View style={styles.sectionHeader}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>ACCOUNT</Text>
+        </View>
+        <View style={[styles.sectionGroup, { backgroundColor: theme.colors.surface }]}>
           {isEditingName ? (
             <View style={styles.editNameContainer}>
               <TextInput
                 style={[
                   styles.nameInput,
                   {
-                    backgroundColor: theme.colors.surface,
+                    backgroundColor: theme.colors.background,
                     borderColor: theme.colors.primary,
                     color: theme.colors.text,
                     fontFamily: theme.typography.fontFamilyBody,
-                    fontSize: theme.typography.fontSizeMD,
                   },
                 ]}
                 value={tempName}
@@ -186,406 +213,157 @@ const SettingsScreen: React.FC = () => {
             </View>
           ) : (
             <TouchableOpacity
-              style={[styles.settingRow, { borderBottomColor: theme.colors.border }]}
+              style={styles.settingRow}
               onPress={startEditingName}
-              activeOpacity={0.7}
             >
-              <View style={styles.settingInfo}>
-                <View style={styles.settingIconContainer}>
-                  <User size={22} color={theme.colors.primary} strokeWidth={2} />
-                </View>
-                <View>
-                  <Text
-                    style={[
-                      styles.settingLabel,
-                      {
-                        color: theme.colors.text,
-                        fontFamily: theme.typography.fontFamilyBodyMedium,
-                        fontSize: theme.typography.fontSizeMD,
-                      },
-                    ]}
-                  >
-                    Name
-                  </Text>
-                  <Text
-                    style={[
-                      styles.settingValue,
-                      {
-                        color: theme.colors.textSecondary,
-                        fontFamily: theme.typography.fontFamilyBody,
-                        fontSize: theme.typography.fontSizeSM,
-                      },
-                    ]}
-                  >
-                    {userName || 'Tap to set your name'}
-                  </Text>
-                </View>
+              <View style={[styles.iconBox, { backgroundColor: theme.colors.primary + '15' }]}>
+                <User size={20} color={theme.colors.primary} />
               </View>
-              <ChevronRight size={18} color={theme.colors.textTertiary} strokeWidth={2} />
+              <View style={styles.rowContent}>
+                <Text style={[styles.rowLabel, { color: theme.colors.text }]}>Name</Text>
+                <Text style={[styles.rowValue, { color: theme.colors.textSecondary }]}>{userName || 'Set Name'}</Text>
+              </View>
+              <ChevronRight size={16} color={theme.colors.textTertiary} />
             </TouchableOpacity>
           )}
-        </Animated.View>
 
-        {/* Appearance Section */}
-        <Animated.View
-          style={[
-            styles.section,
-            {
-              backgroundColor: theme.colors.backgroundSecondary,
-              borderColor: theme.colors.border,
-              opacity: fadeAnim,
-            },
-          ]}
-        >
-          <Text
-            style={[
-              styles.sectionTitle,
-              {
-                color: theme.colors.textSecondary,
-                fontFamily: theme.typography.fontFamilyBodySemibold,
-                fontSize: theme.typography.fontSizeXS,
-              },
-            ]}
-          >
-            APPEARANCE
-          </Text>
+          <View style={[styles.separator, { backgroundColor: theme.colors.border }]} />
 
           <TouchableOpacity
-            style={[styles.settingRow, { borderBottomColor: theme.colors.border }]}
-            onPress={() => navigation.navigate('ThemePicker')}
-            activeOpacity={0.7}
+            style={styles.settingRow}
+            onPress={() => navigation.navigate('AccountSettings')}
           >
-            <View style={styles.settingInfo}>
-              <View style={styles.settingIconContainer}>
-                <Palette size={22} color={theme.colors.primary} strokeWidth={2} />
-              </View>
-              <View>
-                <Text
-                  style={[
-                    styles.settingLabel,
-                    {
-                      color: theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBodyMedium,
-                      fontSize: theme.typography.fontSizeMD,
-                    },
-                  ]}
-                >
-                  Theme
-                </Text>
-                <Text
-                  style={[
-                    styles.settingValue,
-                    {
-                      color: theme.colors.textSecondary,
-                      fontFamily: theme.typography.fontFamilyBody,
-                      fontSize: theme.typography.fontSizeSM,
-                    },
-                  ]}
-                >
-                  {displayThemeMode}
-                </Text>
-              </View>
+            <View style={[styles.iconBox, { backgroundColor: theme.colors.secondary + '15' }]}>
+              <Lock size={20} color={theme.colors.secondary} />
             </View>
-            <View style={styles.themePreview}>
-              {themeMetadata[themeVariant].previewColors.slice(0, 3).map((color, index) => (
-                <View
-                  key={index}
-                  style={[
-                    styles.previewDot,
-                    { backgroundColor: color },
-                  ]}
-                />
-              ))}
-              <ChevronRight size={18} color={theme.colors.textTertiary} strokeWidth={2} />
+            <View style={styles.rowContent}>
+              <Text style={[styles.rowLabel, { color: theme.colors.text }]}>Account Security</Text>
             </View>
+            <ChevronRight size={16} color={theme.colors.textTertiary} />
           </TouchableOpacity>
-        </Animated.View>
+        </View>
 
-        {/* Habi & Celebrations Section */}
-        <Animated.View
-          style={[
-            styles.section,
-            {
-              backgroundColor: theme.colors.backgroundSecondary,
-              borderColor: theme.colors.border,
-              opacity: fadeAnim,
-            },
-          ]}
-        >
-          <Text
-            style={[
-              styles.sectionTitle,
-              {
-                color: theme.colors.textSecondary,
-                fontFamily: theme.typography.fontFamilyBodySemibold,
-                fontSize: theme.typography.fontSizeXS,
-              },
-            ]}
+        {/* Preferences Section */}
+        <View style={styles.sectionHeader}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>PREFERENCES</Text>
+        </View>
+        <View style={[styles.sectionGroup, { backgroundColor: theme.colors.surface }]}>
+          <TouchableOpacity
+            style={styles.settingRow}
+            onPress={() => navigation.navigate('ThemePicker')}
           >
-            HABI & CELEBRATIONS
-          </Text>
+            <View style={[styles.iconBox, { backgroundColor: '#8B5CF615' }]}>
+              <Palette size={20} color="#8B5CF6" />
+            </View>
+            <View style={styles.rowContent}>
+              <Text style={[styles.rowLabel, { color: theme.colors.text }]}>Theme</Text>
+              <View style={styles.themePreview}>
+                {themeMetadata[themeVariant].previewColors.slice(0, 3).map((color, index) => (
+                  <View key={index} style={[styles.previewDot, { backgroundColor: color }]} />
+                ))}
+              </View>
+            </View>
+            <ChevronRight size={16} color={theme.colors.textTertiary} />
+          </TouchableOpacity>
 
-          <View style={[styles.settingRow, { borderBottomColor: theme.colors.border }]}>
-            <View style={styles.settingInfo}>
-              <View style={styles.settingIconContainer}>
-                <Sparkles size={22} color={theme.colors.primary} strokeWidth={2} />
-              </View>
-              <View style={styles.settingTextContainer}>
-                <Text
-                  style={[
-                    styles.settingLabel,
-                    {
-                      color: theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBodyMedium,
-                      fontSize: theme.typography.fontSizeMD,
-                    },
-                  ]}
-                >
-                  Show {MASCOT_NAME}
-                </Text>
-                <Text
-                  style={[
-                    styles.settingValue,
-                    {
-                      color: theme.colors.textSecondary,
-                      fontFamily: theme.typography.fontFamilyBody,
-                      fontSize: theme.typography.fontSizeSM,
-                    },
-                  ]}
-                >
-                  Your friendly habit companion
-                </Text>
-              </View>
+          <View style={[styles.separator, { backgroundColor: theme.colors.border }]} />
+
+          <TouchableOpacity
+            style={styles.settingRow}
+            onPress={() => navigation.navigate('NotificationsSettings')}
+          >
+            <View style={[styles.iconBox, { backgroundColor: '#F59E0B15' }]}>
+              <Bell size={20} color="#F59E0B" />
+            </View>
+            <View style={styles.rowContent}>
+              <Text style={[styles.rowLabel, { color: theme.colors.text }]}>Notifications</Text>
+            </View>
+            <ChevronRight size={16} color={theme.colors.textTertiary} />
+          </TouchableOpacity>
+
+          <View style={[styles.separator, { backgroundColor: theme.colors.border }]} />
+
+          <View style={styles.settingRow}>
+            <View style={[styles.iconBox, { backgroundColor: '#EC489915' }]}>
+              <Sparkles size={20} color="#EC4899" />
+            </View>
+            <View style={styles.rowContent}>
+              <Text style={[styles.rowLabel, { color: theme.colors.text }]}>Show {MASCOT_NAME}</Text>
             </View>
             <Switch
               value={mascotSettings.enabled}
               onValueChange={toggleMascot}
-              trackColor={{ false: theme.colors.border, true: theme.colors.primary + '60' }}
-              thumbColor={mascotSettings.enabled ? theme.colors.primary : theme.colors.surface}
+              trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+              thumbColor="#FFF"
             />
           </View>
+        </View>
 
-          <View style={[styles.settingRow, { borderBottomWidth: 0 }]}>
-            <View style={styles.settingInfo}>
-              <View style={styles.settingIconContainer}>
-                <PartyPopper size={22} color={theme.colors.primary} strokeWidth={2} />
-              </View>
-              <View style={styles.settingTextContainer}>
-                <Text
-                  style={[
-                    styles.settingLabel,
-                    {
-                      color: theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBodyMedium,
-                      fontSize: theme.typography.fontSizeMD,
-                    },
-                  ]}
-                >
-                  Show Celebrations
-                </Text>
-                <Text
-                  style={[
-                    styles.settingValue,
-                    {
-                      color: theme.colors.textSecondary,
-                      fontFamily: theme.typography.fontFamilyBody,
-                      fontSize: theme.typography.fontSizeSM,
-                    },
-                  ]}
-                >
-                  Celebrate when completing all habits
-                </Text>
-              </View>
-            </View>
-            <Switch
-              value={mascotSettings.showCelebrations}
-              onValueChange={toggleCelebrations}
-              trackColor={{ false: theme.colors.border, true: theme.colors.primary + '60' }}
-              thumbColor={mascotSettings.showCelebrations ? theme.colors.primary : theme.colors.surface}
-            />
-          </View>
-
-          {/* Habi Display Mode Option */}
-          <View style={[styles.settingRow, { borderBottomWidth: 0, borderTopWidth: 1, borderTopColor: theme.colors.border, marginTop: 12, paddingTop: 16 }]}>
-            <View style={styles.settingInfo}>
-              <View style={styles.settingIconContainer}>
-                <Text style={{ fontSize: 20 }}>🎨</Text>
-              </View>
-              <View style={styles.settingTextContainer}>
-                <Text
-                  style={[
-                    styles.settingLabel,
-                    {
-                      color: theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBodyMedium,
-                      fontSize: theme.typography.fontSizeMD,
-                    },
-                  ]}
-                >
-                  {MASCOT_NAME} Display Mode
-                </Text>
-                <Text
-                  style={[
-                    styles.settingValue,
-                    {
-                      color: theme.colors.textSecondary,
-                      fontFamily: theme.typography.fontFamilyBody,
-                      fontSize: theme.typography.fontSizeSM,
-                    },
-                  ]}
-                >
-                  Choose between compact and default
-                </Text>
-              </View>
-            </View>
-            <View style={{ flexDirection: 'row', gap: 8 }}>
-              <TouchableOpacity
-                style={[
-                  styles.displayModeButton,
-                  {
-                    backgroundColor: mascotSettings.displayMode === 'compact' ? theme.colors.primary : theme.colors.surface,
-                    borderColor: theme.colors.border,
-                  },
-                ]}
-                onPress={() => toggleDisplayMode('compact')}
-                activeOpacity={0.7}
-              >
-                <Text
-                  style={[
-                    styles.displayModeText,
-                    {
-                      color: mascotSettings.displayMode === 'compact' ? '#FFF' : theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBodyMedium,
-                    },
-                  ]}
-                >
-                  Compact
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.displayModeButton,
-                  {
-                    backgroundColor: mascotSettings.displayMode === 'default' ? theme.colors.primary : theme.colors.surface,
-                    borderColor: theme.colors.border,
-                  },
-                ]}
-                onPress={() => toggleDisplayMode('default')}
-                activeOpacity={0.7}
-              >
-                <Text
-                  style={[
-                    styles.displayModeText,
-                    {
-                      color: mascotSettings.displayMode === 'default' ? '#FFF' : theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBodyMedium,
-                    },
-                  ]}
-                >
-                  Default
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Animated.View>
-
-        {/* About Section */}
-        <Animated.View
-          style={[
-            styles.section,
-            {
-              backgroundColor: theme.colors.backgroundSecondary,
-              borderColor: theme.colors.border,
-              opacity: fadeAnim,
-            },
-          ]}
-        >
-          <Text
-            style={[
-              styles.sectionTitle,
-              {
-                color: theme.colors.textSecondary,
-                fontFamily: theme.typography.fontFamilyBodySemibold,
-                fontSize: theme.typography.fontSizeXS,
-              },
-            ]}
+        {/* Data Section */}
+        <View style={styles.sectionHeader}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>DATA & PRIVACY</Text>
+        </View>
+        <View style={[styles.sectionGroup, { backgroundColor: theme.colors.surface }]}>
+          <TouchableOpacity
+            style={styles.settingRow}
+            onPress={() => navigation.navigate('DataPrivacy')}
           >
-            ABOUT
-          </Text>
-
-          <View style={[styles.settingRow, { borderBottomColor: theme.colors.border }]}>
-            <View style={styles.settingInfo}>
-              <View style={styles.settingIconContainer}>
-                <Smartphone size={22} color={theme.colors.primary} strokeWidth={2} />
-              </View>
-              <View>
-                <Text
-                  style={[
-                    styles.settingLabel,
-                    {
-                      color: theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBodyMedium,
-                      fontSize: theme.typography.fontSizeMD,
-                    },
-                  ]}
-                >
-                  Version
-                </Text>
-                <Text
-                  style={[
-                    styles.settingValue,
-                    {
-                      color: theme.colors.textSecondary,
-                      fontFamily: theme.typography.fontFamilyBody,
-                      fontSize: theme.typography.fontSizeSM,
-                    },
-                  ]}
-                >
-                  1.0.0
-                </Text>
-              </View>
+            <View style={[styles.iconBox, { backgroundColor: '#10B98115' }]}>
+              <Shield size={20} color="#10B981" />
             </View>
-          </View>
+            <View style={styles.rowContent}>
+              <Text style={[styles.rowLabel, { color: theme.colors.text }]}>Privacy Policy</Text>
+            </View>
+            <ChevronRight size={16} color={theme.colors.textTertiary} />
+          </TouchableOpacity>
+
+          <View style={[styles.separator, { backgroundColor: theme.colors.border }]} />
 
           <TouchableOpacity
-            style={[styles.settingRow, { borderBottomWidth: 0 }]}
-            onPress={handleSendFeedback}
-            activeOpacity={0.7}
+            style={styles.settingRow}
+            onPress={() => navigation.navigate('ExportData')}
           >
-            <View style={styles.settingInfo}>
-              <View style={styles.settingIconContainer}>
-                <Lightbulb size={22} color={theme.colors.primary} strokeWidth={2} />
-              </View>
-              <View>
-                <Text
-                  style={[
-                    styles.settingLabel,
-                    {
-                      color: theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBodyMedium,
-                      fontSize: theme.typography.fontSizeMD,
-                    },
-                  ]}
-                >
-                  Send Feedback
-                </Text>
-                <Text
-                  style={[
-                    styles.settingValue,
-                    {
-                      color: theme.colors.textSecondary,
-                      fontFamily: theme.typography.fontFamilyBody,
-                      fontSize: theme.typography.fontSizeSM,
-                    },
-                  ]}
-                >
-                  Help us improve the app
-                </Text>
-              </View>
+            <View style={[styles.iconBox, { backgroundColor: '#3B82F615' }]}>
+              <Upload size={20} color="#3B82F6" />
             </View>
-            <ChevronRight size={18} color={theme.colors.textTertiary} strokeWidth={2} />
+            <View style={styles.rowContent}>
+              <Text style={[styles.rowLabel, { color: theme.colors.text }]}>Export Data</Text>
+            </View>
+            <ChevronRight size={16} color={theme.colors.textTertiary} />
           </TouchableOpacity>
-        </Animated.View>
+        </View>
+
+        {/* Support Section */}
+        <View style={styles.sectionHeader}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>SUPPORT</Text>
+        </View>
+        <View style={[styles.sectionGroup, { backgroundColor: theme.colors.surface }]}>
+          <TouchableOpacity
+            style={styles.settingRow}
+            onPress={handleSendFeedback}
+          >
+            <View style={[styles.iconBox, { backgroundColor: '#6366F115' }]}>
+              <Mail size={20} color="#6366F1" />
+            </View>
+            <View style={styles.rowContent}>
+              <Text style={[styles.rowLabel, { color: theme.colors.text }]}>Send Feedback</Text>
+            </View>
+            <ChevronRight size={16} color={theme.colors.textTertiary} />
+          </TouchableOpacity>
+
+          <View style={[styles.separator, { backgroundColor: theme.colors.border }]} />
+
+          <View style={styles.settingRow}>
+            <View style={[styles.iconBox, { backgroundColor: theme.colors.textTertiary + '15' }]}>
+              <Smartphone size={20} color={theme.colors.textTertiary} />
+            </View>
+            <View style={styles.rowContent}>
+              <Text style={[styles.rowLabel, { color: theme.colors.text }]}>Version</Text>
+              <Text style={[styles.rowValue, { color: theme.colors.textSecondary }]}>1.0.0</Text>
+            </View>
+          </View>
+        </View>
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -608,44 +386,55 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingBottom: 100,
   },
-  section: {
-    borderRadius: 16,
-    borderWidth: 1,
-    marginBottom: 24,
-    overflow: 'hidden',
+  sectionHeader: {
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 8,
   },
   sectionTitle: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 8,
+    fontSize: 12,
+    fontWeight: '600',
     letterSpacing: 1,
+    marginLeft: 4,
+  },
+  sectionGroup: {
+    marginHorizontal: 24,
+    borderRadius: 16,
+    overflow: 'hidden',
   },
   settingRow: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
+    padding: 16,
+    minHeight: 56,
+  },
+  iconBox: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
+    marginRight: 12,
   },
-  settingInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  rowContent: {
     flex: 1,
+    justifyContent: 'center',
   },
-  settingIconContainer: {
-    marginRight: 14,
+  rowLabel: {
+    fontSize: 16,
+    fontWeight: '500',
   },
-  settingTextContainer: {
-    flex: 1,
-  },
-  settingLabel: {},
-  settingValue: {
+  rowValue: {
+    fontSize: 14,
     marginTop: 2,
+  },
+  separator: {
+    height: 1,
+    marginLeft: 60, // Align with text start (16 padding + 32 icon + 12 margin)
   },
   themePreview: {
     flexDirection: 'row',
-    alignItems: 'center',
     gap: 6,
   },
   previewDot: {
@@ -653,14 +442,45 @@ const styles = StyleSheet.create({
     height: 16,
     borderRadius: 8,
   },
+  premiumNudge: {
+    marginHorizontal: 24,
+    marginBottom: 8,
+    marginTop: 8,
+  },
+  premiumGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 16,
+    gap: 12,
+  },
+  premiumIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  nudgeTitle: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 2,
+  },
+  nudgeSubtitle: {
+    color: 'rgba(255,255,255,0.9)',
+    fontSize: 12,
+  },
   editNameContainer: {
     padding: 16,
   },
   nameInput: {
     padding: 12,
     borderRadius: 10,
-    borderWidth: 2,
+    borderWidth: 1,
     marginBottom: 12,
+    fontSize: 16,
   },
   editNameButtons: {
     flexDirection: 'row',
@@ -668,16 +488,9 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   editButton: {
-    padding: 8,
-  },
-  displayModeButton: {
-    paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 12,
-    borderWidth: 1,
-  },
-  displayModeText: {
-    fontSize: 13,
+    paddingHorizontal: 16,
+    borderRadius: 8,
   },
 });
 

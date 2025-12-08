@@ -7,6 +7,7 @@ import {
   Animated,
   ScrollView,
   Dimensions,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -306,16 +307,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 2,
     borderColor: 'transparent',
+    padding: 8,
   },
   selectedCategoryCard: {
     backgroundColor: '#FFF',
   },
   categoryIcon: {
     fontSize: 32,
-    marginBottom: 8,
+    marginBottom: 6, // Reduced from 8
+    textAlign: 'center',
   },
   categoryLabel: {
     fontSize: 12,
+    textAlign: 'center',
   },
   checkBadge: {
     position: 'absolute',
@@ -394,7 +398,8 @@ const styles = StyleSheet.create({
     opacity: 0.3,
   },
   footer: {
-    padding: 24,
+    padding: 16,
+    paddingBottom: Platform.OS === 'ios' ? 16 : 24,
     borderTopWidth: 1,
     borderTopColor: 'rgba(0,0,0,0.05)',
   },
