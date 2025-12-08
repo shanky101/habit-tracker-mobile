@@ -22,6 +22,14 @@ export interface HabitTemplate {
   createdAt: string; // ISO timestamp
   updatedAt?: string; // ISO timestamp
 
+  // Rich Metadata (New)
+  type: 'build' | 'quit' | 'mixed'; // Build new habits or quit bad ones
+  difficulty: 'easy' | 'medium' | 'hard';
+  duration: string; // e.g., "21 Days", "Lifetime"
+  benefits: string[]; // List of key benefits (3-5 items)
+  outcomes: string[]; // Expected results (2-3 items)
+  timeline: { week: number; title: string; description: string }[]; // Journey milestones
+
   // Visual
   emoji: string; // Template icon
   color: string; // Theme color
@@ -36,6 +44,7 @@ export interface HabitTemplateConfig {
   emoji: string;
   category: 'health' | 'fitness' | 'mindfulness' | 'productivity' | 'learning' | 'social' | 'finance' | 'creativity';
   notes?: string;
+  timePeriod?: 'morning' | 'afternoon' | 'evening' | 'anytime';
 
   // Schedule
   frequency: 'daily' | 'weekly';
@@ -60,256 +69,6 @@ export interface TemplatePack {
   author?: string;
   tags: string[];
 }
-
-/**
- * Default Built-in Templates
- */
-export const DEFAULT_TEMPLATES: HabitTemplate[] = [
-  {
-    id: 'morning-routine',
-    version: '1.0',
-    name: 'Morning Routine',
-    description: 'Start your day with energy and focus',
-    emoji: '🌅',
-    color: 'orange',
-    tags: ['wellness', 'productivity', 'morning'],
-    isDefault: true,
-    createdAt: '2024-01-01T00:00:00.000Z',
-    habits: [
-      {
-        name: 'Wake up early',
-        emoji: '⏰',
-        category: 'health',
-        frequency: 'daily',
-        frequencyType: 'single',
-        targetCompletionsPerDay: 1,
-        selectedDays: [0, 1, 2, 3, 4, 5, 6],
-        reminderEnabled: true,
-        reminderTime: '06:00',
-        notes: 'Aim for 6-7 AM to establish a consistent routine',
-      },
-      {
-        name: 'Morning meditation',
-        emoji: '🧘',
-        category: 'mindfulness',
-        frequency: 'daily',
-        frequencyType: 'single',
-        targetCompletionsPerDay: 1,
-        selectedDays: [0, 1, 2, 3, 4, 5, 6],
-        reminderEnabled: false,
-        reminderTime: null,
-        notes: '10-15 minutes of mindfulness to start the day',
-      },
-      {
-        name: 'Healthy breakfast',
-        emoji: '🥗',
-        category: 'health',
-        frequency: 'daily',
-        frequencyType: 'single',
-        targetCompletionsPerDay: 1,
-        selectedDays: [0, 1, 2, 3, 4, 5, 6],
-        reminderEnabled: false,
-        reminderTime: null,
-      },
-    ],
-  },
-  {
-    id: 'fitness-fundamentals',
-    version: '1.0',
-    name: 'Fitness Fundamentals',
-    description: 'Build a strong foundation for physical health',
-    emoji: '💪',
-    color: 'red',
-    tags: ['fitness', 'health', 'exercise'],
-    isDefault: true,
-    createdAt: '2024-01-01T00:00:00.000Z',
-    habits: [
-      {
-        name: 'Morning workout',
-        emoji: '🏋️',
-        category: 'fitness',
-        frequency: 'weekly',
-        frequencyType: 'single',
-        targetCompletionsPerDay: 1,
-        selectedDays: [1, 3, 5], // Mon, Wed, Fri
-        reminderEnabled: true,
-        reminderTime: '07:00',
-        notes: '30-45 minutes of strength training',
-      },
-      {
-        name: 'Drink water',
-        emoji: '💧',
-        category: 'health',
-        frequency: 'daily',
-        frequencyType: 'multiple',
-        targetCompletionsPerDay: 8,
-        selectedDays: [0, 1, 2, 3, 4, 5, 6],
-        reminderEnabled: false,
-        reminderTime: null,
-        notes: 'Aim for 8 glasses per day',
-      },
-      {
-        name: 'Evening walk',
-        emoji: '🚶',
-        category: 'fitness',
-        frequency: 'daily',
-        frequencyType: 'single',
-        targetCompletionsPerDay: 1,
-        selectedDays: [0, 1, 2, 3, 4, 5, 6],
-        reminderEnabled: true,
-        reminderTime: '18:00',
-        notes: '20-30 minutes of light cardio',
-      },
-    ],
-  },
-  {
-    id: 'productivity-power',
-    version: '1.0',
-    name: 'Productivity Power',
-    description: 'Maximize your daily output and focus',
-    emoji: '🚀',
-    color: 'blue',
-    tags: ['productivity', 'work', 'focus'],
-    isDefault: true,
-    createdAt: '2024-01-01T00:00:00.000Z',
-    habits: [
-      {
-        name: 'Review daily goals',
-        emoji: '📋',
-        category: 'productivity',
-        frequency: 'daily',
-        frequencyType: 'single',
-        targetCompletionsPerDay: 1,
-        selectedDays: [1, 2, 3, 4, 5], // Weekdays
-        reminderEnabled: true,
-        reminderTime: '09:00',
-        notes: 'Set 3 key priorities for the day',
-      },
-      {
-        name: 'Deep work session',
-        emoji: '🎯',
-        category: 'productivity',
-        frequency: 'daily',
-        frequencyType: 'multiple',
-        targetCompletionsPerDay: 2,
-        selectedDays: [1, 2, 3, 4, 5],
-        reminderEnabled: false,
-        reminderTime: null,
-        notes: '90-minute focused work blocks',
-      },
-      {
-        name: 'Inbox zero',
-        emoji: '📧',
-        category: 'productivity',
-        frequency: 'daily',
-        frequencyType: 'single',
-        targetCompletionsPerDay: 1,
-        selectedDays: [1, 2, 3, 4, 5],
-        reminderEnabled: true,
-        reminderTime: '16:00',
-        notes: 'Clear email and messages',
-      },
-    ],
-  },
-  {
-    id: 'learning-journey',
-    version: '1.0',
-    name: 'Learning Journey',
-    description: 'Continuous growth and skill development',
-    emoji: '📚',
-    color: 'purple',
-    tags: ['learning', 'education', 'growth'],
-    isDefault: true,
-    createdAt: '2024-01-01T00:00:00.000Z',
-    habits: [
-      {
-        name: 'Read for 30 minutes',
-        emoji: '📖',
-        category: 'learning',
-        frequency: 'daily',
-        frequencyType: 'single',
-        targetCompletionsPerDay: 1,
-        selectedDays: [0, 1, 2, 3, 4, 5, 6],
-        reminderEnabled: true,
-        reminderTime: '21:00',
-        notes: 'Books, articles, or research papers',
-      },
-      {
-        name: 'Practice new skill',
-        emoji: '🎨',
-        category: 'learning',
-        frequency: 'daily',
-        frequencyType: 'single',
-        targetCompletionsPerDay: 1,
-        selectedDays: [0, 1, 2, 3, 4, 5, 6],
-        reminderEnabled: false,
-        reminderTime: null,
-        notes: 'Coding, language, instrument, etc.',
-      },
-      {
-        name: 'Watch educational content',
-        emoji: '🎓',
-        category: 'learning',
-        frequency: 'weekly',
-        frequencyType: 'single',
-        targetCompletionsPerDay: 1,
-        selectedDays: [0, 6], // Weekends
-        reminderEnabled: false,
-        reminderTime: null,
-        notes: 'Documentaries, courses, tutorials',
-      },
-    ],
-  },
-  {
-    id: 'mindfulness-peace',
-    version: '1.0',
-    name: 'Mindfulness & Peace',
-    description: 'Cultivate inner calm and mental clarity',
-    emoji: '🧠',
-    color: 'teal',
-    tags: ['mindfulness', 'mental-health', 'wellness'],
-    isDefault: true,
-    createdAt: '2024-01-01T00:00:00.000Z',
-    habits: [
-      {
-        name: 'Morning meditation',
-        emoji: '🧘',
-        category: 'mindfulness',
-        frequency: 'daily',
-        frequencyType: 'single',
-        targetCompletionsPerDay: 1,
-        selectedDays: [0, 1, 2, 3, 4, 5, 6],
-        reminderEnabled: true,
-        reminderTime: '07:00',
-        notes: '10-15 minutes of guided or silent meditation',
-      },
-      {
-        name: 'Gratitude journaling',
-        emoji: '📝',
-        category: 'mindfulness',
-        frequency: 'daily',
-        frequencyType: 'single',
-        targetCompletionsPerDay: 1,
-        selectedDays: [0, 1, 2, 3, 4, 5, 6],
-        reminderEnabled: true,
-        reminderTime: '22:00',
-        notes: 'Write 3 things you\'re grateful for',
-      },
-      {
-        name: 'Digital detox hour',
-        emoji: '📵',
-        category: 'mindfulness',
-        frequency: 'daily',
-        frequencyType: 'single',
-        targetCompletionsPerDay: 1,
-        selectedDays: [0, 1, 2, 3, 4, 5, 6],
-        reminderEnabled: false,
-        reminderTime: null,
-        notes: 'One hour without screens before bed',
-      },
-    ],
-  },
-];
 
 /**
  * Utility functions for templates

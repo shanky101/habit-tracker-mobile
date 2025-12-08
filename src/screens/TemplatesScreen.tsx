@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -6,59 +7,118 @@ import {
   TouchableOpacity,
   ScrollView,
   Animated,
-  Alert,
-  Share,
   TextInput,
   Modal,
-  FlatList,
+  Dimensions,
+  Easing,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import type { StackNavigationProp } from '@react-navigation/stack';
-import * as Clipboard from 'expo-clipboard';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '@/theme';
 import { useTemplates } from '@/contexts/TemplateContext';
-import { useHabits, Habit } from '@/hooks/useHabits';
+import { useHabits } from '@/hooks/useHabits';
 import { HabitTemplate } from '@/types/HabitTemplate';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
-import { Search, X, Copy, Plus } from 'lucide-react-native';
+import { Search, X, Plus, ChevronRight, Sparkles, TrendingUp, Zap, Ban } from 'lucide-react-native';
 
-type TemplatesNavigationProp = StackNavigationProp<any, 'Templates'>;
+const { width } = Dimensions.get('window');
+const CARD_WIDTH = width * 0.75;
+const FEATURED_HEIGHT = 200;
+
+// Animated Gradient Component
+const AnimatedGradientCard = ({
+  children,
+  colors,
+  style,
+  onPress
+}: {
+  children: React.ReactNode;
+  colors: [string, string];
+  style?: any;
+  onPress: () => void;
+}) => {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  // Removed shimmer animation as per user request
+  // const shimmerAnim = useRef(new Animated.Value(0)).current;
+
+  // useEffect(() => {
+  //   Animated.loop(...).start();
+  // }, []);
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.96,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  // const translateX = shimmerAnim.interpolate({
+  //   inputRange: [0, 1],
+  //   outputRange: [-CARD_WIDTH, CARD_WIDTH * 2],
+  // });
+
+  return (
+    <TouchableOpacity
+      activeOpacity={1}
+      onPress={onPress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+    >
+      <Animated.View style={[style, { transform: [{ scale: scaleAnim }] }]}>
+        <LinearGradient
+          colors={colors}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={{ flex: 1, borderRadius: style.borderRadius, padding: style.padding, overflow: 'hidden' }}
+        >
+          {children}
+
+          {/* Shimmer Effect */}
+          {/* <Animated.View
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              bottom: 0,
+              width: 100,
+              transform: [{ translateX }, { skewX: '-20deg' }],
+              backgroundColor: 'rgba(255,255,255,0.1)',
+            }}
+          /> */}
+        </LinearGradient>
+      </Animated.View>
+    </TouchableOpacity>
+  );
+};
 
 const TemplatesScreen: React.FC = () => {
-  const navigation = useNavigation<TemplatesNavigationProp>();
+  const navigation = useNavigation<any>();
   const { theme } = useTheme();
   const { fadeAnim, slideAnim } = useScreenAnimation();
-  const { templates, deleteTemplate, exportTemplate, importTemplate } = useTemplates();
-  const { addHabit } = useHabits();
+  const { templates, importTemplate } = useTemplates();
 
-  const [selectedFilter, setSelectedFilter] = useState<string>('all');
+  const [activeTab, setActiveTab] = useState<'build' | 'quit'>('build');
+  const [searchQuery, setSearchQuery] = useState('');
   const [showImportModal, setShowImportModal] = useState(false);
   const [importText, setImportText] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
 
-  const filters = [
-    { id: 'all', label: 'All', emoji: '📋' },
-    { id: 'default', label: 'Built-in', emoji: '⭐' },
-    { id: 'custom', label: 'My Templates', emoji: '🎨' },
-    { id: 'fitness', label: 'Fitness', emoji: '💪' },
-    { id: 'wellness', label: 'Wellness', emoji: '🧘' },
-    { id: 'productivity', label: 'Productivity', emoji: '🚀' },
-  ];
+  // Group templates by category/tag
+  const sections = useMemo(() => {
+    let filtered = templates.filter(t => {
+      // Filter by type (build/quit)
+      // If template doesn't have a type (legacy), assume 'build'
+      const type = t.type || 'build';
+      return type === activeTab || type === 'mixed';
+    });
 
-  const getFilteredTemplates = () => {
-    let filtered = templates;
-
-    // Filter by category
-    if (selectedFilter === 'default') {
-      filtered = filtered.filter(t => t.isDefault);
-    } else if (selectedFilter === 'custom') {
-      filtered = filtered.filter(t => !t.isDefault);
-    } else if (selectedFilter !== 'all') {
-      filtered = filtered.filter(t => t.tags.includes(selectedFilter));
-    }
-
-    // Filter by search
     if (searchQuery) {
       filtered = filtered.filter(t =>
         t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -66,435 +126,232 @@ const TemplatesScreen: React.FC = () => {
       );
     }
 
-    return filtered;
-  };
+    const featured = filtered.filter(t => t.isDefault).slice(0, 5);
 
-  const handleUseTemplate = async (template: HabitTemplate) => {
-    Alert.alert(
-      `Use "${template.name}"?`,
-      `This will create ${template.habits.length} new habit${template.habits.length > 1 ? 's' : ''} from this template.`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Create Habits',
-          onPress: async () => {
-            try {
-              // Create habits from template
-              for (const habitConfig of template.habits) {
-                const newHabit: Habit = {
-                  id: `habit-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                  name: habitConfig.name,
-                  emoji: habitConfig.emoji,
-                  category: habitConfig.category,
-                  color: template.color,
-                  frequency: habitConfig.frequency,
-                  frequencyType: habitConfig.frequencyType,
-                  targetCompletionsPerDay: habitConfig.targetCompletionsPerDay,
-                  selectedDays: habitConfig.selectedDays,
-                  reminderEnabled: habitConfig.reminderEnabled,
-                  reminderTime: habitConfig.reminderTime,
-                  notes: habitConfig.notes,
-                  streak: 0,
-                  completions: {},
-                };
+    const categories: { [key: string]: HabitTemplate[] } = {};
 
-                await addHabit(newHabit);
-              }
+    filtered.forEach(t => {
+      const category = t.tags[0] || 'Other';
+      if (!categories[category]) {
+        categories[category] = [];
+      }
+      categories[category].push(t);
+    });
 
-              Alert.alert(
-                'Success! 🎉',
-                `Created ${template.habits.length} habits from "${template.name}". Check them out on the Home screen!`,
-                [
-                  { text: 'Stay Here' },
-                  { text: 'Go to Home', onPress: () => navigation.navigate('Home') },
-                ]
-              );
-            } catch (error) {
-              Alert.alert('Error', 'Failed to create habits from template');
-            }
-          },
-        },
-      ]
-    );
-  };
-
-  const handleShareTemplate = async (template: HabitTemplate) => {
-    const json = exportTemplate(template.id);
-    if (!json) return;
-
-    try {
-      await Share.share({
-        message: `Check out this habit template: "${template.name}"\n\n${json}`,
-        title: `Share ${template.name}`,
-      });
-    } catch (error) {
-      console.error('Error sharing template:', error);
-    }
-  };
-
-  const handleCopyTemplate = async (template: HabitTemplate) => {
-    const json = exportTemplate(template.id);
-    if (!json) return;
-
-    await Clipboard.setStringAsync(json);
-    Alert.alert('Copied! 📋', 'Template JSON copied to clipboard');
-  };
-
-  const handleDeleteTemplate = (template: HabitTemplate) => {
-    if (template.isDefault) {
-      Alert.alert('Cannot Delete', 'Built-in templates cannot be deleted');
-      return;
-    }
-
-    Alert.alert(
-      'Delete Template?',
-      `Are you sure you want to delete "${template.name}"? This cannot be undone.`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteTemplate(template.id);
-              Alert.alert('Deleted', 'Template removed successfully');
-            } catch (error) {
-              Alert.alert('Error', 'Failed to delete template');
-            }
-          },
-        },
-      ]
-    );
-  };
+    return {
+      featured,
+      categories: Object.entries(categories).map(([title, data]) => ({ title, data })),
+    };
+  }, [templates, activeTab, searchQuery]);
 
   const handleImportTemplate = async () => {
-    if (!importText.trim()) {
-      Alert.alert('Error', 'Please paste a template JSON');
-      return;
-    }
-
+    if (!importText.trim()) return;
     const success = await importTemplate(importText.trim());
     if (success) {
       setShowImportModal(false);
       setImportText('');
-      Alert.alert('Success! 🎉', 'Template imported successfully');
-    } else {
-      Alert.alert('Error', 'Invalid template format. Please check the JSON and try again.');
     }
   };
 
-  const handlePasteFromClipboard = async () => {
-    const text = await Clipboard.getStringAsync();
-    setImportText(text);
+  const getGradientColors = (index: number, type: 'build' | 'quit'): [string, string] => {
+    if (type === 'quit') {
+      const quitGradients: [string, string][] = [
+        ['#4C1D95', '#8B5CF6'], // Deep Purple
+        ['#BE123C', '#FB7185'], // Rose
+        ['#1E293B', '#475569'], // Slate
+        ['#7F1D1D', '#EF4444'], // Red
+      ];
+      return quitGradients[index % quitGradients.length];
+    }
+
+    const buildGradients: [string, string][] = [
+      ['#4F46E5', '#7C3AED'], // Indigo -> Violet
+      ['#2563EB', '#3B82F6'], // Blue
+      ['#059669', '#10B981'], // Emerald
+      ['#D97706', '#F59E0B'], // Amber
+      ['#DB2777', '#EC4899'], // Pink
+    ];
+    return buildGradients[index % buildGradients.length];
   };
 
-  const handleViewTemplate = (template: HabitTemplate) => {
-    navigation.navigate('TemplateDetail', { templateId: template.id });
-  };
-
-  const renderTemplateCard = (template: HabitTemplate) => (
-    <TouchableOpacity
+  const renderFeaturedCard = (template: HabitTemplate, index: number) => (
+    <AnimatedGradientCard
       key={template.id}
-      style={[
-        styles.templateCard,
-        {
-          backgroundColor: theme.colors.surface,
-          borderColor: theme.colors.border,
-        },
-      ]}
-      onPress={() => handleViewTemplate(template)}
-      activeOpacity={0.95}
+      onPress={() => navigation.navigate('TemplateDetail', { templateId: template.id })}
+      colors={getGradientColors(index, activeTab)}
+      style={styles.featuredCardContainer}
     >
-      <View style={styles.templateHeader}>
-        <View style={styles.templateIcon}>
-          <Text style={styles.templateEmoji}>{template.emoji}</Text>
+      <View style={styles.featuredContent}>
+        <View style={styles.featuredBadge}>
+          <Sparkles size={12} color="#FFF" style={{ marginRight: 4 }} />
+          <Text style={styles.featuredBadgeText}>FEATURED</Text>
         </View>
-        <View style={styles.templateInfo}>
-          <View style={styles.templateTitleRow}>
-            <Text
-              style={[
-                styles.templateName,
-                {
-                  color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplayBold,
-                  fontSize: theme.typography.fontSizeLG,
-                },
-              ]}
-            >
-              {template.name}
+        <Text style={styles.featuredTitle} numberOfLines={2}>
+          {template.name}
+        </Text>
+        <Text style={styles.featuredSubtitle} numberOfLines={2}>
+          {template.description}
+        </Text>
+        <View style={styles.featuredFooter}>
+          <View style={styles.statsContainer}>
+            <Text style={styles.featuredStats}>
+              {template.habits.length} Habits
             </Text>
-            {template.isDefault && (
-              <View
-                style={[
-                  styles.defaultBadge,
-                  { backgroundColor: theme.colors.primary + '20' }
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.defaultBadgeText,
-                    { color: theme.colors.primary }
-                  ]}
-                >
-                  ⭐ Built-in
-                </Text>
-              </View>
+            {template.duration && (
+              <>
+                <View style={styles.dotSeparator} />
+                <Text style={styles.featuredStats}>{template.duration}</Text>
+              </>
             )}
           </View>
-          <Text
-            style={[
-              styles.templateDescription,
-              {
-                color: theme.colors.textSecondary,
-                fontFamily: theme.typography.fontFamilyBody,
-                fontSize: theme.typography.fontSizeSM,
-              },
-            ]}
-            numberOfLines={2}
-          >
-            {template.description}
-          </Text>
-          <View style={styles.templateMeta}>
-            <Text
-              style={[
-                styles.templateMetaText,
-                { color: theme.colors.textSecondary }
-              ]}
-            >
-              {template.habits.length} habit{template.habits.length > 1 ? 's' : ''}
-            </Text>
-            <View style={styles.templateTags}>
-              {template.tags.slice(0, 2).map(tag => (
-                <View
-                  key={tag}
-                  style={[
-                    styles.tag,
-                    { backgroundColor: theme.colors.backgroundSecondary }
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.tagText,
-                      { color: theme.colors.textSecondary }
-                    ]}
-                  >
-                    {tag}
-                  </Text>
-                </View>
-              ))}
-            </View>
+          <View style={styles.featuredButton}>
+            <Text style={styles.featuredButtonText}>View</Text>
+            <ChevronRight size={16} color="#000" />
           </View>
         </View>
       </View>
-
-      <View style={styles.templateActions}>
-        <TouchableOpacity
-          style={[
-            styles.actionButton,
-            styles.viewButton,
-            {
-              backgroundColor: theme.colors.backgroundSecondary,
-              borderColor: theme.colors.border
-            }
-          ]}
-          onPress={(e) => {
-            e.stopPropagation();
-            handleViewTemplate(template);
-          }}
-          activeOpacity={0.8}
-        >
-          <Text
-            style={[
-              styles.actionButtonText,
-              {
-                color: theme.colors.text,
-                fontFamily: theme.typography.fontFamilyBodySemibold,
-              }
-            ]}
-          >
-            View
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.actionButton,
-            styles.useButton,
-            { backgroundColor: theme.colors.primary }
-          ]}
-          onPress={(e) => {
-            e.stopPropagation();
-            handleUseTemplate(template);
-          }}
-          activeOpacity={0.8}
-        >
-          <Text
-            style={[
-              styles.actionButtonText,
-              {
-                color: theme.colors.white,
-                fontFamily: theme.typography.fontFamilyBodySemibold,
-              }
-            ]}
-          >
-            Use
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
+      {/* Decorative Circle */}
+      <View style={[styles.decorativeCircle, { backgroundColor: 'rgba(255,255,255,0.1)' }]} />
+    </AnimatedGradientCard>
   );
 
-  const filteredTemplates = getFilteredTemplates();
+  const renderStandardCard = (template: HabitTemplate, index: number) => (
+    <AnimatedGradientCard
+      key={template.id}
+      onPress={() => navigation.navigate('TemplateDetail', { templateId: template.id })}
+      colors={getGradientColors(index + 2, activeTab)}
+      style={styles.standardCardContainer}
+    >
+      <View style={styles.standardContent}>
+        <Text style={styles.standardTitle} numberOfLines={2}>
+          {template.name}
+        </Text>
+        <Text style={styles.standardStats}>
+          {template.habits.length} Habits
+        </Text>
+      </View>
+      <View style={styles.standardIcon}>
+        <ChevronRight size={20} color="#FFF" />
+      </View>
+    </AnimatedGradientCard>
+  );
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
-      edges={['top', 'left', 'right']}
-    >
-      <View style={styles.header}>
-        <Text
-          style={[
-            styles.headerTitle,
-            {
-              color: theme.colors.text,
-              fontFamily: theme.typography.fontFamilyDisplayBold,
-              fontSize: theme.typography.fontSize2XL,
-            },
-          ]}
-        >
-          Templates
-        </Text>
-        <View style={styles.headerButtons}>
-          <TouchableOpacity
-            style={[
-              styles.headerButton,
-              {
-                backgroundColor: theme.colors.surface,
-                borderColor: theme.colors.border,
-                borderWidth: 1,
-              }
-            ]}
-            onPress={() => setShowImportModal(true)}
-            activeOpacity={0.8}
-          >
-            <Text style={[styles.headerButtonText, { color: theme.colors.text }]}>Import</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.headerButton,
-              { backgroundColor: theme.colors.primary }
-            ]}
-            onPress={() => navigation.navigate('CreateTemplate', { mode: 'create' })}
-            activeOpacity={0.8}
-          >
-            <Text style={[styles.headerButtonText, { color: theme.colors.white }]}>Create</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Search */}
-      <View style={styles.searchContainer}>
-        <View
-          style={[
-            styles.searchBox,
-            {
-              backgroundColor: theme.colors.surface,
-              borderColor: theme.colors.border,
-            }
-          ]}
-        >
-          <Search size={20} color={theme.colors.textSecondary} strokeWidth={2} style={styles.searchIcon} />
-          <TextInput
-            style={[
-              styles.searchInput,
-              {
-                color: theme.colors.text,
-                fontFamily: theme.typography.fontFamilyBody,
-              }
-            ]}
-            placeholder="Search templates..."
-            placeholderTextColor={theme.colors.textSecondary}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-        </View>
-      </View>
-
-      {/* Filters */}
-      <ScrollView
-        horizontal
-        style={styles.filtersScroll}
-        contentContainerStyle={styles.filtersContainer}
-        showsHorizontalScrollIndicator={false}
-      >
-        {filters.map(filter => (
-          <TouchableOpacity
-            key={filter.id}
-            style={[
-              styles.filterChip,
-              selectedFilter === filter.id && styles.filterChipActive,
-              {
-                backgroundColor:
-                  selectedFilter === filter.id
-                    ? theme.colors.primary
-                    : theme.colors.surface,
-                borderColor:
-                  selectedFilter === filter.id
-                    ? theme.colors.primary
-                    : theme.colors.border,
-              },
-            ]}
-            onPress={() => setSelectedFilter(filter.id)}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.filterEmoji}>{filter.emoji}</Text>
-            <Text
-              style={[
-                styles.filterLabel,
-                {
-                  color:
-                    selectedFilter === filter.id
-                      ? theme.colors.white
-                      : theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyBodySemibold,
-                },
-              ]}
-            >
-              {filter.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
-      {/* Templates List */}
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]} edges={['top', 'left', 'right']}>
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 }]}
         showsVerticalScrollIndicator={false}
       >
-        <Animated.View
-          style={{
-            opacity: fadeAnim,
-            transform: [{ translateY: slideAnim }],
-          }}
-        >
-          {filteredTemplates.length === 0 ? (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyEmoji}>📦</Text>
-              <Text
-                style={[
-                  styles.emptyText,
-                  {
-                    color: theme.colors.textSecondary,
-                    fontFamily: theme.typography.fontFamilyBody,
-                  }
-                ]}
-              >
-                No templates found
+        <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
+          {/* Header */}
+          <View style={styles.header}>
+            <View>
+              <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Explore</Text>
+              <Text style={[styles.headerSubtitle, { color: theme.colors.textSecondary }]}>
+                Discover new habits
               </Text>
             </View>
+            <TouchableOpacity
+              style={[styles.createButton, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+              onPress={() => navigation.navigate('CreateTemplate', { mode: 'create' })}
+            >
+              <Plus size={24} color={theme.colors.primary} />
+            </TouchableOpacity>
+          </View>
+
+          {/* Tabs */}
+          <View style={styles.tabsContainer}>
+            <TouchableOpacity
+              style={[
+                styles.tab,
+                activeTab === 'build' && { backgroundColor: theme.colors.primary },
+                activeTab !== 'build' && { backgroundColor: theme.colors.surface, borderWidth: 1, borderColor: theme.colors.border }
+              ]}
+              onPress={() => setActiveTab('build')}
+            >
+              <Zap size={16} color={activeTab === 'build' ? '#FFF' : theme.colors.textSecondary} style={{ marginRight: 8 }} />
+              <Text style={[styles.tabText, { color: activeTab === 'build' ? '#FFF' : theme.colors.textSecondary }]}>
+                Grow Habits
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.tab,
+                activeTab === 'quit' && { backgroundColor: '#EF4444' }, // Red for quit
+                activeTab !== 'quit' && { backgroundColor: theme.colors.surface, borderWidth: 1, borderColor: theme.colors.border }
+              ]}
+              onPress={() => setActiveTab('quit')}
+            >
+              <Ban size={16} color={activeTab === 'quit' ? '#FFF' : theme.colors.textSecondary} style={{ marginRight: 8 }} />
+              <Text style={[styles.tabText, { color: activeTab === 'quit' ? '#FFF' : theme.colors.textSecondary }]}>
+                Quit Habits
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Search */}
+          <View style={styles.searchContainer}>
+            <View style={[styles.searchBox, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+              <Search size={20} color={theme.colors.textSecondary} />
+              <TextInput
+                style={[styles.searchInput, { color: theme.colors.text }]}
+                placeholder={`Search ${activeTab === 'build' ? 'growth' : 'quitting'} templates...`}
+                placeholderTextColor={theme.colors.textSecondary}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+              />
+              {searchQuery.length > 0 && (
+                <TouchableOpacity onPress={() => setSearchQuery('')}>
+                  <X size={20} color={theme.colors.textSecondary} />
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+
+          {sections.featured.length === 0 && sections.categories.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Text style={{ fontSize: 48, marginBottom: 16 }}>🤔</Text>
+              <Text style={{ color: theme.colors.textSecondary, fontSize: 16 }}>No templates found.</Text>
+            </View>
           ) : (
-            filteredTemplates.map(template => renderTemplateCard(template))
+            <>
+              {/* Featured Section */}
+              {sections.featured.length > 0 && (
+                <View style={styles.section}>
+                  <View style={styles.sectionHeader}>
+                    <TrendingUp size={20} color={theme.colors.primary} style={{ marginRight: 8 }} />
+                    <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Featured Collections</Text>
+                  </View>
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.horizontalScroll}
+                    decelerationRate="fast"
+                    snapToInterval={CARD_WIDTH + 16}
+                  >
+                    {sections.featured.map((template, index) => renderFeaturedCard(template, index))}
+                  </ScrollView>
+                </View>
+              )}
+
+              {/* Categories */}
+              {sections.categories.map((category, catIndex) => (
+                <View key={category.title} style={styles.section}>
+                  <Text style={[styles.sectionTitle, { color: theme.colors.text, marginLeft: 24, marginBottom: 12 }]}>
+                    {category.title.charAt(0).toUpperCase() + category.title.slice(1)}
+                  </Text>
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.horizontalScroll}
+                  >
+                    {category.data.map((template, index) => renderStandardCard(template, index + catIndex))}
+                  </ScrollView>
+                </View>
+              ))}
+            </>
           )}
         </Animated.View>
       </ScrollView>
@@ -507,100 +364,22 @@ const TemplatesScreen: React.FC = () => {
         onRequestClose={() => setShowImportModal(false)}
       >
         <View style={styles.modalOverlay}>
-          <View
-            style={[
-              styles.modalContent,
-              { backgroundColor: theme.colors.background }
-            ]}
-          >
-            <View style={styles.modalHeader}>
-              <Text
-                style={[
-                  styles.modalTitle,
-                  {
-                    color: theme.colors.text,
-                    fontFamily: theme.typography.fontFamilyDisplayBold,
-                  }
-                ]}
-              >
-                Import Template
-              </Text>
-              <TouchableOpacity
-                onPress={() => setShowImportModal(false)}
-                activeOpacity={0.7}
-                style={styles.modalCloseButton}
-              >
-                <X size={24} color={theme.colors.textSecondary} strokeWidth={2} />
-              </TouchableOpacity>
-            </View>
-
-            <Text
-              style={[
-                styles.modalDescription,
-                {
-                  color: theme.colors.textSecondary,
-                  fontFamily: theme.typography.fontFamilyBody,
-                }
-              ]}
-            >
-              Paste the template JSON below to import it
-            </Text>
-
+          <View style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
+            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>Import Template</Text>
             <TextInput
-              style={[
-                styles.importInput,
-                {
-                  backgroundColor: theme.colors.surface,
-                  color: theme.colors.text,
-                  borderColor: theme.colors.border,
-                }
-              ]}
-              placeholder="Paste template JSON here..."
+              style={[styles.importInput, { backgroundColor: theme.colors.surface, color: theme.colors.text, borderColor: theme.colors.border }]}
+              placeholder="Paste JSON..."
               placeholderTextColor={theme.colors.textSecondary}
               value={importText}
               onChangeText={setImportText}
               multiline
-              numberOfLines={10}
-              textAlignVertical="top"
             />
-
             <View style={styles.modalActions}>
-              <TouchableOpacity
-                style={[
-                  styles.modalButton,
-                  styles.modalButtonSecondary,
-                  { backgroundColor: theme.colors.surface }
-                ]}
-                onPress={handlePasteFromClipboard}
-                activeOpacity={0.7}
-              >
-                <Text
-                  style={[
-                    styles.modalButtonText,
-                    { color: theme.colors.text }
-                  ]}
-                >
-                  Paste from Clipboard
-                </Text>
+              <TouchableOpacity onPress={() => setShowImportModal(false)} style={styles.modalButton}>
+                <Text style={{ color: theme.colors.textSecondary }}>Cancel</Text>
               </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.modalButton,
-                  styles.modalButtonPrimary,
-                  { backgroundColor: theme.colors.primary }
-                ]}
-                onPress={handleImportTemplate}
-                activeOpacity={0.8}
-              >
-                <Text
-                  style={[
-                    styles.modalButtonText,
-                    { color: theme.colors.white }
-                  ]}
-                >
-                  Import
-                </Text>
+              <TouchableOpacity onPress={handleImportTemplate} style={[styles.modalButton, { backgroundColor: theme.colors.primary }]}>
+                <Text style={{ color: '#FFF' }}>Import</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -614,227 +393,257 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 40,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
+    paddingHorizontal: 24,
+    paddingTop: 20,
+    marginBottom: 24,
   },
-  headerTitle: {},
-  headerButtons: {
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: '800',
+    letterSpacing: -0.5,
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    marginTop: 4,
+  },
+  createButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+  },
+  tabsContainer: {
     flexDirection: 'row',
-    gap: 8,
+    paddingHorizontal: 24,
+    marginBottom: 24,
+    gap: 12,
   },
-  headerButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
+  tab: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    borderRadius: 16,
   },
-  headerButtonText: {
-    fontSize: 14,
+  tabText: {
+    fontSize: 16,
     fontWeight: '600',
   },
   searchContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingHorizontal: 24,
+    marginBottom: 32,
   },
   searchBox: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 12,
+    height: 50,
+    borderRadius: 16,
     borderWidth: 1,
-  },
-  searchIcon: {
-    marginRight: 8,
   },
   searchInput: {
     flex: 1,
+    marginLeft: 12,
     fontSize: 16,
   },
-  filtersScroll: {
-    maxHeight: 50,
+  section: {
+    marginBottom: 32,
   },
-  filtersContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    gap: 8,
-  },
-  filterChip: {
+  sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    borderWidth: 1,
-    marginRight: 8,
+    paddingHorizontal: 24,
+    marginBottom: 16,
   },
-  filterChipActive: {},
-  filterEmoji: {
-    fontSize: 16,
-    marginRight: 6,
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    letterSpacing: -0.5,
   },
-  filterLabel: {
+  horizontalScroll: {
+    paddingHorizontal: 24,
+    gap: 16,
+  },
+  featuredCardContainer: {
+    width: CARD_WIDTH,
+    height: FEATURED_HEIGHT,
+    borderRadius: 24,
+    padding: 0,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  featuredContent: {
+    flex: 1,
+    justifyContent: 'space-between',
+    zIndex: 2,
+    padding: 24,
+  },
+  featuredBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 100,
+    alignSelf: 'flex-start',
+    marginBottom: 12,
+  },
+  featuredBadgeText: {
+    color: '#FFF',
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  featuredTitle: {
+    color: '#FFF',
+    fontSize: 24,
+    fontWeight: '800',
+    marginBottom: 8,
+    letterSpacing: -0.5,
+  },
+  featuredSubtitle: {
+    color: 'rgba(255,255,255,0.9)',
     fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 16,
   },
-  scrollView: {
+  featuredFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  dotSeparator: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: 'rgba(255,255,255,0.6)',
+    marginHorizontal: 8,
+  },
+  featuredStats: {
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  featuredButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFF',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 100,
+  },
+  featuredButtonText: {
+    color: '#000',
+    fontSize: 12,
+    fontWeight: '700',
+    marginRight: 4,
+  },
+  decorativeCircle: {
+    position: 'absolute',
+    top: -50,
+    right: -50,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    zIndex: 1,
+  },
+  standardCardContainer: {
+    width: 160,
+    height: 160,
+    borderRadius: 20,
+    padding: 0,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  standardContent: {
     flex: 1,
-  },
-  scrollContent: {
-    padding: 20,
-    paddingBottom: 120,
-  },
-  templateCard: {
-    borderRadius: 16,
-    borderWidth: 1,
     padding: 16,
-    marginBottom: 16,
   },
-  templateHeader: {
-    flexDirection: 'row',
-    marginBottom: 16,
-  },
-  templateIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  templateEmoji: {
-    fontSize: 32,
-  },
-  templateInfo: {
-    flex: 1,
-  },
-  templateTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  standardTitle: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: '700',
     marginBottom: 4,
   },
-  templateName: {},
-  defaultBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 8,
-    marginLeft: 8,
-  },
-  defaultBadgeText: {
-    fontSize: 11,
-    fontWeight: '600',
-  },
-  templateDescription: {
-    marginBottom: 8,
-  },
-  templateMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  templateMetaText: {
+  standardStats: {
+    color: 'rgba(255,255,255,0.8)',
     fontSize: 12,
   },
-  templateTags: {
+  standardIcon: {
+    position: 'absolute',
+    bottom: 16,
+    right: 16,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    padding: 8,
+    borderRadius: 12,
+  },
+  searchResults: {
+    paddingHorizontal: 24,
     flexDirection: 'row',
-    gap: 6,
-  },
-  tag: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
-  },
-  tagText: {
-    fontSize: 11,
-  },
-  templateActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  actionButton: {
-    flex: 1,
-    paddingVertical: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  viewButton: {
-    borderWidth: 1,
-  },
-  useButton: {},
-  actionButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
+    flexWrap: 'wrap',
+    gap: 16,
   },
   emptyState: {
     alignItems: 'center',
-    paddingVertical: 60,
-  },
-  emptyEmoji: {
-    fontSize: 64,
-    marginBottom: 16,
-  },
-  emptyText: {
-    fontSize: 16,
+    paddingVertical: 40,
   },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
+    padding: 24,
   },
   modalContent: {
-    width: '100%',
-    maxWidth: 500,
-    borderRadius: 20,
-    padding: 20,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
+    borderRadius: 24,
+    padding: 24,
   },
   modalTitle: {
-    fontSize: 24,
-  },
-  modalCloseButton: {
-    padding: 4,
-  },
-  modalDescription: {
-    fontSize: 14,
+    fontSize: 20,
+    fontWeight: '700',
     marginBottom: 16,
   },
   importInput: {
     borderWidth: 1,
     borderRadius: 12,
     padding: 12,
-    fontSize: 14,
-    fontFamily: 'monospace',
+    height: 120,
     marginBottom: 16,
-    minHeight: 200,
+    textAlignVertical: 'top',
   },
   modalActions: {
     flexDirection: 'row',
+    justifyContent: 'flex-end',
     gap: 12,
   },
   modalButton: {
-    flex: 1,
-    paddingVertical: 14,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
     borderRadius: 12,
-    alignItems: 'center',
-  },
-  modalButtonSecondary: {},
-  modalButtonPrimary: {},
-  modalButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
   },
 });
 
 export default TemplatesScreen;
+

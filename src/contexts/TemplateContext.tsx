@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { HabitTemplate, DEFAULT_TEMPLATES, TemplateUtils } from '@/types/HabitTemplate';
+import { HabitTemplate, TemplateUtils } from '@/types/HabitTemplate';
+import { DEFAULT_TEMPLATES } from '@/data/DefaultTemplates';
 
 const TEMPLATES_STORAGE_KEY = '@habit_tracker_templates';
 
