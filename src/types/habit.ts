@@ -38,6 +38,7 @@ export interface Habit {
     targetCompletionsPerDay: number;
     selectedDays: number[]; // 0-6 for Sunday-Saturday
     timePeriod: HabitTimePeriod; // NEW: When this habit should be done
+    type: 'positive' | 'negative'; // NEW: Positive (build) or Negative (quit) habit
     reminderEnabled: boolean;
     reminderTime?: string; // HH:MM format
     notificationIds?: string[];

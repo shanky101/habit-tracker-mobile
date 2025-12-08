@@ -14,7 +14,7 @@ import { useTheme } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 
 type AddHabitStep2ScreenNavigationProp = StackNavigationProp<any, 'AddHabitStep2'>;
-type AddHabitStep2ScreenRouteProp = RouteProp<{ AddHabitStep2: { habitName: string } }, 'AddHabitStep2'>;
+type AddHabitStep2ScreenRouteProp = RouteProp<{ AddHabitStep2: { habitName: string; habitType: 'positive' | 'negative' } }, 'AddHabitStep2'>;
 
 export const CATEGORIES = [
   { id: 'health', label: 'Health', icon: '❤️', gradient: ['#FF6B6B', '#EE5A6F'] },
@@ -44,7 +44,7 @@ const AddHabitStep2Screen: React.FC = () => {
   const route = useRoute<AddHabitStep2ScreenRouteProp>();
   const { theme } = useTheme();
 
-  const { habitName } = route.params;
+  const { habitName, habitType } = route.params;
 
   const [selectedCategory, setSelectedCategory] = useState('other');
   const [selectedColor, setSelectedColor] = useState('blue');
@@ -80,6 +80,7 @@ const AddHabitStep2Screen: React.FC = () => {
   const handleNext = () => {
     navigation.navigate('AddHabitStep3', {
       habitName,
+      habitType,
       category: selectedCategory,
       color: selectedColor,
     });

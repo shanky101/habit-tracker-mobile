@@ -413,6 +413,23 @@ interface QuickNoteModalProps {
   onSkip: () => void;
 }
 
+// ============================================
+// QUICK NOTE MODAL
+// ============================================
+interface QuickNoteModalProps {
+  visible: boolean;
+  habitName: string;
+  onSave: (note: string, mood?: string) => void;
+  onSkip: () => void;
+}
+
+// ============================================
+// QUICK NOTE MODAL
+// ============================================
+import { LinearGradient } from 'expo-linear-gradient';
+
+// ... (existing interfaces)
+
 export const QuickNoteModal: React.FC<QuickNoteModalProps> = ({
   visible,
   habitName,
@@ -423,14 +440,14 @@ export const QuickNoteModal: React.FC<QuickNoteModalProps> = ({
   const [note, setNote] = useState('');
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(100)).current;
+  const slideAnim = useRef(new Animated.Value(300)).current;
 
   const moods = [
-    { emoji: '😊', label: 'Great' },
+    { emoji: '🤩', label: 'Great' },
     { emoji: '🙂', label: 'Good' },
     { emoji: '😐', label: 'Okay' },
-    { emoji: '😔', label: 'Tough' },
-    { emoji: '💪', label: 'Strong' },
+    { emoji: '😓', label: 'Hard' },
+    { emoji: '😤', label: 'Proud' },
   ];
 
   useEffect(() => {
@@ -440,25 +457,38 @@ export const QuickNoteModal: React.FC<QuickNoteModalProps> = ({
       Animated.parallel([
         Animated.timing(fadeAnim, {
           toValue: 1,
-          duration: 200,
+          duration: 300,
           useNativeDriver: true,
         }),
         Animated.spring(slideAnim, {
           toValue: 0,
-          friction: 8,
-          tension: 40,
+          damping: 20,
+          stiffness: 90,
+          mass: 1,
           useNativeDriver: true,
         }),
       ]).start();
     } else {
-      fadeAnim.setValue(0);
-      slideAnim.setValue(100);
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 300,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
     }
   }, [visible, fadeAnim, slideAnim]);
 
   const handleSave = () => {
     onSave(note.trim(), selectedMood || undefined);
   };
+
+  if (!visible) return null;
 
   return (
     <Modal
@@ -474,7 +504,12 @@ export const QuickNoteModal: React.FC<QuickNoteModalProps> = ({
         <Animated.View
           style={[
             styles.modalOverlay,
-            { backgroundColor: 'rgba(0,0,0,0.6)', opacity: fadeAnim },
+            {
+              backgroundColor: 'rgba(0,0,0,0.4)',
+              opacity: fadeAnim,
+              padding: 0, // Remove padding to allow full width
+              justifyContent: 'flex-end', // Align to bottom
+            },
           ]}
         >
           <TouchableOpacity
@@ -486,151 +521,178 @@ export const QuickNoteModal: React.FC<QuickNoteModalProps> = ({
             style={[
               styles.bottomSheetContent,
               {
-                backgroundColor: theme.colors.surface,
+                width: '100%', // Full width
+                backgroundColor: 'transparent', // Transparent for gradient
                 transform: [{ translateY: slideAnim }],
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: -4 },
+                shadowOpacity: 0.1,
+                shadowRadius: 12,
+                elevation: 10,
+                padding: 0, // Remove padding from container
+                paddingBottom: 0,
+                borderBottomLeftRadius: 0,
+                borderBottomRightRadius: 0,
               },
             ]}
           >
-            <View style={styles.handleBar} />
-            <Text
-              style={[
-                styles.sheetTitle,
-                {
-                  color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplayBold,
-                  fontSize: theme.typography.fontSizeLG,
-                },
-              ]}
+            <LinearGradient
+              colors={[theme.colors.surface, theme.colors.backgroundSecondary]} // Subtle gradient
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0, y: 1 }}
+              style={{
+                padding: 24,
+                paddingBottom: 50,
+                borderTopLeftRadius: 24,
+                borderTopRightRadius: 24,
+                width: '100%',
+              }}
             >
-              Add a Note
-            </Text>
-            <Text
-              style={[
-                styles.sheetSubtitle,
-                {
-                  color: theme.colors.textSecondary,
-                  fontFamily: theme.typography.fontFamilyBody,
-                  fontSize: theme.typography.fontSizeSM,
-                },
-              ]}
-            >
-              How did "{habitName}" go today?
-            </Text>
+              {/* Minimal Handle Bar */}
+              <View style={styles.handleBarContainer}>
+                <View style={[styles.handleBar, { backgroundColor: theme.colors.border, width: 36, height: 4 }]} />
+              </View>
 
-            {/* Mood Selector */}
-            <View style={styles.moodContainer}>
-              {moods.map((mood) => (
-                <TouchableOpacity
-                  key={mood.emoji}
-                  style={[
-                    styles.moodButton,
-                    {
-                      backgroundColor:
-                        selectedMood === mood.emoji
-                          ? theme.colors.primary + '20'
-                          : theme.colors.backgroundSecondary,
-                      borderColor:
-                        selectedMood === mood.emoji
-                          ? theme.colors.primary
-                          : theme.colors.border,
-                    },
-                  ]}
-                  onPress={() =>
-                    setSelectedMood(selectedMood === mood.emoji ? null : mood.emoji)
-                  }
-                  activeOpacity={0.7}
+              {/* Header - Centered & Clean */}
+              <View style={{ alignItems: 'center', marginBottom: 32 }}>
+                <Text
+                  style={{
+                    color: theme.colors.text,
+                    fontFamily: theme.typography.fontFamilyDisplayBold,
+                    fontSize: 24,
+                    marginBottom: 8,
+                    textAlign: 'center',
+                  }}
                 >
-                  <Text style={styles.moodEmoji}>{mood.emoji}</Text>
-                  <Text
+                  Great Job!
+                </Text>
+                <Text
+                  style={{
+                    color: theme.colors.textSecondary,
+                    fontFamily: theme.typography.fontFamilyBody,
+                    fontSize: 16,
+                    textAlign: 'center',
+                  }}
+                >
+                  How did <Text style={{ fontWeight: '600', color: theme.colors.text }}>{habitName}</Text> go?
+                </Text>
+              </View>
+
+              {/* Mood Selector - Clean Row */}
+              <View style={styles.moodContainer}>
+                {moods.map((mood) => (
+                  <TouchableOpacity
+                    key={mood.emoji}
                     style={[
-                      styles.moodLabel,
+                      styles.moodButton,
                       {
+                        backgroundColor:
+                          selectedMood === mood.emoji
+                            ? theme.colors.primary + '15'
+                            : 'transparent',
+                        borderColor:
+                          selectedMood === mood.emoji
+                            ? theme.colors.primary
+                            : theme.colors.border,
+                        borderWidth: selectedMood === mood.emoji ? 1 : 0,
+                        width: 60,
+                        height: 70,
+                        justifyContent: 'center',
+                      },
+                    ]}
+                    onPress={() =>
+                      setSelectedMood(selectedMood === mood.emoji ? null : mood.emoji)
+                    }
+                    activeOpacity={0.7}
+                  >
+                    <Text style={{ fontSize: 32, marginBottom: 4 }}>{mood.emoji}</Text>
+                    <Text
+                      style={{
                         color:
                           selectedMood === mood.emoji
                             ? theme.colors.primary
                             : theme.colors.textSecondary,
-                        fontFamily: theme.typography.fontFamilyBody,
-                        fontSize: theme.typography.fontSizeXS,
-                      },
-                    ]}
+                        fontFamily: theme.typography.fontFamilyBodyMedium,
+                        fontSize: 12,
+                      }}
+                    >
+                      {mood.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {/* Note Input - Minimalist */}
+              <View style={{ marginBottom: 32 }}>
+                <TextInput
+                  style={{
+                    backgroundColor: theme.colors.background, // Slightly different from gradient
+                    borderRadius: 12,
+                    padding: 16,
+                    minHeight: 100,
+                    textAlignVertical: 'top',
+                    color: theme.colors.text,
+                    fontFamily: theme.typography.fontFamilyBody,
+                    fontSize: 16,
+                  }}
+                  placeholder="Add a note..."
+                  placeholderTextColor={theme.colors.textSecondary}
+                  value={note}
+                  onChangeText={setNote}
+                  multiline
+                  maxLength={150}
+                />
+              </View>
+
+              {/* Actions - Stacked Buttons */}
+              <View style={{ gap: 12 }}>
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: theme.colors.text,
+                    paddingVertical: 18,
+                    borderRadius: 30,
+                    alignItems: 'center',
+                    shadowColor: theme.colors.text,
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 8,
+                    elevation: 4,
+                  }}
+                  onPress={handleSave}
+                  activeOpacity={0.9}
+                >
+                  <Text
+                    style={{
+                      color: theme.colors.surface,
+                      fontFamily: theme.typography.fontFamilyBodySemibold,
+                      fontSize: 16,
+                      letterSpacing: 0.5,
+                    }}
                   >
-                    {mood.label}
+                    Save Note
                   </Text>
                 </TouchableOpacity>
-              ))}
-            </View>
 
-            {/* Note Input */}
-            <TextInput
-              style={[
-                styles.noteInput,
-                {
-                  backgroundColor: theme.colors.backgroundSecondary,
-                  borderColor: theme.colors.border,
-                  color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyBody,
-                  fontSize: theme.typography.fontSizeMD,
-                },
-              ]}
-              placeholder="Optional: Add a quick note..."
-              placeholderTextColor={theme.colors.textSecondary}
-              value={note}
-              onChangeText={setNote}
-              multiline
-              maxLength={150}
-            />
-            <Text
-              style={[
-                styles.charCount,
-                {
-                  color: theme.colors.textSecondary,
-                  fontFamily: theme.typography.fontFamilyBody,
-                  fontSize: theme.typography.fontSizeXS,
-                },
-              ]}
-            >
-              {note.length}/150
-            </Text>
-
-            {/* Actions */}
-            <View style={styles.sheetActions}>
-              <TouchableOpacity
-                style={[styles.skipButton, { borderColor: theme.colors.border }]}
-                onPress={onSkip}
-                activeOpacity={0.7}
-              >
-                <Text
-                  style={[
-                    styles.skipButtonText,
-                    {
+                <TouchableOpacity
+                  style={{
+                    paddingVertical: 16,
+                    alignItems: 'center',
+                  }}
+                  onPress={onSkip}
+                  activeOpacity={0.7}
+                >
+                  <Text
+                    style={{
                       color: theme.colors.textSecondary,
                       fontFamily: theme.typography.fontFamilyBodyMedium,
-                      fontSize: theme.typography.fontSizeMD,
-                    },
-                  ]}
-                >
-                  Skip
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.saveButton, { backgroundColor: theme.colors.primary }]}
-                onPress={handleSave}
-                activeOpacity={0.8}
-              >
-                <Text
-                  style={[
-                    styles.saveButtonText,
-                    {
-                      color: theme.colors.white,
-                      fontFamily: theme.typography.fontFamilyBodySemibold,
-                      fontSize: theme.typography.fontSizeMD,
-                    },
-                  ]}
-                >
-                  Save
-                </Text>
-              </TouchableOpacity>
-            </View>
+                      fontSize: 16,
+                    }}
+                  >
+                    Skip
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </LinearGradient>
           </Animated.View>
         </Animated.View>
       </KeyboardAvoidingView>
@@ -889,6 +951,26 @@ const styles = StyleSheet.create({
     padding: 24,
     paddingBottom: 40,
   },
+  handleBarContainer: {
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  sheetHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  sheetEmoji: {
+    fontSize: 40,
+    marginRight: 16,
+  },
+  inputContainer: {
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 4,
+    marginBottom: 8,
+  },
   handleBar: {
     width: 40,
     height: 4,
@@ -922,8 +1004,6 @@ const styles = StyleSheet.create({
   },
   moodLabel: {},
   noteInput: {
-    borderRadius: 12,
-    borderWidth: 1,
     padding: 14,
     minHeight: 80,
     textAlignVertical: 'top',

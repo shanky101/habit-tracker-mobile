@@ -40,6 +40,7 @@ type EditHabitScreenRouteProp = RouteProp<
         completed?: boolean;
         targetCompletionsPerDay?: number;
         frequencyType?: 'single' | 'multiple';
+        type?: 'positive' | 'negative';
       };
     };
   },
@@ -57,6 +58,7 @@ const EditHabitScreen: React.FC = () => {
   const { habitId, habitData } = route.params;
 
   const [habitName, setHabitName] = useState(habitData.name);
+  const [habitType, setHabitType] = useState<'positive' | 'negative'>(habitData.type || 'positive');
   const [selectedCategory, setSelectedCategory] = useState(habitData.category);
   const [selectedColor, setSelectedColor] = useState(habitData.color);
   const [frequency, setFrequency] = useState(habitData.frequency);
@@ -105,8 +107,9 @@ const EditHabitScreen: React.FC = () => {
       return;
     }
 
-    const updates = {
+    const updates: Partial<Habit> = {
       name: habitName.trim(),
+      type: habitType,
       category: selectedCategory,
       color: selectedColor,
       frequency,
@@ -248,6 +251,73 @@ const EditHabitScreen: React.FC = () => {
               placeholder="Enter habit name"
               placeholderTextColor={theme.colors.textSecondary}
             />
+          </View>
+
+          {/* Habit Type */}
+          <View style={styles.section}>
+            <Text
+              style={[
+                styles.sectionLabel,
+                {
+                  color: theme.colors.text,
+                  fontSize: theme.typography.fontSizeSM,
+                  fontFamily: theme.typography.fontFamilyBodySemibold,
+                },
+              ]}
+            >
+              Habit Type
+            </Text>
+            <View style={styles.typeSelectorContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.typeOption,
+                  {
+                    backgroundColor: habitType === 'positive' ? theme.colors.primary : theme.colors.backgroundSecondary,
+                    borderColor: habitType === 'positive' ? theme.colors.primary : theme.colors.border,
+                  },
+                ]}
+                onPress={() => setHabitType('positive')}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.typeIcon}>📈</Text>
+                <Text
+                  style={[
+                    styles.typeText,
+                    {
+                      color: habitType === 'positive' ? theme.colors.white : theme.colors.text,
+                      fontFamily: habitType === 'positive' ? theme.typography.fontFamilyBodySemibold : theme.typography.fontFamilyBody,
+                    },
+                  ]}
+                >
+                  Build
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.typeOption,
+                  {
+                    backgroundColor: habitType === 'negative' ? theme.colors.error : theme.colors.backgroundSecondary,
+                    borderColor: habitType === 'negative' ? theme.colors.error : theme.colors.border,
+                  },
+                ]}
+                onPress={() => setHabitType('negative')}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.typeIcon}>📉</Text>
+                <Text
+                  style={[
+                    styles.typeText,
+                    {
+                      color: habitType === 'negative' ? theme.colors.white : theme.colors.text,
+                      fontFamily: habitType === 'negative' ? theme.typography.fontFamilyBodySemibold : theme.typography.fontFamilyBody,
+                    },
+                  ]}
+                >
+                  Quit
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Category */}
@@ -811,10 +881,31 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   input: {
-    paddingVertical: 14,
+    paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 12,
-    borderWidth: 1.5,
+    borderWidth: 1,
+  },
+  typeSelectorContainer: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  typeOption: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 8,
+  },
+  typeIcon: {
+    fontSize: 18,
+  },
+  typeText: {
+    fontSize: 14,
+    fontWeight: '500',
   },
   categoryGrid: {
     flexDirection: 'row',

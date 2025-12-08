@@ -193,40 +193,55 @@ const HomeScreen: React.FC = () => {
   // Filter out archived habits and filter by selected date
   const dateFilteredHabits = getHabitsForDate(selectedDate);
 
-  // Filter logic
-  const isSpecificPeriod = timePeriodFilter !== 'all' && timePeriodFilter !== 'allday';
+  // Filter logic - CHANGED: We now show all habits in sections, filter just highlights/scrolls
+  // const isSpecificPeriod = timePeriodFilter !== 'all' && timePeriodFilter !== 'allday';
 
-  // Habits matching the specific filter (or all if 'all')
-  const periodHabits = timePeriodFilter === 'all'
-    ? dateFilteredHabits
-    : dateFilteredHabits.filter((h) => h.timePeriod === timePeriodFilter);
-
-  // Habits matching 'allday' (only relevant if filter is specific)
-  const allDayHabits = isSpecificPeriod
-    ? dateFilteredHabits.filter((h) => h.timePeriod === 'allday')
-    : [];
-
-  const activePeriodHabits = periodHabits;
-  const activeAllDayHabits = allDayHabits;
+  // Group habits by time period
+  const morningHabits = dateFilteredHabits.filter(h => h.timePeriod === 'morning');
+  const afternoonHabits = dateFilteredHabits.filter(h => h.timePeriod === 'afternoon');
+  const eveningHabits = dateFilteredHabits.filter(h => h.timePeriod === 'evening');
+  const nightHabits = dateFilteredHabits.filter(h => h.timePeriod === 'night');
+  const allDayHabits = dateFilteredHabits.filter(h => h.timePeriod === 'allday');
 
   // Combined list for counts and other logic
-  const activeHabits = [...activePeriodHabits, ...activeAllDayHabits];
+  const activeHabits = dateFilteredHabits;
 
   // Calculate habit counts per time period for filter badges
   const habitCounts: Record<HabitTimePeriod | 'all', number> = {
     all: dateFilteredHabits.length,
-    morning: dateFilteredHabits.filter(h => h.timePeriod === 'morning').length,
-    afternoon: dateFilteredHabits.filter(h => h.timePeriod === 'afternoon').length,
-    evening: dateFilteredHabits.filter(h => h.timePeriod === 'evening').length,
-    night: dateFilteredHabits.filter(h => h.timePeriod === 'night').length,
-    allday: dateFilteredHabits.filter(h => h.timePeriod === 'allday').length,
+    morning: morningHabits.length,
+    afternoon: afternoonHabits.length,
+    evening: eveningHabits.length,
+    night: nightHabits.length,
+    allday: allDayHabits.length,
   };
 
-  // Calculate completion count for THE ENTIRE DAY (not just filtered habits)
-  // This ensures X/Y Done shows progress across all time periods
+  // Calculate completion count for THE ENTIRE DAY
   const completedCount = dateFilteredHabits.filter((h) => isHabitCompletedForDate(h.id, selectedDateISO)).length;
   const totalCount = dateFilteredHabits.length;
   const progressPercentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+
+  // Refs for scrolling to sections
+  const mainScrollRef = useRef<ScrollView>(null);
+  const sectionLayouts = useRef<Record<string, number>>({});
+
+  const handleScrollToSection = (period: HabitTimePeriod | 'all') => {
+    setTimePeriodFilter(period);
+
+    if (period === 'all') {
+      mainScrollRef.current?.scrollTo({ y: 0, animated: true });
+      return;
+    }
+
+    const y = sectionLayouts.current[period];
+    if (y !== undefined) {
+      mainScrollRef.current?.scrollTo({ y, animated: true });
+    }
+  };
+
+  const onSectionLayout = (period: string, event: any) => {
+    sectionLayouts.current[period] = event.nativeEvent.layout.y;
+  };
 
   const handleAddHabit = () => {
     // Check free tier limit
@@ -371,14 +386,46 @@ const HomeScreen: React.FC = () => {
   };
 
   const handleReorderPeriodHabits = (fromIndex: number, toIndex: number) => {
-    handleReorderList(activePeriodHabits, fromIndex, toIndex);
+    // This needs to be updated to handle specific lists if needed, 
+    // but since we are splitting lists, we might need to pass the specific list to the handler
+    // For now, let's assume reordering works within the list passed to DraggableHabitList
   };
 
-  const handleReorderAllDayHabits = (fromIndex: number, toIndex: number) => {
-    handleReorderList(activeAllDayHabits, fromIndex, toIndex);
+  // Helper to render a habit section
+  const renderHabitSection = (title: string, period: string, sectionHabits: Habit[]) => {
+    if (sectionHabits.length === 0) return null;
+
+    return (
+      <View
+        key={period}
+        onLayout={(event) => onSectionLayout(period, event)}
+        style={styles.habitsSection}
+      >
+        <View style={styles.sectionHeaderContainer}>
+          <Text style={[
+            styles.sectionHeaderText,
+            {
+              color: theme.colors.textSecondary,
+              fontFamily: theme.typography.fontFamilyBodySemibold,
+            }
+          ]}>
+            {title}
+          </Text>
+        </View>
+        <DraggableHabitList
+          habits={sectionHabits}
+          selectedDate={selectedDateISO}
+          onToggle={handleToggleHabit}
+          onPress={handleHabitPress}
+          onEdit={handleEditHabit}
+          onArchive={handleArchiveHabit}
+          onDelete={handleDeleteHabit}
+          onReorder={(from, to) => handleReorderList(sectionHabits, from, to)}
+        />
+      </View>
+    );
   };
 
-  // Handle share all complete
   const handleShareAllComplete = async () => {
     try {
       await Share.share({
@@ -390,7 +437,6 @@ const HomeScreen: React.FC = () => {
     setShowAllCompleteModal(false);
   };
 
-  // Handle quick note save
   const handleSaveQuickNote = (note: string, mood?: string) => {
     if (quickNoteHabitId) {
       const today = new Date().toISOString().split('T')[0];
@@ -417,7 +463,6 @@ const HomeScreen: React.FC = () => {
     }
   };
 
-  // Handle quick note skip
   const handleSkipQuickNote = () => {
     setShowQuickNoteModal(false);
     setQuickNoteHabitId(null);
@@ -558,9 +603,14 @@ const HomeScreen: React.FC = () => {
     </View>
   );
 
+  // ... (rest of handlers)
+
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      {/* Header */}
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      edges={['top', 'left', 'right']}
+    >
+      {/* ... (Header) ... */}
       <Animated.View
         style={[
           styles.header,
@@ -613,6 +663,7 @@ const HomeScreen: React.FC = () => {
       </Animated.View>
 
       <ScrollView
+        ref={mainScrollRef}
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -647,7 +698,7 @@ const HomeScreen: React.FC = () => {
           </ScrollView>
         </Animated.View>
 
-        {/* Mascot Companion - Hero Display */}
+        {/* Mascot Companion */}
         {mascotSettings.enabled ? (
           <Animated.View
             style={[
@@ -709,7 +760,7 @@ const HomeScreen: React.FC = () => {
           </TouchableOpacity>
         )}
 
-        {/* Progress Card - Always show if there are habits for the day */}
+        {/* Progress Card */}
         {dateFilteredHabits.length > 0 && (
           <Animated.View
             style={[
@@ -791,7 +842,7 @@ const HomeScreen: React.FC = () => {
           </Animated.View>
         )}
 
-        {/* Time-Based Filters - Always Visible */}
+        {/* Time-Based Filters - Now acting as scroll anchors */}
         <View style={styles.filtersContainer}>
           <Text
             style={[
@@ -809,16 +860,14 @@ const HomeScreen: React.FC = () => {
           <View style={{ marginHorizontal: -24 }}>
             <TimeFilter
               selected={timePeriodFilter}
-              onSelect={setTimePeriodFilter}
+              onSelect={handleScrollToSection}
               counts={habitCounts}
               timeRanges={timeRanges}
             />
-
           </View>
         </View>
 
-        {/* Habits List */}
-        {/* Habits List */}
+        {/* Habits List - Sectioned */}
         {activeHabits.length > 0 ? (
           <Animated.View
             style={[
@@ -826,48 +875,11 @@ const HomeScreen: React.FC = () => {
               { opacity: fadeAnim },
             ]}
           >
-            {/* Period Habits */}
-            {activePeriodHabits.length > 0 && (
-              <DraggableHabitList
-                habits={activePeriodHabits}
-                selectedDate={selectedDateISO}
-                onToggle={handleToggleHabit}
-                onPress={handleHabitPress}
-                onEdit={handleEditHabit}
-                onArchive={handleArchiveHabit}
-                onDelete={handleDeleteHabit}
-                onReorder={handleReorderPeriodHabits}
-              />
-            )}
-
-            {/* All Day Habits Section */}
-            {activeAllDayHabits.length > 0 && (
-              <>
-                {activePeriodHabits.length > 0 && (
-                  <View style={styles.sectionHeaderContainer}>
-                    <Text style={[
-                      styles.sectionHeaderText,
-                      {
-                        color: theme.colors.textSecondary,
-                        fontFamily: theme.typography.fontFamilyBodySemibold,
-                      }
-                    ]}>
-                      ALL DAY
-                    </Text>
-                  </View>
-                )}
-                <DraggableHabitList
-                  habits={activeAllDayHabits}
-                  selectedDate={selectedDateISO}
-                  onToggle={handleToggleHabit}
-                  onPress={handleHabitPress}
-                  onEdit={handleEditHabit}
-                  onArchive={handleArchiveHabit}
-                  onDelete={handleDeleteHabit}
-                  onReorder={handleReorderAllDayHabits}
-                />
-              </>
-            )}
+            {renderHabitSection('Morning', 'morning', morningHabits)}
+            {renderHabitSection('Afternoon', 'afternoon', afternoonHabits)}
+            {renderHabitSection('Evening', 'evening', eveningHabits)}
+            {renderHabitSection('Night', 'night', nightHabits)}
+            {renderHabitSection('All Day', 'allday', allDayHabits)}
           </Animated.View>
         ) : (
           renderEmptyState()
@@ -1048,7 +1060,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 24,
-    paddingBottom: 20, // Reduced from 100 to avoid blank space above tab bar
+    paddingBottom: 120, // Increased to ensure content clears the tab bar
   },
   datePickerContainer: {
     borderRadius: 16,

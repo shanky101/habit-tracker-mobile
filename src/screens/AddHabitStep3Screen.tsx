@@ -28,6 +28,7 @@ type AddHabitStep3ScreenRouteProp = RouteProp<
   {
     AddHabitStep3: {
       habitName: string;
+      habitType: 'positive' | 'negative';
       category: string;
       color: string;
     };
@@ -43,7 +44,7 @@ const AddHabitStep3Screen: React.FC = () => {
   const route = useRoute<AddHabitStep3ScreenRouteProp>();
   const { theme } = useTheme();
 
-  const { habitName, category, color } = route.params;
+  const { habitName, habitType, category, color } = route.params;
 
   const [frequency, setFrequency] = useState<'daily' | 'weekly'>('daily');
   // frequencyType is derived from targetCompletionsPerDay
@@ -122,11 +123,11 @@ const AddHabitStep3Screen: React.FC = () => {
       category,
       color,
       frequency,
-      frequency,
       frequencyType: targetCompletionsPerDay > 1 ? 'multiple' : 'single',
       targetCompletionsPerDay,
       selectedDays: frequency === 'daily' ? [0, 1, 2, 3, 4, 5, 6] : selectedDays,
       timePeriod,
+      type: habitType,
       reminderEnabled,
       reminderTime: reminderEnabled ? reminderTime : null,
       notes: notes.trim() || undefined,
@@ -366,7 +367,7 @@ const AddHabitStep3Screen: React.FC = () => {
                 },
               ]}
             >
-              How often per day? 🔄
+              {habitType === 'positive' ? 'How often per day? 🔄' : 'Daily Limit 🛑'}
             </Text>
             <Text
               style={[
@@ -378,7 +379,9 @@ const AddHabitStep3Screen: React.FC = () => {
                 },
               ]}
             >
-              Choose if this habit needs to be done once or multiple times per day
+              {habitType === 'positive'
+                ? 'Choose if this habit needs to be done once or multiple times per day'
+                : 'Set a limit for how many times you want to allow this habit'}
             </Text>
 
             {/* Target Count Input - Always visible now */}
@@ -393,7 +396,7 @@ const AddHabitStep3Screen: React.FC = () => {
                   },
                 ]}
               >
-                How many times per day?
+                {habitType === 'positive' ? 'How many times per day?' : 'Maximum allowed times:'}
               </Text>
               <View style={styles.targetCountInputRow}>
                 <TouchableOpacity
@@ -450,7 +453,7 @@ const AddHabitStep3Screen: React.FC = () => {
                   },
                 ]}
               >
-                {targetCompletionsPerDay === 1 ? 'Once a day' : `${targetCompletionsPerDay} times a day`}
+                {targetCompletionsPerDay === 1 ? (habitType === 'positive' ? 'Once a day' : 'Limit: 1 time') : (habitType === 'positive' ? `${targetCompletionsPerDay} times a day` : `Limit: ${targetCompletionsPerDay} times`)}
               </Text>
             </View>
           </View>
@@ -967,6 +970,11 @@ const styles = StyleSheet.create({
   targetCountHint: {
     marginTop: 8,
     textAlign: 'center',
+  },
+  targetCountHelper: {
+    marginTop: 8,
+    textAlign: 'center',
+    fontSize: 14,
   },
   summaryCard: {
     borderRadius: 16,

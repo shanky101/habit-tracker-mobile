@@ -32,6 +32,7 @@ const AddHabitStep1Screen: React.FC = () => {
   const { theme } = useTheme();
 
   const [habitName, setHabitName] = useState('');
+  const [habitType, setHabitType] = useState<'positive' | 'negative'>('positive');
   const [error, setError] = useState('');
   const textInputRef = useRef<TextInput>(null);
 
@@ -76,8 +77,8 @@ const AddHabitStep1Screen: React.FC = () => {
       return;
     }
 
-    // Navigate to step 2 with habit name
-    navigation.navigate('AddHabitStep2', { habitName: habitName.trim() });
+    // Navigate to step 2 with habit name and type
+    navigation.navigate('AddHabitStep2', { habitName: habitName.trim(), habitType });
   };
 
   const handleCancel = () => {
@@ -103,242 +104,295 @@ const AddHabitStep1Screen: React.FC = () => {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-        <Animated.View
-          style={[
-            styles.content,
-            {
-              opacity: fadeAnim,
-              transform: [{ translateY: slideAnim }],
-            },
-          ]}
-        >
-          {/* Header */}
-          <View style={styles.header}>
-            <TouchableOpacity
-              onPress={handleCancel}
-              style={styles.cancelButton}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.cancelButtonText, { color: theme.colors.textSecondary, fontFamily: theme.typography.fontFamilyBodyMedium }]}>
-                Cancel
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Progress Indicator */}
-          <View style={styles.progressContainer}>
-            <View style={styles.progressBar}>
-              <View
-                style={[
-                  styles.progressFill,
-                  {
-                    backgroundColor: theme.colors.primary,
-                    width: '33%',
-                  },
-                ]}
-              />
-            </View>
-            <Text
-              style={[
-                styles.stepText,
-                {
-                  color: theme.colors.textSecondary,
-                  fontFamily: theme.typography.fontFamilyBody,
-                  fontSize: theme.typography.fontSizeXS,
-                },
-              ]}
-            >
-              Step 1 of 3
-            </Text>
-          </View>
-
-          {/* Title */}
-          <Text
+          <Animated.View
             style={[
-              styles.title,
+              styles.content,
               {
-                color: theme.colors.text,
-                fontFamily: theme.typography.fontFamilyDisplayBold,
-                fontSize: theme.typography.fontSize2XL,
+                opacity: fadeAnim,
+                transform: [{ translateY: slideAnim }],
               },
             ]}
           >
-            What's your habit?
-          </Text>
+            {/* Header */}
+            <View style={styles.header}>
+              <TouchableOpacity
+                onPress={handleCancel}
+                style={styles.cancelButton}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.cancelButtonText, { color: theme.colors.textSecondary, fontFamily: theme.typography.fontFamilyBodyMedium }]}>
+                  Cancel
+                </Text>
+              </TouchableOpacity>
+            </View>
 
-          {/* Input Field */}
-          <View style={styles.inputContainer}>
-            <TextInput
-              ref={textInputRef}
-              autoFocus
-              style={[
-                styles.input,
-                {
-                  backgroundColor: theme.colors.backgroundSecondary,
-                  borderColor: error ? theme.colors.error : theme.colors.border,
-                  color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyBody,
-                  fontSize: theme.typography.fontSizeLG,
-                },
-              ]}
-              placeholder="E.g., Meditate for 10 minutes"
-              placeholderTextColor={theme.colors.textSecondary}
-              value={habitName}
-              onChangeText={(text) => {
-                setHabitName(text);
-                if (error) setError('');
-              }}
-              maxLength={characterLimit}
-              autoCapitalize="sentences"
-              autoCorrect={false}
-              multiline
-            />
-            <View style={styles.inputFooter}>
+            {/* Progress Indicator */}
+            <View style={styles.progressContainer}>
+              <View style={styles.progressBar}>
+                <View
+                  style={[
+                    styles.progressFill,
+                    {
+                      backgroundColor: theme.colors.primary,
+                      width: '33%',
+                    },
+                  ]}
+                />
+              </View>
               <Text
                 style={[
-                  styles.characterCount,
+                  styles.stepText,
                   {
-                    color: characterCount > 80 ? theme.colors.warning : theme.colors.textSecondary,
+                    color: theme.colors.textSecondary,
                     fontFamily: theme.typography.fontFamilyBody,
                     fontSize: theme.typography.fontSizeXS,
                   },
                 ]}
               >
-                {characterCount}/{characterLimit}
+                Step 1 of 3
               </Text>
             </View>
-            {error ? (
-              <Text style={[styles.errorText, { color: theme.colors.error }]}>
-                {error}
-              </Text>
-            ) : null}
-          </View>
 
-          {/* Suggestions */}
-          <View style={styles.suggestionsSection}>
+            {/* Title */}
             <Text
               style={[
-                styles.suggestionsLabel,
+                styles.title,
                 {
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyBodyMedium,
-                  fontSize: theme.typography.fontSizeSM,
+                  fontFamily: theme.typography.fontFamilyDisplayBold,
+                  fontSize: theme.typography.fontSize2XL,
                 },
               ]}
             >
-              Common habits:
+              What's your habit?
             </Text>
-            <View style={styles.suggestionsGrid}>
-              {HABIT_SUGGESTIONS.map((suggestion, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={[
-                    styles.suggestionChip,
-                    {
-                      backgroundColor: theme.colors.backgroundSecondary,
-                      borderColor: theme.colors.border,
-                    },
-                  ]}
-                  onPress={() => handleSuggestionTap(suggestion)}
-                  activeOpacity={0.7}
-                >
-                  <Text
-                    style={[
-                      styles.suggestionText,
-                      {
-                        color: theme.colors.text,
-                        fontFamily: theme.typography.fontFamilyBody,
-                        fontSize: theme.typography.fontSizeSM,
-                      },
-                    ]}
-                  >
-                    {suggestion}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-            <Animated.View
-              style={[
-                styles.browseTemplatesContainer,
-                {
-                  transform: [{ scale: pulseAnim }],
-                },
-              ]}
-            >
+
+            {/* Habit Type Selector */}
+            <View style={styles.typeSelectorContainer}>
               <TouchableOpacity
-                onPress={() => navigation.navigate('HabitTemplates')}
                 style={[
-                  styles.browseTemplatesButton,
+                  styles.typeOption,
                   {
-                    backgroundColor: `${theme.colors.primary}15`,
-                    borderColor: theme.colors.primary,
+                    backgroundColor: habitType === 'positive' ? theme.colors.primary : theme.colors.backgroundSecondary,
+                    borderColor: habitType === 'positive' ? theme.colors.primary : theme.colors.border,
                   },
                 ]}
+                onPress={() => setHabitType('positive')}
                 activeOpacity={0.7}
               >
-                <Text style={styles.templateIcon}>📚</Text>
-                <View style={styles.browseTemplatesContent}>
-                  <Text
-                    style={[
-                      styles.browseTemplatesText,
-                      {
-                        color: theme.colors.primary,
-                        fontFamily: theme.typography.fontFamilyBodyBold,
-                        fontSize: theme.typography.fontSizeMD,
-                      },
-                    ]}
-                  >
-                    Browse Templates
-                  </Text>
-                  <Text
-                    style={[
-                      styles.browseTemplatesSubtext,
-                      {
-                        color: theme.colors.textSecondary,
-                        fontFamily: theme.typography.fontFamilyBody,
-                        fontSize: theme.typography.fontSizeXS,
-                      },
-                    ]}
-                  >
-                    Get inspired by popular habits
-                  </Text>
-                </View>
-                <Text style={styles.arrowIcon}>→</Text>
+                <Text style={styles.typeIcon}>📈</Text>
+                <Text
+                  style={[
+                    styles.typeText,
+                    {
+                      color: habitType === 'positive' ? theme.colors.white : theme.colors.text,
+                      fontFamily: habitType === 'positive' ? theme.typography.fontFamilyBodySemibold : theme.typography.fontFamilyBody,
+                    },
+                  ]}
+                >
+                  Build Habit
+                </Text>
               </TouchableOpacity>
-            </Animated.View>
-          </View>
 
-          {/* Next Button */}
-          <TouchableOpacity
-            style={[
-              styles.nextButton,
-              {
-                backgroundColor: habitName.trim().length >= 3 ? theme.colors.primary : theme.colors.border,
-                shadowColor: theme.shadows.shadowMD.shadowColor,
-                shadowOffset: theme.shadows.shadowMD.shadowOffset,
-                shadowOpacity: habitName.trim().length >= 3 ? theme.shadows.shadowMD.shadowOpacity : 0,
-                shadowRadius: theme.shadows.shadowMD.shadowRadius,
-                elevation: habitName.trim().length >= 3 ? theme.shadows.shadowMD.elevation : 0,
-              },
-            ]}
-            onPress={handleNext}
-            activeOpacity={0.8}
-            disabled={habitName.trim().length < 3}
-          >
-            <Text
+              <TouchableOpacity
+                style={[
+                  styles.typeOption,
+                  {
+                    backgroundColor: habitType === 'negative' ? theme.colors.error : theme.colors.backgroundSecondary,
+                    borderColor: habitType === 'negative' ? theme.colors.error : theme.colors.border,
+                  },
+                ]}
+                onPress={() => setHabitType('negative')}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.typeIcon}>📉</Text>
+                <Text
+                  style={[
+                    styles.typeText,
+                    {
+                      color: habitType === 'negative' ? theme.colors.white : theme.colors.text,
+                      fontFamily: habitType === 'negative' ? theme.typography.fontFamilyBodySemibold : theme.typography.fontFamilyBody,
+                    },
+                  ]}
+                >
+                  Quit Habit
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Input Field */}
+            <View style={styles.inputContainer}>
+              <TextInput
+                ref={textInputRef}
+                autoFocus
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor: theme.colors.backgroundSecondary,
+                    borderColor: error ? theme.colors.error : theme.colors.border,
+                    color: theme.colors.text,
+                    fontFamily: theme.typography.fontFamilyBody,
+                    fontSize: theme.typography.fontSizeLG,
+                  },
+                ]}
+                placeholder={habitType === 'positive' ? "E.g., Meditate for 10 minutes" : "E.g., No sugar today"}
+                placeholderTextColor={theme.colors.textSecondary}
+                value={habitName}
+                onChangeText={(text) => {
+                  setHabitName(text);
+                  if (error) setError('');
+                }}
+                maxLength={characterLimit}
+                autoCapitalize="sentences"
+                autoCorrect={false}
+                multiline
+              />
+              <View style={styles.inputFooter}>
+                <Text
+                  style={[
+                    styles.characterCount,
+                    {
+                      color: characterCount > 80 ? theme.colors.warning : theme.colors.textSecondary,
+                      fontFamily: theme.typography.fontFamilyBody,
+                      fontSize: theme.typography.fontSizeXS,
+                    },
+                  ]}
+                >
+                  {characterCount}/{characterLimit}
+                </Text>
+              </View>
+              {error ? (
+                <Text style={[styles.errorText, { color: theme.colors.error }]}>
+                  {error}
+                </Text>
+              ) : null}
+            </View>
+
+            {/* Suggestions */}
+            <View style={styles.suggestionsSection}>
+              <Text
+                style={[
+                  styles.suggestionsLabel,
+                  {
+                    color: theme.colors.text,
+                    fontFamily: theme.typography.fontFamilyBodyMedium,
+                    fontSize: theme.typography.fontSizeSM,
+                  },
+                ]}
+              >
+                Common habits:
+              </Text>
+              <View style={styles.suggestionsGrid}>
+                {HABIT_SUGGESTIONS.map((suggestion, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={[
+                      styles.suggestionChip,
+                      {
+                        backgroundColor: theme.colors.backgroundSecondary,
+                        borderColor: theme.colors.border,
+                      },
+                    ]}
+                    onPress={() => handleSuggestionTap(suggestion)}
+                    activeOpacity={0.7}
+                  >
+                    <Text
+                      style={[
+                        styles.suggestionText,
+                        {
+                          color: theme.colors.text,
+                          fontFamily: theme.typography.fontFamilyBody,
+                          fontSize: theme.typography.fontSizeSM,
+                        },
+                      ]}
+                    >
+                      {suggestion}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <Animated.View
+                style={[
+                  styles.browseTemplatesContainer,
+                  {
+                    transform: [{ scale: pulseAnim }],
+                  },
+                ]}
+              >
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('HabitTemplates')}
+                  style={[
+                    styles.browseTemplatesButton,
+                    {
+                      backgroundColor: `${theme.colors.primary}15`,
+                      borderColor: theme.colors.primary,
+                    },
+                  ]}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.templateIcon}>📚</Text>
+                  <View style={styles.browseTemplatesContent}>
+                    <Text
+                      style={[
+                        styles.browseTemplatesText,
+                        {
+                          color: theme.colors.primary,
+                          fontFamily: theme.typography.fontFamilyBodyBold,
+                          fontSize: theme.typography.fontSizeMD,
+                        },
+                      ]}
+                    >
+                      Browse Templates
+                    </Text>
+                    <Text
+                      style={[
+                        styles.browseTemplatesSubtext,
+                        {
+                          color: theme.colors.textSecondary,
+                          fontFamily: theme.typography.fontFamilyBody,
+                          fontSize: theme.typography.fontSizeXS,
+                        },
+                      ]}
+                    >
+                      Get inspired by popular habits
+                    </Text>
+                  </View>
+                  <Text style={styles.arrowIcon}>→</Text>
+                </TouchableOpacity>
+              </Animated.View>
+            </View>
+
+            {/* Next Button */}
+            <TouchableOpacity
               style={[
-                styles.nextButtonText,
+                styles.nextButton,
                 {
-                  color: habitName.trim().length >= 3 ? theme.colors.white : theme.colors.textSecondary,
-                  fontFamily: theme.typography.fontFamilyBodySemibold,
-                  fontSize: theme.typography.fontSizeMD,
+                  backgroundColor: habitName.trim().length >= 3 ? theme.colors.primary : theme.colors.border,
+                  shadowColor: theme.shadows.shadowMD.shadowColor,
+                  shadowOffset: theme.shadows.shadowMD.shadowOffset,
+                  shadowOpacity: habitName.trim().length >= 3 ? theme.shadows.shadowMD.shadowOpacity : 0,
+                  shadowRadius: theme.shadows.shadowMD.shadowRadius,
+                  elevation: habitName.trim().length >= 3 ? theme.shadows.shadowMD.elevation : 0,
                 },
               ]}
+              onPress={handleNext}
+              activeOpacity={0.8}
+              disabled={habitName.trim().length < 3}
             >
-              Next
-            </Text>
-          </TouchableOpacity>
-        </Animated.View>
+              <Text
+                style={[
+                  styles.nextButtonText,
+                  {
+                    color: habitName.trim().length >= 3 ? theme.colors.white : theme.colors.textSecondary,
+                    fontFamily: theme.typography.fontFamilyBodySemibold,
+                    fontSize: theme.typography.fontSizeMD,
+                  },
+                ]}
+              >
+                Next
+              </Text>
+            </TouchableOpacity>
+          </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -390,7 +444,29 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   title: {
-    marginBottom: 32,
+    marginBottom: 24,
+  },
+  typeSelectorContainer: {
+    flexDirection: 'row',
+    marginBottom: 24,
+    gap: 12,
+  },
+  typeOption: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 8,
+  },
+  typeIcon: {
+    fontSize: 18,
+  },
+  typeText: {
+    fontSize: 14,
+    fontWeight: '500',
   },
   inputContainer: {
     marginBottom: 32,

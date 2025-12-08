@@ -53,6 +53,11 @@ const SwipeableHabitCard: React.FC<SwipeableHabitCardProps> = ({
   const isMultiCompletion = habit.targetCompletionsPerDay > 1;
   const cardHeight = isMultiCompletion ? CARD_HEIGHT_MULTIPLE : CARD_HEIGHT_SINGLE;
 
+  // Negative habit logic
+  const isNegative = habit.type === 'negative';
+  const isLimitReached = isNegative && progress.current >= progress.target;
+  const isSafe = isNegative && progress.current < progress.target;
+
   // Animated value for card translation
   const translateX = useRef(new Animated.Value(0)).current;
 
@@ -239,6 +244,24 @@ const SwipeableHabitCard: React.FC<SwipeableHabitCardProps> = ({
     onToggle(habit.id);
   }, [habit.id, onToggle]);
 
+  // Determine colors based on state
+  const getCheckboxColor = () => {
+    if (isNegative) {
+      if (isLimitReached) return theme.colors.error; // Red if limit reached
+      if (progress.current > 0) return theme.colors.warning; // Orange if some progress
+      return 'transparent';
+    }
+    return isCompleted ? theme.colors.primary : 'transparent';
+  };
+
+  const getCheckboxBorderColor = () => {
+    if (isNegative) {
+      if (isLimitReached) return theme.colors.error;
+      return theme.colors.border;
+    }
+    return isCompleted ? theme.colors.primary : theme.colors.border;
+  };
+
   return (
     <View style={[styles.swipeableContainer, { height: cardHeight }]}>
       {/* Left action - Done/Undo button */}
@@ -246,7 +269,9 @@ const SwipeableHabitCard: React.FC<SwipeableHabitCardProps> = ({
         style={[
           styles.leftAction,
           {
-            backgroundColor: isCompleted ? theme.colors.error : theme.colors.success,
+            backgroundColor: isNegative
+              ? (isLimitReached ? theme.colors.textSecondary : theme.colors.error) // Undo limit reached vs Add count
+              : (isCompleted ? theme.colors.error : theme.colors.success),
             opacity: checkInOpacity,
           },
         ]}
@@ -258,9 +283,15 @@ const SwipeableHabitCard: React.FC<SwipeableHabitCardProps> = ({
           }}
           activeOpacity={0.8}
         >
-          <Text style={styles.checkInIcon}>{isCompleted ? '↶' : '✓'}</Text>
+          <Text style={styles.checkInIcon}>
+            {isNegative
+              ? (isLimitReached ? '↶' : '+')
+              : (isCompleted ? '↶' : '✓')}
+          </Text>
           <Text style={[styles.checkInText, { color: theme.colors.white }]}>
-            {isCompleted ? 'Undo' : 'Done'}
+            {isNegative
+              ? (isLimitReached ? 'Undo' : 'Log')
+              : (isCompleted ? 'Undo' : 'Done')}
           </Text>
         </TouchableOpacity>
       </Animated.View>
@@ -318,32 +349,43 @@ const SwipeableHabitCard: React.FC<SwipeableHabitCardProps> = ({
           style={[
             styles.habitCard,
             {
-              backgroundColor: theme.colors.surface,
+              backgroundColor: isNegative ? '#FFF5F5' : theme.colors.surface, // Subtle red tint for negative
               height: cardHeight,
               transform: [{ translateX }],
               // Enhanced shadow for premium depth
               shadowColor: '#000',
               shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.08,
-              shadowRadius: 12,
-              elevation: 3,
+              shadowOpacity: 0.06,
+              shadowRadius: 16,
+              elevation: 4,
+              borderWidth: 1,
+              borderColor: isNegative ? 'rgba(239, 68, 68, 0.1)' : 'rgba(0,0,0,0.03)', // Very subtle border
             },
           ]}>
           {/* Subtle gradient overlay for completed cards */}
-          {isCompleted && (
+          {(isCompleted || isLimitReached) && (
             <View
               style={[
                 styles.gradientOverlay,
                 {
-                  backgroundColor: `${theme.colors.primary}08`, // 3% opacity
+                  backgroundColor: isNegative
+                    ? `${theme.colors.error}08`
+                    : `${theme.colors.primary}08`, // 3% opacity
                 },
               ]}>
             </View>
           )}
           <View style={styles.cardContent}>
-            {/* Emoji/Icon */}
-            <View style={styles.emojiContainer}>
-              <Text style={styles.habitEmoji}>{habit.emoji || '🏃'}</Text>
+            {/* Emoji/Icon - Larger and more colorful */}
+            <View style={[
+              styles.emojiContainer,
+              {
+                backgroundColor: isNegative
+                  ? 'rgba(239, 68, 68, 0.1)'
+                  : (habit.color ? `${habit.color}15` : 'rgba(59, 130, 246, 0.1)')
+              }
+            ]}>
+              <Text style={styles.habitEmoji}>{habit.emoji || (isNegative ? '🚫' : '🏃')}</Text>
             </View>
 
             {/* Habit info */}
@@ -353,10 +395,11 @@ const SwipeableHabitCard: React.FC<SwipeableHabitCardProps> = ({
                   styles.habitName,
                   {
                     color: theme.colors.text,
-                    fontFamily: theme.typography.fontFamilyBodyMedium,
+
+                    fontFamily: theme.typography.fontFamilyDisplayBold, // Bolder font
                     fontSize: theme.typography.fontSizeMD,
-                    textDecorationLine: isCompleted ? 'line-through' : 'none',
-                    opacity: isCompleted ? 0.7 : 1,
+                    textDecorationLine: (isCompleted && !isNegative) ? 'line-through' : 'none',
+                    opacity: (isCompleted || isLimitReached) ? 0.7 : 1,
                   },
                 ]}
                 numberOfLines={1}
@@ -376,10 +419,10 @@ const SwipeableHabitCard: React.FC<SwipeableHabitCardProps> = ({
                           styles.progressBar,
                           {
                             backgroundColor: isFilled
-                              ? theme.colors.success
+                              ? (isNegative ? theme.colors.error : theme.colors.success)
                               : theme.colors.border,
                             opacity: isFilled ? 1 : 0.5, // Unfilled bars are more subtle
-                            shadowColor: isFilled ? theme.colors.success : 'transparent',
+                            shadowColor: isFilled ? (isNegative ? theme.colors.error : theme.colors.success) : 'transparent',
                             shadowOffset: { width: 0, height: 1 },
                             shadowOpacity: isFilled ? 0.3 : 0,
                             shadowRadius: 2,
@@ -392,17 +435,39 @@ const SwipeableHabitCard: React.FC<SwipeableHabitCardProps> = ({
                 </View>
               )}
 
+              {/* Negative Habit Limit Bar */}
+              {isNegative && habit.targetCompletionsPerDay === 1 && (
+                <View style={styles.limitBarContainer}>
+                  <View style={[styles.limitBarTrack, { backgroundColor: 'rgba(239, 68, 68, 0.1)' }]}>
+                    <View
+                      style={[
+                        styles.limitBarFill,
+                        {
+                          width: `${Math.min(100, (progress.current / progress.target) * 100)}%`,
+                          backgroundColor: isLimitReached ? theme.colors.error : theme.colors.warning
+                        }
+                      ]}
+                    />
+                  </View>
+                  <Text style={[styles.limitText, { color: theme.colors.error }]}>
+                    Limit: {progress.target}
+                  </Text>
+                </View>
+              )}
+
               <Text
                 style={[
                   styles.habitSubtext,
                   {
-                    color: theme.colors.textSecondary,
+                    color: isNegative && isLimitReached ? theme.colors.error : theme.colors.textSecondary,
                     fontFamily: theme.typography.fontFamilyBody,
                     fontSize: theme.typography.fontSizeXS,
                   },
                 ]}
               >
-                {progress.current} / {progress.target} {progress.target === 1 ? 'time' : 'times'}
+                {isNegative
+                  ? (isLimitReached ? 'Limit reached' : `${progress.current}/${progress.target} used`)
+                  : `${progress.current} / ${progress.target} ${progress.target === 1 ? 'time' : 'times'}`}
               </Text>
             </View>
 
@@ -413,16 +478,21 @@ const SwipeableHabitCard: React.FC<SwipeableHabitCardProps> = ({
                 style={[
                   styles.checkbox,
                   {
-                    backgroundColor: isCompleted ? theme.colors.primary : 'transparent',
-                    borderColor: isCompleted ? theme.colors.primary : theme.colors.border,
+                    backgroundColor: getCheckboxColor(),
+                    borderColor: getCheckboxBorderColor(),
                   },
                 ]}
                 onPress={handleCheckboxPress}
                 activeOpacity={0.7}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
-                {isCompleted && (
+                {isCompleted && !isNegative && (
                   <Text style={[styles.checkmark, { color: theme.colors.white }]}>✓</Text>
+                )}
+                {isNegative && progress.current > 0 && (
+                  <Text style={[styles.checkmark, { color: isLimitReached ? theme.colors.white : theme.colors.error, fontSize: 12 }]}>
+                    {progress.current}
+                  </Text>
                 )}
               </TouchableOpacity>
             ) : (
@@ -431,8 +501,8 @@ const SwipeableHabitCard: React.FC<SwipeableHabitCardProps> = ({
                 style={[
                   styles.checkInButton,
                   {
-                    backgroundColor: isCompleted ? theme.colors.success : 'transparent',
-                    borderColor: isCompleted ? theme.colors.success : theme.colors.border,
+                    backgroundColor: getCheckboxColor(),
+                    borderColor: getCheckboxBorderColor(),
                   },
                 ]}
                 onPress={handleCheckboxPress}
@@ -442,10 +512,12 @@ const SwipeableHabitCard: React.FC<SwipeableHabitCardProps> = ({
                 <Text
                   style={[
                     styles.checkInButtonIcon,
-                    { color: isCompleted ? theme.colors.white : theme.colors.textSecondary }
+                    { color: (isCompleted || isLimitReached) ? theme.colors.white : theme.colors.textSecondary }
                   ]}
                 >
-                  {isCompleted ? '✓' : '+'}
+                  {isNegative
+                    ? (isLimitReached ? '!' : '+')
+                    : (isCompleted ? '✓' : '+')}
                 </Text>
               </TouchableOpacity>
             )}
@@ -458,8 +530,8 @@ const SwipeableHabitCard: React.FC<SwipeableHabitCardProps> = ({
 
 const styles = StyleSheet.create({
   swipeableContainer: {
-    marginBottom: 12,
-    marginHorizontal: 0, // Edge-to-edge
+    marginBottom: 16, // Increased spacing
+    marginHorizontal: 0,
     position: 'relative',
   },
   leftAction: {
@@ -468,7 +540,7 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     width: 100,
-    borderRadius: 20,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -495,7 +567,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: RIGHT_ACTIONS_WIDTH,
     flexDirection: 'row',
-    borderRadius: 20,
+    borderRadius: 24,
     overflow: 'hidden',
   },
   actionButton: {
@@ -523,9 +595,8 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   habitCard: {
-    borderRadius: 20, // Larger radius for modern feel
+    borderRadius: 24, // More rounded for premium feel
     overflow: 'hidden',
-    // No border - shadows define edges
   },
   gradientOverlay: {
     position: 'absolute',
@@ -538,21 +609,20 @@ const styles = StyleSheet.create({
   cardContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20, // Increased for airy feel
-    paddingVertical: 16, // More breathing room
+    paddingHorizontal: 20,
+    paddingVertical: 18,
     height: '100%',
   },
   emojiContainer: {
-    width: 44, // Larger for balance
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(59, 130, 246, 0.08)', // Subtle background
+    width: 52, // Larger
+    height: 52,
+    borderRadius: 20, // Squircle-ish
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 14,
+    marginRight: 16,
   },
   habitEmoji: {
-    fontSize: 22, // Larger emoji
+    fontSize: 26,
   },
   habitInfo: {
     flex: 1,
@@ -560,48 +630,70 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   habitName: {
-    marginBottom: 2, // Space between habit name and progress bars/subtext
+    marginBottom: 4,
   },
   progressBarsContainer: {
     flexDirection: 'row',
-    gap: 4, // Spacing between progress bars
-    marginTop: 4, // Space above progress bars
-    marginBottom: 4, // Space below progress bars
+    gap: 4,
+    marginTop: 6,
+    marginBottom: 4,
     alignItems: 'center',
   },
   progressBar: {
-    width: 4, // Thicker bars
-    height: 18, // Taller bars
+    width: 4,
+    height: 18,
     borderRadius: 2,
+  },
+  limitBarContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 6,
+    marginBottom: 2,
+    gap: 8,
+  },
+  limitBarTrack: {
+    flex: 1,
+    height: 6,
+    borderRadius: 3,
+    overflow: 'hidden',
+    maxWidth: 100,
+  },
+  limitBarFill: {
+    height: '100%',
+    borderRadius: 3,
+  },
+  limitText: {
+    fontSize: 10,
+    fontWeight: '600',
   },
   habitSubtext: {
     opacity: 0.6,
     marginTop: 2,
   },
   checkbox: {
-    width: 28, // Larger touch target
-    height: 28,
-    borderRadius: 14,
+    width: 32, // Larger
+    height: 32,
+    borderRadius: 16,
     borderWidth: 2,
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 12,
   },
   checkmark: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
   },
   checkInButton: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     borderWidth: 2,
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 12,
   },
   checkInButtonIcon: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
   },
 });
