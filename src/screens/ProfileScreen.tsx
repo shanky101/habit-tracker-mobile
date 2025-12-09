@@ -18,6 +18,7 @@ import { useTheme } from '@/theme';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 import { useHabits } from '@/hooks/useHabits';
+import { useUser } from '@/context/UserContext';
 import { useSubscription, formatPlanName } from '@/context/SubscriptionContext';
 import {
   Settings,
@@ -40,7 +41,8 @@ import {
   Palette,
   Sparkles,
   Database,
-  ArrowRight
+  ArrowRight,
+  Plane
 } from 'lucide-react-native';
 
 import HabiCustomizationSheet from '@/components/HabiCustomizationSheet';
@@ -55,6 +57,7 @@ const ProfileScreen: React.FC = () => {
   const { theme } = useTheme();
   const { fadeAnim, slideAnim } = useScreenAnimation();
   const { subscription } = useSubscription();
+  const { isVacationMode, toggleVacationMode } = useUser();
 
   const { habits } = useHabits();
   const [userName, setUserName] = useState('');
@@ -471,7 +474,54 @@ const ProfileScreen: React.FC = () => {
             <View style={[styles.menuGroup, { backgroundColor: theme.colors.surface }]}>
               {renderMenuItem(HelpCircle, 'Help & Support', handleHelpSupport, true)}
               {renderMenuItem(Star, 'Rate the App', handleRateApp, true)}
-              {renderMenuItem(Megaphone, 'Share App', handleShareApp, false)}
+              {renderMenuItem(Megaphone, 'Share App', handleShareApp, true)}
+
+              {/* Vacation Mode Toggle */}
+              <TouchableOpacity
+                style={[
+                  styles.menuItem,
+                  {
+                    borderBottomColor: theme.colors.border,
+                    borderBottomWidth: 0,
+                  },
+                ]}
+                onPress={toggleVacationMode}
+                activeOpacity={0.7}
+              >
+                <View style={styles.menuItemLeft}>
+                  <View style={[styles.menuIconContainer, { backgroundColor: isVacationMode ? theme.colors.primary + '20' : 'transparent' }]}>
+                    <Plane size={22} color={isVacationMode ? theme.colors.primary : theme.colors.textTertiary} strokeWidth={2} />
+                  </View>
+                  <View>
+                    <Text
+                      style={[
+                        styles.menuLabel,
+                        {
+                          color: theme.colors.text,
+                          fontFamily: theme.typography.fontFamilyBodyMedium,
+                          fontSize: theme.typography.fontSizeMD,
+                        },
+                      ]}
+                    >
+                      Vacation Mode
+                    </Text>
+                    <Text style={{ fontSize: 12, color: theme.colors.textSecondary }}>
+                      {isVacationMode ? 'Active - Streaks frozen' : 'Pause streaks'}
+                    </Text>
+                  </View>
+                </View>
+                <View style={{
+                  width: 40,
+                  height: 24,
+                  borderRadius: 12,
+                  backgroundColor: isVacationMode ? theme.colors.primary : theme.colors.border,
+                  justifyContent: 'center',
+                  alignItems: isVacationMode ? 'flex-end' : 'flex-start',
+                  paddingHorizontal: 2,
+                }}>
+                  <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: '#FFF' }} />
+                </View>
+              </TouchableOpacity>
             </View>
           </View>
 

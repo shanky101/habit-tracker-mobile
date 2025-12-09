@@ -22,6 +22,7 @@ import { ThemeProvider } from './src/theme';
 import { TemplateProvider } from './src/contexts/TemplateContext';
 import { SubscriptionProvider } from './src/context/SubscriptionContext';
 import { MascotProvider } from './src/context/MascotContext';
+import { UserProvider } from './src/context/UserContext';
 import OnboardingNavigator from './src/navigation/OnboardingNavigator';
 import { initializeDatabase } from './src/data/database';
 
@@ -64,16 +65,18 @@ export default function App() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <ThemeProvider>
-          <SubscriptionProvider>
-            <TemplateProvider>
-              <MascotProvider>
-                <NavigationContainer>
-                  <StatusBar style="auto" />
-                  <OnboardingNavigator />
-                </NavigationContainer>
-              </MascotProvider>
-            </TemplateProvider>
-          </SubscriptionProvider>
+          <UserProvider>
+            <SubscriptionProvider>
+              <TemplateProvider>
+                <MascotProvider>
+                  <NavigationContainer>
+                    <StatusBar style="auto" />
+                    <OnboardingNavigator />
+                  </NavigationContainer>
+                </MascotProvider>
+              </TemplateProvider>
+            </SubscriptionProvider>
+          </UserProvider>
         </ThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

@@ -16,7 +16,8 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '@/theme';
-import { useHabits, Habit } from '@/hooks/useHabits';
+import { useHabits, Habit, HabitEntry } from '@/hooks/useHabits';
+import { useUser } from '@/context/UserContext';
 import { ExportManager, ExportFormat } from '@/utils/exportManager';
 import {
   ArrowLeft,
@@ -57,6 +58,7 @@ const HabitDetailScreen: React.FC = () => {
     isHabitCompletedForDate,
     getCompletionProgress
   } = useHabits();
+  const { vacationHistory } = useUser();
 
   const { habitId } = route.params;
 
@@ -84,6 +86,16 @@ const HabitDetailScreen: React.FC = () => {
       return sum + (completions[date]?.completionCount || 0);
     }, 0);
 
+    // Helper to check if a date is during vacation
+    const isVacationDay = (dateStr: string) => {
+      return vacationHistory.some(interval => {
+        const start = new Date(interval.startDate);
+        const end = interval.endDate ? new Date(interval.endDate) : new Date(); // If null, assume ongoing (up to today)
+        const check = new Date(dateStr);
+        return check >= start && check <= end;
+      });
+    };
+
     // Longest streak: calculate from completion history
     const calculateLongestStreak = (): number => {
       if (completionDates.length === 0) return 0;
@@ -108,7 +120,26 @@ const HabitDetailScreen: React.FC = () => {
             if (daysDiff === 1) {
               currentStreakLength++;
             } else {
-              currentStreakLength = 1;
+              // Check if gap is covered by vacation
+              let gapCovered = true;
+              for (let j = 1; j < daysDiff; j++) {
+                const checkDate = new Date(prevDate);
+                checkDate.setDate(checkDate.getDate() + j);
+                const checkDateStr = checkDate.toISOString().split('T')[0];
+
+                // If it's a scheduled day AND not vacation, then the chain is broken
+                const dayOfWeek = checkDate.getDay();
+                if (habitData.selectedDays.includes(dayOfWeek) && !isVacationDay(checkDateStr)) {
+                  gapCovered = false;
+                  break;
+                }
+              }
+
+              if (gapCovered) {
+                currentStreakLength++;
+              } else {
+                currentStreakLength = 1;
+              }
             }
           }
 
@@ -119,6 +150,51 @@ const HabitDetailScreen: React.FC = () => {
       }
 
       return longestStreak;
+    };
+
+    // Calculate Current Streak (Backwards from today)
+    const calculateCurrentStreak = (): number => {
+      let streak = 0;
+      const today = new Date();
+      let checkDate = new Date(today);
+
+      // If not completed today, start checking from yesterday
+      const todayStr = checkDate.toISOString().split('T')[0];
+      if (!isHabitCompletedForDate(habitId, todayStr)) {
+        checkDate.setDate(checkDate.getDate() - 1);
+      }
+
+      // Look back up to 365 days (safety limit)
+      for (let i = 0; i < 365; i++) {
+        const dateStr = checkDate.toISOString().split('T')[0];
+        const dayOfWeek = checkDate.getDay();
+
+        // If not a scheduled day, just skip back
+        if (!habitData.selectedDays.includes(dayOfWeek)) {
+          checkDate.setDate(checkDate.getDate() - 1);
+          continue;
+        }
+
+        // Check completion
+        const completion = completions[dateStr];
+        const isCompleted = completion && completion.completionCount >= completion.targetCount;
+
+        if (isCompleted) {
+          streak++;
+        } else {
+          // If not completed, check if vacation
+          if (isVacationDay(dateStr)) {
+            // Vacation: freeze streak (don't increment, don't break)
+          } else {
+            // Not completed and not vacation: break streak
+            break;
+          }
+        }
+
+        checkDate.setDate(checkDate.getDate() - 1);
+      }
+
+      return streak;
     };
 
     // Completion rate: % of scheduled days that were completed
@@ -137,7 +213,11 @@ const HabitDetailScreen: React.FC = () => {
 
       while (currentDate <= today) {
         const dayOfWeek = currentDate.getDay();
-        if (habitData.selectedDays.includes(dayOfWeek)) {
+        const dateStr = currentDate.toISOString().split('T')[0];
+
+        // Exclude vacation days from denominator? 
+        // Usually completion rate should probably exclude vacation days to be fair.
+        if (habitData.selectedDays.includes(dayOfWeek) && !isVacationDay(dateStr)) {
           scheduledDays++;
         }
         currentDate.setDate(currentDate.getDate() + 1);
@@ -155,7 +235,7 @@ const HabitDetailScreen: React.FC = () => {
     };
 
     return {
-      currentStreak: habitData.streak || 0,
+      currentStreak: calculateCurrentStreak(),
       longestStreak: calculateLongestStreak(),
       totalCompletions,
       completionRate: calculateCompletionRate(),

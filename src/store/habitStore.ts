@@ -77,6 +77,17 @@ export const useHabitStore = create<HabitState>()(
           habits: state.habits.map((habit) => {
             if (habit.id !== id) return habit;
 
+            // Prevent future completions
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const completionDate = new Date(date);
+            completionDate.setHours(0, 0, 0, 0);
+
+            if (completionDate > today) {
+              console.warn('Cannot complete habit for future date');
+              return habit;
+            }
+
             const existingCompletion = habit.completions[date];
             const now = Date.now();
 
