@@ -37,7 +37,10 @@ const ensureDbInitialized = async (): Promise<void> => {
 /**
  * SQLite storage adapter for user store
  */
-const userStorage: StateStorage = {
+/**
+ * SQLite storage adapter for user store
+ */
+export const sqliteStorage: StateStorage = {
     getItem: async (name: string): Promise<string | null> => {
         try {
             await ensureDbInitialized();
@@ -192,7 +195,7 @@ export const useUserStore = create<UserState>()(
         }),
         {
             name: 'user-storage',
-            storage: createJSONStorage(() => userStorage),
+            storage: createJSONStorage(() => sqliteStorage),
             onRehydrateStorage: () => (state) => {
                 console.log('[UserStore] Hydration complete');
                 if (state) {

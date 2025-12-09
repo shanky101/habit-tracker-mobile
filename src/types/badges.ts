@@ -1,0 +1,766 @@
+export type BadgeCategory =
+    | 'streak'
+    | 'volume'
+    | 'perfectionist'
+    | 'explorer'
+    | 'resilience'
+    | 'social'
+    | 'specialist'
+    | 'seasonal'
+    | 'diversity'
+    | 'longevity'
+    | 'multi_tasker'
+    | 'hidden';
+
+export type BadgeTier = 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond' | 'cosmic';
+
+export type BadgeShape = 'hexagon' | 'shield' | 'star' | 'circle' | 'diamond';
+
+export interface BadgeRequirement {
+    type:
+    | 'streak_days'
+    | 'total_completions'
+    | 'habits_created'
+    | 'time_of_day'
+    | 'perfect_days'
+    | 'category_completions'
+    | 'notes_added'
+    | 'mood_logs'
+    | 'themes_used'
+    | 'vacation_mode'
+    | 'template_usage'
+    | 'past_completions'
+    | 'streak_recovery'
+    | 'shares'
+    | 'diversity_time'
+    | 'diversity_category'
+    | 'diversity_type'
+    | 'active_days'
+    | 'specific_date'
+    | 'multi_task'
+    | 'special_number';
+    threshold: number;
+    meta?: any; // e.g., { time: 'morning', category: 'health', date: '01-01' }
+}
+
+export interface BadgeDefinition {
+    id: string;
+    category: BadgeCategory;
+    tier: BadgeTier;
+    shape: BadgeShape;
+    title: string;
+    description: string;
+    icon: string; // Lucide icon name
+    requirement: BadgeRequirement;
+    secret?: boolean; // If true, title/description hidden until unlocked
+    progressTracked?: boolean; // If true, show progress ring
+}
+
+export const BADGES: BadgeDefinition[] = [
+    // --- 7.1 The Streak Masters (Consistency) ---
+    {
+        id: 'streak_3',
+        category: 'streak',
+        tier: 'bronze',
+        shape: 'circle',
+        title: 'Baby Steps',
+        description: 'Maintain a 3-day streak on any habit.',
+        icon: 'footprints',
+        requirement: { type: 'streak_days', threshold: 3 },
+        progressTracked: true,
+    },
+    {
+        id: 'streak_7',
+        category: 'streak',
+        tier: 'bronze',
+        shape: 'circle',
+        title: 'Week Warrior',
+        description: 'Maintain a 7-day streak on any habit.',
+        icon: 'calendar-check',
+        requirement: { type: 'streak_days', threshold: 7 },
+        progressTracked: true,
+    },
+    {
+        id: 'streak_14',
+        category: 'streak',
+        tier: 'bronze',
+        shape: 'circle',
+        title: 'Fortnight Fortitude',
+        description: 'Maintain a 14-day streak on any habit.',
+        icon: 'shield-check',
+        requirement: { type: 'streak_days', threshold: 14 },
+        progressTracked: true,
+    },
+    {
+        id: 'streak_21',
+        category: 'streak',
+        tier: 'silver',
+        shape: 'circle',
+        title: 'Habit Former',
+        description: 'Maintain a 21-day streak. You\'re building a habit!',
+        icon: 'brain-circuit',
+        requirement: { type: 'streak_days', threshold: 21 },
+        progressTracked: true,
+    },
+    {
+        id: 'streak_30',
+        category: 'streak',
+        tier: 'silver',
+        shape: 'circle',
+        title: 'Monthly Master',
+        description: 'Maintain a 30-day streak on any habit.',
+        icon: 'calendar-days',
+        requirement: { type: 'streak_days', threshold: 30 },
+        progressTracked: true,
+    },
+    {
+        id: 'streak_50',
+        category: 'streak',
+        tier: 'gold',
+        shape: 'circle',
+        title: 'Roaring Fifty',
+        description: 'Maintain a 50-day streak on any habit.',
+        icon: 'flame',
+        requirement: { type: 'streak_days', threshold: 50 },
+        progressTracked: true,
+    },
+    {
+        id: 'streak_60',
+        category: 'streak',
+        tier: 'gold',
+        shape: 'circle',
+        title: 'Solid Sixty',
+        description: 'Maintain a 60-day streak on any habit.',
+        icon: 'dumbbell',
+        requirement: { type: 'streak_days', threshold: 60 },
+        progressTracked: true,
+    },
+    {
+        id: 'streak_90',
+        category: 'streak',
+        tier: 'gold',
+        shape: 'circle',
+        title: 'Ninety Degrees',
+        description: 'Maintain a 90-day streak on any habit.',
+        icon: 'compass',
+        requirement: { type: 'streak_days', threshold: 90 },
+        progressTracked: true,
+    },
+    {
+        id: 'streak_100',
+        category: 'streak',
+        tier: 'platinum',
+        shape: 'circle',
+        title: 'Century Club',
+        description: 'Maintain a 100-day streak on any habit.',
+        icon: 'trophy',
+        requirement: { type: 'streak_days', threshold: 100 },
+        progressTracked: true,
+    },
+    {
+        id: 'streak_180',
+        category: 'streak',
+        tier: 'platinum',
+        shape: 'circle',
+        title: 'Half Year Hero',
+        description: 'Maintain a 180-day streak on any habit.',
+        icon: 'medal',
+        requirement: { type: 'streak_days', threshold: 180 },
+        progressTracked: true,
+    },
+    {
+        id: 'streak_365',
+        category: 'streak',
+        tier: 'diamond',
+        shape: 'circle',
+        title: 'Year of Yes',
+        description: 'Maintain a 365-day streak on any habit.',
+        icon: 'crown',
+        requirement: { type: 'streak_days', threshold: 365 },
+        progressTracked: true,
+    },
+    {
+        id: 'streak_500',
+        category: 'streak',
+        tier: 'diamond',
+        shape: 'circle',
+        title: 'The 500',
+        description: 'Maintain a 500-day streak on any habit.',
+        icon: 'gem',
+        requirement: { type: 'streak_days', threshold: 500 },
+        progressTracked: true,
+    },
+    {
+        id: 'streak_1000',
+        category: 'streak',
+        tier: 'cosmic',
+        shape: 'circle',
+        title: 'Millennial',
+        description: 'Maintain a 1000-day streak on any habit.',
+        icon: 'rocket',
+        requirement: { type: 'streak_days', threshold: 1000 },
+        progressTracked: true,
+    },
+    {
+        id: 'streak_2000',
+        category: 'streak',
+        tier: 'cosmic',
+        shape: 'circle',
+        title: 'Infinity & Beyond',
+        description: 'Maintain a 2000-day streak on any habit.',
+        icon: 'infinity',
+        requirement: { type: 'streak_days', threshold: 2000 },
+        progressTracked: true,
+    },
+
+    // --- 7.2 Volume Warriors (Total Completions) ---
+    {
+        id: 'vol_1',
+        category: 'volume',
+        tier: 'bronze',
+        shape: 'hexagon',
+        title: 'First Step',
+        description: 'Complete your first habit.',
+        icon: 'check',
+        requirement: { type: 'total_completions', threshold: 1 },
+    },
+    {
+        id: 'vol_5',
+        category: 'volume',
+        tier: 'bronze',
+        shape: 'hexagon',
+        title: 'High Five',
+        description: 'Complete habits 5 times total.',
+        icon: 'hand',
+        requirement: { type: 'total_completions', threshold: 5 },
+        progressTracked: true,
+    },
+    {
+        id: 'vol_10',
+        category: 'volume',
+        tier: 'bronze',
+        shape: 'hexagon',
+        title: 'Ten-tastic',
+        description: 'Complete habits 10 times total.',
+        icon: 'star',
+        requirement: { type: 'total_completions', threshold: 10 },
+        progressTracked: true,
+    },
+    {
+        id: 'vol_25',
+        category: 'volume',
+        tier: 'bronze',
+        shape: 'hexagon',
+        title: 'Quarter Century',
+        description: 'Complete habits 25 times total.',
+        icon: 'pie-chart',
+        requirement: { type: 'total_completions', threshold: 25 },
+        progressTracked: true,
+    },
+    {
+        id: 'vol_50',
+        category: 'volume',
+        tier: 'silver',
+        shape: 'hexagon',
+        title: 'Nifty Fifty',
+        description: 'Complete habits 50 times total.',
+        icon: 'layers',
+        requirement: { type: 'total_completions', threshold: 50 },
+        progressTracked: true,
+    },
+    {
+        id: 'vol_100',
+        category: 'volume',
+        tier: 'silver',
+        shape: 'hexagon',
+        title: 'Hundo',
+        description: 'Complete habits 100 times total.',
+        icon: 'target',
+        requirement: { type: 'total_completions', threshold: 100 },
+        progressTracked: true,
+    },
+    {
+        id: 'vol_250',
+        category: 'volume',
+        tier: 'gold',
+        shape: 'hexagon',
+        title: 'Two-Fifty',
+        description: 'Complete habits 250 times total.',
+        icon: 'database',
+        requirement: { type: 'total_completions', threshold: 250 },
+        progressTracked: true,
+    },
+    {
+        id: 'vol_500',
+        category: 'volume',
+        tier: 'gold',
+        shape: 'hexagon',
+        title: 'Five Hundred',
+        description: 'Complete habits 500 times total.',
+        icon: 'server',
+        requirement: { type: 'total_completions', threshold: 500 },
+        progressTracked: true,
+    },
+    {
+        id: 'vol_1000',
+        category: 'volume',
+        tier: 'platinum',
+        shape: 'hexagon',
+        title: 'Kilo',
+        description: 'Complete habits 1,000 times total.',
+        icon: 'hard-drive',
+        requirement: { type: 'total_completions', threshold: 1000 },
+        progressTracked: true,
+    },
+    {
+        id: 'vol_2500',
+        category: 'volume',
+        tier: 'platinum',
+        shape: 'hexagon',
+        title: '2.5K',
+        description: 'Complete habits 2,500 times total.',
+        icon: 'mountain',
+        requirement: { type: 'total_completions', threshold: 2500 },
+        progressTracked: true,
+    },
+    {
+        id: 'vol_5000',
+        category: 'volume',
+        tier: 'diamond',
+        shape: 'hexagon',
+        title: '5K',
+        description: 'Complete habits 5,000 times total.',
+        icon: 'globe',
+        requirement: { type: 'total_completions', threshold: 5000 },
+        progressTracked: true,
+    },
+    {
+        id: 'vol_10000',
+        category: 'volume',
+        tier: 'diamond',
+        shape: 'hexagon',
+        title: '10K',
+        description: 'Complete habits 10,000 times total.',
+        icon: 'zap',
+        requirement: { type: 'total_completions', threshold: 10000 },
+        progressTracked: true,
+    },
+    {
+        id: 'vol_25000',
+        category: 'volume',
+        tier: 'cosmic',
+        shape: 'hexagon',
+        title: 'Legend',
+        description: 'Complete habits 25,000 times total.',
+        icon: 'sun',
+        requirement: { type: 'total_completions', threshold: 25000 },
+        progressTracked: true,
+    },
+    {
+        id: 'vol_50000',
+        category: 'volume',
+        tier: 'cosmic',
+        shape: 'hexagon',
+        title: 'Mythic',
+        description: 'Complete habits 50,000 times total.',
+        icon: 'sparkles',
+        requirement: { type: 'total_completions', threshold: 50000 },
+        progressTracked: true,
+    },
+
+    // --- 7.3 Early Birds & Night Owls ---
+    {
+        id: 'time_morning_5',
+        category: 'specialist',
+        tier: 'bronze',
+        shape: 'hexagon',
+        title: 'Morning Glory',
+        description: 'Complete a habit before 8 AM (5 times).',
+        icon: 'sunrise',
+        requirement: { type: 'time_of_day', threshold: 5, meta: { beforeHour: 8 } },
+        progressTracked: true,
+    },
+    {
+        id: 'time_early_20',
+        category: 'specialist',
+        tier: 'silver',
+        shape: 'hexagon',
+        title: 'Early Riser',
+        description: 'Complete a habit before 7 AM (20 times).',
+        icon: 'coffee',
+        requirement: { type: 'time_of_day', threshold: 20, meta: { beforeHour: 7 } },
+        progressTracked: true,
+    },
+    {
+        id: 'time_dawn_50',
+        category: 'specialist',
+        tier: 'gold',
+        shape: 'hexagon',
+        title: 'Dawn Patrol',
+        description: 'Complete a habit before 6 AM (50 times).',
+        icon: 'bird',
+        requirement: { type: 'time_of_day', threshold: 50, meta: { beforeHour: 6 } },
+        progressTracked: true,
+    },
+    {
+        id: 'time_night_5',
+        category: 'specialist',
+        tier: 'bronze',
+        shape: 'hexagon',
+        title: 'Night Watch',
+        description: 'Complete a habit after 8 PM (5 times).',
+        icon: 'moon',
+        requirement: { type: 'time_of_day', threshold: 5, meta: { afterHour: 20 } },
+        progressTracked: true,
+    },
+    {
+        id: 'time_midnight_20',
+        category: 'specialist',
+        tier: 'silver',
+        shape: 'hexagon',
+        title: 'Midnight Oil',
+        description: 'Complete a habit after 10 PM (20 times).',
+        icon: 'lamp',
+        requirement: { type: 'time_of_day', threshold: 20, meta: { afterHour: 22 } },
+        progressTracked: true,
+    },
+    {
+        id: 'time_nocturnal_50',
+        category: 'specialist',
+        tier: 'gold',
+        shape: 'hexagon',
+        title: 'Nocturnal',
+        description: 'Complete a habit after 11 PM (50 times).',
+        icon: 'ghost',
+        requirement: { type: 'time_of_day', threshold: 50, meta: { afterHour: 23 } },
+        progressTracked: true,
+    },
+    {
+        id: 'time_lunch_5',
+        category: 'specialist',
+        tier: 'bronze',
+        shape: 'hexagon',
+        title: 'Lunch Break',
+        description: 'Complete a habit between 12 PM - 2 PM (5 times).',
+        icon: 'utensils',
+        requirement: { type: 'time_of_day', threshold: 5, meta: { startHour: 12, endHour: 14 } },
+        progressTracked: true,
+    },
+    {
+        id: 'time_afternoon_20',
+        category: 'specialist',
+        tier: 'silver',
+        shape: 'hexagon',
+        title: 'Afternoon Delight',
+        description: 'Complete a habit between 12 PM - 2 PM (20 times).',
+        icon: 'sun-medium',
+        requirement: { type: 'time_of_day', threshold: 20, meta: { startHour: 12, endHour: 14 } },
+        progressTracked: true,
+    },
+
+    // --- 7.4 Weekend Warriors ---
+    {
+        id: 'weekend_sat_4',
+        category: 'specialist',
+        tier: 'bronze',
+        shape: 'circle',
+        title: 'Saturday Spark',
+        description: 'Complete habits on 4 consecutive Saturdays.',
+        icon: 'calendar',
+        requirement: { type: 'streak_days', threshold: 4, meta: { dayOfWeek: 6 } }, // 6 = Saturday
+        progressTracked: true,
+    },
+    {
+        id: 'weekend_sun_4',
+        category: 'specialist',
+        tier: 'bronze',
+        shape: 'circle',
+        title: 'Sunday Funday',
+        description: 'Complete habits on 4 consecutive Sundays.',
+        icon: 'smile',
+        requirement: { type: 'streak_days', threshold: 4, meta: { dayOfWeek: 0 } }, // 0 = Sunday
+        progressTracked: true,
+    },
+    // Note: Complex weekend logic (Weekend Warrior, Weekend Master) will be handled by custom logic in BadgeService
+
+    // --- 7.5 The Perfectionists ---
+    {
+        id: 'perfect_day_1',
+        category: 'perfectionist',
+        tier: 'bronze',
+        shape: 'diamond',
+        title: 'Perfect Day',
+        description: 'Complete ALL active habits in one day.',
+        icon: 'check-circle-2',
+        requirement: { type: 'perfect_days', threshold: 1 },
+    },
+    {
+        id: 'perfect_day_3',
+        category: 'perfectionist',
+        tier: 'bronze',
+        shape: 'diamond',
+        title: 'Hat Trick',
+        description: '3 Perfect Days in a row.',
+        icon: 'party-popper',
+        requirement: { type: 'perfect_days', threshold: 3, meta: { consecutive: true } },
+        progressTracked: true,
+    },
+    {
+        id: 'perfect_day_7',
+        category: 'perfectionist',
+        tier: 'silver',
+        shape: 'diamond',
+        title: 'Perfect Week',
+        description: '7 Perfect Days in a row.',
+        icon: 'calendar-range',
+        requirement: { type: 'perfect_days', threshold: 7, meta: { consecutive: true } },
+        progressTracked: true,
+    },
+    {
+        id: 'perfect_day_30',
+        category: 'perfectionist',
+        tier: 'gold',
+        shape: 'diamond',
+        title: 'Perfect Month',
+        description: '30 Perfect Days total.', // Changed from consecutive for easier tracking, or custom logic
+        icon: 'calendar-check-2',
+        requirement: { type: 'perfect_days', threshold: 30 },
+        progressTracked: true,
+    },
+    {
+        id: 'perfect_day_100',
+        category: 'perfectionist',
+        tier: 'platinum',
+        shape: 'diamond',
+        title: 'Flawless',
+        description: '100 Perfect Days total.',
+        icon: 'diamond',
+        requirement: { type: 'perfect_days', threshold: 100 },
+        progressTracked: true,
+    },
+    {
+        id: 'perfect_day_365',
+        category: 'perfectionist',
+        tier: 'diamond',
+        shape: 'diamond',
+        title: 'Relentless',
+        description: '365 Perfect Days total.',
+        icon: 'crown',
+        requirement: { type: 'perfect_days', threshold: 365 },
+        progressTracked: true,
+    },
+
+    // --- 7.6 Category Specialists ---
+    {
+        id: 'cat_health_create',
+        category: 'specialist',
+        tier: 'bronze',
+        shape: 'hexagon',
+        title: 'Health Nut',
+        description: 'Create a Health habit.',
+        icon: 'heart',
+        requirement: { type: 'habits_created', threshold: 1, meta: { category: 'Health' } },
+    },
+    {
+        id: 'cat_health_100',
+        category: 'specialist',
+        tier: 'silver',
+        shape: 'hexagon',
+        title: 'Iron Body',
+        description: '100 completions in Health category.',
+        icon: 'activity',
+        requirement: { type: 'category_completions', threshold: 100, meta: { category: 'Health' } },
+        progressTracked: true,
+    },
+    {
+        id: 'cat_health_500',
+        category: 'specialist',
+        tier: 'gold',
+        shape: 'hexagon',
+        title: 'Fitness Fanatic',
+        description: '500 completions in Health category.',
+        icon: 'biceps-flexed', // Lucide icon check needed, fallback to 'activity'
+        requirement: { type: 'category_completions', threshold: 500, meta: { category: 'Health' } },
+        progressTracked: true,
+    },
+    // ... (Similar for Learning, Mindfulness, Productivity, Social) ...
+    // Adding a few representative ones for brevity in this initial file, will populate all in implementation
+    {
+        id: 'cat_learning_create',
+        category: 'specialist',
+        tier: 'bronze',
+        shape: 'hexagon',
+        title: 'Bookworm',
+        description: 'Create a Learning habit.',
+        icon: 'book',
+        requirement: { type: 'habits_created', threshold: 1, meta: { category: 'Learning' } },
+    },
+    {
+        id: 'cat_learning_100',
+        category: 'specialist',
+        tier: 'silver',
+        shape: 'hexagon',
+        title: 'Scholar',
+        description: '100 completions in Learning category.',
+        icon: 'graduation-cap',
+        requirement: { type: 'category_completions', threshold: 100, meta: { category: 'Learning' } },
+        progressTracked: true,
+    },
+
+    // --- 7.7 The Explorers ---
+    {
+        id: 'exp_first',
+        category: 'explorer',
+        tier: 'bronze',
+        shape: 'star',
+        title: 'Hello World',
+        description: 'Create your first habit.',
+        icon: 'plus',
+        requirement: { type: 'habits_created', threshold: 1 },
+    },
+    {
+        id: 'exp_5',
+        category: 'explorer',
+        tier: 'silver',
+        shape: 'star',
+        title: 'Architect',
+        description: 'Create 5 habits.',
+        icon: 'pencil-ruler',
+        requirement: { type: 'habits_created', threshold: 5 },
+        progressTracked: true,
+    },
+    {
+        id: 'exp_note_1',
+        category: 'explorer',
+        tier: 'bronze',
+        shape: 'star',
+        title: 'Journalist',
+        description: 'Add a note to a completion.',
+        icon: 'sticky-note',
+        requirement: { type: 'notes_added', threshold: 1 },
+    },
+    {
+        id: 'exp_mood_1',
+        category: 'explorer',
+        tier: 'bronze',
+        shape: 'star',
+        title: 'Moody',
+        description: 'Log your mood once.',
+        icon: 'smile-plus',
+        requirement: { type: 'mood_logs', threshold: 1 },
+    },
+    {
+        id: 'exp_theme_1',
+        category: 'explorer',
+        tier: 'bronze',
+        shape: 'star',
+        title: 'Chameleon',
+        description: 'Change the app theme.',
+        icon: 'palette',
+        requirement: { type: 'themes_used', threshold: 2 }, // Default + 1
+    },
+    {
+        id: 'exp_vacation_1',
+        category: 'explorer',
+        tier: 'bronze',
+        shape: 'star',
+        title: 'Vacationer',
+        description: 'Turn on Vacation Mode.',
+        icon: 'palmtree',
+        requirement: { type: 'vacation_mode', threshold: 1 },
+    },
+    {
+        id: 'exp_template_1',
+        category: 'explorer',
+        tier: 'bronze',
+        shape: 'star',
+        title: 'Template User',
+        description: 'Create a habit from a template.',
+        icon: 'copy',
+        requirement: { type: 'template_usage', threshold: 1 },
+    },
+
+    // --- 7.9 Social Butterflies ---
+    {
+        id: 'social_share_1',
+        category: 'social',
+        tier: 'bronze',
+        shape: 'star',
+        title: 'Sharer',
+        description: 'Share a badge or stat once.',
+        icon: 'share-2',
+        requirement: { type: 'shares', threshold: 1 },
+    },
+    {
+        id: 'social_share_10',
+        category: 'social',
+        tier: 'silver',
+        shape: 'star',
+        title: 'Broadcaster',
+        description: 'Share 10 times.',
+        icon: 'megaphone',
+        requirement: { type: 'shares', threshold: 10 },
+        progressTracked: true,
+    },
+
+    // --- 7.11 Longevity Legends ---
+    {
+        id: 'long_30',
+        category: 'longevity',
+        tier: 'bronze',
+        shape: 'circle',
+        title: 'First Month',
+        description: 'Use the app for 30 days.',
+        icon: 'calendar-clock',
+        requirement: { type: 'active_days', threshold: 30 },
+        progressTracked: true,
+    },
+
+    // --- 7.12 Fun & Easter Eggs ---
+    {
+        id: 'fun_42',
+        category: 'hidden',
+        tier: 'silver',
+        shape: 'star',
+        title: 'The Answer',
+        description: 'Reach a streak of 42.',
+        icon: 'help-circle',
+        requirement: { type: 'streak_days', threshold: 42 },
+        secret: true,
+    },
+    {
+        id: 'fun_666',
+        category: 'hidden',
+        tier: 'bronze',
+        shape: 'star',
+        title: 'Devil\'s Luck',
+        description: '666 total completions.',
+        icon: 'flame',
+        requirement: { type: 'total_completions', threshold: 666 },
+        secret: true,
+    },
+
+    // --- 7.16 The Ultimate ---
+    {
+        id: 'ult_collector',
+        category: 'perfectionist',
+        tier: 'diamond',
+        shape: 'diamond',
+        title: 'Badge Collector',
+        description: 'Unlock 50 badges.',
+        icon: 'award',
+        requirement: { type: 'special_number', threshold: 50, meta: { type: 'badges_unlocked' } },
+        progressTracked: true,
+    },
+    {
+        id: 'ult_completionist',
+        category: 'perfectionist',
+        tier: 'cosmic',
+        shape: 'diamond',
+        title: 'Completionist',
+        description: 'Unlock 100 badges.',
+        icon: 'crown',
+        requirement: { type: 'special_number', threshold: 100, meta: { type: 'badges_unlocked' } },
+        progressTracked: true,
+    },
+];

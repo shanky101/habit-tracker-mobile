@@ -30,6 +30,7 @@ import {
   ChangePasswordScreen,
   StatDetailScreen,
   CalendarHistoryScreen,
+  BadgesScreen,
 } from '@/screens';
 import TemplatesScreen from '@/screens/TemplatesScreen';
 import TemplateDetailScreen from '@/screens/TemplateDetailScreen';
@@ -80,6 +81,7 @@ export type ProfileStackParamList = {
   Paywall: undefined;
   DataPrivacy: undefined;
   ChangePassword: undefined;
+  Badges: undefined;
 };
 
 export type TemplatesStackParamList = {
@@ -201,6 +203,7 @@ const ProfileStackNavigator: React.FC = () => {
       <ProfileStack.Screen name="Paywall" component={PaywallScreen} />
       <ProfileStack.Screen name="DataPrivacy" component={DataPrivacyScreen} />
       <ProfileStack.Screen name="ChangePassword" component={ChangePasswordScreen} />
+      <ProfileStack.Screen name="Badges" component={BadgesScreen} />
     </ProfileStack.Navigator>
   );
 };

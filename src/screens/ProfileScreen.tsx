@@ -46,6 +46,8 @@ import {
 } from 'lucide-react-native';
 
 import HabiCustomizationSheet from '@/components/HabiCustomizationSheet';
+import { BadgeIcon } from '@/components/badges/BadgeIcon';
+import { useBadgeStore } from '@/store/badgeStore';
 
 type ProfileNavigationProp = StackNavigationProp<any, 'Profile'>;
 
@@ -64,6 +66,7 @@ const ProfileScreen: React.FC = () => {
   const userEmail = profile.email || '';
   const [isHabiSheetVisible, setIsHabiSheetVisible] = useState(false);
   const isPremium = subscription.isPremium;
+  const badges = useBadgeStore(state => state.badges);
 
   // Calculate real user-level stats from all habits
   const calculateUserStats = () => {
@@ -361,6 +364,44 @@ const ProfileScreen: React.FC = () => {
             </View>
           </View>
 
+          {/* Badges Section */}
+          <View style={styles.sectionContainer}>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Badges</Text>
+              <TouchableOpacity onPress={() => navigation.navigate('Badges')}>
+                <Text style={[styles.seeAllText, { color: theme.colors.primary }]}>See All</Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.badgesScrollContent}
+            >
+              {badges.filter(b => b.isUnlocked).slice(0, 5).map((badge) => (
+                <TouchableOpacity
+                  key={badge.id}
+                  style={styles.badgePreviewItem}
+                  onPress={() => navigation.navigate('Badges')}
+                >
+                  <BadgeIcon
+                    tier={badge.tier}
+                    shape={badge.shape}
+                    icon={badge.icon}
+                    size={60}
+                    isLocked={false}
+                  />
+                </TouchableOpacity>
+              ))}
+              {badges.filter(b => b.isUnlocked).length === 0 && (
+                <View style={[styles.emptyBadges, { backgroundColor: theme.colors.surface }]}>
+                  <Text style={[styles.emptyBadgesText, { color: theme.colors.textSecondary }]}>
+                    No badges yet. Keep tracking!
+                  </Text>
+                </View>
+              )}
+            </ScrollView>
+          </View>
+
           {/* Premium Banner */}
           <TouchableOpacity
             activeOpacity={0.9}
@@ -618,7 +659,7 @@ const ProfileScreen: React.FC = () => {
         visible={isHabiSheetVisible}
         onClose={() => setIsHabiSheetVisible(false)}
       />
-    </SafeAreaView>
+    </SafeAreaView >
   );
 };
 
@@ -903,8 +944,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     letterSpacing: 1,
-    marginLeft: 28,
-    marginBottom: 16,
+    marginBottom: 0, // Removed bottom margin as it's handled by sectionHeader
   },
   carouselContent: {
     paddingHorizontal: 16,
@@ -946,6 +986,40 @@ const styles = StyleSheet.create({
   versionText: {
     textAlign: 'center',
     marginBottom: 24,
+  },
+  sectionContainer: {
+    marginBottom: 32,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    marginBottom: 16,
+  },
+  seeAllText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  badgesScrollContent: {
+    paddingHorizontal: 16,
+    gap: 16,
+  },
+  badgePreviewItem: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyBadges: {
+    padding: 20,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 200,
+    marginLeft: 16,
+  },
+  emptyBadgesText: {
+    fontSize: 14,
+    textAlign: 'center',
   },
 });
 

@@ -198,6 +198,21 @@ export const initializeDatabase = async (): Promise<void> => {
         updated_at TEXT NOT NULL
       );
 
+      -- User Badges Table
+      CREATE TABLE IF NOT EXISTS user_badges (
+        badge_id TEXT NOT NULL PRIMARY KEY,
+        unlocked_at TEXT NOT NULL,
+        is_seen INTEGER DEFAULT 0
+      );
+
+      -- Badge Progress Table
+      CREATE TABLE IF NOT EXISTS badge_progress (
+        badge_id TEXT NOT NULL PRIMARY KEY,
+        current_value INTEGER NOT NULL DEFAULT 0,
+        meta TEXT,
+        last_updated TEXT NOT NULL
+      );
+
       -- Indexes
       CREATE INDEX IF NOT EXISTS idx_completions_habit_id ON completions(habit_id);
       CREATE INDEX IF NOT EXISTS idx_completions_date ON completions(date);
