@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -22,18 +22,30 @@ import {
   Upload,
   TrendingUp,
   Flame,
-  BarChart3,
-  Clipboard,
-  Lightbulb,
-  Sparkles,
+  Award,
+  Zap,
+  Calendar,
+  PieChart as PieChartIcon,
+  Clock,
   ChevronRight,
 } from 'lucide-react-native';
+
+// New Components & Utils
+import StatCard from '@/components/stats/StatCard';
+import ConsistencyHeatmap from '@/components/stats/ConsistencyHeatmap';
+import CategoryDistributionChart from '@/components/stats/CategoryDistributionChart';
+import TimeOfDayChart from '@/components/stats/TimeOfDayChart';
+import {
+  getConsistencyHeatmapData,
+  getCategoryDistribution,
+  getTimeOfDayDistribution,
+  getPerfectDaysCount,
+  getUserLevel,
+} from '@/utils/analyticsUtils';
 
 type AnalyticsDashboardNavigationProp = StackNavigationProp<any, 'AnalyticsDashboard'>;
 
 const { width } = Dimensions.get('window');
-
-const DATE_RANGES = ['7 days', '30 days', '90 days', 'All time'];
 
 const AnalyticsDashboardScreen: React.FC = () => {
   const navigation = useNavigation<AnalyticsDashboardNavigationProp>();
@@ -42,986 +54,249 @@ const AnalyticsDashboardScreen: React.FC = () => {
   const { subscription } = useSubscription();
   const { fadeAnim, slideAnim } = useScreenAnimation();
 
-  const [selectedRange, setSelectedRange] = useState<'7 days' | '30 days' | '90 days' | 'All time'>('30 days');
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    // Simulate refresh or refetch data if needed
     setTimeout(() => {
       setRefreshing(false);
-    }, 2000);
+    }, 1500);
   }, []);
 
-  // Filter out archived habits
   const activeHabits = habits.filter(h => !h.archived);
-
-  // Helper function to get start date for a range
-  const getStartDateForRange = (range: string): Date => {
-    const now = new Date();
-    const startDate = new Date(now);
-
-    switch (range) {
-      case '7 days':
-        startDate.setDate(now.getDate() - 7);
-        break;
-      case '30 days':
-        startDate.setDate(now.getDate() - 30);
-        break;
-      case '90 days':
-        startDate.setDate(now.getDate() - 90);
-        break;
-      case 'All time':
-        // Find earliest habit creation date
-        const earliestHabit = activeHabits.reduce((earliest: Date | null, habit) => {
-          if (!habit.createdAt) return earliest;
-          const createdDate = new Date(habit.createdAt);
-          return !earliest || createdDate < earliest ? createdDate : earliest;
-        }, null);
-        return earliestHabit || new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
-      default:
-        startDate.setDate(now.getDate() - 30);
-    }
-
-    return startDate;
-  };
-
-  // Helper function to calculate completion rate for a habit
-  const calculateCompletionRate = (habit: any): number => {
-    if (!habit.createdAt) return 0;
-
-    const createdDate = new Date(habit.createdAt);
-    const today = new Date();
-    const completions = habit.completions || {};
-
-    // Count scheduled days since creation
-    let scheduledDays = 0;
-    const currentDate = new Date(createdDate);
-
-    while (currentDate <= today) {
-      const dayOfWeek = currentDate.getDay();
-      if (habit.selectedDays.includes(dayOfWeek)) {
-        scheduledDays++;
-      }
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
-
-    if (scheduledDays === 0) return 0;
-
-    // Count completed days (met target)
-    const completedDays = Object.keys(completions).filter(date => {
-      const completion = completions[date];
-      return completion && completion.completionCount >= completion.targetCount;
-    }).length;
-
-    return Math.round((completedDays / scheduledDays) * 100);
-  };
-  const archivedCount = habits.filter((h) => h.archived).length;
-
-  // Calculate analytics data based on selected range
-  const analyticsData = useMemo(() => {
-    const now = new Date();
-    const startDate = getStartDateForRange(selectedRange);
-
-    // Calculate real total completions within the selected range
-    const totalCompletions = activeHabits.reduce((sum, habit) => {
-      const completions = habit.completions || {};
-
-      // For "All time", don't filter by date - count all completions
-      const completionsInRange = selectedRange === 'All time'
-        ? Object.keys(completions)
-        : Object.keys(completions).filter(dateStr => {
-          const completionDate = new Date(dateStr);
-          return completionDate >= startDate && completionDate <= now;
-        });
-
-      // Sum up all completion counts in range
-      return sum + completionsInRange.reduce((dateSum, dateStr) => {
-        const completion = completions[dateStr];
-        return dateSum + (completion?.completionCount || 0);
-      }, 0);
-    }, 0);
-
-    // Calculate real consistency score (avg completion rate across scheduled days)
-    const calculateConsistencyScore = () => {
-      if (activeHabits.length === 0) return 0;
-
-      const now = new Date();
-      const startDate = getStartDateForRange(selectedRange);
-
-      let totalScheduledDays = 0;
-      let totalCompletedDays = 0;
-
-      activeHabits.forEach(habit => {
-        const completions = habit.completions || {};
-        const currentDate = new Date(startDate);
-
-        while (currentDate <= now) {
-          const dayOfWeek = currentDate.getDay();
-          const dateStr = currentDate.toISOString().split('T')[0];
-
-          // Check if this habit is scheduled for this day
-          if (habit.selectedDays.includes(dayOfWeek)) {
-            // Only count days on or after habit creation
-            if (!habit.createdAt || new Date(habit.createdAt) <= currentDate) {
-              totalScheduledDays++;
-              const completion = completions[dateStr];
-              if (completion && completion.completionCount >= completion.targetCount) {
-                totalCompletedDays++;
-              }
-            }
-          }
-          currentDate.setDate(currentDate.getDate() + 1);
-        }
-      });
-
-      return totalScheduledDays > 0 ? Math.round((totalCompletedDays / totalScheduledDays) * 100) : 0;
-    };
-
-    // Calculate real day of week data from completion history
-    const calculateDayOfWeekData = () => {
-      const dayStats = Array(7).fill(null).map(() => ({ scheduled: 0, completed: 0 }));
-      const now = new Date();
-      const startDate = getStartDateForRange(selectedRange);
-
-      activeHabits.forEach(habit => {
-        const completions = habit.completions || {};
-        const currentDate = new Date(startDate);
-
-        while (currentDate <= now) {
-          const dayOfWeek = currentDate.getDay();
-          const dateStr = currentDate.toISOString().split('T')[0];
-
-          if (habit.selectedDays.includes(dayOfWeek)) {
-            if (!habit.createdAt || new Date(habit.createdAt) <= currentDate) {
-              dayStats[dayOfWeek].scheduled++;
-              const completion = completions[dateStr];
-              if (completion && completion.completionCount >= completion.targetCount) {
-                dayStats[dayOfWeek].completed++;
-              }
-            }
-          }
-          currentDate.setDate(currentDate.getDate() + 1);
-        }
-      });
-
-      return dayStats.map((stat, index) => ({
-        day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][index],
-        value: stat.scheduled > 0
-          ? Math.round((stat.completed / stat.scheduled) * 100)
-          : 0
-      }));
-    };
-
-    // Calculate real trend: compare current period to previous period
-    const calculateTrend = () => {
-      const now = new Date();
-      const currentStart = getStartDateForRange(selectedRange);
-      const periodLength = Math.ceil((now.getTime() - currentStart.getTime()) / (1000 * 60 * 60 * 24));
-
-      const previousEnd = new Date(currentStart);
-      previousEnd.setDate(previousEnd.getDate() - 1);
-      const previousStart = new Date(previousEnd);
-      previousStart.setDate(previousStart.getDate() - periodLength);
-
-      // Calculate completions for previous period
-      const previousCompletions = activeHabits.reduce((sum, habit) => {
-        const completions = habit.completions || {};
-        return sum + Object.keys(completions).filter(dateStr => {
-          const d = new Date(dateStr);
-          return d >= previousStart && d <= previousEnd;
-        }).reduce((dateSum, dateStr) => {
-          return dateSum + (completions[dateStr]?.completionCount || 0);
-        }, 0);
-      }, 0);
-
-      if (previousCompletions === 0) return totalCompletions > 0 ? '+100%' : '0%';
-      const change = Math.round(((totalCompletions - previousCompletions) / previousCompletions) * 100);
-      return change >= 0 ? `+${change}%` : `${change}%`;
-    };
-
-    // Generate real AI insights from habit data
-    const generateRealInsights = () => {
-      const insights: string[] = [];
-
-      // Best day insight
-      const bestDay = dayOfWeekData.reduce((best, current) =>
-        current.value > best.value ? current : best
-        , dayOfWeekData[0]);
-      if (bestDay.value > 0) {
-        insights.push(`${bestDay.day} is your best day with ${bestDay.value}% completion rate`);
-      }
-
-      // Streak insights
-      const habitsWithStreaks = activeHabits.filter(h => h.streak > 3);
-      if (habitsWithStreaks.length > 0) {
-        const topStreak = habitsWithStreaks.reduce((a, b) => a.streak > b.streak ? a : b);
-        insights.push(`"${topStreak.name}" has a ${topStreak.streak} day streak - keep it going!`);
-      }
-
-      // Consistency insight
-      if (consistencyScore >= 80) {
-        insights.push(`${consistencyScore}% consistency - you're crushing it!`);
-      } else if (consistencyScore >= 50) {
-        insights.push(`${consistencyScore}% consistency - room for improvement`);
-      } else if (consistencyScore > 0) {
-        insights.push(`${consistencyScore}% consistency - try starting smaller`);
-      }
-
-      // Habits at risk (low completion)
-      const lowCompletionHabits = activeHabits.filter(h => {
-        const rate = calculateCompletionRate(h);
-        return rate < 50 && rate > 0;
-      });
-      if (lowCompletionHabits.length > 0) {
-        insights.push(`${lowCompletionHabits.length} habit(s) need attention`);
-      }
-
-      return insights.length > 0 ? insights : ['Complete more habits to see insights'];
-    };
-
-    const consistencyScore = calculateConsistencyScore();
-    const dayOfWeekData = calculateDayOfWeekData();
-    const trendPercentage = calculateTrend();
-    const aiInsights = generateRealInsights();
-
-    // Find best day from real data
-    const bestDay = dayOfWeekData.reduce((best, current) =>
-      current.value > best.value ? current : best
-      , dayOfWeekData[0]);
-
-    const bestDayInsight = bestDay.value > 0
-      ? `You're most productive on ${bestDay.day}s with ${bestDay.value}% completion!`
-      : "Complete more habits to see insights";
-
-    return {
-      totalCompletions,
-      consistencyScore,
-      dayOfWeekData,
-      trendPercentage,
-      bestDayInsight,
-      aiInsights,
-    };
-  }, [selectedRange, activeHabits, habits.length]);
-
-  const averageStreak = activeHabits.length > 0
-    ? Math.round(activeHabits.reduce((sum, h) => sum + h.streak, 0) / activeHabits.length)
-    : 0;
-
-  const maxDayValue = Math.max(...analyticsData.dayOfWeekData.map((d) => d.value));
-
-  // Use real subscription status
   const isPremium = subscription.isPremium;
 
+  // --- Metrics Calculation ---
+  const metrics = useMemo(() => {
+    const heatmapData = getConsistencyHeatmapData(habits, 90);
+    const categoryData = getCategoryDistribution(habits, theme.colors);
+    const timeOfDayData = getTimeOfDayDistribution(habits, theme.colors);
+    const perfectDays = getPerfectDaysCount(habits);
+    const userLevel = getUserLevel(habits);
+
+    // Calculate average streak
+    const avgStreak = activeHabits.length > 0
+      ? Math.round(activeHabits.reduce((sum, h) => sum + h.streak, 0) / activeHabits.length)
+      : 0;
+
+    // Calculate consistency score (simple average of last 30 days)
+    // This is a simplified version for the demo
+    const consistencyScore = Math.min(Math.round((userLevel.totalCompletions / (activeHabits.length * 30 || 1)) * 100), 100);
+
+    return {
+      heatmapData,
+      categoryData,
+      timeOfDayData,
+      perfectDays,
+      userLevel,
+      avgStreak,
+      consistencyScore,
+    };
+  }, [habits, activeHabits.length, theme.colors]);
+
+  // --- Premium Gate ---
   if (!isPremium) {
-    // Premium Gate Screen
     return (
-      <SafeAreaView
-        style={[styles.container, { backgroundColor: theme.colors.background }]}
-        edges={['top', 'left', 'right']}
-      >
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 }]}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-        >
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]} edges={['top', 'left', 'right']}>
+        <ScrollView contentContainerStyle={styles.scrollContent} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
           <View style={styles.premiumGate}>
             <View style={styles.blurOverlay}>
               <View style={styles.lockIconContainer}>
                 <Lock size={64} color={theme.colors.primary} strokeWidth={2} />
               </View>
-              <Text
-                style={[
-                  styles.gateTitle,
-                  {
-                    color: theme.colors.text,
-                    fontFamily: theme.typography.fontFamilyDisplayBold,
-                    fontSize: theme.typography.fontSize2XL,
-                  },
-                ]}
-              >
-                Unlock Analytics with Premium
+              <Text style={[styles.gateTitle, { color: theme.colors.text, fontFamily: theme.typography.fontFamilyDisplayBold }]}>
+                Unlock Advanced Analytics
               </Text>
-              <View style={styles.featureList}>
-                {['Advanced statistics', 'AI-powered insights', 'Habit correlations', 'Export reports'].map(
-                  (feature, index) => (
-                    <View key={index} style={styles.featureItem}>
-                      <Check size={18} color="#22C55E" strokeWidth={2.5} />
-                      <Text
-                        style={[
-                          styles.featureText,
-                          {
-                            color: theme.colors.textSecondary,
-                            fontFamily: theme.typography.fontFamilyBody,
-                            fontSize: theme.typography.fontSizeMD,
-                          },
-                        ]}
-                      >
-                        {feature}
-                      </Text>
-                    </View>
-                  )
-                )}
-              </View>
+              <Text style={[styles.gateSubtitle, { color: theme.colors.textSecondary, fontFamily: theme.typography.fontFamilyBody }]}>
+                Gain deep insights into your habits, track your consistency, and level up your life.
+              </Text>
               <TouchableOpacity
                 style={[styles.upgradeButton, { backgroundColor: theme.colors.primary }]}
                 onPress={() => navigation.navigate('Subscription')}
                 activeOpacity={0.8}
               >
-                <Text
-                  style={[
-                    styles.upgradeButtonText,
-                    {
-                      color: theme.colors.white,
-                      fontFamily: theme.typography.fontFamilyBodySemibold,
-                      fontSize: theme.typography.fontSizeMD,
-                    },
-                  ]}
-                >
-                  Upgrade Now
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.gateBackButton}
-                onPress={() => navigation.goBack()}
-                activeOpacity={0.7}
-              >
-                <Text
-                  style={[
-                    styles.gateBackButtonText,
-                    {
-                      color: theme.colors.textSecondary,
-                      fontFamily: theme.typography.fontFamilyBody,
-                      fontSize: theme.typography.fontSizeSM,
-                    },
-                  ]}
-                >
-                  Back
+                <Text style={[styles.upgradeButtonText, { color: theme.colors.white, fontFamily: theme.typography.fontFamilyBodySemibold }]}>
+                  Upgrade to Premium
                 </Text>
               </TouchableOpacity>
             </View>
           </View>
         </ScrollView>
-      </SafeAreaView >
+      </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
-      edges={['top', 'left', 'right']}
-    >
-      <Animated.View
-        style={[
-          styles.header,
-          {
-            opacity: fadeAnim,
-            transform: [{ translateY: slideAnim }],
-          },
-        ]}
-      >
-        <Text
-          style={[
-            styles.title,
-            {
-              color: theme.colors.text,
-              fontFamily: theme.typography.fontFamilyDisplayBold,
-              fontSize: theme.typography.fontSizeXL,
-            },
-          ]}
-        >
-          Analytics
-        </Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]} edges={['top', 'left', 'right']}>
+      {/* Header */}
+      <Animated.View style={[styles.header, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
+        <View>
+          <Text style={[styles.title, { color: theme.colors.text, fontFamily: theme.typography.fontFamilyDisplayBold }]}>
+            Analytics
+          </Text>
+          <Text style={[styles.subtitle, { color: theme.colors.textSecondary, fontFamily: theme.typography.fontFamilyBody }]}>
+            Level {metrics.userLevel.level} • {metrics.userLevel.xp} XP
+          </Text>
+        </View>
         <TouchableOpacity
           style={[styles.exportButton, { backgroundColor: theme.colors.backgroundSecondary }]}
           onPress={() => navigation.navigate('ExportData')}
-          activeOpacity={0.7}
         >
-          <Upload size={20} color={theme.colors.primary} strokeWidth={2} />
+          <Upload size={20} color={theme.colors.primary} />
         </TouchableOpacity>
       </Animated.View>
 
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: 120 }]}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
-        {/* Date Range Selector */}
-        <Animated.View
-          style={[
-            styles.dateRangeContainer,
-            {
-              opacity: fadeAnim,
-            },
-          ]}
-        >
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {DATE_RANGES.map((range) => (
-              <TouchableOpacity
-                key={range}
-                style={[
-                  styles.dateRangeButton,
-                  {
-                    backgroundColor:
-                      selectedRange === range
-                        ? theme.colors.primary
-                        : theme.colors.backgroundSecondary,
-                    borderColor:
-                      selectedRange === range ? theme.colors.primary : theme.colors.border,
-                  },
-                ]}
-                onPress={() => setSelectedRange(range)}
-                activeOpacity={0.7}
-              >
-                <Text
-                  style={[
-                    styles.dateRangeText,
-                    {
-                      color:
-                        selectedRange === range ? theme.colors.white : theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBody,
-                      fontSize: theme.typography.fontSizeSM,
-                      fontWeight:
-                        selectedRange === range
-                          ? theme.typography.fontWeightSemibold
-                          : theme.typography.fontWeightMedium,
-                    },
-                  ]}
-                >
-                  {range}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </Animated.View>
-
-        {/* Summary Cards */}
-        <Animated.View
-          style={[
-            styles.summaryGrid,
-            {
-              opacity: fadeAnim,
-            },
-          ]}
-        >
-          {/* Total Completions */}
-          <View
-            style={[
-              styles.summaryCard,
-              {
-                backgroundColor: theme.colors.backgroundSecondary,
-                borderColor: theme.colors.border,
-              },
-            ]}
-          >
-            <View style={styles.summaryIconContainer}>
-              <Check size={24} color={theme.colors.primary} strokeWidth={2} />
-            </View>
-            <Text
-              style={[
-                styles.summaryValue,
-                {
-                  color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplayBold,
-                  fontSize: theme.typography.fontSize2XL,
-                },
-              ]}
-            >
-              {analyticsData.totalCompletions}
+        {/* Level Progress */}
+        <Animated.View style={[styles.levelContainer, { opacity: fadeAnim }]}>
+          <View style={styles.levelHeader}>
+            <Text style={[styles.levelText, { color: theme.colors.text, fontFamily: theme.typography.fontFamilyBodySemibold }]}>
+              Progress to Level {metrics.userLevel.level + 1}
             </Text>
-            <Text
-              style={[
-                styles.summaryLabel,
-                {
-                  color: theme.colors.textSecondary,
-                  fontFamily: theme.typography.fontFamilyBody,
-                  fontSize: theme.typography.fontSizeXS,
-                },
-              ]}
-            >
-              Completions
-            </Text>
-            <View style={styles.trendIndicator}>
-              <TrendingUp size={12} color="#22C55E" strokeWidth={2} />
-              <Text
-                style={[
-                  styles.trendText,
-                  {
-                    color: theme.colors.success,
-                    fontFamily: theme.typography.fontFamilyBody,
-                    fontSize: theme.typography.fontSizeXS,
-                  },
-                ]}
-              >
-                {analyticsData.trendPercentage}
-              </Text>
-            </View>
-          </View>
-
-          {/* Average Streak */}
-          <View
-            style={[
-              styles.summaryCard,
-              {
-                backgroundColor: theme.colors.backgroundSecondary,
-                borderColor: theme.colors.border,
-              },
-            ]}
-          >
-            <View style={styles.summaryIconContainer}>
-              <Flame size={24} color={theme.colors.primary} strokeWidth={2} />
-            </View>
-            <Text
-              style={[
-                styles.summaryValue,
-                {
-                  color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplayBold,
-                  fontSize: theme.typography.fontSize2XL,
-                },
-              ]}
-            >
-              {averageStreak}
-            </Text>
-            <Text
-              style={[
-                styles.summaryLabel,
-                {
-                  color: theme.colors.textSecondary,
-                  fontFamily: theme.typography.fontFamilyBody,
-                  fontSize: theme.typography.fontSizeXS,
-                },
-              ]}
-            >
-              Avg Streak
+            <Text style={[styles.xpText, { color: theme.colors.primary, fontFamily: theme.typography.fontFamilyBodyMedium }]}>
+              {Math.round(metrics.userLevel.progress * 100)}%
             </Text>
           </View>
-
-          {/* Consistency Score */}
-          <View
-            style={[
-              styles.summaryCard,
-              {
-                backgroundColor: theme.colors.backgroundSecondary,
-                borderColor: theme.colors.border,
-              },
-            ]}
-          >
-            <View style={styles.summaryIconContainer}>
-              <BarChart3 size={24} color={theme.colors.primary} strokeWidth={2} />
-            </View>
-            <Text
-              style={[
-                styles.summaryValue,
-                {
-                  color: analyticsData.consistencyScore >= 80 ? theme.colors.success : theme.colors.warning,
-                  fontFamily: theme.typography.fontFamilyDisplayBold,
-                  fontSize: theme.typography.fontSize2XL,
-                },
-              ]}
-            >
-              {analyticsData.consistencyScore}%
-            </Text>
-            <Text
-              style={[
-                styles.summaryLabel,
-                {
-                  color: theme.colors.textSecondary,
-                  fontFamily: theme.typography.fontFamilyBody,
-                  fontSize: theme.typography.fontSizeXS,
-                },
-              ]}
-            >
-              Consistency
-            </Text>
-          </View>
-
-          {/* Active Habits */}
-          <View
-            style={[
-              styles.summaryCard,
-              {
-                backgroundColor: theme.colors.backgroundSecondary,
-                borderColor: theme.colors.border,
-              },
-            ]}
-          >
-            <View style={styles.summaryIconContainer}>
-              <Clipboard size={24} color={theme.colors.primary} strokeWidth={2} />
-            </View>
-            <Text
-              style={[
-                styles.summaryValue,
-                {
-                  color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyDisplayBold,
-                  fontSize: theme.typography.fontSize2XL,
-                },
-              ]}
-            >
-              {activeHabits.length}
-            </Text>
-            <Text
-              style={[
-                styles.summaryLabel,
-                {
-                  color: theme.colors.textSecondary,
-                  fontFamily: theme.typography.fontFamilyBody,
-                  fontSize: theme.typography.fontSizeXS,
-                },
-              ]}
-            >
-              Active Habits
-            </Text>
-            {archivedCount > 0 && (
-              <Text
-                style={[
-                  styles.archivedText,
-                  {
-                    color: theme.colors.textSecondary,
-                    fontFamily: theme.typography.fontFamilyBody,
-                    fontSize: 10,
-                  },
-                ]}
-              >
-                {archivedCount} archived
-              </Text>
-            )}
-          </View>
-        </Animated.View>
-
-        {/* Day of Week Analysis */}
-        <Animated.View
-          style={[
-            styles.chartSection,
-            {
-              backgroundColor: theme.colors.backgroundSecondary,
-              borderColor: theme.colors.border,
-              opacity: fadeAnim,
-            },
-          ]}
-        >
-          <Text
-            style={[
-              styles.chartTitle,
-              {
-                color: theme.colors.text,
-                fontFamily: theme.typography.fontFamilyBodySemibold,
-                fontSize: theme.typography.fontSizeMD,
-              },
-            ]}
-          >
-            Completion by Day of Week
-          </Text>
-          <View style={styles.barChart}>
-            {analyticsData.dayOfWeekData.map((item, index) => (
-              <View key={item.day} style={styles.barContainer}>
-                <Text
-                  style={[
-                    styles.barValue,
-                    {
-                      color: theme.colors.textSecondary,
-                      fontFamily: theme.typography.fontFamilyBody,
-                      fontSize: 10,
-                    },
-                  ]}
-                >
-                  {item.value}%
-                </Text>
-                <View
-                  style={[
-                    styles.barBackground,
-                    { backgroundColor: theme.colors.border },
-                  ]}
-                >
-                  <View
-                    style={[
-                      styles.barFill,
-                      {
-                        backgroundColor:
-                          item.value === maxDayValue
-                            ? theme.colors.primary
-                            : theme.colors.primaryLight || `${theme.colors.primary}60`,
-                        height: `${item.value}%`,
-                      },
-                    ]}
-                  />
-                </View>
-                <Text
-                  style={[
-                    styles.barLabel,
-                    {
-                      color:
-                        item.value === maxDayValue
-                          ? theme.colors.primary
-                          : theme.colors.textSecondary,
-                      fontFamily: theme.typography.fontFamilyBody,
-                      fontSize: theme.typography.fontSizeXS,
-                      fontWeight:
-                        item.value === maxDayValue
-                          ? theme.typography.fontWeightSemibold
-                          : theme.typography.fontWeightMedium,
-                    },
-                  ]}
-                >
-                  {item.day}
-                </Text>
-              </View>
-            ))}
-          </View>
-          <View
-            style={[
-              styles.insightBadge,
-              { backgroundColor: `${theme.colors.primary}15` },
-            ]}
-          >
-            <View style={styles.insightIconContainer}>
-              <Lightbulb size={16} color={theme.colors.primary} strokeWidth={2} />
-            </View>
-            <Text
-              style={[
-                styles.insightText,
-                {
-                  color: theme.colors.primary,
-                  fontFamily: theme.typography.fontFamilyBody,
-                  fontSize: theme.typography.fontSizeSM,
-                },
-              ]}
-            >
-              {analyticsData.bestDayInsight}
-            </Text>
-          </View>
-        </Animated.View>
-
-        {/* Habits Performance Table */}
-        <Animated.View
-          style={[
-            styles.tableSection,
-            {
-              backgroundColor: theme.colors.backgroundSecondary,
-              borderColor: theme.colors.border,
-              opacity: fadeAnim,
-            },
-          ]}
-        >
-          <Text
-            style={[
-              styles.chartTitle,
-              {
-                color: theme.colors.text,
-                fontFamily: theme.typography.fontFamilyBodySemibold,
-                fontSize: theme.typography.fontSizeMD,
-              },
-            ]}
-          >
-            Habits Performance
-          </Text>
-          {activeHabits.length === 0 ? (
-            <View style={{ paddingVertical: 32, alignItems: 'center' }}>
-              <Text style={{ fontSize: 48, marginBottom: 12 }}>📊</Text>
-              <Text
-                style={[
-                  {
-                    color: theme.colors.textSecondary,
-                    fontFamily: theme.typography.fontFamilyBody,
-                    fontSize: theme.typography.fontSizeSM,
-                    textAlign: 'center',
-                    paddingHorizontal: 24,
-                    lineHeight: theme.typography.fontSizeSM * theme.typography.lineHeightRelaxed,
-                  },
-                ]}
-              >
-                Complete a few habits to see detailed performance insights and track your progress over time.
-              </Text>
-            </View>
-          ) : (
-            activeHabits.slice(0, 5).map((habit) => (
-              <TouchableOpacity
-                key={habit.id}
-                style={[styles.habitRow, { borderBottomColor: theme.colors.border }]}
-                onPress={() =>
-                  navigation.navigate('HabitDeepDive', { habitId: habit.id, habitData: habit })
-                }
-                activeOpacity={0.7}
-              >
-                <View style={styles.habitInfo}>
-                  <Text style={styles.habitEmoji}>{habit.emoji}</Text>
-                  <Text
-                    style={[
-                      styles.habitName,
-                      {
-                        color: theme.colors.text,
-                        fontFamily: theme.typography.fontFamilyBodyMedium,
-                        fontSize: theme.typography.fontSizeSM,
-                      },
-                    ]}
-                    numberOfLines={1}
-                  >
-                    {habit.name}
-                  </Text>
-                </View>
-                <View style={styles.habitStats}>
-                  <View style={styles.statBadge}>
-                    <Flame size={12} color={theme.colors.primary} strokeWidth={2} />
-                    <Text
-                      style={[
-                        styles.statText,
-                        {
-                          color: theme.colors.text,
-                          fontFamily: theme.typography.fontFamilyBody,
-                          fontSize: theme.typography.fontSizeXS,
-                        },
-                      ]}
-                    >
-                      {habit.streak}
-                    </Text>
-                  </View>
-                  <Text
-                    style={[
-                      styles.completionRate,
-                      {
-                        color: theme.colors.success,
-                        fontFamily: theme.typography.fontFamilyBodySemibold,
-                        fontSize: theme.typography.fontSizeSM,
-                      },
-                    ]}
-                  >
-                    {calculateCompletionRate(habit)}%
-                  </Text>
-                  <ChevronRight size={20} color="#9CA3AF" strokeWidth={2} />
-                </View>
-              </TouchableOpacity>
-            ))
-          )}
-        </Animated.View>
-
-        {/* AI Insights Panel */}
-        <Animated.View
-          style={[
-            styles.aiSection,
-            {
-              backgroundColor: `${theme.colors.primary}10`,
-              borderColor: `${theme.colors.primary}30`,
-              opacity: fadeAnim,
-            },
-          ]}
-        >
-          <View style={styles.aiHeader}>
-            <View style={styles.aiIconContainer}>
-              <Sparkles size={20} color={theme.colors.primary} strokeWidth={2} />
-            </View>
-            <Text
-              style={[
-                styles.aiTitle,
-                {
-                  color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyBodySemibold,
-                  fontSize: theme.typography.fontSizeMD,
-                },
-              ]}
-            >
-              AI Insights
-            </Text>
+          <View style={[styles.progressBarBg, { backgroundColor: theme.colors.border }]}>
             <View
-              style={[styles.aiBadge, { backgroundColor: theme.colors.primary }]}
-            >
-              <Text
-                style={{
-                  color: theme.colors.white,
-                  fontSize: 10,
-                  fontFamily: theme.typography.fontFamilyBodySemibold,
-                }}
-              >
-                PREMIUM
-              </Text>
-            </View>
-          </View>
-          {analyticsData.aiInsights.map((insight, index) => (
-            <View key={index} style={styles.insightItem}>
-              <Text style={styles.insightBullet}>•</Text>
-              <Text
-                style={[
-                  styles.insightItemText,
-                  {
-                    color: theme.colors.text,
-                    fontFamily: theme.typography.fontFamilyBody,
-                    fontSize: theme.typography.fontSizeSM,
-                  },
-                ]}
-              >
-                {insight}
-              </Text>
-            </View>
-          ))}
-          <TouchableOpacity
-            style={[styles.refreshButton, { borderColor: theme.colors.primary }]}
-            onPress={() => navigation.navigate('AIInsights')}
-            activeOpacity={0.7}
-          >
-            <Text
               style={[
-                styles.refreshButtonText,
+                styles.progressBarFill,
                 {
-                  color: theme.colors.primary,
-                  fontFamily: theme.typography.fontFamilyBodyMedium,
-                  fontSize: theme.typography.fontSizeSM,
-                },
+                  backgroundColor: theme.colors.primary,
+                  width: `${metrics.userLevel.progress * 100}%`
+                }
               ]}
-            >
-              View All Insights →
-            </Text>
-          </TouchableOpacity>
+            />
+          </View>
         </Animated.View>
 
-        {/* Quick Actions */}
-        <View style={styles.quickActions}>
-          <TouchableOpacity
-            style={[
-              styles.actionButton,
-              { backgroundColor: theme.colors.backgroundSecondary },
-            ]}
-            onPress={() => navigation.navigate('ExportData')}
-            activeOpacity={0.7}
+        {/* Bento Grid Layout */}
+        <Animated.View style={[styles.bentoGrid, { opacity: fadeAnim }]}>
+
+          {/* Row 1: Consistency & Streak */}
+          <View style={styles.row}>
+            <StatCard
+              title="Consistency"
+              value={`${metrics.consistencyScore}%`}
+              subtitle="Last 30 Days"
+              icon={TrendingUp}
+              gradientColors={[theme.colors.primary, theme.colors.secondary]}
+              fullWidth={false}
+              height={160}
+              onPress={() => navigation.navigate('StatDetail', {
+                statType: 'consistency',
+                metrics
+              })}
+            />
+            <StatCard
+              title="Avg Streak"
+              value={`${metrics.avgStreak}`}
+              subtitle="Days"
+              icon={Flame}
+              fullWidth={false}
+              height={160}
+              onPress={() => navigation.navigate('StatDetail', {
+                statType: 'streak',
+                metrics
+              })}
+            />
+          </View>
+
+          {/* Row 2: Heatmap (Full Width) */}
+          <StatCard
+            title="Consistency Map"
+            icon={Calendar}
+            fullWidth
+            style={{ paddingBottom: 0 }}
+            onPress={() => navigation.navigate('StatDetail', {
+              statType: 'heatmap',
+              metrics
+            })}
           >
-            <Upload size={18} color={theme.colors.primary} strokeWidth={2} />
-            <Text
-              style={[
-                styles.actionText,
-                {
-                  color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyBody,
-                  fontSize: theme.typography.fontSizeSM,
-                },
-              ]}
+            <ConsistencyHeatmap data={metrics.heatmapData} />
+          </StatCard>
+
+          {/* Row 3: Category & Time of Day */}
+          <View style={styles.row}>
+            <StatCard
+              title="Life Balance"
+              icon={PieChartIcon}
+              fullWidth={false}
+              onPress={() => navigation.navigate('StatDetail', {
+                statType: 'balance',
+                metrics
+              })}
             >
-              Export Data
-            </Text>
-          </TouchableOpacity>
+              <CategoryDistributionChart data={metrics.categoryData} />
+            </StatCard>
+            <StatCard
+              title="Chronotype"
+              icon={Clock}
+              fullWidth={false}
+              onPress={() => navigation.navigate('StatDetail', {
+                statType: 'chronotype',
+                metrics
+              })}
+            >
+              <TimeOfDayChart data={metrics.timeOfDayData} />
+            </StatCard>
+          </View>
+
+          {/* Row 4: Perfect Days & Total */}
+          <View style={styles.row}>
+            <StatCard
+              title="Perfect Days"
+              value={`${metrics.perfectDays}`}
+              subtitle="100% Completion"
+              icon={Award}
+              gradientColors={['#F59E0B', '#D97706']} // Gold gradient
+              fullWidth={false}
+              height={140}
+              onPress={() => navigation.navigate('StatDetail', {
+                statType: 'perfectDays',
+                metrics
+              })}
+            />
+            <StatCard
+              title="User Level"
+              value={`Lvl ${metrics.userLevel.level}`}
+              subtitle={`${metrics.userLevel.xp} XP`}
+              icon={Check}
+              fullWidth={false}
+              height={140}
+              onPress={() => navigation.navigate('StatDetail', {
+                statType: 'level',
+                metrics
+              })}
+            />
+          </View>
+
+          {/* AI Insights Teaser */}
           <TouchableOpacity
-            style={[
-              styles.actionButton,
-              { backgroundColor: theme.colors.backgroundSecondary },
-            ]}
-            onPress={() => console.log('Share report')}
-            activeOpacity={0.7}
+            style={[styles.aiCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+            onPress={() => navigation.navigate('AIInsights')} // Assuming this screen exists or will exist
+            activeOpacity={0.8}
           >
-            <BarChart3 size={18} color={theme.colors.primary} strokeWidth={2} />
-            <Text
-              style={[
-                styles.actionText,
-                {
-                  color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamilyBody,
-                  fontSize: theme.typography.fontSizeSM,
-                },
-              ]}
-            >
-              Share Report
+            <View style={styles.aiHeader}>
+              <View style={[styles.aiIcon, { backgroundColor: `${theme.colors.primary}20` }]}>
+                <Zap size={20} color={theme.colors.primary} />
+              </View>
+              <Text style={[styles.aiTitle, { color: theme.colors.text, fontFamily: theme.typography.fontFamilyBodySemibold }]}>
+                AI Insights
+              </Text>
+            </View>
+            <Text style={[styles.aiText, { color: theme.colors.textSecondary, fontFamily: theme.typography.fontFamilyBody }]}>
+              View personalized recommendations based on your habit data.
             </Text>
+            <ChevronRight size={20} color={theme.colors.textSecondary} style={styles.aiArrow} />
           </TouchableOpacity>
-        </View>
+
+        </Animated.View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -1036,26 +311,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 24,
-    paddingTop: 20,
-    paddingBottom: 16,
+    paddingVertical: 16,
   },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
+  title: {
+    fontSize: 28,
+    marginBottom: 4,
   },
-  title: {},
-  backButton: {
+  subtitle: {
+    fontSize: 14,
+  },
+  exportButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  exportButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -1064,7 +332,37 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 24,
-    paddingBottom: 100,
+    paddingBottom: 120,
+  },
+  levelContainer: {
+    marginBottom: 24,
+  },
+  levelHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  levelText: {
+    fontSize: 14,
+  },
+  xpText: {
+    fontSize: 14,
+  },
+  progressBarBg: {
+    height: 8,
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  bentoGrid: {
+    gap: 12,
+  },
+  row: {
+    flexDirection: 'row',
+    gap: 12,
   },
   dateRangeContainer: {
     marginBottom: 24,
@@ -1205,16 +503,42 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 24,
   },
+  aiCard: {
+    padding: 16,
+    borderRadius: 24,
+    borderWidth: 1,
+    marginTop: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'relative',
+  },
   aiHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginRight: 12,
+  },
+  aiIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
   },
   aiIconContainer: {
     marginRight: 8,
   },
   aiTitle: {
+    fontSize: 16,
     flex: 1,
+  },
+  aiText: {
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  aiArrow: {
+    marginLeft: 8,
   },
   aiBadge: {
     paddingVertical: 4,
@@ -1273,7 +597,12 @@ const styles = StyleSheet.create({
   },
   gateTitle: {
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: 12,
+  },
+  gateSubtitle: {
+    textAlign: 'center',
+    marginBottom: 32,
+    lineHeight: 24,
   },
   featureList: {
     marginBottom: 32,

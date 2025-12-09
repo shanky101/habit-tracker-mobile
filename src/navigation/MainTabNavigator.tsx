@@ -28,6 +28,7 @@ import {
   AboutScreen,
   DataPrivacyScreen,
   ChangePasswordScreen,
+  StatDetailScreen,
 } from '@/screens';
 import TemplatesScreen from '@/screens/TemplatesScreen';
 import TemplateDetailScreen from '@/screens/TemplateDetailScreen';
@@ -44,11 +45,19 @@ export type HomeStackParamList = {
   HabitTemplates: undefined;
 };
 
+
+
 export type AnalyticsStackParamList = {
   AnalyticsMain: undefined;
   HabitDeepDive: { habitId: string; habitData: any };
+  StatDetail: {
+    statType: 'consistency' | 'streak' | 'heatmap' | 'balance' | 'chronotype' | 'perfectDays' | 'level';
+    data?: any;
+    metrics?: any;
+  };
   AIInsights: undefined;
   ExportData: undefined;
+
 };
 
 export type SettingsStackParamList = {
@@ -77,7 +86,7 @@ export type TemplatesStackParamList = {
   CreateTemplate: { mode: 'create' | 'edit' | 'copy'; templateId?: string };
 };
 
-const Tab = createBottomTabNavigator();
+const BottomTab = createBottomTabNavigator();
 const HomeStack = createStackNavigator<HomeStackParamList>();
 const TemplatesStack = createStackNavigator<TemplatesStackParamList>();
 const AnalyticsStack = createStackNavigator<AnalyticsStackParamList>();
@@ -131,6 +140,7 @@ const AnalyticsStackNavigator: React.FC = () => {
     >
       <AnalyticsStack.Screen name="AnalyticsMain" component={AnalyticsDashboardScreen} />
       <AnalyticsStack.Screen name="HabitDeepDive" component={HabitDeepDiveScreen} />
+      <AnalyticsStack.Screen name="StatDetail" component={StatDetailScreen} />
       <AnalyticsStack.Screen name="AIInsights" component={AIInsightsScreen} />
       <AnalyticsStack.Screen name="ExportData" component={ExportDataScreen} />
     </AnalyticsStack.Navigator>
@@ -219,7 +229,7 @@ const MainTabNavigator: React.FC = () => {
   const { theme } = useTheme();
 
   return (
-    <Tab.Navigator
+    <BottomTab.Navigator
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
@@ -239,7 +249,7 @@ const MainTabNavigator: React.FC = () => {
         },
       }}
     >
-      <Tab.Screen
+      <BottomTab.Screen
         name="Home"
         component={HomeStackNavigator}
         options={{
@@ -248,7 +258,7 @@ const MainTabNavigator: React.FC = () => {
           ),
         }}
       />
-      <Tab.Screen
+      <BottomTab.Screen
         name="Templates"
         component={TemplatesStackNavigator}
         options={{
@@ -257,7 +267,7 @@ const MainTabNavigator: React.FC = () => {
           ),
         }}
       />
-      <Tab.Screen
+      <BottomTab.Screen
         name="Create"
         component={HomeStackNavigator}
         listeners={({ navigation }) => ({
@@ -271,7 +281,7 @@ const MainTabNavigator: React.FC = () => {
           tabBarLabel: () => null,
         }}
       />
-      <Tab.Screen
+      <BottomTab.Screen
         name="Stats"
         component={AnalyticsStackNavigator}
         options={{
@@ -280,7 +290,7 @@ const MainTabNavigator: React.FC = () => {
           ),
         }}
       />
-      <Tab.Screen
+      <BottomTab.Screen
         name="Profile"
         component={ProfileStackNavigator}
         options={{
@@ -289,7 +299,7 @@ const MainTabNavigator: React.FC = () => {
           ),
         }}
       />
-    </Tab.Navigator>
+    </BottomTab.Navigator>
   );
 };
 
