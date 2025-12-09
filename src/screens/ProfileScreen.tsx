@@ -13,12 +13,12 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { useTheme } from '@/theme';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
+import { useUserStore } from '@/store/userStore';
 import { useHabits } from '@/hooks/useHabits';
-import { useUser } from '@/context/UserContext';
 import { useSubscription, formatPlanName } from '@/context/SubscriptionContext';
 import {
   Settings,
@@ -57,11 +57,11 @@ const ProfileScreen: React.FC = () => {
   const { theme } = useTheme();
   const { fadeAnim, slideAnim } = useScreenAnimation();
   const { subscription } = useSubscription();
-  const { isVacationMode, toggleVacationMode } = useUser();
+  const { profile, isVacationMode, toggleVacationMode, updateProfile } = useUserStore();
 
   const { habits } = useHabits();
-  const [userName, setUserName] = useState('');
-  const [userEmail, setUserEmail] = useState('');
+  const userName = profile.name || '';
+  const userEmail = profile.email || '';
   const [isHabiSheetVisible, setIsHabiSheetVisible] = useState(false);
   const isPremium = subscription.isPremium;
 
@@ -147,21 +147,6 @@ const ProfileScreen: React.FC = () => {
   };
 
   const { level, progress } = calculateLevel(stats.totalCompletions);
-
-  useEffect(() => {
-    loadUserData();
-  }, []);
-
-  const loadUserData = async () => {
-    try {
-      const name = await AsyncStorage.getItem(USER_NAME_KEY);
-      const email = await AsyncStorage.getItem(USER_EMAIL_KEY);
-      if (name) setUserName(name);
-      if (email) setUserEmail(email);
-    } catch (error) {
-      console.error('Error loading user data:', error);
-    }
-  };
 
   const handleHelpSupport = async () => {
     const supportEmail = 'support@habittracker.app';
@@ -648,11 +633,11 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   content: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
     paddingTop: 20,
   },
   headerContainer: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
     paddingTop: 16,
     marginBottom: 24,
   },
@@ -749,7 +734,7 @@ const styles = StyleSheet.create({
   bentoGrid: {
     flexDirection: 'row',
     gap: 12,
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
     marginBottom: 24,
   },
   bentoCard: {
@@ -794,7 +779,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   premiumBanner: {
-    marginHorizontal: 24,
+    marginHorizontal: 16,
     borderRadius: 20,
     padding: 20,
     marginBottom: 32,
@@ -822,7 +807,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   menuContainer: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
     marginBottom: 32,
   },
   menuSectionTitle: {
@@ -922,7 +907,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   carouselContent: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
     gap: 16,
   },
   featureCard: {

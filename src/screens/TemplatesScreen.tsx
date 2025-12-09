@@ -16,7 +16,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '@/theme';
-import { useTemplates } from '@/contexts/TemplateContext';
+import { useTemplates } from '@/hooks/useTemplates';
 import { useHabits } from '@/hooks/useHabits';
 import { HabitTemplate } from '@/types/HabitTemplate';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';

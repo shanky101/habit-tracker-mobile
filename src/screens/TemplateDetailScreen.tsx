@@ -14,7 +14,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '@/theme';
-import { useTemplates } from '@/contexts/TemplateContext';
+import { useTemplates } from '@/hooks/useTemplates';
 import { useHabits, Habit } from '@/hooks/useHabits';
 import { TemplatesStackParamList } from '@/navigation/MainTabNavigator';
 import { ArrowLeft, Share2, Trash2, Edit3, Check, Calendar, Bell, Repeat, Award, Clock, Target, TrendingUp, Sparkles } from 'lucide-react-native';

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { format, subDays } from 'date-fns';
 
 interface VacationInterval {
     startDate: string; // ISO Date string
@@ -43,7 +44,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const toggleVacationMode = async () => {
         const newMode = !isVacationMode;
-        const today = new Date().toISOString().split('T')[0];
+        const today = format(new Date(), 'yyyy-MM-dd');
         let newHistory = [...vacationHistory];
 
         if (newMode) {
@@ -51,13 +52,21 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             newHistory.push({ startDate: today, endDate: null });
         } else {
             // Turning OFF: End the last interval
-            // Find the last open interval (should be the last one)
             const lastIntervalIndex = newHistory.length - 1;
             if (lastIntervalIndex >= 0 && newHistory[lastIntervalIndex].endDate === null) {
-                newHistory[lastIntervalIndex] = {
-                    ...newHistory[lastIntervalIndex],
-                    endDate: today,
-                };
+                const lastInterval = newHistory[lastIntervalIndex];
+
+                if (lastInterval.startDate === today) {
+                    // If started today and ended today, just remove it (accidental toggle)
+                    newHistory.pop();
+                } else {
+                    // Otherwise, set end date to yesterday
+                    const yesterday = format(subDays(new Date(), 1), 'yyyy-MM-dd');
+                    newHistory[lastIntervalIndex] = {
+                        ...lastInterval,
+                        endDate: yesterday,
+                    };
+                }
             }
         }
 

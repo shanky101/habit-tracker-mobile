@@ -18,6 +18,7 @@ const DEFAULT_HABITS: Omit<Habit, 'completions'>[] = [
     reminderEnabled: true,
     reminderTime: '07:00',
     isDefault: true,
+    type: 'positive',
   },
   {
     id: '2',
@@ -33,6 +34,7 @@ const DEFAULT_HABITS: Omit<Habit, 'completions'>[] = [
     timePeriod: 'evening',
     reminderEnabled: false,
     isDefault: true,
+    type: 'positive',
   },
   {
     id: '3',
@@ -49,6 +51,7 @@ const DEFAULT_HABITS: Omit<Habit, 'completions'>[] = [
     reminderEnabled: true,
     reminderTime: '09:00',
     isDefault: true,
+    type: 'positive',
   },
   {
     id: '4',
@@ -65,6 +68,7 @@ const DEFAULT_HABITS: Omit<Habit, 'completions'>[] = [
     reminderEnabled: true,
     reminderTime: '18:00',
     isDefault: true,
+    type: 'positive',
   },
 ];
 
@@ -154,6 +158,46 @@ export const initializeDatabase = async (): Promise<void> => {
         updated_at TEXT NOT NULL
       );
 
+      -- Habit Templates Table
+      CREATE TABLE IF NOT EXISTS habit_templates (
+        id TEXT PRIMARY KEY,
+        version TEXT NOT NULL DEFAULT '1.0',
+        name TEXT NOT NULL,
+        description TEXT NOT NULL,
+        notes TEXT,
+        author TEXT,
+        tags TEXT NOT NULL DEFAULT '[]',
+        is_default INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL,
+        updated_at TEXT,
+        type TEXT NOT NULL,
+        difficulty TEXT NOT NULL,
+        duration TEXT NOT NULL,
+        benefits TEXT NOT NULL DEFAULT '[]',
+        outcomes TEXT NOT NULL DEFAULT '[]',
+        timeline TEXT NOT NULL DEFAULT '[]',
+        emoji TEXT NOT NULL,
+        color TEXT NOT NULL,
+        habits TEXT NOT NULL DEFAULT '[]'
+      );
+
+      -- Vacation Intervals Table
+      CREATE TABLE IF NOT EXISTS vacation_intervals (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        start_date TEXT NOT NULL,
+        end_date TEXT,
+        created_at TEXT NOT NULL
+      );
+
+      -- User Profile Table
+      CREATE TABLE IF NOT EXISTS user_profile (
+        id TEXT PRIMARY KEY DEFAULT 'default',
+        name TEXT,
+        email TEXT,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
+
       -- Indexes
       CREATE INDEX IF NOT EXISTS idx_completions_habit_id ON completions(habit_id);
       CREATE INDEX IF NOT EXISTS idx_completions_date ON completions(date);
@@ -161,6 +205,8 @@ export const initializeDatabase = async (): Promise<void> => {
       CREATE INDEX IF NOT EXISTS idx_entries_date ON entries(date);
       CREATE INDEX IF NOT EXISTS idx_habits_archived ON habits(archived);
       CREATE INDEX IF NOT EXISTS idx_habits_sort_order ON habits(sort_order);
+      CREATE INDEX IF NOT EXISTS idx_templates_type ON habit_templates(type);
+      CREATE INDEX IF NOT EXISTS idx_vacation_start ON vacation_intervals(start_date);
     `);
 
     console.log('[DB] Schema created successfully');

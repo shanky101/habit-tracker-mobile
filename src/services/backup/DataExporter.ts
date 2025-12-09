@@ -9,6 +9,9 @@ import {
   DeviceInfo,
   CompletionRecord,
   EntryRecord,
+  TemplateRecord,
+  VacationIntervalRecord,
+  UserProfileRecord,
   MascotCustomization,
   AppSettings,
   AppMetadata,
@@ -89,8 +92,20 @@ export class DataExporter {
     const completions = this.exportCompletions();
 
     // Export entries
-    onProgress?.(60, 'Exporting entries...');
+    onProgress?.(50, 'Exporting entries...');
     const entries = this.exportEntries();
+
+    // Export templates
+    onProgress?.(55, 'Exporting templates...');
+    const templates = this.exportTemplates();
+
+    // Export vacation intervals
+    onProgress?.(60, 'Exporting vacation...');
+    const vacationIntervals = this.exportVacationIntervals();
+
+    // Export user profile
+    onProgress?.(65, 'Exporting profile...');
+    const userProfile = this.exportUserProfile();
 
     // Export mascot customization
     onProgress?.(70, 'Exporting mascot...');
@@ -108,6 +123,9 @@ export class DataExporter {
       habits,
       completions,
       entries,
+      templates,
+      vacationIntervals,
+      userProfile,
       mascotCustomization,
       settings,
       metadata,
@@ -141,6 +159,7 @@ export class DataExporter {
         notes: row.notes || undefined,
         isDefault: row.is_default === 1,
         archived: row.archived === 1,
+        type: 'positive' as const, // Default to positive for old habits without type
         completions: {}, // Will be reconstructed from completions table
       }));
     } catch (error) {
@@ -238,6 +257,51 @@ export class DataExporter {
     } catch (error) {
       console.error('[DataExporter] Failed to export metadata:', error);
       return {};
+    }
+  }
+
+  /**
+   * Export templates from database
+   */
+  private static exportTemplates(): TemplateRecord[] {
+    try {
+      const rows = db.getAllSync<TemplateRecord>(
+        'SELECT * FROM habit_templates ORDER BY created_at DESC'
+      );
+      return rows;
+    } catch (error) {
+      console.error('[DataExporter] Failed to export templates:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Export vacation intervals from database
+   */
+  private static exportVacationIntervals(): VacationIntervalRecord[] {
+    try {
+      const rows = db.getAllSync<VacationIntervalRecord>(
+        'SELECT * FROM vacation_intervals ORDER BY start_date DESC'
+      );
+      return rows;
+    } catch (error) {
+      console.error('[DataExporter] Failed to export vacation intervals:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Export user profile from database
+   */
+  private static exportUserProfile(): UserProfileRecord | null {
+    try {
+      const row = db.getFirstSync<UserProfileRecord>(
+        "SELECT * FROM user_profile WHERE id = 'default'"
+      );
+      return row || null;
+    } catch (error) {
+      console.error('[DataExporter] Failed to export user profile:', error);
+      return null;
     }
   }
 

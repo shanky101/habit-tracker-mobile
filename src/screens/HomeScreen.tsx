@@ -16,7 +16,7 @@ import * as Haptics from 'expo-haptics';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useUserStore } from '@/store/userStore';
 import { useTheme } from '@/theme';
 import { useHabits } from '@/hooks/useHabits';
 import { useSubscription } from '@/context/SubscriptionContext';
@@ -39,7 +39,6 @@ type HomeScreenNavigationProp = StackNavigationProp<any, 'Home'>;
 type HomeScreenRouteProp = RouteProp<{ Home: { newHabit?: any } }, 'Home'>;
 
 const { width } = Dimensions.get('window');
-const USER_NAME_KEY = '@habit_tracker_user_name';
 
 // Generate dates for the horizontal date picker
 const generateDates = (daysCount: number = 14) => {
@@ -102,7 +101,6 @@ const HomeScreen: React.FC = () => {
 
   const { fadeAnim, slideAnim, fabScale } = useScreenAnimation({ enableFAB: true });
 
-  const [userName, setUserName] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [dates] = useState(generateDates(14));
   const [refreshing, setRefreshing] = useState(false);
@@ -125,21 +123,9 @@ const HomeScreen: React.FC = () => {
   // Get time ranges from settings store
   const { timeRanges } = useSettingsStore();
 
-  // Load user name - refresh every time screen comes into focus
-  useFocusEffect(
-    React.useCallback(() => {
-      const loadUserName = async () => {
-        try {
-          const name = await AsyncStorage.getItem(USER_NAME_KEY);
-          if (name) setUserName(name);
-        } catch (error) {
-          console.error('Error loading user name:', error);
-        }
-      };
-      loadUserName();
-    }, [])
-  );
-
+  // Load user name - refresh every time screen  const { profile } = useUserStore();
+  const { profile } = useUserStore();
+  const userName = profile.name || 'Friend';
   // Scroll to today on mount
   useEffect(() => {
     setTimeout(() => {
@@ -911,7 +897,7 @@ const HomeScreen: React.FC = () => {
                     },
                   ]}
                 >
-                  {habits.filter(h => !h.archived && !h.isDefault).length}/{FREE_HABIT_LIMIT} free habits used
+                  {habits.filter(h => !h.archived).length}/{FREE_HABIT_LIMIT} free habits used
                 </Text>
                 <Text
                   style={[

@@ -29,6 +29,7 @@ import {
   DataPrivacyScreen,
   ChangePasswordScreen,
   StatDetailScreen,
+  CalendarHistoryScreen,
 } from '@/screens';
 import TemplatesScreen from '@/screens/TemplatesScreen';
 import TemplateDetailScreen from '@/screens/TemplateDetailScreen';
@@ -57,6 +58,7 @@ export type AnalyticsStackParamList = {
   };
   AIInsights: undefined;
   ExportData: undefined;
+  CalendarHistory: undefined;
 
 };
 
@@ -143,6 +145,7 @@ const AnalyticsStackNavigator: React.FC = () => {
       <AnalyticsStack.Screen name="StatDetail" component={StatDetailScreen} />
       <AnalyticsStack.Screen name="AIInsights" component={AIInsightsScreen} />
       <AnalyticsStack.Screen name="ExportData" component={ExportDataScreen} />
+      <AnalyticsStack.Screen name="CalendarHistory" component={CalendarHistoryScreen} />
     </AnalyticsStack.Navigator>
   );
 };

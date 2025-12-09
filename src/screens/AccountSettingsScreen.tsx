@@ -13,7 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useUserStore } from '@/store/userStore';
 import { useTheme } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 import {
@@ -34,37 +34,23 @@ import {
 
 type AccountSettingsNavigationProp = StackNavigationProp<any, 'AccountSettings'>;
 
-const USER_EMAIL_KEY = '@habit_tracker_user_email';
+
 
 const AccountSettingsScreen: React.FC = () => {
   const navigation = useNavigation<AccountSettingsNavigationProp>();
   const { theme } = useTheme();
   const { fadeAnim, slideAnim } = useScreenAnimation();
 
-  const [userEmail, setUserEmail] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { profile } = useUserStore();
+  const userEmail = profile.email || '';
+  const isLoggedIn = !!profile.email;
+
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSynced, setLastSynced] = useState('2 minutes ago');
 
   // Connected accounts state
   const [connectedApple, setConnectedApple] = useState(false);
   const [connectedGoogle, setConnectedGoogle] = useState(false);
-
-  useEffect(() => {
-    loadUserData();
-  }, []);
-
-  const loadUserData = async () => {
-    try {
-      const email = await AsyncStorage.getItem(USER_EMAIL_KEY);
-      if (email) {
-        setUserEmail(email);
-        setIsLoggedIn(true);
-      }
-    } catch (error) {
-      console.error('Error loading user data:', error);
-    }
-  };
 
   const handleSync = async () => {
     setIsSyncing(true);
@@ -81,7 +67,7 @@ const AccountSettingsScreen: React.FC = () => {
       'You will need to verify your new email address.',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Continue', onPress: () => {} },
+        { text: 'Continue', onPress: () => { } },
       ]
     );
   };
@@ -108,7 +94,7 @@ const AccountSettingsScreen: React.FC = () => {
                 {
                   text: 'Delete Everything',
                   style: 'destructive',
-                  onPress: () => {},
+                  onPress: () => { },
                 },
               ]
             );
@@ -136,7 +122,7 @@ const AccountSettingsScreen: React.FC = () => {
                 {
                   text: 'Confirm Delete',
                   style: 'destructive',
-                  onPress: () => {},
+                  onPress: () => { },
                 },
               ]
             );
@@ -454,7 +440,7 @@ const AccountSettingsScreen: React.FC = () => {
                 Camera,
                 'Profile Picture',
                 'Tap to change',
-                () => {},
+                () => { },
                 false
               )}
             </View>

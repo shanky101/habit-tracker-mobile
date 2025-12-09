@@ -28,6 +28,9 @@ export interface AppData {
   habits: Habit[];
   completions: CompletionRecord[];
   entries: EntryRecord[];
+  templates: TemplateRecord[];
+  vacationIntervals: VacationIntervalRecord[];
+  userProfile: UserProfileRecord | null;
   mascotCustomization: MascotCustomization | null;
   settings: AppSettings;
   metadata: AppMetadata;
@@ -77,6 +80,52 @@ export interface MascotCustomization {
   pattern_color?: string;
   necklace: string;
   special_effect: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * Template record from database
+ */
+export interface TemplateRecord {
+  id: string;
+  version: string;
+  name: string;
+  description: string;
+  notes: string | null;
+  author: string | null;
+  tags: string;
+  is_default: number;
+  created_at: string;
+  updated_at: string | null;
+  type: string;
+  difficulty: string;
+  duration: string;
+  benefits: string;
+  outcomes: string;
+  timeline: string;
+  emoji: string;
+  color: string;
+  habits: string;
+}
+
+/**
+ * Vacation interval record from database
+ */
+export interface VacationIntervalRecord {
+  id: number;
+  start_date: string;
+  end_date: string | null;
+  created_at: string;
+}
+
+/**
+ * User profile record from database
+ */
+export interface UserProfileRecord {
+  id: string;
+  name: string | null;
+  email: string | null;
   created_at: string;
   updated_at: string;
 }

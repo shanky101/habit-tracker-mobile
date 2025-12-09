@@ -6,6 +6,9 @@ import {
   ProgressCallback,
   CompletionRecord,
   EntryRecord,
+  TemplateRecord,
+  VacationIntervalRecord,
+  UserProfileRecord,
   MascotCustomization,
 } from './types';
 import { Habit } from '@/hooks/useHabits';
@@ -114,8 +117,20 @@ export class DataImporter {
         restoredCompletions = await this.restoreCompletions(backupData.data.completions);
 
         // Restore entries
-        onProgress?.(60, 'Restoring entries...');
+        onProgress?.(50, 'Restoring entries...');
         restoredEntries = await this.restoreEntries(backupData.data.entries);
+
+        // Restore templates
+        onProgress?.(55, 'Restoring templates...');
+        await this.restoreTemplates(backupData.data.templates);
+
+        // Restore vacation intervals
+        onProgress?.(60, 'Restoring vacation...');
+        await this.restoreVacationIntervals(backupData.data.vacationIntervals);
+
+        // Restore user profile
+        onProgress?.(65, 'Restoring profile...');
+        await this.restoreUserProfile(backupData.data.userProfile);
 
         // Restore mascot customization
         onProgress?.(70, 'Restoring mascot...');
@@ -152,6 +167,9 @@ export class DataImporter {
       db.runSync('DELETE FROM entries');
       db.runSync('DELETE FROM completions');
       db.runSync('DELETE FROM habits');
+      db.runSync('DELETE FROM habit_templates WHERE is_user_created = 1');
+      db.runSync('DELETE FROM vacation_intervals');
+      db.runSync("DELETE FROM user_profile WHERE id = 'default'");
       db.runSync('DELETE FROM mascot_customization');
 
       // Clear settings but keep initial_seed_done
@@ -374,6 +392,110 @@ export class DataImporter {
       console.log('[DataImporter] Restored metadata');
     } catch (error) {
       console.error('[DataImporter] Failed to restore metadata:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Restore templates
+   */
+  private static async restoreTemplates(templates: TemplateRecord[]): Promise<void> {
+    try {
+      let count = 0;
+
+      for (const template of templates) {
+        db.runSync(
+          `INSERT INTO habit_templates (
+            id, version, name, description, notes, author, tags, is_default,
+            created_at, updated_at, type, difficulty, duration, benefits,
+            outcomes, timeline, emoji, color, habits
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            template.id,
+            template.version,
+            template.name,
+            template.description,
+            template.notes,
+            template.author,
+            template.tags,
+            template.is_default,
+            template.created_at,
+            template.updated_at,
+            template.type,
+            template.difficulty,
+            template.duration,
+            template.benefits,
+            template.outcomes,
+            template.timeline,
+            template.emoji,
+            template.color,
+            template.habits,
+          ]
+        );
+        count++;
+      }
+
+      console.log(`[DataImporter] Restored ${count} templates`);
+    } catch (error) {
+      console.error('[DataImporter] Failed to restore templates:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Restore vacation intervals
+   */
+  private static async restoreVacationIntervals(
+    intervals: VacationIntervalRecord[]
+  ): Promise<void> {
+    try {
+      let count = 0;
+
+      for (const interval of intervals) {
+        db.runSync(
+          `INSERT INTO vacation_intervals (
+            start_date, end_date, created_at
+          ) VALUES (?, ?, ?)`,
+          [interval.start_date, interval.end_date, interval.created_at]
+        );
+        count++;
+      }
+
+      console.log(`[DataImporter] Restored ${count} vacation intervals`);
+    } catch (error) {
+      console.error('[DataImporter] Failed to restore vacation intervals:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Restore user profile
+   */
+  private static async restoreUserProfile(
+    profile: UserProfileRecord | null
+  ): Promise<void> {
+    if (!profile) {
+      console.log('[DataImporter] No user profile to restore');
+      return;
+    }
+
+    try {
+      db.runSync(
+        `INSERT OR REPLACE INTO user_profile (
+          id, name, email, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?)`,
+        [
+          profile.id || 'default',
+          profile.name,
+          profile.email,
+          profile.created_at,
+          profile.updated_at,
+        ]
+      );
+
+      console.log('[DataImporter] Restored user profile');
+    } catch (error) {
+      console.error('[DataImporter] Failed to restore user profile:', error);
       throw error;
     }
   }

@@ -14,7 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useUserStore } from '@/store/userStore';
 import { useTheme, themes, themeMetadata } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 import { useMascot, MASCOT_NAME } from '@/context/MascotContext';
@@ -40,7 +40,7 @@ import {
 
 type SettingsNavigationProp = StackNavigationProp<any, 'Settings'>;
 
-const USER_NAME_KEY = '@habit_tracker_user_name';
+
 
 const SettingsScreen: React.FC = () => {
   const navigation = useNavigation<SettingsNavigationProp>();
@@ -50,29 +50,14 @@ const SettingsScreen: React.FC = () => {
   const { subscription } = useSubscription();
   const isPremium = subscription.isPremium;
 
-  const [userName, setUserName] = useState('');
+  const { profile, updateProfile } = useUserStore();
+  const userName = profile.name || '';
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempName, setTempName] = useState('');
 
-  useEffect(() => {
-    loadUserName();
-  }, []);
-
-  const loadUserName = async () => {
-    try {
-      const name = await AsyncStorage.getItem(USER_NAME_KEY);
-      if (name) {
-        setUserName(name);
-      }
-    } catch (error) {
-      console.error('Error loading user name:', error);
-    }
-  };
-
   const saveUserName = async () => {
     try {
-      await AsyncStorage.setItem(USER_NAME_KEY, tempName);
-      setUserName(tempName);
+      await updateProfile({ name: tempName });
       setIsEditingName(false);
     } catch (error) {
       console.error('Error saving user name:', error);
@@ -374,7 +359,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
     paddingTop: 20,
     paddingBottom: 16,
   },
@@ -383,11 +368,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 24,
     paddingBottom: 100,
   },
   sectionHeader: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
     paddingTop: 24,
     paddingBottom: 8,
   },
@@ -398,7 +382,7 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   sectionGroup: {
-    marginHorizontal: 24,
+    marginHorizontal: 16,
     borderRadius: 16,
     overflow: 'hidden',
   },
@@ -443,7 +427,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   premiumNudge: {
-    marginHorizontal: 24,
+    marginHorizontal: 16,
     marginBottom: 8,
     marginTop: 8,
   },

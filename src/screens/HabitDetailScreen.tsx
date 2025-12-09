@@ -17,7 +17,7 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '@/theme';
 import { useHabits, Habit, HabitEntry } from '@/hooks/useHabits';
-import { useUser } from '@/context/UserContext';
+import { useUserStore } from '@/store/userStore';
 import { ExportManager, ExportFormat } from '@/utils/exportManager';
 import {
   ArrowLeft,
@@ -58,7 +58,7 @@ const HabitDetailScreen: React.FC = () => {
     isHabitCompletedForDate,
     getCompletionProgress
   } = useHabits();
-  const { vacationHistory } = useUser();
+  const { vacationHistory } = useUserStore();
 
   const { habitId } = route.params;
 

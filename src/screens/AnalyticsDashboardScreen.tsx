@@ -175,6 +175,19 @@ const AnalyticsDashboardScreen: React.FC = () => {
           </View>
         </Animated.View>
 
+        {/* Time Travel / History Card */}
+        <Animated.View style={{ opacity: fadeAnim, marginBottom: 12 }}>
+          <StatCard
+            title="Time Travel"
+            subtitle="View your entire journey"
+            icon={Calendar}
+            gradientColors={['#8B5CF6', '#6366F1']} // Violet to Indigo
+            fullWidth
+            height={100}
+            onPress={() => navigation.navigate('CalendarHistory')}
+          />
+        </Animated.View>
+
         {/* Bento Grid Layout */}
         <Animated.View style={[styles.bentoGrid, { opacity: fadeAnim }]}>
 

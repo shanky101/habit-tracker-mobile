@@ -19,12 +19,11 @@ import {
   PlusJakartaSans_700Bold,
 } from '@expo-google-fonts/plus-jakarta-sans';
 import { ThemeProvider } from './src/theme';
-import { TemplateProvider } from './src/contexts/TemplateContext';
 import { SubscriptionProvider } from './src/context/SubscriptionContext';
 import { MascotProvider } from './src/context/MascotContext';
-import { UserProvider } from './src/context/UserContext';
 import OnboardingNavigator from './src/navigation/OnboardingNavigator';
 import { initializeDatabase } from './src/data/database';
+import { runAsyncStorageMigration } from './src/services/migration/asyncStorageMigration';
 
 export default function App() {
   const [dbReady, setDbReady] = useState(false);
@@ -39,18 +38,27 @@ export default function App() {
     PlusJakartaSans_700Bold,
   });
 
-  // Initialize database on mount
+  // Initialize database and run migration on mount
   useEffect(() => {
-    initializeDatabase()
-      .then(() => {
+    const init = async () => {
+      try {
+        // Initialize database first
+        await initializeDatabase();
         console.log('[App] Database initialized successfully');
+
+        // Run migration from AsyncStorage to SQLite
+        const migrationResult = await runAsyncStorageMigration();
+        console.log('[App] Migration result:', migrationResult);
+
         setDbReady(true);
-      })
-      .catch((error) => {
-        console.error('[App] Database initialization failed:', error);
-        // Still set dbReady to true to allow app to load (will fail loudly if DB is needed)
+      } catch (error) {
+        console.error('[App] Initialization failed:', error);
+        // Still set dbReady to true to allow app to load
         setDbReady(true);
-      });
+      }
+    };
+
+    init();
   }, []);
 
   if (!fontsLoaded || !dbReady) {
@@ -65,18 +73,14 @@ export default function App() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <ThemeProvider>
-          <UserProvider>
-            <SubscriptionProvider>
-              <TemplateProvider>
-                <MascotProvider>
-                  <NavigationContainer>
-                    <StatusBar style="auto" />
-                    <OnboardingNavigator />
-                  </NavigationContainer>
-                </MascotProvider>
-              </TemplateProvider>
-            </SubscriptionProvider>
-          </UserProvider>
+          <SubscriptionProvider>
+            <MascotProvider>
+              <NavigationContainer>
+                <StatusBar style="auto" />
+                <OnboardingNavigator />
+              </NavigationContainer>
+            </MascotProvider>
+          </SubscriptionProvider>
         </ThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

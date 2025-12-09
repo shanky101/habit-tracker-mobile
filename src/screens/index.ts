@@ -24,6 +24,7 @@ export { default as TemplatesScreen } from './TemplatesScreen';
 export { default as TemplateDetailScreen } from './TemplateDetailScreen';
 export { default as CreateTemplateScreen } from './CreateTemplateScreen';
 export { default as StatDetailScreen } from './StatDetailScreen';
+export { default as CalendarHistoryScreen } from './CalendarHistoryScreen';
 export { default as SplashScreen } from './SplashScreen';
 export { default as OnboardingWelcomeScreen } from './OnboardingWelcomeScreen';
 export { default as OnboardingTrackScreen } from './OnboardingTrackScreen';
