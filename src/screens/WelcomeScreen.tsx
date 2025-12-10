@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 
 type WelcomeScreenNavigationProp = StackNavigationProp<any, 'Welcome'>;

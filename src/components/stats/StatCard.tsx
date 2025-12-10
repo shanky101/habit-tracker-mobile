@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 import { LucideIcon } from 'lucide-react-native';
 
 interface StatCardProps {

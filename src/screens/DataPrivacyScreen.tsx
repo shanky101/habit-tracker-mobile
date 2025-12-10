@@ -29,7 +29,7 @@ import {
   Trash2,
   ChevronRight,
 } from 'lucide-react-native';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 
 type DataPrivacyNavigationProp = StackNavigationProp<any, 'DataPrivacy'>;

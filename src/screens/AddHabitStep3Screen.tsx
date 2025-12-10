@@ -16,7 +16,7 @@ import * as Haptics from 'expo-haptics';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 import { CATEGORIES, COLORS } from '@/data/habitOptions';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 import { HabitTimePeriod } from '@/types/habit';

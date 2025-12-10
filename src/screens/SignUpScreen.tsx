@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 import { ArrowLeft } from 'lucide-react-native';
 
 type SignUpScreenNavigationProp = StackNavigationProp<any, 'SignUp'>;

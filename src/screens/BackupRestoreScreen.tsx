@@ -10,7 +10,7 @@ import {
   Platform,
   RefreshControl,
 } from 'react-native';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 import { BackupService, AutomaticBackup, BackupInfo } from '@/services/backup';
 import * as Haptics from 'expo-haptics';
 

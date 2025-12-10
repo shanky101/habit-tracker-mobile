@@ -22,7 +22,7 @@ import {
   FileText,
   Lock,
 } from 'lucide-react-native';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 import { useHabits } from '@/hooks/useHabits';
 import { ExportManager, ExportFormat as EMExportFormat } from '@/utils/exportManager';

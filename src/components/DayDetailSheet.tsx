@@ -8,7 +8,7 @@ import {
     ScrollView,
     Dimensions,
 } from 'react-native';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 import { useHabits } from '@/hooks/useHabits';
 import { useUserStore } from '@/store/userStore';
 import { X, CheckCircle2, Circle, Plane, Calendar } from 'lucide-react-native';

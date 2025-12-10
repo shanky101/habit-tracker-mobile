@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import * as Application from 'expo-application';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 import {
   ArrowLeft,

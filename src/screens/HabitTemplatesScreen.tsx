@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 import { useTemplates } from '@/hooks/useTemplates';
 import { HabitTemplate, HabitTemplateConfig } from '@/types/HabitTemplate';
 import { ArrowLeft, Search, X } from 'lucide-react-native';

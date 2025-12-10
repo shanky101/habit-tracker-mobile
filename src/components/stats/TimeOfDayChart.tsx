@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { BarChart } from 'react-native-gifted-charts';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 import { TimeOfDayData } from '@/utils/analyticsUtils';
 
 interface TimeOfDayChartProps {

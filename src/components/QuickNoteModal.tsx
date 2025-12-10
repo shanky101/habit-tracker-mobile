@@ -11,7 +11,7 @@ import {
   Dimensions,
   Animated,
 } from 'react-native';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 
 const { width } = Dimensions.get('window');
 

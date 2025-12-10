@@ -9,7 +9,7 @@ import {
   Dimensions,
   Modal,
 } from 'react-native';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 import { useMascot, MASCOT_NAME } from '@/context/MascotContext';
 import MascotRenderer from './MascotRenderer';
 

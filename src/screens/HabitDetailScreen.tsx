@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 import { useHabits, Habit, HabitEntry } from '@/hooks/useHabits';
 import { useUserStore } from '@/store/userStore';
 import { ExportManager, ExportFormat } from '@/utils/exportManager';

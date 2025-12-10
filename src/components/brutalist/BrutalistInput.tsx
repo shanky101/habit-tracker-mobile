@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TextInput, StyleSheet, ViewStyle, TextInputProps, View, Text } from 'react-native';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 
 interface BrutalistInputProps extends TextInputProps {
   label?: string;

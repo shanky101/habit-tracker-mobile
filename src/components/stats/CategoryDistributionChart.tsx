@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { PieChart } from 'react-native-gifted-charts';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 import { CategoryData } from '@/utils/analyticsUtils';
 
 interface CategoryDistributionChartProps {

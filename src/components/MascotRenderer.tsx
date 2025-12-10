@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image, Text, View, StyleSheet, ImageSourcePropType } from 'react-native';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 import { MascotMood } from '@/context/MascotContext';
 import MascotCharacter from './MascotCharacter';
 

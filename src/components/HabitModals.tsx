@@ -11,7 +11,7 @@ import {
   Platform,
   Share,
 } from 'react-native';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 
 // ============================================
 // STREAK BROKEN MODAL

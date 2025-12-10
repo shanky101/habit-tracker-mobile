@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
 import { Habit } from '@/hooks/useHabits';
 import PremiumHabitCard from './PremiumHabitCard';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 
 interface DraggableHabitListProps {
   habits: Habit[];

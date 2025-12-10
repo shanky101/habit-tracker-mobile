@@ -13,7 +13,7 @@ import {
 import * as Notifications from 'expo-notifications';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 import { OnboardingStackParamList } from '@/navigation/OnboardingNavigator';
 import { Bell, Target } from 'lucide-react-native';
 

@@ -10,7 +10,7 @@ import {
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 import { OnboardingStackParamList } from '@/navigation/OnboardingNavigator';
 import { Check } from 'lucide-react-native';
 

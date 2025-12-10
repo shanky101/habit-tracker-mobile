@@ -13,7 +13,7 @@ import {
   GestureUpdateEvent,
   PanGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 import { Habit, useHabits } from '@/hooks/useHabits';
 
 // Constants matching the design reference

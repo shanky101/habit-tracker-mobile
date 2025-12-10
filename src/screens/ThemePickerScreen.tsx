@@ -10,7 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import { useTheme, themes, themeMetadata, ThemeVariant } from '@/theme';
+import { useTheme, themes, themeMetadata, ThemeVariant } from '@app-core/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 import { ArrowLeft, Check, Moon } from 'lucide-react-native';
 

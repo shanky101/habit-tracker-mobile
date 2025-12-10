@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { format } from 'date-fns';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 import { useHabits } from '@/hooks/useHabits';
 import { useSubscription } from '@/context/SubscriptionContext';
 

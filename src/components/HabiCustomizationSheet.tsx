@@ -10,7 +10,7 @@ import {
     TouchableWithoutFeedback,
     Platform,
 } from 'react-native';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 import { useMascot, MASCOT_NAME } from '@/context/MascotContext';
 import MascotRenderer from './MascotRenderer';
 import { X, Check, Sparkles, Maximize2, Minimize2 } from 'lucide-react-native';

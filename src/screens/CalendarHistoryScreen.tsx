@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 import { useHabits } from '@/hooks/useHabits';
 import { useUserStore } from '@/store/userStore';
 import { LinearGradient } from 'expo-linear-gradient';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, StyleSheet, Pressable, ViewStyle, TextStyle } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 
 interface BrutalistButtonProps {
   onPress: () => void;

@@ -19,7 +19,7 @@ import {
     PanGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
 import { Check, X, Edit2, Trash2, Archive, Flame, Zap } from 'lucide-react-native';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 import { Habit, useHabits } from '@/hooks/useHabits';
 import { CATEGORIES } from '@/data/habitOptions';
 

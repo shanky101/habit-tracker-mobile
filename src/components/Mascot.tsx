@@ -8,7 +8,7 @@ import {
   Easing,
   Dimensions,
 } from 'react-native';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 import {
   useMascot,
   MASCOT_NAME,

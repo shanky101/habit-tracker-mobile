@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 import { HeatmapPoint } from '@/utils/analyticsUtils';
 import { format, parseISO } from 'date-fns';
 
