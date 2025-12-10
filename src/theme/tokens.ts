@@ -1,6 +1,6 @@
 // Design Tokens for all theme variants
 
-export type ThemeVariant = 'default' | 'dark' | 'zen' | 'neon' | 'retro' | 'minimalist' | 'brutalist' | 'retro-pacman';
+export type ThemeVariant = 'default' | 'dark' | 'zen' | 'neon' | 'retro' | 'minimalist' | 'brutalist' | 'retro-pacman' | 'royal' | 'royalBlue';
 
 export interface ColorTokens {
   primary: string;
@@ -204,8 +204,8 @@ const baseTypography: TypographyTokens = {
   lineHeightRelaxed: 1.6,  // Body Text
 };
 
-// Default Theme (Light, colorful)
-const defaultColors: ColorTokens = {
+// Royal Theme (Formerly Default - Purple)
+const royalColors: ColorTokens = {
   primary: '#6366f1',
   primaryDark: '#4f46e5',
   primaryLight: '#818cf8',
@@ -229,6 +229,35 @@ const defaultColors: ColorTokens = {
   border: '#e5e5e5',
   borderLight: '#f0f0f0',
   white: '#ffffff',
+  black: '#000000',
+};
+
+// New Default Theme (Airy, Professional, Colourful)
+// Sky Blue + Emerald + Slate
+const defaultColors: ColorTokens = {
+  primary: '#0EA5E9',        // Sky 500 - Professional, airy blue
+  primaryDark: '#0284C7',    // Sky 600
+  primaryLight: '#38BDF8',   // Sky 400
+  secondary: '#10B981',      // Emerald 500 - Fresh, growth
+  secondaryLight: '#34D399', // Emerald 400
+  accent1: '#F59E0B',        // Amber 500 - Warmth/Energy
+  accent2: '#6366F1',        // Indigo 500 - Depth
+  accent3: '#EC4899',        // Pink 500 - Playful
+  background: '#F8FAFC',     // Slate 50 - Airy, professional off-white
+  backgroundSecondary: '#F1F5F9', // Slate 100
+  surface: '#FFFFFF',        // Pure white
+  surfaceSecondary: '#F8FAFC', // Slate 50
+  text: '#0F172A',           // Slate 900 - Sharp, professional text
+  textSecondary: '#475569',  // Slate 600
+  textTertiary: '#94A3B8',   // Slate 400
+  success: '#10B981',
+  successLight: '#D1FAE5',
+  warning: '#F59E0B',
+  error: '#EF4444',
+  errorLight: '#FEE2E2',
+  border: '#E2E8F0',         // Slate 200
+  borderLight: '#F1F5F9',
+  white: '#FFFFFF',
   black: '#000000',
 };
 
@@ -513,18 +542,187 @@ const brutalistAnimation: AnimationTokens = {
   easingSmooth: 'cubic-bezier(0.34, 1.56, 0.64, 1)',       // Elastic
 };
 
+// ... (keep existing colors)
+
+// ... (keep existing colors)
+
+// 👑 ROYAL BLUE THEME (Formerly Liquid) 👑
+// Dark, sleek, "Liquid Glass" feel with vibrant gradients and glows
+const royalBlueColors: ColorTokens = {
+  primary: '#3B82F6',        // Electric Blue
+  primaryDark: '#2563EB',    // Deep Blue
+  primaryLight: '#60A5FA',   // Bright Blue
+  secondary: '#8B5CF6',      // Violet
+  secondaryLight: '#A78BFA', // Light Violet
+  accent1: '#F472B6',        // Pink Glow
+  accent2: '#2DD4BF',        // Teal Glow
+  accent3: '#FBBF24',        // Amber Glow
+  background: '#0F172A',     // Deep Slate (Almost Black)
+  backgroundSecondary: '#1E293B', // Slate 800 (Card Background)
+  surface: '#1E293B',        // Slate 800
+  surfaceSecondary: '#334155', // Slate 700
+  text: '#F8FAFC',           // White text
+  textSecondary: '#94A3B8',  // Slate 400
+  textTertiary: '#64748B',   // Slate 500
+  success: '#34D399',        // Emerald 400
+  successLight: 'rgba(52, 211, 153, 0.2)',
+  warning: '#FBBF24',
+  error: '#F87171',
+  errorLight: 'rgba(248, 113, 113, 0.2)',
+  border: '#334155',         // Slate 700
+  borderLight: '#475569',
+  white: '#FFFFFF',
+  black: '#000000',
+};
+
+// Royal Blue Radius
+const royalBlueRadius: RadiusTokens = {
+  radiusXS: 8,
+  radiusSM: 12,
+  radiusMD: 20,
+  radiusLG: 24,
+  radiusXL: 32,
+  radius2XL: 40,
+  radiusFull: 9999,
+};
+
+// Royal Blue Shadows
+const royalBlueShadows: ShadowTokens = {
+  shadowSM: {
+    shadowColor: '#3B82F6',  // Blue glow
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  shadowMD: {
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  shadowLG: {
+    shadowColor: '#8B5CF6',  // Violet glow for larger elements
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  shadowXL: {
+    shadowColor: '#F472B6',  // Pink glow for modals/hero
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.35,
+    shadowRadius: 24,
+    elevation: 12,
+  },
+};
+
+// 🚀 GO CLUB REVAMP (New Default) 🚀
+// Based on "Go Club Step Counter" Design Spec
+const goClubColors: ColorTokens = {
+  primary: '#1E1EFF',        // Electric Ultramarine (Main Background Start)
+  primaryDark: '#0000E0',    // Electric Ultramarine (Main Background End)
+  primaryLight: '#5C5CFF',   // Soft Blue (Inactive Elements)
+  secondary: '#FFFF00',      // Neon Lemon (Highlights/Yellow Cards)
+  secondaryLight: '#FAFF00', // Neon Lemon Alt
+  accent1: '#FFFFFF',        // Pure White (Text/Active)
+  accent2: '#000000',        // Pitch Black (Text on Light Cards)
+  accent3: 'rgba(255, 255, 255, 0.2)', // Glass White Overlay
+  background: '#1E1EFF',     // Fallback background (Gradient handled in wrapper)
+  backgroundSecondary: 'rgba(255, 255, 255, 0.20)', // Glass Card - balanced opacity
+  surface: 'rgba(255, 255, 255, 0.25)',        // Glass Surface - balanced opacity  
+  surfaceSecondary: 'rgba(255, 255, 255, 0.12)', // Faint Glass
+  text: '#FFFFFF',           // White Text
+  textSecondary: 'rgba(255, 255, 255, 0.9)',  // Improved contrast (was 0.7)
+  textTertiary: 'rgba(255, 255, 255, 0.75)',   // Improved contrast (was 0.5)
+  success: '#FFFF00',        // Neon Lemon for success/completion
+  successLight: 'rgba(255, 255, 0, 0.2)',
+  warning: '#FF9F0A',
+  error: '#FF453A',
+  errorLight: 'rgba(255, 69, 58, 0.2)',
+  border: 'rgba(255, 255, 255, 0.3)',         // Glass Border
+  borderLight: 'rgba(255, 255, 255, 0.15)',   // Slightly more visible
+  white: '#FFFFFF',
+  black: '#000000',
+};
+
+// Go Club Radius - Rounded geometric shapes
+const goClubRadius: RadiusTokens = {
+  radiusXS: 8,
+  radiusSM: 16,
+  radiusMD: 24,
+  radiusLG: 32,
+  radiusXL: 40,
+  radius2XL: 48,
+  radiusFull: 9999, // Pill shape
+};
+
+// Go Club Shadows - Glassmorphism glows
+const goClubShadows: ShadowTokens = {
+  shadowSM: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  shadowMD: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  shadowLG: {
+    shadowColor: '#1E1EFF', // Blue glow
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 24,
+    elevation: 8,
+  },
+  shadowXL: {
+    shadowColor: '#FFFF00',  // Neon Lemon Glow for hero elements
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.4,
+    shadowRadius: 32,
+    elevation: 12,
+  },
+};
+
 // Theme exports
 export const themes: Record<ThemeVariant, ThemeTokens> = {
   default: {
-    name: 'Default',
+    name: 'Electric Blue', // New Default
     isPremium: false,
-    colors: defaultColors,
+    colors: goClubColors,
+    typography: baseTypography,
+    spacing: baseSpacing,
+    radius: goClubRadius,
+    shadows: goClubShadows,
+    animation: baseAnimation,
+  },
+  royalBlue: {
+    name: 'Royal Blue', // Formerly Liquid
+    isPremium: false,
+    colors: royalBlueColors,
+    typography: baseTypography,
+    spacing: baseSpacing,
+    radius: royalBlueRadius,
+    shadows: royalBlueShadows,
+    animation: baseAnimation,
+  },
+  royal: {
+    name: 'Royal Purple',
+    isPremium: false,
+    colors: royalColors,
     typography: baseTypography,
     spacing: baseSpacing,
     radius: baseRadius,
     shadows: baseShadows,
     animation: baseAnimation,
   },
+  // ... (keep other themes)
   dark: {
     name: 'Dark Mode',
     isPremium: false,
@@ -620,7 +818,15 @@ export const themes: Record<ThemeVariant, ThemeTokens> = {
 // Theme metadata for UI display
 export const themeMetadata: Record<ThemeVariant, { description: string; previewColors: string[] }> = {
   default: {
-    description: 'Bright and modern with purple accents',
+    description: 'Electric Blue & Neon Lemon',
+    previewColors: ['#1E1EFF', '#FFFF00', '#FFFFFF', '#000000'],
+  },
+  royalBlue: {
+    description: 'Sleek, dark, liquid glass aesthetic',
+    previewColors: ['#3B82F6', '#0F172A', '#1E293B', '#F472B6'],
+  },
+  royal: {
+    description: 'Classic purple elegance',
     previewColors: ['#6366f1', '#8b5cf6', '#fafafa', '#22c55e'],
   },
   dark: {

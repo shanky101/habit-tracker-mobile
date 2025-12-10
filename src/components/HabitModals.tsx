@@ -75,7 +75,7 @@ export const StreakBrokenModal: React.FC<StreakBrokenModalProps> = ({
       <Animated.View
         style={[
           styles.modalOverlay,
-          { backgroundColor: 'rgba(0,0,0,0.6)', opacity: fadeAnim },
+          { backgroundColor: 'rgba(0,0,0,0.85)', opacity: fadeAnim },
         ]}
       >
         <Animated.View
@@ -270,7 +270,7 @@ export const AllHabitsCompleteModal: React.FC<AllHabitsCompleteModalProps> = ({
       <Animated.View
         style={[
           styles.modalOverlay,
-          { backgroundColor: 'rgba(0,0,0,0.6)', opacity: fadeAnim },
+          { backgroundColor: 'rgba(0,0,0,0.85)', opacity: fadeAnim },
         ]}
       >
         <Animated.View
@@ -505,7 +505,7 @@ export const QuickNoteModal: React.FC<QuickNoteModalProps> = ({
           style={[
             styles.modalOverlay,
             {
-              backgroundColor: 'rgba(0,0,0,0.4)',
+              backgroundColor: 'rgba(0,0,0,0.85)',
               opacity: fadeAnim,
               padding: 0, // Remove padding to allow full width
               justifyContent: 'flex-end', // Align to bottom
@@ -753,7 +753,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
       <Animated.View
         style={[
           styles.dialogOverlay,
-          { backgroundColor: 'rgba(0,0,0,0.5)', opacity: fadeAnim },
+          { backgroundColor: 'rgba(0,0,0,0.85)', opacity: fadeAnim },
         ]}
       >
         <Animated.View

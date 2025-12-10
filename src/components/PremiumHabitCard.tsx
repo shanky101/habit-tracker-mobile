@@ -159,10 +159,11 @@ const PremiumHabitCard: React.FC<PremiumHabitCardProps> = ({
             return ['#FFFFFF', '#F9FAFB']; // White/Gray
         }
         if (isCompleted) {
-            // Sophisticated gradient for completed state
-            return [theme.colors.surface, theme.colors.surfaceSecondary];
+            // Solid gradient for completed state - subtle but opaque
+            return ['#5B21B6', '#7C3AED']; // Purple gradient
         }
-        return [theme.colors.surface, theme.colors.surface];
+        // Default state - SOLID vibrant gradient like Templates
+        return ['#4F46E5', '#6366F1']; // Indigo gradient - NO TRANSPARENCY
     };
 
     const CategoryIcon = CATEGORIES.find(c => c.id === habit.category)?.icon;

@@ -19,6 +19,8 @@ interface HabitState {
   // Completion actions
   completeHabit: (id: string, date: string, entry?: { mood?: string; note?: string }) => void;
   uncompleteHabit: (id: string, date: string) => void;
+  addProgress: (id: string, date: string, amount: number) => void;
+  removeProgress: (id: string, date: string, amount: number) => void;
   resetHabitForDate: (id: string, date: string) => void;
   addNoteToCompletion: (id: string, date: string, entry: { mood?: string; note?: string }) => void;
 
@@ -84,6 +86,13 @@ export const useHabitStore = create<HabitState>()(
 
       // Completion operations
       completeHabit: (id, date, entry) => {
+        get().addProgress(id, date, 1);
+        // Add entry if provided (handled separately or we can merge logic later, 
+        // but for now reusing addProgress for the count increment is cleaner, 
+        // though addProgress doesn't take entry. So keeping original logic or refactoring.)
+        // Actually, let's keep completeHabit as is for backward compatibility and simple habits,
+        // and implement addProgress separately.
+
         set((state) => ({
           habits: state.habits.map((habit) => {
             if (habit.id !== id) return habit;
@@ -153,7 +162,9 @@ export const useHabitStore = create<HabitState>()(
         const habit = get().habits.find(h => h.id === id);
         if (habit) {
           const completion = habit.completions[date];
-          const currentStreak = calculateStreak(habit); // Helper needed or simplified logic
+          // Recalculate streak after update
+          const updatedHabit = get().habits.find(h => h.id === id);
+          const currentStreak = updatedHabit ? calculateStreak(updatedHabit) : 0;
 
           // Calculate total completions across all habits
           const allHabits = get().habits;
@@ -167,7 +178,6 @@ export const useHabitStore = create<HabitState>()(
             timestamp: Date.now(),
             category: habit.category,
             habitId: id,
-            // Add other context as needed
           });
         }
       },
@@ -210,6 +220,74 @@ export const useHabitStore = create<HabitState>()(
             }
           }),
         })),
+
+      addProgress: (id, date, amount) => {
+        set((state) => ({
+          habits: state.habits.map((habit) => {
+            if (habit.id !== id) return habit;
+
+            const now = Date.now();
+            const existingCompletion = habit.completions[date];
+
+            if (existingCompletion) {
+              return {
+                ...habit,
+                completions: {
+                  ...habit.completions,
+                  [date]: {
+                    ...existingCompletion,
+                    completionCount: existingCompletion.completionCount + amount,
+                    timestamps: [...existingCompletion.timestamps, now],
+                  },
+                },
+              };
+            } else {
+              return {
+                ...habit,
+                completions: {
+                  ...habit.completions,
+                  [date]: {
+                    date,
+                    completionCount: amount,
+                    targetCount: habit.targetCompletionsPerDay,
+                    timestamps: [now],
+                    entries: [],
+                  },
+                },
+              };
+            }
+          }),
+        }));
+      },
+
+      removeProgress: (id, date, amount) => {
+        set((state) => ({
+          habits: state.habits.map((habit) => {
+            if (habit.id !== id) return habit;
+
+            const existingCompletion = habit.completions[date];
+            if (!existingCompletion) return habit;
+
+            const newCount = Math.max(0, existingCompletion.completionCount - amount);
+
+            if (newCount === 0) {
+              const { [date]: removed, ...remainingCompletions } = habit.completions;
+              return { ...habit, completions: remainingCompletions };
+            }
+
+            return {
+              ...habit,
+              completions: {
+                ...habit.completions,
+                [date]: {
+                  ...existingCompletion,
+                  completionCount: newCount,
+                },
+              },
+            };
+          }),
+        }));
+      },
 
       resetHabitForDate: (id, date) =>
         set((state) => ({

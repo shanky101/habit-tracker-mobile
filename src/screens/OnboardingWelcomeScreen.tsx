@@ -1,20 +1,21 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  Animated,
   Dimensions,
+  Platform,
 } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
 import { OnboardingStackParamList } from '@/navigation/OnboardingNavigator';
-import { Check } from 'lucide-react-native';
+import { BlurView } from 'expo-blur';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Footprints, Apple, Chrome } from 'lucide-react-native';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 type OnboardingWelcomeScreenNavigationProp = StackNavigationProp<
   OnboardingStackParamList,
@@ -25,168 +26,48 @@ const OnboardingWelcomeScreen: React.FC = () => {
   const navigation = useNavigation<OnboardingWelcomeScreenNavigationProp>();
   const { theme } = useTheme();
 
-  const handleNext = () => navigation.navigate('OnboardingTrack');
-  const handleSkip = () => navigation.navigate('PermissionNotification');
-  const slideAnim = useRef(new Animated.Value(50)).current;
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [slideAnim, fadeAnim]);
-
-  // Swipe gesture handler
-  const panGesture = Gesture.Pan()
-    .activeOffsetX([-50, 50])
-    .failOffsetY([-20, 20]) // Allow vertical scrolling
-    .onEnd((event) => {
-      const { translationX } = event;
-      // Swipe left to go to next screen
-      if (translationX < -50) {
-        handleNext();
-      }
-    });
+  const handleContinue = () => navigation.navigate('OnboardingTrack');
 
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: theme.colors.background },
-      ]}
-    >
-      {/* Skip Button */}
-      <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
-        <Text
-          style={[
-            styles.skipText,
-            {
-              color: theme.colors.textSecondary,
-              fontFamily: theme.typography.fontFamilyBodyMedium,
-            },
-          ]}
-        >
-          Skip
+    <View style={styles.container}>
+      {/* Massive Header Typography */}
+      <SafeAreaView style={styles.headerContainer}>
+        <Text style={[styles.massiveText, { color: theme.colors.white }]}>
+          every
         </Text>
-      </TouchableOpacity>
+        <Text style={[styles.massiveText, { color: theme.colors.secondary }]}>
+          step
+        </Text>
+        <Text style={[styles.massiveText, { color: theme.colors.white }]}>
+          counts
+        </Text>
+      </SafeAreaView>
 
-      <GestureDetector gesture={panGesture}>
-        <Animated.View
-          style={[
-            styles.content,
-            {
-              opacity: fadeAnim,
-              transform: [{ translateY: slideAnim }],
-            },
-          ]}
-        >
-        {/* Hero Illustration */}
-        <View
-          style={[
-            styles.illustrationContainer,
-            {
-              backgroundColor: theme.colors.primaryLight,
-            },
-          ]}
-        >
-          <View
-            style={[
-              styles.illustrationCircle,
-              {
-                backgroundColor: theme.colors.primary,
-              },
-            ]}
-          >
-            <Check size={80} color="white" strokeWidth={3} />
-          </View>
-        </View>
+      {/* 3D Runner Illustration Placeholder */}
+      <View style={styles.illustrationContainer}>
+        {/* Placeholder for 3D Runner - Using a large icon for now */}
+        <Footprints size={200} color={theme.colors.white} opacity={0.2} />
+      </View>
 
-        {/* Text Content */}
-        <View style={styles.textContent}>
-          <Text
-            style={[
-              styles.headline,
-              {
-                color: theme.colors.text,
-                fontFamily: theme.typography.fontFamilyDisplayBold,
-              },
-            ]}
-          >
-            Build Habits That Stick
+      {/* Glassmorphic Bottom Sheet */}
+      <BlurView
+        intensity={30}
+        tint="light"
+        style={styles.glassSheet}
+      >
+        <View style={styles.sheetContent}>
+          <Text style={[styles.sheetTitle, { color: theme.colors.black }]}>
+            Start your journey today
           </Text>
 
-          <Text
-            style={[
-              styles.subheading,
-              {
-                color: theme.colors.textSecondary,
-                fontFamily: theme.typography.fontFamilyBody,
-                lineHeight: theme.typography.lineHeightRelaxed * theme.typography.fontSizeLG,
-              },
-            ]}
+          <TouchableOpacity
+            style={[styles.socialButton, { backgroundColor: theme.colors.primary }]}
+            onPress={handleContinue}
           >
-            Track your daily habits, build streaks, and transform your life one
-            day at a time
-          </Text>
+            <Text style={[styles.socialButtonText, { color: theme.colors.white }]}>Get Started</Text>
+          </TouchableOpacity>
         </View>
-
-        {/* Pagination Dots */}
-        <View style={styles.pagination}>
-          <View
-            style={[
-              styles.dot,
-              styles.dotActive,
-              { backgroundColor: theme.colors.primary },
-            ]}
-          />
-          <View
-            style={[
-              styles.dot,
-              { backgroundColor: theme.colors.border },
-            ]}
-          />
-          <View
-            style={[
-              styles.dot,
-              { backgroundColor: theme.colors.border },
-            ]}
-          />
-        </View>
-
-        {/* Get Started Button */}
-        <TouchableOpacity
-          style={[
-            styles.primaryButton,
-            {
-              backgroundColor: theme.colors.primary,
-            },
-          ]}
-          onPress={handleNext}
-          activeOpacity={0.8}
-        >
-          <Text
-            style={[
-              styles.primaryButtonText,
-              {
-                color: theme.colors.white,
-                fontFamily: theme.typography.fontFamilyBodySemibold,
-              },
-            ]}
-          >
-            Get Started
-          </Text>
-        </TouchableOpacity>
-        </Animated.View>
-      </GestureDetector>
+      </BlurView>
     </View>
   );
 };
@@ -194,79 +75,83 @@ const OnboardingWelcomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: 'transparent',
+    // Background is handled by BackgroundWrapper in App.tsx
   },
-  skipButton: {
-    position: 'absolute',
-    top: 60,
-    right: 20,
-    zIndex: 10,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-  },
-  skipText: {
-    fontSize: 16,
-  },
-  content: {
-    flex: 1,
+  headerContainer: {
     paddingHorizontal: 24,
-    paddingTop: 120,
-    paddingBottom: 60,
-    justifyContent: 'space-between',
+    paddingTop: 20,
+  },
+  massiveText: {
+    fontSize: 80,
+    fontFamily: 'Outfit_700Bold',
+    lineHeight: 80,
+    letterSpacing: -2,
+    textTransform: 'lowercase',
   },
   illustrationContainer: {
-    width: width - 80,
-    height: width - 80,
-    alignSelf: 'center',
-    borderRadius: (width - 80) / 2,
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    opacity: 0.15,
+    marginTop: -50, // Pull up slightly into the text space
   },
-  illustrationCircle: {
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    justifyContent: 'center',
-    alignItems: 'center',
+  glassSheet: {
+    position: 'absolute',
+    bottom: 40,
+    left: 20,
+    right: 20,
+    borderRadius: 32,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
-  textContent: {
-    alignItems: 'center',
+  sheetContent: {
+    padding: 24,
+    backgroundColor: 'rgba(255, 255, 255, 0.7)', // Fallback / Overlay color
   },
-  headline: {
-    fontSize: 32,
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  subheading: {
+  sheetTitle: {
     fontSize: 18,
+    fontFamily: 'PlusJakartaSans_600SemiBold',
     textAlign: 'center',
-    paddingHorizontal: 20,
+    marginBottom: 24,
+    lineHeight: 24,
   },
-  pagination: {
+  actionButtons: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-around',
+    marginBottom: 24,
+  },
+  textButton: {
+    padding: 10,
+  },
+  textButtonLabel: {
+    fontSize: 17,
+    color: '#007AFF', // System blue
+  },
+  separator: {
+    height: 1,
+    backgroundColor: 'rgba(0,0,0,0.1)',
+    marginBottom: 24,
+  },
+  socialButton: {
+    flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  dotActive: {
-    width: 24,
-    height: 8,
-    borderRadius: 4,
-  },
-  primaryButton: {
-    paddingVertical: 18,
-    paddingHorizontal: 32,
-    borderRadius: 16,
-    alignItems: 'center',
     justifyContent: 'center',
+    paddingVertical: 16,
+    borderRadius: 30, // Pill shape
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  primaryButtonText: {
-    fontSize: 18,
+  socialIcon: {
+    marginRight: 12,
+  },
+  socialButtonText: {
+    fontSize: 16,
+    fontFamily: 'PlusJakartaSans_600SemiBold',
+    color: '#000',
   },
 });
 

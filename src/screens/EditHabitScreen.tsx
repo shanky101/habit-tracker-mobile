@@ -17,8 +17,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@/theme';
-import { useHabits } from '@/hooks/useHabits';
-import { CATEGORIES, COLORS } from './AddHabitStep2Screen';
+import { useHabits, Habit } from '@/hooks/useHabits';
+import { CATEGORIES, COLORS } from '@/data/habitOptions';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 
 type EditHabitScreenNavigationProp = StackNavigationProp<any, 'EditHabit'>;
@@ -117,7 +117,7 @@ const EditHabitScreen: React.FC = () => {
       targetCompletionsPerDay,
       selectedDays: frequency === 'daily' ? [0, 1, 2, 3, 4, 5, 6] : selectedDays,
       reminderEnabled,
-      reminderTime: reminderEnabled ? reminderTime : null,
+      reminderTime: reminderEnabled ? reminderTime : undefined,
       notes: notes.trim() || undefined,
     };
 
@@ -350,7 +350,9 @@ const EditHabitScreen: React.FC = () => {
                   onPress={() => setSelectedCategory(category.id)}
                   activeOpacity={0.7}
                 >
-                  <Text style={styles.categoryIcon}>{category.icon}</Text>
+                  <View style={styles.categoryIconContainer}>
+                    <category.icon size={24} color={selectedCategory === category.id ? theme.colors.primary : theme.colors.textSecondary} />
+                  </View>
                   <Text
                     style={[
                       styles.categoryLabel,
@@ -921,11 +923,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 12,
   },
-  categoryIcon: {
-    fontSize: 32,
-    marginBottom: 8,
+  categoryIconContainer: {
+    marginBottom: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   categoryLabel: {
+    fontSize: 12,
     textAlign: 'center',
   },
   colorGrid: {
@@ -1100,6 +1104,15 @@ const styles = StyleSheet.create({
   targetCountHelper: {
     textAlign: 'center',
     fontSize: 14,
+  },
+  categoryIconContainer: {
+    marginBottom: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  categoryLabel: {
+    fontSize: 12,
+    textAlign: 'center',
   },
 });
 

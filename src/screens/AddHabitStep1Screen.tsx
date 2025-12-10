@@ -18,20 +18,36 @@ import { useTheme } from '@/theme';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { ArrowRight, Sparkles, TrendingUp, TrendingDown } from 'lucide-react-native';
+import {
+  ArrowRight,
+  Sparkles,
+  TrendingUp,
+  TrendingDown,
+  Heart,
+  Activity,
+  Zap,
+  Brain,
+  Users,
+  DollarSign,
+  Palette,
+  Star,
+  Check
+} from 'lucide-react-native';
 
 type AddHabitStep1ScreenNavigationProp = StackNavigationProp<any, 'AddHabitStep1'>;
 
-const HABIT_SUGGESTIONS = [
-  'Drink Water 💧',
-  'Read Books 📚',
-  'Meditate 🧘',
-  'Exercise 💪',
-  'Journal ✍️',
-  'Walk 🚶',
-];
-
 const { width } = Dimensions.get('window');
+
+const CATEGORIES = [
+  { id: 'health', name: 'Health', icon: Heart, color: '#EF4444' },
+  { id: 'fitness', name: 'Fitness', icon: Activity, color: '#22C55E' },
+  { id: 'productivity', name: 'Productivity', icon: Zap, color: '#3B82F6' },
+  { id: 'mindfulness', name: 'Mindfulness', icon: Brain, color: '#A855F7' },
+  { id: 'social', name: 'Social', icon: Users, color: '#EC4899' },
+  { id: 'finance', name: 'Finance', icon: DollarSign, color: '#10B981' },
+  { id: 'creativity', name: 'Creativity', icon: Palette, color: '#F97316' },
+  { id: 'other', name: 'Other', icon: Star, color: '#64748B' },
+];
 
 const AddHabitStep1Screen: React.FC = () => {
   const navigation = useNavigation<AddHabitStep1ScreenNavigationProp>();
@@ -39,12 +55,12 @@ const AddHabitStep1Screen: React.FC = () => {
 
   const [habitName, setHabitName] = useState('');
   const [habitType, setHabitType] = useState<'positive' | 'negative'>('positive');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [error, setError] = useState('');
 
   // Animations
   const { fadeAnim, slideAnim } = useScreenAnimation();
-  const typeScale = useRef(new Animated.Value(1)).current;
-  const inputScale = useRef(new Animated.Value(1)).current;
+  const categoryScale = useRef(new Animated.Value(1)).current;
 
   const handleNext = () => {
     if (!habitName.trim()) {
@@ -57,27 +73,23 @@ const AddHabitStep1Screen: React.FC = () => {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       return;
     }
+    if (!selectedCategory) {
+      setError('Please select a category');
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      return;
+    }
 
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    navigation.navigate('AddHabitStep2', { habitName: habitName.trim(), habitType });
+    navigation.navigate('AddHabitStep2', {
+      habitName: habitName.trim(),
+      habitType,
+      category: selectedCategory
+    });
   };
 
-  const handleTypeSelect = (type: 'positive' | 'negative') => {
-    if (type !== habitType) {
-      Haptics.selectionAsync();
-      setHabitType(type);
-
-      // Bounce animation
-      Animated.sequence([
-        Animated.timing(typeScale, { toValue: 0.95, duration: 100, useNativeDriver: true }),
-        Animated.spring(typeScale, { toValue: 1, friction: 4, useNativeDriver: true }),
-      ]).start();
-    }
-  };
-
-  const handleSuggestionTap = (suggestion: string) => {
+  const handleCategorySelect = (id: string) => {
     Haptics.selectionAsync();
-    setHabitName(suggestion);
+    setSelectedCategory(id);
     setError('');
   };
 
@@ -116,143 +128,134 @@ const AddHabitStep1Screen: React.FC = () => {
             {/* Main Title */}
             <View style={styles.titleContainer}>
               <Text style={[styles.title, { color: theme.colors.text }]}>
-                The Spark ✨
+                What's your focus?
               </Text>
               <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
-                What habit do you want to {habitType === 'positive' ? 'build' : 'break'}?
+                Choose a category to start your journey.
               </Text>
             </View>
 
-            {/* Type Selector Cards */}
-            <Animated.View style={[styles.typeContainer, { transform: [{ scale: typeScale }] }]}>
-              <TouchableOpacity
-                style={[
-                  styles.typeCard,
-                  habitType === 'positive' && styles.selectedTypeCard,
-                  { borderColor: habitType === 'positive' ? theme.colors.primary : theme.colors.border }
-                ]}
-                onPress={() => handleTypeSelect('positive')}
-                activeOpacity={0.9}
-              >
-                <LinearGradient
-                  colors={habitType === 'positive' ? [theme.colors.primary + '20', theme.colors.primary + '05'] : ['transparent', 'transparent']}
-                  style={styles.typeGradient}
-                >
-                  <View style={[styles.typeIcon, { backgroundColor: habitType === 'positive' ? theme.colors.primary : theme.colors.backgroundSecondary }]}>
-                    <TrendingUp color={habitType === 'positive' ? '#FFF' : theme.colors.textSecondary} size={24} />
-                  </View>
-                  <Text style={[styles.typeTitle, { color: theme.colors.text }]}>Build</Text>
-                  <Text style={[styles.typeDesc, { color: theme.colors.textSecondary }]}>Start something new</Text>
-                </LinearGradient>
-              </TouchableOpacity>
+            {/* Category Grid */}
+            <View style={styles.gridContainer}>
+              {CATEGORIES.map((cat) => {
+                const isSelected = selectedCategory === cat.id;
+                const Icon = cat.icon;
 
-              <TouchableOpacity
-                style={[
-                  styles.typeCard,
-                  habitType === 'negative' && styles.selectedTypeCard,
-                  { borderColor: habitType === 'negative' ? theme.colors.error : theme.colors.border }
-                ]}
-                onPress={() => handleTypeSelect('negative')}
-                activeOpacity={0.9}
-              >
-                <LinearGradient
-                  colors={habitType === 'negative' ? [theme.colors.error + '20', theme.colors.error + '05'] : ['transparent', 'transparent']}
-                  style={styles.typeGradient}
-                >
-                  <View style={[styles.typeIcon, { backgroundColor: habitType === 'negative' ? theme.colors.error : theme.colors.backgroundSecondary }]}>
-                    <TrendingDown color={habitType === 'negative' ? '#FFF' : theme.colors.textSecondary} size={24} />
-                  </View>
-                  <Text style={[styles.typeTitle, { color: theme.colors.text }]}>Quit</Text>
-                  <Text style={[styles.typeDesc, { color: theme.colors.textSecondary }]}>Stop a bad habit</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </Animated.View>
+                return (
+                  <TouchableOpacity
+                    key={cat.id}
+                    style={[
+                      styles.gridCard,
+                      {
+                        backgroundColor: isSelected ? cat.color + '20' : theme.colors.surface,
+                        borderColor: isSelected ? cat.color : 'transparent',
+                        borderWidth: 2,
+                      }
+                    ]}
+                    onPress={() => handleCategorySelect(cat.id)}
+                    activeOpacity={0.8}
+                  >
+                    <View style={[
+                      styles.iconCircle,
+                      { backgroundColor: isSelected ? cat.color : theme.colors.backgroundSecondary }
+                    ]}>
+                      <Icon size={24} color={isSelected ? '#FFF' : theme.colors.textSecondary} />
+                    </View>
+                    <Text style={[
+                      styles.cardLabel,
+                      { color: isSelected ? theme.colors.text : theme.colors.textSecondary, fontWeight: isSelected ? '700' : '500' }
+                    ]}>
+                      {cat.name}
+                    </Text>
+                    {isSelected && (
+                      <View style={[styles.checkBadge, { backgroundColor: cat.color }]}>
+                        <Check size={12} color="#FFF" strokeWidth={3} />
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
 
-            {/* Massive Input */}
-            <Animated.View style={[styles.inputContainer, { transform: [{ scale: inputScale }] }]}>
+            {/* Habit Name Input */}
+            <View style={styles.inputSection}>
+              <Text style={[styles.inputLabel, { color: theme.colors.textSecondary }]}>NAME YOUR HABIT</Text>
               <TextInput
                 style={[
-                  styles.massiveInput,
-                  { color: theme.colors.text }
+                  styles.input,
+                  {
+                    color: theme.colors.text,
+                    backgroundColor: theme.colors.surface,
+                    borderColor: error && !habitName ? theme.colors.error : 'transparent'
+                  }
                 ]}
-                placeholder={habitType === 'positive' ? "e.g. Morning Run" : "e.g. Sugar"}
+                placeholder="e.g. Morning Run"
                 placeholderTextColor={theme.colors.textSecondary + '80'}
                 value={habitName}
                 onChangeText={(text) => {
                   setHabitName(text);
                   if (error) setError('');
                 }}
-                autoFocus
                 maxLength={40}
               />
-              {error ? (
-                <Text style={[styles.errorText, { color: theme.colors.error }]}>{error}</Text>
-              ) : null}
-            </Animated.View>
-
-            {/* Floating Suggestions */}
-            <View style={styles.suggestionsContainer}>
-              <Text style={[styles.suggestionsLabel, { color: theme.colors.textSecondary }]}>
-                Need inspiration?
-              </Text>
-              <View style={styles.bubblesGrid}>
-                {HABIT_SUGGESTIONS.map((suggestion, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={[styles.bubble, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
-                    onPress={() => handleSuggestionTap(suggestion)}
-                  >
-                    <Text style={[styles.bubbleText, { color: theme.colors.text }]}>{suggestion}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
             </View>
 
-            {/* Browse Templates Link - Prominent Card */}
-            <TouchableOpacity
-              style={styles.templateCard}
-              onPress={() => navigation.navigate('HabitTemplates')}
-              activeOpacity={0.8}
-            >
-              <LinearGradient
-                colors={[theme.colors.primary + '15', theme.colors.primary + '05']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.templateGradient}
+            {/* Type Toggle (Small) */}
+            <View style={styles.toggleContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.toggleOption,
+                  habitType === 'positive' && { backgroundColor: theme.colors.primary + '20' }
+                ]}
+                onPress={() => setHabitType('positive')}
               >
-                <View style={[styles.templateIcon, { backgroundColor: theme.colors.primary + '20' }]}>
-                  <Sparkles size={20} color={theme.colors.primary} />
-                </View>
-                <View style={styles.templateInfo}>
-                  <Text style={[styles.templateTitle, { color: theme.colors.text }]}>
-                    Browse Curated Templates
-                  </Text>
-                  <Text style={[styles.templateSubtitle, { color: theme.colors.textSecondary }]}>
-                    Discover popular habits to build or break
-                  </Text>
-                </View>
-                <ArrowRight size={16} color={theme.colors.primary} />
-              </LinearGradient>
-            </TouchableOpacity>
+                <TrendingUp size={16} color={habitType === 'positive' ? theme.colors.primary : theme.colors.textSecondary} />
+                <Text style={[
+                  styles.toggleText,
+                  { color: habitType === 'positive' ? theme.colors.primary : theme.colors.textSecondary }
+                ]}>Build</Text>
+              </TouchableOpacity>
+
+              <View style={{ width: 1, height: 20, backgroundColor: theme.colors.border }} />
+
+              <TouchableOpacity
+                style={[
+                  styles.toggleOption,
+                  habitType === 'negative' && { backgroundColor: theme.colors.error + '20' }
+                ]}
+                onPress={() => setHabitType('negative')}
+              >
+                <TrendingDown size={16} color={habitType === 'negative' ? theme.colors.error : theme.colors.textSecondary} />
+                <Text style={[
+                  styles.toggleText,
+                  { color: habitType === 'negative' ? theme.colors.error : theme.colors.textSecondary }
+                ]}>Quit</Text>
+              </TouchableOpacity>
+            </View>
+
+            {error ? (
+              <Text style={[styles.errorText, { color: theme.colors.error }]}>{error}</Text>
+            ) : null}
 
           </Animated.View>
         </ScrollView>
 
         {/* Floating Next Button */}
-        <View style={[styles.footer, { backgroundColor: theme.colors.background }]}>
+        <View style={[styles.footer, { backgroundColor: 'transparent' }]}>
           <TouchableOpacity
             style={[
               styles.nextButton,
               {
-                backgroundColor: habitName.trim().length >= 3 ? theme.colors.primary : theme.colors.border,
-                opacity: habitName.trim().length >= 3 ? 1 : 0.5,
+                backgroundColor: theme.colors.primary,
+                opacity: (habitName.trim().length >= 3 && selectedCategory) ? 1 : 0.5,
+                shadowColor: theme.colors.primary,
               }
             ]}
             onPress={handleNext}
-            disabled={habitName.trim().length < 3}
+            disabled={habitName.trim().length < 3 || !selectedCategory}
           >
             <Text style={styles.nextButtonText}>Continue</Text>
-            <ArrowRight color="#FFF" size={18} />
+            <ArrowRight color="#FFF" size={20} />
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -275,7 +278,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 32,
   },
   closeButton: {
     padding: 8,
@@ -283,6 +286,7 @@ const styles = StyleSheet.create({
   closeText: {
     fontSize: 16,
     fontWeight: '500',
+    fontFamily: 'Outfit_500Medium',
   },
   stepIndicator: {
     flexDirection: 'row',
@@ -298,157 +302,116 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontWeight: '800',
+    fontFamily: 'Outfit_700Bold',
     marginBottom: 8,
-    letterSpacing: -0.5,
+    letterSpacing: -1,
   },
   subtitle: {
     fontSize: 16,
+    fontFamily: 'Outfit_400Regular',
     lineHeight: 24,
   },
-  typeContainer: {
+  gridContainer: {
     flexDirection: 'row',
-    gap: 16,
-    marginBottom: 40,
+    flexWrap: 'wrap',
+    gap: 12,
+    marginBottom: 32,
   },
-  typeCard: {
-    flex: 1,
-    height: 140,
-    borderRadius: 24,
-    borderWidth: 2,
-    overflow: 'hidden',
-    backgroundColor: '#FFF',
-  },
-  selectedTypeCard: {
-    borderWidth: 2,
-  },
-  typeGradient: {
-    flex: 1,
+  gridCard: {
+    width: (width - 48 - 12) / 2, // 2 columns
     padding: 16,
-    justifyContent: 'center',
+    borderRadius: 20,
     alignItems: 'center',
+    justifyContent: 'center',
+    height: 120,
+    position: 'relative',
   },
-  typeIcon: {
+  iconCircle: {
     width: 48,
     height: 48,
-    borderRadius: 16,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
   },
-  typeTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: 4,
+  cardLabel: {
+    fontSize: 14,
+    fontFamily: 'Outfit_500Medium',
   },
-  typeDesc: {
+  checkBadge: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  inputSection: {
+    marginBottom: 24,
+  },
+  inputLabel: {
     fontSize: 12,
-    textAlign: 'center',
+    fontFamily: 'Outfit_600SemiBold',
+    marginBottom: 12,
+    letterSpacing: 1,
   },
-  inputContainer: {
-    marginBottom: 40,
+  input: {
+    fontSize: 18,
+    fontFamily: 'Outfit_500Medium',
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
   },
-  massiveInput: {
-    fontSize: 32,
-    fontWeight: '700',
-    borderBottomWidth: 2,
-    borderBottomColor: '#E5E7EB',
-    paddingVertical: 16,
-    textAlign: 'center',
+  toggleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.03)',
+    borderRadius: 12,
+    padding: 4,
+    alignSelf: 'center',
+    marginBottom: 24,
+  },
+  toggleOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    gap: 6,
+  },
+  toggleText: {
+    fontSize: 14,
+    fontFamily: 'Outfit_600SemiBold',
   },
   errorText: {
     textAlign: 'center',
     marginTop: 8,
     fontSize: 14,
-    fontWeight: '500',
-  },
-  suggestionsContainer: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  suggestionsLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 16,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
-  bubblesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: 10,
-  },
-  bubble: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 24,
-    borderWidth: 1,
-  },
-  bubbleText: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  templateCard: {
-    marginTop: 8,
-    borderRadius: 20,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.05)',
-  },
-  templateGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-  },
-  templateIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  templateInfo: {
-    flex: 1,
-  },
-  templateTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    marginBottom: 2,
-  },
-  templateSubtitle: {
-    fontSize: 12,
-  },
-  templateLink: {
-    display: 'none', // Deprecated
-  },
-  templateLinkText: {
-    display: 'none', // Deprecated
+    fontFamily: 'Outfit_500Medium',
   },
   footer: {
-    padding: 16, // Reduced from 24
-    paddingBottom: Platform.OS === 'ios' ? 16 : 24, // Adjust for safe area
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(0,0,0,0.05)',
+    padding: 24,
+    paddingBottom: Platform.OS === 'ios' ? 16 : 24,
   },
   nextButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 14, // Reduced from 18
-    borderRadius: 16, // Reduced radius slightly
+    paddingVertical: 18,
+    borderRadius: 32,
     gap: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 }, // Reduced shadow
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   nextButtonText: {
     color: '#FFF',
-    fontSize: 16, // Reduced from 18
-    fontWeight: '700',
+    fontSize: 18,
+    fontFamily: 'Outfit_700Bold',
   },
 });
 

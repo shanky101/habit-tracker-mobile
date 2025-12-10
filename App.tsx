@@ -21,6 +21,7 @@ import {
 import { ThemeProvider } from './src/theme';
 import { SubscriptionProvider } from './src/context/SubscriptionContext';
 import { MascotProvider } from './src/context/MascotContext';
+import { BackgroundWrapper } from './src/components/BackgroundWrapper';
 import OnboardingNavigator from './src/navigation/OnboardingNavigator';
 import { initializeDatabase } from './src/data/database';
 import { runAsyncStorageMigration } from './src/services/migration/asyncStorageMigration';
@@ -75,10 +76,12 @@ export default function App() {
         <ThemeProvider>
           <SubscriptionProvider>
             <MascotProvider>
-              <NavigationContainer>
-                <StatusBar style="auto" />
-                <OnboardingNavigator />
-              </NavigationContainer>
+              <BackgroundWrapper>
+                <NavigationContainer>
+                  <StatusBar style="auto" />
+                  <OnboardingNavigator />
+                </NavigationContainer>
+              </BackgroundWrapper>
             </MascotProvider>
           </SubscriptionProvider>
         </ThemeProvider>

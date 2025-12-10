@@ -110,51 +110,7 @@ const WelcomeScreen: React.FC = () => {
             </Text>
           </TouchableOpacity>
 
-          {/* Divider */}
-          <View style={styles.dividerContainer}>
-            <View style={[styles.dividerLine, { backgroundColor: theme.colors.border }]} />
-            <Text style={[styles.dividerText, {
-              color: theme.colors.textSecondary,
-              fontFamily: theme.typography.fontFamilyBody,
-              fontSize: theme.typography.fontSizeSM,
-            }]}>
-              OR
-            </Text>
-            <View style={[styles.dividerLine, { backgroundColor: theme.colors.border }]} />
-          </View>
 
-          {/* Sign Up Button */}
-          <TouchableOpacity
-            style={[styles.secondaryButton, {
-              backgroundColor: theme.colors.backgroundSecondary,
-              borderColor: theme.colors.border,
-            }]}
-            onPress={handleSignUp}
-            activeOpacity={0.7}
-          >
-            <Text style={[styles.secondaryButtonText, {
-              color: theme.colors.text,
-              fontFamily: theme.typography.fontFamilyBodyMedium,
-              fontSize: theme.typography.fontSizeMD,
-            }]}>
-              Sign Up with Email
-            </Text>
-          </TouchableOpacity>
-
-          {/* Log In Button */}
-          <TouchableOpacity
-            style={[styles.tertiaryButton]}
-            onPress={handleLogin}
-            activeOpacity={0.7}
-          >
-            <Text style={[styles.tertiaryButtonText, {
-              color: theme.colors.primary,
-              fontFamily: theme.typography.fontFamilyBodyMedium,
-              fontSize: theme.typography.fontSizeMD,
-            }]}>
-              Log In
-            </Text>
-          </TouchableOpacity>
         </View>
 
         {/* Footer with Terms and Privacy */}

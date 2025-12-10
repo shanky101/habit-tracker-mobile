@@ -21,6 +21,8 @@ export const useHabits = () => {
   const uncompleteHabit = useHabitStore((state) => state.uncompleteHabit);
   const resetHabitForDate = useHabitStore((state) => state.resetHabitForDate);
   const addNoteToCompletion = useHabitStore((state) => state.addNoteToCompletion);
+  const addProgress = useHabitStore((state) => state.addProgress);
+  const removeProgress = useHabitStore((state) => state.removeProgress);
 
   const getCompletionForDate = useHabitStore((state) => state.getCompletionForDate);
   const isHabitCompletedForDate = useHabitStore((state) => state.isHabitCompletedForDate);
@@ -42,6 +44,8 @@ export const useHabits = () => {
     getCompletionForDate,
     isHabitCompletedForDate,
     getCompletionProgress,
+    addProgress,
+    removeProgress,
   };
 };
 

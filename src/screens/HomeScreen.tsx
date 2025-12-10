@@ -10,6 +10,7 @@ import {
   RefreshControl,
   Share,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle } from 'react-native-svg';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -33,6 +34,7 @@ import { useMascot } from '@/context/MascotContext';
 import { Mascot, MascotCelebration, DraggableHabitList } from '@/components';
 import { User } from 'lucide-react-native';
 import { TimeFilter } from '@/components/filters/TimeFilter';
+import { BackgroundWrapper } from '@/components/BackgroundWrapper';
 
 import { useSettingsStore } from '@/store/settingsStore';
 
@@ -544,8 +546,8 @@ const HomeScreen: React.FC = () => {
         style={[
           styles.dateItem,
           {
-            backgroundColor: isSelected ? theme.colors.primary : theme.colors.surface,
-            borderColor: isTodayDate && !isSelected ? theme.colors.primary : 'transparent',
+            backgroundColor: isSelected ? theme.colors.secondary : '#4F46E5', // Solid blue like Templates
+            borderColor: isTodayDate && !isSelected ? theme.colors.secondary : 'transparent',
             borderWidth: isTodayDate && !isSelected ? 2 : 0,
           },
         ]}
@@ -556,7 +558,7 @@ const HomeScreen: React.FC = () => {
           style={[
             styles.dateDayName,
             {
-              color: isSelected ? theme.colors.white : theme.colors.textSecondary,
+              color: isSelected ? theme.colors.black : theme.colors.textSecondary,
               fontFamily: theme.typography.fontFamilyBodyMedium,
               fontSize: theme.typography.fontSizeXS,
             },
@@ -568,7 +570,7 @@ const HomeScreen: React.FC = () => {
           style={[
             styles.dateNumber,
             {
-              color: isSelected ? theme.colors.white : theme.colors.text,
+              color: isSelected ? theme.colors.black : theme.colors.text,
               fontFamily: theme.typography.fontFamilyDisplayBold,
               fontSize: theme.typography.fontSizeLG,
             },
@@ -614,419 +616,182 @@ const HomeScreen: React.FC = () => {
   // ... (rest of handlers)
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
-      edges={['top', 'left', 'right']}
-    >
-      {/* ... (Header) ... */}
-      <Animated.View
-        style={[
-          styles.header,
-          {
-            opacity: fadeAnim,
-            transform: [{ translateY: slideAnim }],
-          },
-        ]}
+    <BackgroundWrapper>
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: 'transparent' }]} // Transparent for global gradient
+        edges={['top', 'left', 'right']}
       >
-        <View style={styles.headerLeft}>
-          <Text
-            style={[
-              styles.dateText,
-              {
-                color: theme.colors.textSecondary,
-                fontFamily: theme.typography.fontFamilyBody,
-                fontSize: theme.typography.fontSizeXS,
-                letterSpacing: 1,
-              },
-            ]}
+        {/* Go Club Header */}
+        <View style={styles.header}>
+          <View>
+            <Text style={[styles.greeting, { color: theme.colors.white }]}>
+              {getGreeting()},
+            </Text>
+            <Text style={[styles.subGreeting, { color: theme.colors.white }]}>
+              Ready to crush your goals?
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={[styles.statsButton, { backgroundColor: '#4F46E5' }]}
+            onPress={() => navigation.navigate('Stats')}
           >
-            {getFormattedDate()}
-          </Text>
-          <Text
-            style={[
-              styles.greeting,
-              {
-                color: theme.colors.text,
-                fontFamily: theme.typography.fontFamilyDisplayBold,
-                fontSize: theme.typography.fontSize2XL,
-              },
-            ]}
-          >
-            Hi, {userName || 'there'} 👋
-          </Text>
+            <Ionicons name="stats-chart" size={20} color="#FFF" />
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          style={[
-            styles.profileButton,
-            {
-              backgroundColor: theme.colors.primary + '30',
-              borderColor: theme.colors.primary,
-            },
-          ]}
-          onPress={handleProfilePress}
-          activeOpacity={0.7}
-        >
-          <User size={22} color={theme.colors.primary} strokeWidth={2.5} />
-        </TouchableOpacity>
-      </Animated.View>
 
-      <ScrollView
-        ref={mainScrollRef}
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        bounces={true}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={theme.colors.primary}
-            colors={[theme.colors.primary]}
-          />
-        }
-      >
-        {/* Date Picker */}
+        <ScrollView
+          ref={mainScrollRef}
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={theme.colors.secondary}
+            />
+          }
+        >
+          {/* Premium Upsell Banner */}
+          {!subscription.isPremium && (
+            <LinearGradient
+              colors={['#4F46E5', '#7C3AED']} // Solid gradient like Templates
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.premiumCard}
+            >
+              <TouchableOpacity
+                style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}
+                onPress={() => navigation.navigate('Profile', { screen: 'Paywall' })}
+                activeOpacity={0.8}
+              >
+                <View style={styles.premiumIconCircle}>
+                  <Text style={styles.premiumIconText}>✨</Text>
+                </View>
+                <View style={styles.premiumTextContainer}>
+                  <Text style={styles.premiumTitle}>Go Premium</Text>
+                  <Text style={styles.premiumSubtitle}>$19.99 a year</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={24} color="#FFF" />
+              </TouchableOpacity>
+            </LinearGradient>
+          )}
+
+
+
+          {/* Date Picker (Kept for functionality but styled minimally) */}
+          <View style={{ marginTop: 24, marginBottom: 16 }}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20 }}>
+              {dates.map((date, index) => renderDateItem(date, index))}
+            </ScrollView>
+          </View>
+
+          {/* Habits List */}
+          {dateFilteredHabits.length > 0 ? (
+            <View style={styles.habitsContainer}>
+              {/* We can group by time period or just show all. Design implies a list. */}
+              {/* Showing grouped for now as per existing logic, but with new styles */}
+              {renderHabitSection('Morning', 'morning', morningHabits)}
+              {renderHabitSection('Afternoon', 'afternoon', afternoonHabits)}
+              {renderHabitSection('Evening', 'evening', eveningHabits)}
+              {renderHabitSection('Night', 'night', nightHabits)}
+              {renderHabitSection('All Day', 'allday', allDayHabits)}
+            </View>
+          ) : (
+            renderEmptyState()
+          )}
+
+
+        </ScrollView >
+
+        {/* Floating Action Button */}
         <Animated.View
           style={[
-            styles.datePickerContainer,
-            {
-              backgroundColor: theme.colors.surface,
-              borderColor: theme.colors.border,
-              opacity: fadeAnim,
-            },
+            styles.fabContainer,
+            { transform: [{ scale: fabScale }] },
           ]}
         >
-          <ScrollView
-            ref={dateScrollRef}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.datePickerContent}
-          >
-            {dates.map((date, index) => renderDateItem(date, index))}
-          </ScrollView>
-        </Animated.View>
-
-        {/* Mascot Companion */}
-        {mascotSettings.enabled ? (
-          <Animated.View
-            style={[
-              styles.mascotCard,
-              {
-                backgroundColor: theme.colors.surface,
-                borderColor: theme.colors.border,
-                opacity: fadeAnim,
-                overflow: 'hidden',
-              },
-            ]}
-          >
-            <TouchableOpacity
-              style={[
-                styles.mascotToggleButton,
-                {
-                  backgroundColor: theme.colors.background + 'CC',
-                  borderColor: theme.colors.border,
-                },
-              ]}
-              onPress={() => toggleMascot(false)}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.mascotToggleText, { color: theme.colors.textSecondary }]}>
-                Hide
-              </Text>
-            </TouchableOpacity>
-            <Mascot
-              compact={mascotSettings.displayMode === 'compact'}
-              showMessage
-              onPress={petMascot}
-            />
-          </Animated.View>
-        ) : (
           <TouchableOpacity
             style={[
-              styles.showMascotPill,
+              styles.fab,
               {
-                backgroundColor: theme.colors.primary + '15',
-                borderColor: theme.colors.primary + '30',
+                backgroundColor: theme.colors.primary,
+                shadowColor: theme.shadows.shadowLG.shadowColor,
+                shadowOffset: theme.shadows.shadowLG.shadowOffset,
+                shadowOpacity: theme.shadows.shadowLG.shadowOpacity,
+                shadowRadius: theme.shadows.shadowLG.shadowRadius,
+                elevation: theme.shadows.shadowLG.elevation,
               },
             ]}
-            onPress={() => toggleMascot(true)}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.showMascotEmoji}>🐾</Text>
-            <Text
-              style={[
-                styles.showMascotText,
-                {
-                  color: theme.colors.primary,
-                  fontFamily: theme.typography.fontFamilyBodyMedium,
-                  fontSize: theme.typography.fontSizeSM,
-                },
-              ]}
-            >
-              Show Habi
-            </Text>
-          </TouchableOpacity>
-        )}
-
-        {/* Progress Card */}
-        {dateFilteredHabits.length > 0 && (
-          <Animated.View
-            style={[
-              styles.progressCard,
-              {
-                backgroundColor: theme.colors.surface,
-                borderColor: theme.colors.border,
-                opacity: fadeAnim,
-              },
-            ]}
-          >
-            <View style={styles.progressInfo}>
-              <Text
-                style={[
-                  styles.progressTitle,
-                  {
-                    color: theme.colors.text,
-                    fontFamily: theme.typography.fontFamilyDisplayBold,
-                    fontSize: theme.typography.fontSize2XL,
-                  },
-                ]}
-              >
-                {completedCount}/{totalCount} Done
-              </Text>
-              <Text
-                style={[
-                  styles.progressSubtitle,
-                  {
-                    color: theme.colors.textSecondary,
-                    fontFamily: theme.typography.fontFamilyBody,
-                    fontSize: theme.typography.fontSizeSM,
-                  },
-                ]}
-              >
-                {getMotivationalMessage()}
-              </Text>
-            </View>
-            <View style={styles.progressRingContainer}>
-              <Svg width="70" height="70" style={styles.progressSvg}>
-                {/* Background circle */}
-                <Circle
-                  cx="35"
-                  cy="35"
-                  r="31"
-                  stroke={theme.colors.border}
-                  strokeWidth="4"
-                  fill="none"
-                />
-                {/* Progress circle */}
-                <Circle
-                  cx="35"
-                  cy="35"
-                  r="31"
-                  stroke={theme.colors.primary}
-                  strokeWidth="4"
-                  fill="none"
-                  strokeDasharray={`${2 * Math.PI * 31}`}
-                  strokeDashoffset={`${2 * Math.PI * 31 * (1 - progressPercentage / 100)}`}
-                  strokeLinecap="round"
-                  rotation="-90"
-                  origin="35, 35"
-                />
-              </Svg>
-              <View style={styles.progressPercentageContainer}>
-                <Text
-                  style={[
-                    styles.progressPercentage,
-                    {
-                      color: theme.colors.primary,
-                      fontFamily: theme.typography.fontFamilyDisplayBold,
-                      fontSize: theme.typography.fontSizeLG,
-                    },
-                  ]}
-                >
-                  {progressPercentage}%
-                </Text>
-              </View>
-            </View>
-          </Animated.View>
-        )}
-
-        {/* Time-Based Filters - Now acting as scroll anchors */}
-        <View style={styles.filtersContainer}>
-          <Text
-            style={[
-              styles.sectionTitle,
-              {
-                color: theme.colors.text,
-                fontFamily: theme.typography.fontFamilyDisplayBold,
-                fontSize: theme.typography.fontSizeLG,
-              },
-            ]}
-          >
-            {getSectionTitle()}
-          </Text>
-
-          <View style={{ marginHorizontal: -24 }}>
-            <TimeFilter
-              selected={timePeriodFilter}
-              onSelect={handleScrollToSection}
-              counts={habitCounts}
-              timeRanges={timeRanges}
-            />
-          </View>
-        </View>
-
-        {/* Habits List - Sectioned */}
-        {activeHabits.length > 0 ? (
-          <Animated.View
-            style={[
-              styles.habitsSection,
-              { opacity: fadeAnim },
-            ]}
-          >
-            {renderHabitSection('Morning', 'morning', morningHabits)}
-            {renderHabitSection('Afternoon', 'afternoon', afternoonHabits)}
-            {renderHabitSection('Evening', 'evening', eveningHabits)}
-            {renderHabitSection('Night', 'night', nightHabits)}
-            {renderHabitSection('All Day', 'allday', allDayHabits)}
-          </Animated.View>
-        ) : (
-          renderEmptyState()
-        )}
-
-        {/* Free Tier Limit Indicator */}
-        {!subscription.isPremium && activeHabits.length > 0 && (
-          <TouchableOpacity
-            style={[
-              styles.limitBanner,
-              {
-                backgroundColor: theme.colors.primaryLight + '20',
-                borderColor: theme.colors.primary + '40',
-              },
-            ]}
-            onPress={() => navigation.navigate('Profile', { screen: 'Paywall' })}
+            onPress={handleAddHabit}
             activeOpacity={0.8}
           >
-            <View style={styles.limitBannerLeft}>
-              <Text style={styles.limitBannerIcon}>✨</Text>
-              <View>
-                <Text
-                  style={[
-                    styles.limitBannerText,
-                    {
-                      color: theme.colors.text,
-                      fontFamily: theme.typography.fontFamilyBodyMedium,
-                      fontSize: theme.typography.fontSizeSM,
-                    },
-                  ]}
-                >
-                  {habits.filter(h => !h.archived).length}/{FREE_HABIT_LIMIT} free habits used
-                </Text>
-                <Text
-                  style={[
-                    styles.limitBannerSubtext,
-                    {
-                      color: theme.colors.primary,
-                      fontFamily: theme.typography.fontFamilyBody,
-                      fontSize: theme.typography.fontSizeXS,
-                    },
-                  ]}
-                >
-                  Upgrade for unlimited
-                </Text>
-              </View>
-            </View>
-            <Text style={[styles.limitBannerChevron, { color: theme.colors.primary }]}>→</Text>
+            <Text style={[styles.fabText, { color: theme.colors.white }]}>+</Text>
           </TouchableOpacity>
-        )}
-      </ScrollView>
+        </Animated.View >
 
-      {/* Floating Action Button */}
-      <Animated.View
-        style={[
-          styles.fabContainer,
-          { transform: [{ scale: fabScale }] },
-        ]}
-      >
-        <TouchableOpacity
-          style={[
-            styles.fab,
-            {
-              backgroundColor: theme.colors.primary,
-              shadowColor: theme.shadows.shadowLG.shadowColor,
-              shadowOffset: theme.shadows.shadowLG.shadowOffset,
-              shadowOpacity: theme.shadows.shadowLG.shadowOpacity,
-              shadowRadius: theme.shadows.shadowLG.shadowRadius,
-              elevation: theme.shadows.shadowLG.elevation,
-            },
-          ]}
-          onPress={handleAddHabit}
-          activeOpacity={0.8}
-        >
-          <Text style={[styles.fabText, { color: theme.colors.white }]}>+</Text>
-        </TouchableOpacity>
-      </Animated.View>
+        {/* Celebration Modal */}
+        <CelebrationModal
+          visible={showCelebration}
+          type={celebrationType}
+          habitName={celebrationHabit}
+          streakDays={7}
+          onDismiss={() => setShowCelebration(false)}
+          onShare={() => {
+            console.log('Share achievement');
+            setShowCelebration(false);
+          }}
+        />
 
-      {/* Celebration Modal */}
-      <CelebrationModal
-        visible={showCelebration}
-        type={celebrationType}
-        habitName={celebrationHabit}
-        streakDays={7}
-        onDismiss={() => setShowCelebration(false)}
-        onShare={() => {
-          console.log('Share achievement');
-          setShowCelebration(false);
-        }}
-      />
+        {/* Mascot Celebration - Shows when all habits complete */}
+        <MascotCelebration
+          visible={showMascotCelebration}
+          type="allComplete"
+          title="All Done! 🎉"
+          message={`You completed all ${totalCount} habits today! ${userName ? userName + ', you' : 'You'}'re absolutely crushing it!`}
+          onDismiss={() => {
+            setShowMascotCelebration(false);
+            setCelebrationType('allComplete');
+            // Trigger mascot celebration animation
+            // TODO: Re-add celebration animation after implementing differently
+            // setTimeout(() => mascotRef.current?.celebrate(), 100);
+            setTimeout(() => setShowAllCompleteModal(true), 300);
+          }}
+        />
 
-      {/* Mascot Celebration - Shows when all habits complete */}
-      <MascotCelebration
-        visible={showMascotCelebration}
-        type="allComplete"
-        title="All Done! 🎉"
-        message={`You completed all ${totalCount} habits today! ${userName ? userName + ', you' : 'You'}'re absolutely crushing it!`}
-        onDismiss={() => {
-          setShowMascotCelebration(false);
-          setCelebrationType('allComplete');
-          // Trigger mascot celebration animation
-          // TODO: Re-add celebration animation after implementing differently
-          // setTimeout(() => mascotRef.current?.celebrate(), 100);
-          setTimeout(() => setShowAllCompleteModal(true), 300);
-        }}
-      />
+        {/* All Habits Complete Modal (Share option) */}
+        <AllHabitsCompleteModal
+          visible={showAllCompleteModal}
+          completedCount={totalCount}
+          activeStreaks={activeHabits.filter(h => h.streak > 0).length}
+          onDismiss={() => setShowAllCompleteModal(false)}
+          onShare={handleShareAllComplete}
+        />
 
-      {/* All Habits Complete Modal (Share option) */}
-      <AllHabitsCompleteModal
-        visible={showAllCompleteModal}
-        completedCount={totalCount}
-        activeStreaks={activeHabits.filter(h => h.streak > 0).length}
-        onDismiss={() => setShowAllCompleteModal(false)}
-        onShare={handleShareAllComplete}
-      />
+        {/* Quick Note Modal */}
+        <QuickNoteModal
+          visible={showQuickNoteModal}
+          habitName={quickNoteHabitId ? activeHabits.find(h => h.id === quickNoteHabitId)?.name || '' : ''}
+          onSave={handleSaveQuickNote}
+          onSkip={handleSkipQuickNote}
+        />
 
-      {/* Quick Note Modal */}
-      <QuickNoteModal
-        visible={showQuickNoteModal}
-        habitName={quickNoteHabitId ? activeHabits.find(h => h.id === quickNoteHabitId)?.name || '' : ''}
-        onSave={handleSaveQuickNote}
-        onSkip={handleSkipQuickNote}
-      />
-
-      {/* Delete Confirmation Dialog */}
-      <ConfirmationDialog
-        visible={showDeleteConfirm}
-        title="Delete Habit"
-        message={`Are you sure you want to delete "${habitToDelete?.name}"? This will delete all history and cannot be undone.`}
-        confirmText="Delete"
-        cancelText="Cancel"
-        destructive
-        onConfirm={confirmDeleteHabit}
-        onCancel={() => {
-          setShowDeleteConfirm(false);
-          setHabitToDelete(null);
-        }}
-      />
-    </SafeAreaView>
+        {/* Delete Confirmation Dialog */}
+        <ConfirmationDialog
+          visible={showDeleteConfirm}
+          title="Delete Habit"
+          message={`Are you sure you want to delete "${habitToDelete?.name}"? This will delete all history and cannot be undone.`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          destructive
+          onConfirm={confirmDeleteHabit}
+          onCancel={() => {
+            setShowDeleteConfirm(false);
+            setHabitToDelete(null);
+          }}
+        />
+      </SafeAreaView >
+    </BackgroundWrapper>
   );
 };
 
@@ -1039,8 +804,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 16,
+    paddingTop: 12,
+    paddingBottom: 24,
   },
   headerLeft: {
     flex: 1,
@@ -1050,7 +815,13 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   greeting: {
-    // styles from theme
+    fontSize: 18,
+    fontFamily: 'Outfit_400Regular',
+  },
+  subGreeting: {
+    fontSize: 24,
+    fontFamily: 'Outfit_700Bold',
+    marginTop: 4,
   },
   profileButton: {
     width: 48,
@@ -1063,12 +834,18 @@ const styles = StyleSheet.create({
   profileInitials: {
     // styles from theme
   },
+  statsButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 24,
-    paddingBottom: 120, // Increased to ensure content clears the tab bar
+    paddingBottom: 100,
   },
   datePickerContainer: {
     borderRadius: 16,
@@ -1120,19 +897,144 @@ const styles = StyleSheet.create({
   datePickerContent: {
     gap: 8,
   },
-  dateItem: {
-    width: 64,
-    height: 72,
-    borderRadius: 12,
+  premiumCard: {
+    marginHorizontal: 20,
+    marginBottom: 24,
+    borderRadius: 24,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+  },
+  premiumIconCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#FFF',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 8,
+    marginRight: 16,
+  },
+  premiumIconText: {
+    color: '#000',
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+  premiumTextContainer: {
+    flex: 1,
+  },
+  premiumTitle: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  premiumSubtitle: {
+    color: '#FFF',
+    fontSize: 14,
+  },
+  goalSection: {
+    marginHorizontal: 20,
+    marginBottom: 24,
+  },
+  goalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontFamily: 'Outfit_600SemiBold',
+  },
+  viewPlanText: {
+    fontSize: 16,
+    fontFamily: 'Outfit_500Medium',
+  },
+  metricsRow: {
+    flexDirection: 'row',
+    gap: 24,
+    marginBottom: 16,
+  },
+  metricItem: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+  },
+  metricValue: {
+    color: '#FFF',
+    fontSize: 24,
+    fontFamily: 'Outfit_700Bold',
+  },
+  metricUnit: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.85)',
+    marginLeft: 2,
+  },
+  visualizerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    height: 40,
+  },
+  visualizerBar: {
+    width: 4,
+    borderRadius: 2,
+  },
+  goldenHourCard: {
+    marginHorizontal: 20,
+    borderRadius: 32,
+    padding: 24,
+    marginBottom: 24,
+    overflow: 'hidden',
+    minHeight: 160,
+    justifyContent: 'space-between',
+  },
+  goldenHourContent: {
+    zIndex: 2,
+  },
+  goldenHourTitle: {
+    fontSize: 28,
+    fontFamily: 'Outfit_700Bold',
+    marginBottom: 16,
+    maxWidth: '80%',
+    lineHeight: 32,
+  },
+  goldenHourButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
+  },
+  goldenHourButtonText: {
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  sunDial: {
+    position: 'absolute',
+    bottom: -20,
+    right: -20,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 8,
+    borderColor: 'rgba(255,165,0,0.5)',
+    zIndex: 1,
+  },
+  sunDialArc: {
+    // Placeholder for arc
+  },
+  dateItem: {
+    width: 60,
+    height: 80,
+    borderRadius: 30, // Pill shape
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
   },
   dateDayName: {
     marginBottom: 4,
   },
   dateNumber: {
-    // styles from theme
+    //
   },
   progressCard: {
     flexDirection: 'row',
@@ -1170,21 +1072,20 @@ const styles = StyleSheet.create({
   progressPercentage: {
     // styles from theme
   },
-  habitsSection: {
-    marginTop: 8,
+  habitsContainer: {
+    paddingBottom: 20,
   },
-  sectionTitle: {
-    marginBottom: 16,
+  habitsSection: {
+    marginBottom: 24,
   },
   sectionHeaderContainer: {
-    marginTop: 24,
+    paddingHorizontal: 24,
     marginBottom: 12,
-    paddingHorizontal: 4,
   },
   sectionHeaderText: {
-    fontSize: 12,
-    letterSpacing: 1,
+    fontSize: 14,
     textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   filtersContainer: {
     marginBottom: 16,
