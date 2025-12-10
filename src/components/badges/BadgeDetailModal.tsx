@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Dimensions, Share, Animated, PanResponder, PanResponderGestureState } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, Dimensions, Share, Animated } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { BlurView } from 'expo-blur';
 import { BadgeDefinition } from '../../types/badges';
 import { BadgeIcon } from './BadgeIcon';
@@ -23,42 +24,35 @@ export const BadgeDetailModal: React.FC<BadgeDetailModalProps> = ({ badge, visib
     const lastRotate = useRef(0);
     const velocity = useRef(0);
 
-    // PanResponder for rotation
-    const panResponder = useRef(
-        PanResponder.create({
-            onStartShouldSetPanResponder: () => true,
-            onMoveShouldSetPanResponder: () => true,
-            onPanResponderGrant: () => {
-                rotateAnim.stopAnimation((value) => {
-                    lastRotate.current = value;
-                });
-            },
-            onPanResponderMove: (_: any, gestureState: PanResponderGestureState) => {
-                // Map dx to degrees (sensitivity factor)
-                // 1 pixel = 0.5 degree
-                const newRotate = lastRotate.current + gestureState.dx * 0.8;
-                rotateAnim.setValue(newRotate);
-                velocity.current = gestureState.vx;
-            },
-            onPanResponderRelease: (_: any, gestureState: PanResponderGestureState) => {
-                lastRotate.current += gestureState.dx * 0.8;
+    // Gesture for rotation
+    const startRotate = useRef(0);
 
-                // Add inertia/decay
-                Animated.decay(rotateAnim, {
-                    velocity: gestureState.vx * 0.5, // Adjust velocity factor
-                    deceleration: 0.995,
-                    useNativeDriver: true,
-                }).start(({ finished }) => {
-                    if (finished) {
-                        // Update lastRotate after decay finishes to prevent jumping on next touch
-                        // However, getting the value from native driver is async.
-                        // For simple continuous rotation, we might not strictly need exact sync if we just add delta.
-                        // But to be precise, we'd add a listener.
-                    }
-                });
-            },
+    const pan = Gesture.Pan()
+        .onStart(() => {
+            rotateAnim.stopAnimation((value) => {
+                startRotate.current = value;
+            });
         })
-    ).current;
+        .onUpdate((e) => {
+            // Map translationX to degrees (sensitivity factor)
+            // 1 pixel = 0.8 degree
+            const newRotate = startRotate.current + e.translationX * 0.8;
+            rotateAnim.setValue(newRotate);
+        })
+        .onEnd((e) => {
+            // Add inertia/decay
+            // GH velocity is pixels/sec. Animated.decay expects units/ms.
+            // We map pixels to degrees (0.8 factor).
+            // So velocity in degrees/ms = (velocityX * 0.8) / 1000
+            const velocityMs = (e.velocityX * 0.8) / 1000;
+
+            Animated.decay(rotateAnim, {
+                velocity: velocityMs,
+                deceleration: 0.995,
+                useNativeDriver: true,
+            }).start();
+        })
+        .runOnJS(true);
 
     // Reset rotation when modal opens
     React.useEffect(() => {
@@ -118,19 +112,21 @@ export const BadgeDetailModal: React.FC<BadgeDetailModalProps> = ({ badge, visib
 
                 <View style={styles.content}>
                     <ViewShot ref={viewShotRef} options={{ format: 'png', quality: 0.9 }} style={styles.card}>
-                        <View style={styles.badgeContainer} {...panResponder.panHandlers}>
-                            <Animated.View style={{
-                                transform: [{ perspective: 1000 }, { rotateY: rotateInterpolate }]
-                            }}>
-                                <BadgeIcon
-                                    tier={badge.tier}
-                                    shape={badge.shape}
-                                    icon={badge.icon}
-                                    size={160}
-                                    isLocked={isLocked}
-                                />
-                            </Animated.View>
-                        </View>
+                        <GestureDetector gesture={pan}>
+                            <View style={styles.badgeContainer}>
+                                <Animated.View style={{
+                                    transform: [{ perspective: 1000 }, { rotateY: rotateInterpolate }]
+                                }}>
+                                    <BadgeIcon
+                                        tier={badge.tier}
+                                        shape={badge.shape}
+                                        icon={badge.icon}
+                                        size={160}
+                                        isLocked={isLocked}
+                                    />
+                                </Animated.View>
+                            </View>
+                        </GestureDetector>
 
                         <Text style={styles.title}>
                             {badge.secret && isLocked ? 'Secret Badge' : badge.title}

@@ -368,38 +368,62 @@ const ProfileScreen: React.FC = () => {
           <View style={styles.sectionContainer}>
             <View style={styles.sectionHeader}>
               <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Badges</Text>
-              <TouchableOpacity onPress={() => navigation.navigate('Badges')}>
-                <Text style={[styles.seeAllText, { color: theme.colors.primary }]}>See All</Text>
-              </TouchableOpacity>
             </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.badgesScrollContent}
+
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={() => navigation.navigate('Badges')}
+              style={{ marginHorizontal: 16 }}
             >
-              {badges.filter(b => b.isUnlocked).slice(0, 5).map((badge) => (
-                <TouchableOpacity
-                  key={badge.id}
-                  style={styles.badgePreviewItem}
-                  onPress={() => navigation.navigate('Badges')}
-                >
-                  <BadgeIcon
-                    tier={badge.tier}
-                    shape={badge.shape}
-                    icon={badge.icon}
-                    size={60}
-                    isLocked={false}
-                  />
-                </TouchableOpacity>
-              ))}
-              {badges.filter(b => b.isUnlocked).length === 0 && (
-                <View style={[styles.emptyBadges, { backgroundColor: theme.colors.surface }]}>
-                  <Text style={[styles.emptyBadgesText, { color: theme.colors.textSecondary }]}>
-                    No badges yet. Keep tracking!
+              <LinearGradient
+                colors={['#D97706', '#B45309']} // Darker/Richer Gold/Amber
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={{
+                  borderRadius: 24,
+                  padding: 24,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  shadowColor: "#B45309",
+                  shadowOffset: { width: 0, height: 8 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 12,
+                  elevation: 8,
+                }}
+              >
+                <View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <Trophy size={20} color="#FFF" fill="#FFF" />
+                    <Text style={{ fontSize: 20, fontWeight: '800', color: '#FFF' }}>Hall of Fame</Text>
+                  </View>
+                  <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 14, fontWeight: '500' }}>
+                    {badges.filter(b => b.isUnlocked).length} Badges Unlocked
                   </Text>
                 </View>
-              )}
-            </ScrollView>
+
+                <View style={{ flexDirection: 'row', paddingRight: 10 }}>
+                  {badges.filter(b => b.isUnlocked).length > 0 ? (
+                    badges.filter(b => b.isUnlocked).slice(0, 3).map((badge, index) => (
+                      <View key={badge.id} style={{ marginLeft: index > 0 ? -25 : 0, zIndex: 3 - index }}>
+                        {/* Removed scale transform which might cause clipping issues if parent doesn't accommodate */}
+                        <BadgeIcon
+                          tier={badge.tier}
+                          shape={badge.shape}
+                          icon={badge.icon}
+                          size={50}
+                          isLocked={false}
+                        />
+                      </View>
+                    ))
+                  ) : (
+                    <View style={{ opacity: 0.5 }}>
+                      <Trophy size={40} color="#FFF" />
+                    </View>
+                  )}
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
           </View>
 
           {/* Premium Banner */}
@@ -411,7 +435,7 @@ const ProfileScreen: React.FC = () => {
               colors={isPremium ? ['#F59E0B', '#D97706'] : [theme.colors.primary, theme.colors.secondary]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              style={[styles.premiumBanner, { borderRadius: theme.styles.cardBorderRadius }]}
+              style={[styles.premiumBanner, { borderRadius: 100, overflow: 'hidden' }]}
             >
               <View style={styles.premiumContent}>
                 <View style={[styles.premiumIconCircle, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
@@ -432,7 +456,7 @@ const ProfileScreen: React.FC = () => {
 
           {/* Premium Features Carousel */}
           <View style={styles.carouselContainer}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>PREMIUM FEATURES</Text>
+            <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary, marginBottom: 16, paddingHorizontal: 16 }]}>PREMIUM FEATURES</Text>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
