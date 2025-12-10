@@ -46,6 +46,8 @@ import {
 } from 'lucide-react-native';
 
 import HabiCustomizationSheet from '@/components/HabiCustomizationSheet';
+import { BadgeIcon } from '@/components/badges/BadgeIcon';
+import { useBadgeStore } from '@/store/badgeStore';
 
 type ProfileNavigationProp = StackNavigationProp<any, 'Profile'>;
 
@@ -64,6 +66,7 @@ const ProfileScreen: React.FC = () => {
   const userEmail = profile.email || '';
   const [isHabiSheetVisible, setIsHabiSheetVisible] = useState(false);
   const isPremium = subscription.isPremium;
+  const badges = useBadgeStore(state => state.badges);
 
   // Calculate real user-level stats from all habits
   const calculateUserStats = () => {
@@ -361,6 +364,68 @@ const ProfileScreen: React.FC = () => {
             </View>
           </View>
 
+          {/* Badges Section */}
+          <View style={styles.sectionContainer}>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Badges</Text>
+            </View>
+
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={() => navigation.navigate('Badges')}
+              style={{ marginHorizontal: 16 }}
+            >
+              <LinearGradient
+                colors={['#D97706', '#B45309']} // Darker/Richer Gold/Amber
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={{
+                  borderRadius: 24,
+                  padding: 24,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  shadowColor: "#B45309",
+                  shadowOffset: { width: 0, height: 8 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 12,
+                  elevation: 8,
+                }}
+              >
+                <View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <Trophy size={20} color="#FFF" fill="#FFF" />
+                    <Text style={{ fontSize: 20, fontWeight: '800', color: '#FFF' }}>Hall of Fame</Text>
+                  </View>
+                  <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 14, fontWeight: '500' }}>
+                    {badges.filter(b => b.isUnlocked).length} Badges Unlocked
+                  </Text>
+                </View>
+
+                <View style={{ flexDirection: 'row', paddingRight: 10 }}>
+                  {badges.filter(b => b.isUnlocked).length > 0 ? (
+                    badges.filter(b => b.isUnlocked).slice(0, 3).map((badge, index) => (
+                      <View key={badge.id} style={{ marginLeft: index > 0 ? -25 : 0, zIndex: 3 - index }}>
+                        {/* Removed scale transform which might cause clipping issues if parent doesn't accommodate */}
+                        <BadgeIcon
+                          tier={badge.tier}
+                          shape={badge.shape}
+                          icon={badge.icon}
+                          size={50}
+                          isLocked={false}
+                        />
+                      </View>
+                    ))
+                  ) : (
+                    <View style={{ opacity: 0.5 }}>
+                      <Trophy size={40} color="#FFF" />
+                    </View>
+                  )}
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+
           {/* Premium Banner */}
           <TouchableOpacity
             activeOpacity={0.9}
@@ -370,7 +435,7 @@ const ProfileScreen: React.FC = () => {
               colors={isPremium ? ['#F59E0B', '#D97706'] : [theme.colors.primary, theme.colors.secondary]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              style={[styles.premiumBanner, { borderRadius: theme.styles.cardBorderRadius }]}
+              style={[styles.premiumBanner, { borderRadius: 100, overflow: 'hidden' }]}
             >
               <View style={styles.premiumContent}>
                 <View style={[styles.premiumIconCircle, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
@@ -391,7 +456,7 @@ const ProfileScreen: React.FC = () => {
 
           {/* Premium Features Carousel */}
           <View style={styles.carouselContainer}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>PREMIUM FEATURES</Text>
+            <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary, marginBottom: 16, paddingHorizontal: 16 }]}>PREMIUM FEATURES</Text>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -618,7 +683,7 @@ const ProfileScreen: React.FC = () => {
         visible={isHabiSheetVisible}
         onClose={() => setIsHabiSheetVisible(false)}
       />
-    </SafeAreaView>
+    </SafeAreaView >
   );
 };
 
@@ -903,8 +968,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     letterSpacing: 1,
-    marginLeft: 28,
-    marginBottom: 16,
+    marginBottom: 0, // Removed bottom margin as it's handled by sectionHeader
   },
   carouselContent: {
     paddingHorizontal: 16,
@@ -946,6 +1010,40 @@ const styles = StyleSheet.create({
   versionText: {
     textAlign: 'center',
     marginBottom: 24,
+  },
+  sectionContainer: {
+    marginBottom: 32,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    marginBottom: 16,
+  },
+  seeAllText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  badgesScrollContent: {
+    paddingHorizontal: 16,
+    gap: 16,
+  },
+  badgePreviewItem: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyBadges: {
+    padding: 20,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 200,
+    marginLeft: 16,
+  },
+  emptyBadgesText: {
+    fontSize: 14,
+    textAlign: 'center',
   },
 });
 

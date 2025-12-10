@@ -19,6 +19,7 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import { useUserStore } from '@/store/userStore';
 import { useTheme } from '@/theme';
 import { useHabits } from '@/hooks/useHabits';
+import { useBadgeStore } from '@/store/badgeStore';
 import { useSubscription } from '@/context/SubscriptionContext';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 import { Habit, HabitTimePeriod } from '@/types/habit';
@@ -137,6 +138,11 @@ const HomeScreen: React.FC = () => {
         });
       }
     }, 100);
+
+    // Trigger app open badge check
+    useBadgeStore.getState().checkUnlock('app_open', {
+      timestamp: Date.now(),
+    });
   }, [dates]);
 
   // Handle new habit creation
@@ -429,6 +435,22 @@ const HomeScreen: React.FC = () => {
       // Add the note/mood to today's completion
       addNoteToCompletion(quickNoteHabitId, today, { mood, note });
       console.log('Note/mood saved:', note, mood, 'for habit:', quickNoteHabitId);
+
+      // Trigger badge checks
+      if (note) {
+        useBadgeStore.getState().checkUnlock('note_add', {
+          habitId: quickNoteHabitId,
+          timestamp: Date.now(),
+        });
+      }
+
+      if (mood) {
+        useBadgeStore.getState().checkUnlock('mood_log', {
+          habitId: quickNoteHabitId,
+          mood,
+          timestamp: Date.now(),
+        });
+      }
     }
 
     setShowQuickNoteModal(false);

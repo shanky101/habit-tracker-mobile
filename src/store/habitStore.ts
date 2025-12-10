@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { Habit, DailyCompletion, HabitEntry } from '../types/habit';
 import { sqliteStorage } from './sqliteStorage';
+import { useBadgeStore } from './badgeStore';
 
 interface HabitState {
   // State
@@ -39,10 +40,20 @@ export const useHabitStore = create<HabitState>()(
       isHydrated: false,
 
       // Habit CRUD operations
-      addHabit: (habit) =>
+      addHabit: (habit) => {
         set((state) => ({
           habits: [habit, ...state.habits],
-        })),
+        }));
+
+        // Check for creation badges
+        // We need to pass the new total count of habits
+        const currentHabits = get().habits;
+        useBadgeStore.getState().checkUnlock('habit_create', {
+          habitsCount: currentHabits.length,
+          category: habit.category,
+          type: habit.type,
+        });
+      },
 
       updateHabit: (id, updates) =>
         set((state) => ({
@@ -72,7 +83,7 @@ export const useHabitStore = create<HabitState>()(
         }),
 
       // Completion operations
-      completeHabit: (id, date, entry) =>
+      completeHabit: (id, date, entry) => {
         set((state) => ({
           habits: state.habits.map((habit) => {
             if (habit.id !== id) return habit;
@@ -136,7 +147,30 @@ export const useHabitStore = create<HabitState>()(
               };
             }
           }),
-        })),
+        }));
+
+        // Trigger badge check
+        const habit = get().habits.find(h => h.id === id);
+        if (habit) {
+          const completion = habit.completions[date];
+          const currentStreak = calculateStreak(habit); // Helper needed or simplified logic
+
+          // Calculate total completions across all habits
+          const allHabits = get().habits;
+          const totalCompletions = allHabits.reduce((acc, h) => {
+            return acc + Object.values(h.completions).reduce((sum, c) => sum + c.completionCount, 0);
+          }, 0);
+
+          useBadgeStore.getState().checkUnlock('habit_complete', {
+            streak: currentStreak,
+            totalCompletions,
+            timestamp: Date.now(),
+            category: habit.category,
+            habitId: id,
+            // Add other context as needed
+          });
+        }
+      },
 
       uncompleteHabit: (id, date) =>
         set((state) => ({
@@ -288,3 +322,34 @@ export const useHabitStore = create<HabitState>()(
     }
   )
 );
+
+// Helper to calculate current streak
+function calculateStreak(habit: Habit): number {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  let streak = 0;
+  let checkDate = new Date(today);
+
+  // Check today first
+  const todayStr = checkDate.toISOString().split('T')[0];
+  const todayCompletion = habit.completions[todayStr];
+
+  if (todayCompletion && todayCompletion.completionCount >= habit.targetCompletionsPerDay) {
+    streak++;
+  }
+
+  // Iterate backwards
+  while (true) {
+    checkDate.setDate(checkDate.getDate() - 1);
+    const dateStr = checkDate.toISOString().split('T')[0];
+    const completion = habit.completions[dateStr];
+
+    if (completion && completion.completionCount >= habit.targetCompletionsPerDay) {
+      streak++;
+    } else {
+      break;
+    }
+  }
+
+  return streak;
+}
