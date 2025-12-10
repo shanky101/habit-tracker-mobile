@@ -21,36 +21,39 @@ const SHAPES: Record<BadgeShape, (size: number) => string> = {
         return `M ${r} 0 A ${r} ${r} 0 1 1 ${r} ${s} A ${r} ${r} 0 1 1 ${r} 0 Z`;
     },
     hexagon: (s) => {
+        // User requested hexagon to be replaced with circle
         const r = s / 2;
-        const w = r * Math.sqrt(3);
-        // Pointy top hexagon
-        return `
-      M ${r} 0
-      L ${r + w * 0.5} ${r * 0.5}
-      L ${r + w * 0.5} ${r * 1.5}
-      L ${r} ${s}
-      L ${r - w * 0.5} ${r * 1.5}
-      L ${r - w * 0.5} ${r * 0.5}
-      Z
-    `;
+        return `M ${r} 0 A ${r} ${r} 0 1 1 ${r} ${s} A ${r} ${r} 0 1 1 ${r} 0 Z`;
     },
     diamond: (s) => {
         const r = s / 2;
-        return `M ${r} 0 L ${s} ${r} L ${r} ${s} L 0 ${r} Z`;
+        const cornerRadius = s * 0.1;
+        return `
+            M ${r} ${cornerRadius}
+            Q ${r} 0 ${r + cornerRadius} ${cornerRadius}
+            L ${s - cornerRadius} ${r - cornerRadius}
+            Q ${s} ${r} ${s - cornerRadius} ${r + cornerRadius}
+            L ${r + cornerRadius} ${s - cornerRadius}
+            Q ${r} ${s} ${r - cornerRadius} ${s - cornerRadius}
+            L ${cornerRadius} ${r + cornerRadius}
+            Q 0 ${r} ${cornerRadius} ${r - cornerRadius}
+            Z
+        `;
     },
     shield: (s) => {
+        // Rounded Shield
         return `
-      M ${s * 0.5} 0
-      L ${s} ${s * 0.25}
-      V ${s * 0.5}
-      C ${s} ${s * 0.8} ${s * 0.75} ${s * 0.9} ${s * 0.5} ${s}
-      C ${s * 0.25} ${s * 0.9} 0 ${s * 0.8} 0 ${s * 0.5}
-      V ${s * 0.25}
-      Z
-    `;
+            M ${s * 0.5} 0
+            L ${s - 10} ${s * 0.25}
+            V ${s * 0.5}
+            C ${s - 10} ${s * 0.8} ${s * 0.75} ${s * 0.9} ${s * 0.5} ${s}
+            C ${s * 0.25} ${s * 0.9} 10 ${s * 0.8} 10 ${s * 0.5}
+            V ${s * 0.25}
+            Z
+        `;
     },
     star: (s) => {
-        // Simplified star path
+        // Rounded Star
         const cx = s / 2;
         const cy = s / 2;
         const outerRadius = s / 2;
@@ -60,9 +63,30 @@ const SHAPES: Record<BadgeShape, (size: number) => string> = {
             const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
             const x = cx + outerRadius * Math.cos(angle);
             const y = cy + outerRadius * Math.sin(angle);
-            path += i === 0 ? `M ${x} ${y}` : `L ${x} ${y}`;
+
+            // Inner point
+            const nextAngle = ((i + 1) * 4 * Math.PI) / 5 - Math.PI / 2;
+            const midAngle = (angle + nextAngle) / 2; // Actually this logic is for 5-point star skipping vertices
+            // Let's use a simpler standard star logic but round it
+
+            // Standard 5-point star vertices
+            const a1 = (i * 2 * Math.PI) / 5 - Math.PI / 2;
+            const x1 = cx + outerRadius * Math.cos(a1);
+            const y1 = cy + outerRadius * Math.sin(a1);
+
+            const a2 = ((i * 2 + 1) * Math.PI) / 5 - Math.PI / 2;
+            const x2 = cx + innerRadius * Math.cos(a2);
+            const y2 = cy + innerRadius * Math.sin(a2);
+
+            if (i === 0) {
+                path += `M ${x1} ${y1}`;
+            } else {
+                path += `L ${x1} ${y1}`;
+            }
+            path += `L ${x2} ${y2}`;
         }
         path += "Z";
+        // Note: True rounded star path is complex, using standard star for now but will add corner rounding via strokeJoin="round"
         return path;
     }
 };
@@ -138,7 +162,8 @@ export const BadgeIcon: React.FC<BadgeIconProps> = ({
         <Animated.View style={[{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }, animatedStyle]}>
             <Canvas style={{ width: size, height: size, position: 'absolute' }}>
                 <Group>
-                    <Path path={pathData} color={colors[0]}>
+                    {/* Main Fill */}
+                    <Path path={pathData} color={colors[0]} style="fill">
                         <Shadow dx={0} dy={4} blur={8} color={shadowColor} />
                         {tier === 'cosmic' ? (
                             <RuntimeShader source={COSMIC_SHADER} uniforms={uniforms} />
@@ -155,12 +180,33 @@ export const BadgeIcon: React.FC<BadgeIconProps> = ({
                         )}
                     </Path>
 
-                    {/* Inner highlight/bevel */}
+                    {/* Metallic Border */}
                     <Path
                         path={pathData}
                         style="stroke"
-                        strokeWidth={size * 0.05}
-                        color="rgba(255,255,255,0.3)"
+                        strokeWidth={size * 0.08}
+                        strokeJoin="round"
+                        strokeCap="round"
+                    >
+                        <LinearGradient
+                            start={vec(0, 0)}
+                            end={vec(size, size)}
+                            colors={[
+                                tier === 'bronze' ? '#CD7F32' : tier === 'silver' ? '#E0E0E0' : tier === 'gold' ? '#FFD700' : '#E0E0E0',
+                                '#FFF',
+                                tier === 'bronze' ? '#8B4513' : tier === 'silver' ? '#A0A0A0' : tier === 'gold' ? '#B8860B' : '#A0A0A0',
+                            ]}
+                            positions={[0, 0.5, 1]}
+                        />
+                    </Path>
+
+                    {/* Inner Bevel/Highlight */}
+                    <Path
+                        path={pathData}
+                        style="stroke"
+                        strokeWidth={size * 0.02}
+                        color="rgba(255,255,255,0.5)"
+                        strokeJoin="round"
                     />
                 </Group>
             </Canvas>
