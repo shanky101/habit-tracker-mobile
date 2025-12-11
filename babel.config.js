@@ -12,6 +12,7 @@ module.exports = function (api) {
             '@': './src',
             '@app-core/theme': './packages/theme/src',
             '@app-core/ui': './packages/ui/src',
+            '@app-core/storage': './packages/storage/src',
           },
         },
       ],
