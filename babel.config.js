@@ -13,6 +13,7 @@ module.exports = function (api) {
             '@app-core/theme': './packages/theme/src',
             '@app-core/ui': './packages/ui/src',
             '@app-core/storage': './packages/storage/src',
+            '@app-core/subscription': './packages/subscription/src',
           },
         },
       ],
