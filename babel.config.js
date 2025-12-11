@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = function (api) {
   api.cache(true);
   return {
@@ -14,6 +16,9 @@ module.exports = function (api) {
             '@app-core/ui': './packages/ui/src',
             '@app-core/storage': './packages/storage/src',
             '@app-core/subscription': './packages/subscription/src',
+            // Ensure single React instance
+            'react': path.resolve(__dirname, 'node_modules/react'),
+            'react-native': path.resolve(__dirname, 'node_modules/react-native'),
           },
         },
       ],
