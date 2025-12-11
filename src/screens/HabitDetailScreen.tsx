@@ -35,7 +35,7 @@ import {
   TrendingUp,
   Award,
 } from 'lucide-react-native';
-import ConsistencyHeatmap from '@/components/stats/ConsistencyHeatmap';
+import { ConsistencyHeatmap } from '@app-core/ui';
 import { HeatmapPoint } from '@/utils/analyticsUtils';
 
 type HabitDetailRouteProp = RouteProp<

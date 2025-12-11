@@ -28,9 +28,7 @@ import {
 import { BlurView } from 'expo-blur';
 
 // Import charts/components to reuse
-import ConsistencyHeatmap from '@/components/stats/ConsistencyHeatmap';
-import CategoryDistributionChart from '@/components/stats/CategoryDistributionChart';
-import TimeOfDayChart from '@/components/stats/TimeOfDayChart';
+import { ConsistencyHeatmap, CategoryDistributionChart, TimeOfDayChart } from '@app-core/ui';
 
 const { width } = Dimensions.get('window');
 

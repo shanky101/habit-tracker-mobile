@@ -31,10 +31,7 @@ import {
 } from 'lucide-react-native';
 
 // New Components & Utils
-import StatCard from '@/components/stats/StatCard';
-import ConsistencyHeatmap from '@/components/stats/ConsistencyHeatmap';
-import CategoryDistributionChart from '@/components/stats/CategoryDistributionChart';
-import TimeOfDayChart from '@/components/stats/TimeOfDayChart';
+import { StatCard, ConsistencyHeatmap, CategoryDistributionChart, TimeOfDayChart } from '@app-core/ui';
 import {
   getConsistencyHeatmapData,
   getCategoryDistribution,
