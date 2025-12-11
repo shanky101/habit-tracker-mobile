@@ -1,15 +1,16 @@
 {
-    "name": "@app-core/theme",
+    "name": "@app-core/ui",
     "version": "1.0.0",
     "main": "src/index.ts",
     "types": "src/index.ts",
-    "scripts": {
-        "build": "tsc",
-        "type-check": "tsc --noEmit"
-    },
+    "scripts": {},
     "peerDependencies": {
         "react": "*",
-        "react-native": "*"
+        "react-native": "*",
+        "expo-linear-gradient": "*"
+    },
+    "dependencies": {
+        "@app-core/theme": "workspace:*"
     },
     "devDependencies": {
         "@types/react": "~19.1.10",
