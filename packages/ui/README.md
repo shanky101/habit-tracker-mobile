@@ -1,34 +1,51 @@
 # @app-core/ui
 
 Shared UI components library for all mobile apps. Provides reusable, theme-aware components.
+Comprehensive UI component library for React Native apps with theme integration.
 
 ## Components
 
-### ProgressRing
-Circular progress indicator with customizable size and colors.
+### Display Components
+- **ProgressRing** - Circular progress indicator with customizable colors
+- **EmptyState** - Consistent empty state messaging
+- **LoadingState** - Loading indicator with theme
+- **ErrorState** - Error display with retry functionality
+
+### Selection Components
+- **TimePeriodSelector** - Time of day selector (morning, afternoon, etc.)
+
+### Data Visualization
+- **StatCard** - Display statistics with icon and value
+- **CategoryDistributionChart** - Pie chart for category distribution
+- **ConsistencyHeatmap** - Calendar heatmap for tracking consistency
+- **TimeOfDayChart** - Bar chart showing time distribution
+
+## Usage
 
 ```typescript
-import { ProgressRing } from '@app-core/ui';
+import {
+  ProgressRing,
+  EmptyState,
+  LoadingState,
+  ErrorState,
+  TimePeriodSelector,
+  StatCard,
+  CategoryDistributionChart,
+  ConsistencyHeatmap,
+  TimeOfDayChart,
+} from '@app-core/ui';
 
-<ProgressRing progress={0.75} size={120} />
-```
-
-### State Components
-Empty, Loading, and Error state components.
-
-```typescript
-import { EmptyState, LoadingState, ErrorState } from '@app-core/ui';
-
-<EmptyState message="No habits yet" icon="inbox" />
-<LoadingState />
-<ErrorState message="Failed to load" onRetry={handleRetry} />
+// Use in your components
+<ProgressRing progress={0.75} size={100} />
+<EmptyState message="No items found" />
+<StatCard title="Total" value={42} icon="star" />
 ```
 
 ## Dependencies
 
-- `@app-core/theme` - Uses theme context for styling
-- `expo-linear-gradient` - For gradient backgrounds
+- `react` - React library
+- `react-native` - React Native
+- `expo-linear-gradient` - Gradient support
+- `@app-core/theme` - Theme integration
 
-## Usage
-
-All components are theme-aware and will automatically adapt to the current theme from `@app-core/theme`.
+All components are fully themed and work with any theme from `@app-core/theme`.

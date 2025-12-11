@@ -20,7 +20,7 @@ import { useTheme } from '@app-core/theme';
 import { CATEGORIES, COLORS } from '@/data/habitOptions';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 import { HabitTimePeriod } from '@/types/habit';
-import { TimePeriodSelector } from '@/components/TimePeriodSelector';
+import { TimePeriodSelector } from '@app-core/ui';
 import { useSettingsStore } from '@/store/settingsStore';
 import { Calendar, Clock, Sun, Moon, Check, ArrowRight } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
