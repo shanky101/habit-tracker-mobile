@@ -1,0 +1,440 @@
+
+
+> @features/mascot@1.0.0 type-check /Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot
+> tsc --noEmit
+
+[96msrc/components/layers/AccessoriesLayer.tsx[0m:[93m3[0m:[93m35[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/types/mascotCustomization' or its corresponding type declarations.
+
+[7m3[0m import { HabiCustomization } from '@/types/mascotCustomization';
+[7m [0m [91m                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/components/layers/BodyLayer.tsx[0m:[93m3[0m:[93m35[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/types/mascotCustomization' or its corresponding type declarations.
+
+[7m3[0m import { HabiCustomization } from '@/types/mascotCustomization';
+[7m [0m [91m                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/components/layers/EffectsLayer.tsx[0m:[93m3[0m:[93m35[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/types/mascotCustomization' or its corresponding type declarations.
+
+[7m3[0m import { HabiCustomization } from '@/types/mascotCustomization';
+[7m [0m [91m                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/components/layers/FaceLayer.tsx[0m:[93m4[0m:[93m35[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/types/mascotCustomization' or its corresponding type declarations.
+
+[7m4[0m import { HabiCustomization } from '@/types/mascotCustomization';
+[7m [0m [91m                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/components/layers/PatternLayer.tsx[0m:[93m3[0m:[93m35[0m - [91merror[0m[90m TS2307: [0mCannot find module '@/types/mascotCustomization' or its corresponding type declarations.
+
+[7m3[0m import { HabiCustomization } from '@/types/mascotCustomization';
+[7m [0m [91m                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/components/Mascot.tsx[0m:[93m11[0m:[93m26[0m - [91merror[0m[90m TS6059: [0mFile '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/index.ts' is not under 'rootDir' '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via '@app-core/theme' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/src/components/Mascot.tsx'
+    Imported via '@app-core/theme' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/src/components/MascotRenderer.tsx'
+    Imported via '@app-core/theme' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/src/components/MascotCelebration.tsx'
+    Imported via '@app-core/theme' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/src/components/BrutalistSpeechBubble.tsx'
+    Imported via '@app-core/theme' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/src/components/SpeechBubble.tsx'
+
+[7m11[0m import { useTheme } from '@app-core/theme';
+[7m  [0m [91m                         ~~~~~~~~~~~~~~~~~[0m
+
+  [96msrc/components/MascotRenderer.tsx[0m:[93m3[0m:[93m26[0m
+    [7m3[0m import { useTheme } from '@app-core/theme';
+    [7m [0m [96m                         ~~~~~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96msrc/components/MascotCelebration.tsx[0m:[93m12[0m:[93m26[0m
+    [7m12[0m import { useTheme } from '@app-core/theme';
+    [7m  [0m [96m                         ~~~~~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96msrc/components/BrutalistSpeechBubble.tsx[0m:[93m3[0m:[93m26[0m
+    [7m3[0m import { useTheme } from '@app-core/theme';
+    [7m [0m [96m                         ~~~~~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96msrc/components/SpeechBubble.tsx[0m:[93m3[0m:[93m26[0m
+    [7m3[0m import { useTheme } from '@app-core/theme';
+    [7m [0m [96m                         ~~~~~~~~~~~~~~~~~[0m
+    File is included via import here.
+
+[96msrc/components/Mascot.tsx[0m:[93m11[0m:[93m26[0m - [91merror[0m[90m TS6307: [0mFile '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/index.ts' is not listed within the file list of project '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via '@app-core/theme' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/src/components/Mascot.tsx'
+    Imported via '@app-core/theme' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/src/components/MascotRenderer.tsx'
+    Imported via '@app-core/theme' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/src/components/MascotCelebration.tsx'
+    Imported via '@app-core/theme' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/src/components/BrutalistSpeechBubble.tsx'
+    Imported via '@app-core/theme' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/src/components/SpeechBubble.tsx'
+
+[7m11[0m import { useTheme } from '@app-core/theme';
+[7m  [0m [91m                         ~~~~~~~~~~~~~~~~~[0m
+
+  [96msrc/components/MascotRenderer.tsx[0m:[93m3[0m:[93m26[0m
+    [7m3[0m import { useTheme } from '@app-core/theme';
+    [7m [0m [96m                         ~~~~~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96msrc/components/MascotCelebration.tsx[0m:[93m12[0m:[93m26[0m
+    [7m12[0m import { useTheme } from '@app-core/theme';
+    [7m  [0m [96m                         ~~~~~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96msrc/components/BrutalistSpeechBubble.tsx[0m:[93m3[0m:[93m26[0m
+    [7m3[0m import { useTheme } from '@app-core/theme';
+    [7m [0m [96m                         ~~~~~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96msrc/components/SpeechBubble.tsx[0m:[93m3[0m:[93m26[0m
+    [7m3[0m import { useTheme } from '@app-core/theme';
+    [7m [0m [96m                         ~~~~~~~~~~~~~~~~~[0m
+    File is included via import here.
+
+[96msrc/components/Mascot.tsx[0m:[93m16[0m:[93m8[0m - [91merror[0m[90m TS6059: [0mFile '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/src/context/MascotContext.tsx' is not under 'rootDir' '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via '@/context/MascotContext' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/src/components/Mascot.tsx'
+    Imported via '@/context/MascotContext' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/src/components/MascotRenderer.tsx'
+    Imported via '@/context/MascotContext' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/src/components/MascotCharacter.tsx'
+    Imported via '@/context/MascotContext' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/src/components/MascotCelebration.tsx'
+    Imported via '@/context/MascotContext' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/src/components/layers/FaceLayer.tsx'
+
+[7m16[0m } from '@/context/MascotContext';
+[7m  [0m [91m       ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  [96msrc/components/MascotRenderer.tsx[0m:[93m4[0m:[93m28[0m
+    [7m4[0m import { MascotMood } from '@/context/MascotContext';
+    [7m [0m [96m                           ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96msrc/components/MascotCharacter.tsx[0m:[93m13[0m:[93m28[0m
+    [7m13[0m import { MascotMood } from '@/context/MascotContext';
+    [7m  [0m [96m                           ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96msrc/components/MascotCelebration.tsx[0m:[93m13[0m:[93m40[0m
+    [7m13[0m import { useMascot, MASCOT_NAME } from '@/context/MascotContext';
+    [7m  [0m [96m                                       ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96msrc/components/layers/FaceLayer.tsx[0m:[93m5[0m:[93m28[0m
+    [7m5[0m import { MascotMood } from '@/context/MascotContext';
+    [7m [0m [96m                           ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+    File is included via import here.
+
+[96msrc/components/Mascot.tsx[0m:[93m16[0m:[93m8[0m - [91merror[0m[90m TS6307: [0mFile '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/src/context/MascotContext.tsx' is not listed within the file list of project '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via '@/context/MascotContext' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/src/components/Mascot.tsx'
+    Imported via '@/context/MascotContext' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/src/components/MascotRenderer.tsx'
+    Imported via '@/context/MascotContext' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/src/components/MascotCharacter.tsx'
+    Imported via '@/context/MascotContext' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/src/components/MascotCelebration.tsx'
+    Imported via '@/context/MascotContext' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/src/components/layers/FaceLayer.tsx'
+
+[7m16[0m } from '@/context/MascotContext';
+[7m  [0m [91m       ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  [96msrc/components/MascotRenderer.tsx[0m:[93m4[0m:[93m28[0m
+    [7m4[0m import { MascotMood } from '@/context/MascotContext';
+    [7m [0m [96m                           ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96msrc/components/MascotCharacter.tsx[0m:[93m13[0m:[93m28[0m
+    [7m13[0m import { MascotMood } from '@/context/MascotContext';
+    [7m  [0m [96m                           ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96msrc/components/MascotCelebration.tsx[0m:[93m13[0m:[93m40[0m
+    [7m13[0m import { useMascot, MASCOT_NAME } from '@/context/MascotContext';
+    [7m  [0m [96m                                       ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96msrc/components/layers/FaceLayer.tsx[0m:[93m5[0m:[93m28[0m
+    [7m5[0m import { MascotMood } from '@/context/MascotContext';
+    [7m [0m [96m                           ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+    File is included via import here.
+
+[96msrc/components/MascotRenderer.tsx[0m:[93m28[0m:[93m19[0m - [91merror[0m[90m TS18048: [0m'theme.assets.mascot' is possibly 'undefined'.
+
+[7m28[0m     const asset = theme.assets.mascot[mood] || theme.assets.mascot.happy;
+[7m  [0m [91m                  ~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/components/MascotRenderer.tsx[0m:[93m28[0m:[93m48[0m - [91merror[0m[90m TS18048: [0m'theme.assets.mascot' is possibly 'undefined'.
+
+[7m28[0m     const asset = theme.assets.mascot[mood] || theme.assets.mascot.happy;
+[7m  [0m [91m                                               ~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/MascotProvider.tsx[0m:[93m248[0m:[93m9[0m - [91merror[0m[90m TS2322: [0mType '(mood: MascotMood) => string' is not assignable to type '(mood?: MascotMood | undefined) => string'.
+  Types of parameters 'mood' and 'mood' are incompatible.
+    Type 'MascotMood | undefined' is not assignable to type 'MascotMood'.
+      Type 'undefined' is not assignable to type 'MascotMood'.
+
+[7m248[0m         getRandomMessage,
+[7m   [0m [91m        ~~~~~~~~~~~~~~~~[0m
+
+[96m../theme/src/index.ts[0m:[93m1[0m:[93m15[0m - [91merror[0m[90m TS6059: [0mFile '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/tokens.ts' is not under 'rootDir' '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via './tokens' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/index.ts'
+    Imported via './tokens' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/types.ts'
+    Imported via '../../tokens' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/default/index.ts'
+    Imported via '../../tokens' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/retro-pacman/index.ts'
+    Imported via '../../tokens' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/retro-pacman/colors.ts'
+    Imported via '../../tokens' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/minimalist/index.ts'
+    Imported via '../../tokens' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/dark/index.ts'
+
+[7m1[0m export * from './tokens';
+[7m [0m [91m              ~~~~~~~~~~[0m
+
+  [96m../theme/src/types.ts[0m:[93m1[0m:[93m29[0m
+    [7m1[0m import { ThemeTokens } from './tokens';
+    [7m [0m [96m                            ~~~~~~~~~~[0m
+    File is included via import here.
+  [96m../theme/src/variants/default/index.ts[0m:[93m2[0m:[93m24[0m
+    [7m2[0m import { themes } from '../../tokens';
+    [7m [0m [96m                       ~~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96m../theme/src/variants/retro-pacman/index.ts[0m:[93m2[0m:[93m24[0m
+    [7m2[0m import { themes } from '../../tokens';
+    [7m [0m [96m                       ~~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96m../theme/src/variants/retro-pacman/colors.ts[0m:[93m1[0m:[93m29[0m
+    [7m1[0m import { ColorTokens } from '../../tokens';
+    [7m [0m [96m                            ~~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96m../theme/src/variants/minimalist/index.ts[0m:[93m2[0m:[93m24[0m
+    [7m2[0m import { themes } from '../../tokens';
+    [7m [0m [96m                       ~~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96m../theme/src/variants/dark/index.ts[0m:[93m2[0m:[93m24[0m
+    [7m2[0m import { themes } from '../../tokens';
+    [7m [0m [96m                       ~~~~~~~~~~~~~~[0m
+    File is included via import here.
+
+[96m../theme/src/index.ts[0m:[93m1[0m:[93m15[0m - [91merror[0m[90m TS6307: [0mFile '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/tokens.ts' is not listed within the file list of project '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via './tokens' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/index.ts'
+    Imported via './tokens' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/types.ts'
+    Imported via '../../tokens' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/default/index.ts'
+    Imported via '../../tokens' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/retro-pacman/index.ts'
+    Imported via '../../tokens' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/retro-pacman/colors.ts'
+    Imported via '../../tokens' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/minimalist/index.ts'
+    Imported via '../../tokens' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/dark/index.ts'
+
+[7m1[0m export * from './tokens';
+[7m [0m [91m              ~~~~~~~~~~[0m
+
+  [96m../theme/src/types.ts[0m:[93m1[0m:[93m29[0m
+    [7m1[0m import { ThemeTokens } from './tokens';
+    [7m [0m [96m                            ~~~~~~~~~~[0m
+    File is included via import here.
+  [96m../theme/src/variants/default/index.ts[0m:[93m2[0m:[93m24[0m
+    [7m2[0m import { themes } from '../../tokens';
+    [7m [0m [96m                       ~~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96m../theme/src/variants/retro-pacman/index.ts[0m:[93m2[0m:[93m24[0m
+    [7m2[0m import { themes } from '../../tokens';
+    [7m [0m [96m                       ~~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96m../theme/src/variants/retro-pacman/colors.ts[0m:[93m1[0m:[93m29[0m
+    [7m1[0m import { ColorTokens } from '../../tokens';
+    [7m [0m [96m                            ~~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96m../theme/src/variants/minimalist/index.ts[0m:[93m2[0m:[93m24[0m
+    [7m2[0m import { themes } from '../../tokens';
+    [7m [0m [96m                       ~~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96m../theme/src/variants/dark/index.ts[0m:[93m2[0m:[93m24[0m
+    [7m2[0m import { themes } from '../../tokens';
+    [7m [0m [96m                       ~~~~~~~~~~~~~~[0m
+    File is included via import here.
+
+[96m../theme/src/index.ts[0m:[93m2[0m:[93m15[0m - [91merror[0m[90m TS6059: [0mFile '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/ThemeContext.tsx' is not under 'rootDir' '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via './ThemeContext' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/index.ts'
+    Imported via './ThemeContext' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/index.ts'
+
+[7m2[0m export * from './ThemeContext';
+[7m [0m [91m              ~~~~~~~~~~~~~~~~[0m
+
+  [96m../theme/src/index.ts[0m:[93m5[0m:[93m41[0m
+    [7m5[0m export { useTheme, ThemeProvider } from './ThemeContext';
+    [7m [0m [96m                                        ~~~~~~~~~~~~~~~~[0m
+    File is included via import here.
+
+[96m../theme/src/index.ts[0m:[93m2[0m:[93m15[0m - [91merror[0m[90m TS6307: [0mFile '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/ThemeContext.tsx' is not listed within the file list of project '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via './ThemeContext' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/index.ts'
+    Imported via './ThemeContext' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/index.ts'
+
+[7m2[0m export * from './ThemeContext';
+[7m [0m [91m              ~~~~~~~~~~~~~~~~[0m
+
+  [96m../theme/src/index.ts[0m:[93m5[0m:[93m41[0m
+    [7m5[0m export { useTheme, ThemeProvider } from './ThemeContext';
+    [7m [0m [96m                                        ~~~~~~~~~~~~~~~~[0m
+    File is included via import here.
+
+[96m../theme/src/ThemeContext.tsx[0m:[93m4[0m:[93m31[0m - [91merror[0m[90m TS6059: [0mFile '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/types.ts' is not under 'rootDir' '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via './types' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/ThemeContext.tsx'
+    Imported via '../../types' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/default/index.ts'
+    Imported via '../../types' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/retro-pacman/index.ts'
+    Imported via '../../types' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/minimalist/index.ts'
+    Imported via '../../types' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/dark/index.ts'
+    Imported via '../types' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/index.ts'
+    Imported via './types' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/index.ts'
+
+[7m4[0m import { ExtendedTheme } from './types';
+[7m [0m [91m                              ~~~~~~~~~[0m
+
+  [96m../theme/src/variants/default/index.ts[0m:[93m1[0m:[93m31[0m
+    [7m1[0m import { ExtendedTheme } from '../../types';
+    [7m [0m [96m                              ~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96m../theme/src/variants/retro-pacman/index.ts[0m:[93m1[0m:[93m31[0m
+    [7m1[0m import { ExtendedTheme } from '../../types';
+    [7m [0m [96m                              ~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96m../theme/src/variants/minimalist/index.ts[0m:[93m1[0m:[93m31[0m
+    [7m1[0m import { ExtendedTheme } from '../../types';
+    [7m [0m [96m                              ~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96m../theme/src/variants/dark/index.ts[0m:[93m1[0m:[93m31[0m
+    [7m1[0m import { ExtendedTheme } from '../../types';
+    [7m [0m [96m                              ~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96m../theme/src/variants/index.ts[0m:[93m5[0m:[93m31[0m
+    [7m5[0m import { ExtendedTheme } from '../types';
+    [7m [0m [96m                              ~~~~~~~~~~[0m
+    File is included via import here.
+  [96m../theme/src/index.ts[0m:[93m3[0m:[93m15[0m
+    [7m3[0m export * from './types';
+    [7m [0m [96m              ~~~~~~~~~[0m
+    File is included via import here.
+
+[96m../theme/src/ThemeContext.tsx[0m:[93m4[0m:[93m31[0m - [91merror[0m[90m TS6307: [0mFile '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/types.ts' is not listed within the file list of project '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via './types' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/ThemeContext.tsx'
+    Imported via '../../types' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/default/index.ts'
+    Imported via '../../types' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/retro-pacman/index.ts'
+    Imported via '../../types' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/minimalist/index.ts'
+    Imported via '../../types' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/dark/index.ts'
+    Imported via '../types' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/index.ts'
+    Imported via './types' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/index.ts'
+
+[7m4[0m import { ExtendedTheme } from './types';
+[7m [0m [91m                              ~~~~~~~~~[0m
+
+  [96m../theme/src/variants/default/index.ts[0m:[93m1[0m:[93m31[0m
+    [7m1[0m import { ExtendedTheme } from '../../types';
+    [7m [0m [96m                              ~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96m../theme/src/variants/retro-pacman/index.ts[0m:[93m1[0m:[93m31[0m
+    [7m1[0m import { ExtendedTheme } from '../../types';
+    [7m [0m [96m                              ~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96m../theme/src/variants/minimalist/index.ts[0m:[93m1[0m:[93m31[0m
+    [7m1[0m import { ExtendedTheme } from '../../types';
+    [7m [0m [96m                              ~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96m../theme/src/variants/dark/index.ts[0m:[93m1[0m:[93m31[0m
+    [7m1[0m import { ExtendedTheme } from '../../types';
+    [7m [0m [96m                              ~~~~~~~~~~~~~[0m
+    File is included via import here.
+  [96m../theme/src/variants/index.ts[0m:[93m5[0m:[93m31[0m
+    [7m5[0m import { ExtendedTheme } from '../types';
+    [7m [0m [96m                              ~~~~~~~~~~[0m
+    File is included via import here.
+  [96m../theme/src/index.ts[0m:[93m3[0m:[93m15[0m
+    [7m3[0m export * from './types';
+    [7m [0m [96m              ~~~~~~~~~[0m
+    File is included via import here.
+
+[96m../theme/src/ThemeContext.tsx[0m:[93m5[0m:[93m48[0m - [91merror[0m[90m TS6059: [0mFile '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/index.ts' is not under 'rootDir' '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Imported via './variants' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/ThemeContext.tsx'
+    Imported via './variants' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/index.ts'
+
+[7m5[0m import { themeVariants, ThemeVariantKey } from './variants';
+[7m [0m [91m                                               ~~~~~~~~~~~~[0m
+
+  [96m../theme/src/index.ts[0m:[93m4[0m:[93m15[0m
+    [7m4[0m export * from './variants';
+    [7m [0m [96m              ~~~~~~~~~~~~[0m
+    File is included via import here.
+
+[96m../theme/src/ThemeContext.tsx[0m:[93m5[0m:[93m48[0m - [91merror[0m[90m TS6307: [0mFile '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/index.ts' is not listed within the file list of project '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+  The file is in the program because:
+    Imported via './variants' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/ThemeContext.tsx'
+    Imported via './variants' from file '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/index.ts'
+
+[7m5[0m import { themeVariants, ThemeVariantKey } from './variants';
+[7m [0m [91m                                               ~~~~~~~~~~~~[0m
+
+  [96m../theme/src/index.ts[0m:[93m4[0m:[93m15[0m
+    [7m4[0m export * from './variants';
+    [7m [0m [96m              ~~~~~~~~~~~~[0m
+    File is included via import here.
+
+[96m../theme/src/variants/index.ts[0m:[93m1[0m:[93m30[0m - [91merror[0m[90m TS6059: [0mFile '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/default/index.ts' is not under 'rootDir' '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot'. 'rootDir' is expected to contain all source files.
+
+[7m1[0m import { defaultTheme } from './default';
+[7m [0m [91m                             ~~~~~~~~~~~[0m
+
+[96m../theme/src/variants/index.ts[0m:[93m1[0m:[93m30[0m - [91merror[0m[90m TS6307: [0mFile '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/default/index.ts' is not listed within the file list of project '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+
+[7m1[0m import { defaultTheme } from './default';
+[7m [0m [91m                             ~~~~~~~~~~~[0m
+
+[96m../theme/src/variants/index.ts[0m:[93m2[0m:[93m34[0m - [91merror[0m[90m TS6059: [0mFile '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/retro-pacman/index.ts' is not under 'rootDir' '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot'. 'rootDir' is expected to contain all source files.
+
+[7m2[0m import { retroPacmanTheme } from './retro-pacman';
+[7m [0m [91m                                 ~~~~~~~~~~~~~~~~[0m
+
+[96m../theme/src/variants/index.ts[0m:[93m2[0m:[93m34[0m - [91merror[0m[90m TS6307: [0mFile '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/retro-pacman/index.ts' is not listed within the file list of project '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+
+[7m2[0m import { retroPacmanTheme } from './retro-pacman';
+[7m [0m [91m                                 ~~~~~~~~~~~~~~~~[0m
+
+[96m../theme/src/variants/index.ts[0m:[93m3[0m:[93m33[0m - [91merror[0m[90m TS6059: [0mFile '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/minimalist/index.ts' is not under 'rootDir' '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot'. 'rootDir' is expected to contain all source files.
+
+[7m3[0m import { minimalistTheme } from './minimalist';
+[7m [0m [91m                                ~~~~~~~~~~~~~~[0m
+
+[96m../theme/src/variants/index.ts[0m:[93m3[0m:[93m33[0m - [91merror[0m[90m TS6307: [0mFile '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/minimalist/index.ts' is not listed within the file list of project '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+
+[7m3[0m import { minimalistTheme } from './minimalist';
+[7m [0m [91m                                ~~~~~~~~~~~~~~[0m
+
+[96m../theme/src/variants/index.ts[0m:[93m4[0m:[93m27[0m - [91merror[0m[90m TS6059: [0mFile '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/dark/index.ts' is not under 'rootDir' '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot'. 'rootDir' is expected to contain all source files.
+
+[7m4[0m import { darkTheme } from './dark';
+[7m [0m [91m                          ~~~~~~~~[0m
+
+[96m../theme/src/variants/index.ts[0m:[93m4[0m:[93m27[0m - [91merror[0m[90m TS6307: [0mFile '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/dark/index.ts' is not listed within the file list of project '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+
+[7m4[0m import { darkTheme } from './dark';
+[7m [0m [91m                          ~~~~~~~~[0m
+
+[96m../theme/src/variants/retro-pacman/index.ts[0m:[93m3[0m:[93m35[0m - [91merror[0m[90m TS6059: [0mFile '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/retro-pacman/colors.ts' is not under 'rootDir' '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot'. 'rootDir' is expected to contain all source files.
+
+[7m3[0m import { retroPacmanColors } from './colors';
+[7m [0m [91m                                  ~~~~~~~~~~[0m
+
+[96m../theme/src/variants/retro-pacman/index.ts[0m:[93m3[0m:[93m35[0m - [91merror[0m[90m TS6307: [0mFile '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/theme/src/variants/retro-pacman/colors.ts' is not listed within the file list of project '/Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/mascot/tsconfig.json'. Projects must list all files or use an 'include' pattern.
+
+[7m3[0m import { retroPacmanColors } from './colors';
+[7m [0m [91m                                  ~~~~~~~~~~[0m
+
+[96m../../src/context/MascotContext.tsx[0m:[93m434[0m:[93m9[0m - [91merror[0m[90m TS2322: [0mType '(mood: MascotMood) => string' is not assignable to type '(mood?: MascotMood | undefined) => string'.
+  Types of parameters 'mood' and 'mood' are incompatible.
+    Type 'MascotMood | undefined' is not assignable to type 'MascotMood'.
+      Type 'undefined' is not assignable to type 'MascotMood'.
+
+[7m434[0m         getRandomMessage,
+[7m   [0m [91m        ~~~~~~~~~~~~~~~~[0m
+
+
+Found 31 errors in 13 files.
+
+Errors  Files
+     1  src/components/layers/AccessoriesLayer.tsx[90m:3[0m
+     1  src/components/layers/BodyLayer.tsx[90m:3[0m
+     1  src/components/layers/EffectsLayer.tsx[90m:3[0m
+     1  src/components/layers/FaceLayer.tsx[90m:4[0m
+     1  src/components/layers/PatternLayer.tsx[90m:3[0m
+     4  src/components/Mascot.tsx[90m:11[0m
+     2  src/components/MascotRenderer.tsx[90m:28[0m
+     1  src/MascotProvider.tsx[90m:248[0m
+     4  ../theme/src/index.ts[90m:1[0m
+     4  ../theme/src/ThemeContext.tsx[90m:4[0m
+     8  ../theme/src/variants/index.ts[90m:1[0m
+     2  ../theme/src/variants/retro-pacman/index.ts[90m:3[0m
+     1  ../../src/context/MascotContext.tsx[90m:434[0m
+[41m[30m ELIFECYCLE [39m[49m [31mCommand failed with exit code 2.[39m
