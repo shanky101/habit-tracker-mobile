@@ -22,8 +22,6 @@ export interface SQLiteStorageConfig<T> {
  * State structure expected by storage
  */
 export interface StorageState<T> {
-    state: Record<string, T[]> & {
-        isHydrated?: boolean;
-    };
+    state: any; // Allow mixed types for flexibility with isHydrated boolean
     version: number;
 }
