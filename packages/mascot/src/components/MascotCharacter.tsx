@@ -10,7 +10,7 @@ import Svg, {
   Stop,
   LinearGradient,
 } from 'react-native-svg';
-import { MascotMood } from '@/context/MascotContext';
+import { MascotMood } from '../types';
 
 interface MascotCharacterProps {
   mood: MascotMood;

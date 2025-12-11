@@ -48,6 +48,16 @@ export interface MascotFeatures {
     backgroundEffects?: boolean;
 }
 
+export interface HabiCustomization {
+    eyes: 'happy' | 'sleepy' | 'determined' | 'cute' | 'mischievous' | 'normal';
+    eyebrows: 'raised' | 'furrowed' | 'wavy' | 'normal' | 'none';
+    mouth: 'grin' | 'neutral' | 'determined' | 'sleepy' | 'silly' | 'smile';
+    blushEnabled?: boolean;
+    blushColor?: string;
+    theme?: string;
+    accessory?: string;
+}
+
 export interface MascotConfig {
     name?: string;
     messages?: {

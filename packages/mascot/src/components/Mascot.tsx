@@ -9,11 +9,9 @@ import {
   Dimensions,
 } from 'react-native';
 import { useTheme } from '@app-core/theme';
-import {
-  useMascot,
-  MASCOT_NAME,
-  MascotMood,
-} from '@/context/MascotContext';
+import { useMascot } from '../MascotProvider';
+import { DEFAULT_MASCOT_NAME as MASCOT_NAME } from '../defaults/defaultMessages';
+import { MascotMood } from '../types';
 import MascotRenderer from './MascotRenderer';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');

@@ -20,7 +20,7 @@ import { useUserStore } from '@/store/userStore';
 import { useTheme } from '@app-core/theme';
 import { useHabits } from '@/hooks/useHabits';
 import { useBadgeStore } from '@/store/badgeStore';
-import { useSubscription } from '@/context/SubscriptionContext';
+import { useSubscription } from '../context/SubscriptionContext';
 import { useScreenAnimation } from '@/hooks/useScreenAnimation';
 import { Habit, HabitTimePeriod } from '@/types/habit';
 import CelebrationModal from '@/components/CelebrationModal';
@@ -29,8 +29,8 @@ import {
   QuickNoteModal,
   ConfirmationDialog,
 } from '@/components/HabitModals';
-import { useMascot } from '@/context/MascotContext';
-import { Mascot, MascotCelebration, DraggableHabitList } from '@/components';
+import { useMascot, Mascot, MascotCelebration } from '@features/mascot';
+import { DraggableHabitList } from '@/components';
 import { User } from 'lucide-react-native';
 import { TimeFilter } from '@/components/filters/TimeFilter';
 

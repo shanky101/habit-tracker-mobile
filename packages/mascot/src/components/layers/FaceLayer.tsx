@@ -1,8 +1,7 @@
-import React, { useEffect, useRef } from 'react';
-import { Animated } from 'react-native';
-import { G, Circle, Path, Ellipse } from 'react-native-svg';
-import { HabiCustomization } from '@/types/mascotCustomization';
-import { MascotMood } from '@/context/MascotContext';
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+import Svg, { G, Circle, Path, Ellipse, Defs, RadialGradient, Stop } from 'react-native-svg';
+import { HabiCustomization, MascotMood } from '../../types';
 
 interface FaceLayerProps {
   customization: HabiCustomization;

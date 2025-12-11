@@ -10,7 +10,8 @@ import {
   Modal,
 } from 'react-native';
 import { useTheme } from '@app-core/theme';
-import { useMascot, MASCOT_NAME } from '@/context/MascotContext';
+import { useMascot } from '../MascotProvider';
+import { DEFAULT_MASCOT_NAME as MASCOT_NAME } from '../defaults/defaultMessages';
 import MascotRenderer from './MascotRenderer';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');

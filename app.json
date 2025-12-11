@@ -9,6 +9,7 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "entryPoint": "./index.js",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.habittracker.mobile",

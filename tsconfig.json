@@ -9,6 +9,27 @@
       ],
       "@app-core/*": [
         "packages/*/src"
+      ],
+      "@app-core/ui/*": [
+        "./packages/ui/src/*"
+      ],
+      "@app-core/storage": [
+        "./packages/storage/src/index"
+      ],
+      "@app-core/storage/*": [
+        "./packages/storage/src/*"
+      ],
+      "@app-core/subscription": [
+        "./packages/subscription/src/index"
+      ],
+      "@app-core/subscription/*": [
+        "./packages/subscription/src/*"
+      ],
+      "@features/mascot": [
+        "./packages/mascot/src/index"
+      ],
+      "@features/mascot/*": [
+        "./packages/mascot/src/*"
       ]
     }
   }

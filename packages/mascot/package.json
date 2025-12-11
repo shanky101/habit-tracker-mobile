@@ -10,7 +10,8 @@
         "react": "*",
         "react-native": "*",
         "@react-native-async-storage/async-storage": "*",
-        "expo-haptics": "*"
+        "expo-haptics": "*",
+        "expo-linear-gradient": "*"
     },
     "dependencies": {
         "@app-core/theme": "workspace:*"

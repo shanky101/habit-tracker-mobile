@@ -1,7 +1,9 @@
 import React from 'react';
-import { Image, Text, View, StyleSheet, ImageSourcePropType } from 'react-native';
+import { View, StyleSheet, Animated, Easing, Text, Image, ImageSourcePropType } from 'react-native';
+import { Svg, Circle, G, Defs, RadialGradient, Stop } from 'react-native-svg';
 import { useTheme } from '@app-core/theme';
-import { MascotMood } from '@/context/MascotContext';
+import { MascotMood, HabiCustomization } from '../types';
+import { FaceLayer } from './layers/FaceLayer';
 import MascotCharacter from './MascotCharacter';
 
 interface MascotRendererProps {
@@ -25,7 +27,8 @@ const MascotRenderer: React.FC<MascotRendererProps> = ({ mood, size = 100, isAni
     }
 
     // Fallback to happy if specific mood asset is missing (though types enforce it)
-    const asset = theme.assets.mascot[mood] || theme.assets.mascot.happy;
+    const mascotAssets = (theme.assets?.mascot || {}) as Record<string, any>;
+    const asset = mascotAssets[mood] || mascotAssets.happy;
 
     // Check if asset is a string (emoji) or image source
     const isEmoji = typeof asset === 'string';

@@ -15,9 +15,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { useUserStore } from '@/store/userStore';
-import { useTheme, themes, themeMetadata } from '@app-core/theme';
-import { useScreenAnimation } from '@/hooks/useScreenAnimation';
-import { useMascot, MASCOT_NAME } from '@/context/MascotContext';
+import { ThemeProvider, useTheme, themes, themeMetadata } from '@app-core/theme';
+import { useScreenAnimation } from '@/hooks/useScreenAnimation'; // Restored import
+import { useMascot, MASCOT_NAME } from '@features/mascot';
 import { useSubscription } from '@/context/SubscriptionContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
