@@ -16,6 +16,7 @@ module.exports = function (api) {
             '@app-core/ui': './packages/ui/src',
             '@app-core/storage': './packages/storage/src',
             '@app-core/subscription': './packages/subscription/src',
+            '@features/mascot': './packages/mascot/src',
             // Ensure single React instance
             'react': path.resolve(__dirname, 'node_modules/react'),
             'react-native': path.resolve(__dirname, 'node_modules/react-native'),

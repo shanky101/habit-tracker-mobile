@@ -1,0 +1,23 @@
+{
+    "name": "@features/mascot",
+    "version": "1.0.0",
+    "main": "src/index.ts",
+    "types": "src/index.ts",
+    "scripts": {
+        "build": "tsc",
+        "type-check": "tsc --noEmit"
+    },
+    "peerDependencies": {
+        "react": "*",
+        "react-native": "*",
+        "@react-native-async-storage/async-storage": "*",
+        "expo-haptics": "*"
+    },
+    "dependencies": {
+        "@app-core/theme": "workspace:*"
+    },
+    "devDependencies": {
+        "@types/react": "~19.1.10",
+        "typescript": "^5.9.3"
+    }
+}
