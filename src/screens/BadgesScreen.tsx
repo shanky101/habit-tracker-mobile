@@ -1,11 +1,9 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Dimensions, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useBadgeStore, BadgeState } from '../store/badgeStore';
-import { BadgeIcon } from '../components/badges/BadgeIcon';
-import { BadgeDefinition, BadgeCategory } from '../types/badges';
+import { useBadgeStore } from '../store/badgeStore';
+import { BadgeIcon, BadgeDetailModal, BadgeDefinition, BadgeCategory, BadgeState } from '@app-core/achievements';
 import { ArrowLeft, Bug } from 'lucide-react-native';
-import { BadgeDetailModal } from '../components/badges/BadgeDetailModal';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur'; // Assuming expo-blur is available, or fallback
 import { Ionicons } from '@expo/vector-icons';

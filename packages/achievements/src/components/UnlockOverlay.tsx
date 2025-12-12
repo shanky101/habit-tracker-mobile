@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Dimensions, Animated, Easing } from 'react-native';
 import { BlurView } from 'expo-blur';
 import ConfettiCannon from 'react-native-confetti-cannon';
-import { BadgeDefinition } from '../../types/badges';
+import { BadgeDefinition } from '../types/badges';
 import { BadgeIcon } from './BadgeIcon';
 import { Audio } from 'expo-av';
 

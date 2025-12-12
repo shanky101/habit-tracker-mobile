@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Dimensions, Share, Animated } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { BlurView } from 'expo-blur';
-import { BadgeDefinition } from '../../types/badges';
+import { BadgeDefinition } from '../types/badges';
 import { BadgeIcon } from './BadgeIcon';
 import { CheckCircle, Share2, X } from 'lucide-react-native';
 import ViewShot from 'react-native-view-shot';

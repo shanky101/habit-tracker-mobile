@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, Animated, Easing } from 'react-native';
 import { Canvas, Path, LinearGradient, vec, Shadow, Group, RuntimeShader } from '@shopify/react-native-skia';
 import * as LucideIcons from 'lucide-react-native';
-import { BadgeShape, BadgeTier } from '../../types/badges';
-import { TIER_COLORS, TIER_SHADOWS, COSMIC_SHADER, HOLOGRAPHIC_SHADER, DIAMOND_SHADER } from '../../assets/shaders/badgeShaders';
+import { BadgeShape, BadgeTier } from '../types/badges';
+import { TIER_COLORS, TIER_SHADOWS, COSMIC_SHADER, HOLOGRAPHIC_SHADER, DIAMOND_SHADER } from '../assets/badgeShaders';
 
 interface BadgeIconProps {
     tier: BadgeTier;

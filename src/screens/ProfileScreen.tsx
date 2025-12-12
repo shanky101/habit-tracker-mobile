@@ -46,7 +46,7 @@ import {
 } from 'lucide-react-native';
 
 import HabiCustomizationSheet from '@/components/HabiCustomizationSheet';
-import { BadgeIcon } from '@/components/badges/BadgeIcon';
+import { BadgeIcon } from '@app-core/achievements';
 import { useBadgeStore } from '@/store/badgeStore';
 
 type ProfileNavigationProp = StackNavigationProp<any, 'Profile'>;

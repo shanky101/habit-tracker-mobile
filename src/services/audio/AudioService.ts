@@ -1,5 +1,5 @@
 import { Audio } from 'expo-av';
-import { BadgeTier } from '../../types/badges';
+import { BadgeTier } from '@app-core/achievements';
 
 // Map tiers to sound files
 // Note: These files need to be added to assets/sounds/

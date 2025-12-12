@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { BadgeIcon } from './BadgeIcon';
-import { BadgeDefinition } from '../../types/badges';
-import { useTheme } from '../../theme';
+import { BadgeDefinition } from '../types/badges';
+import { useTheme } from '@app-core/theme';
 
 interface BadgeToastProps {
     badge: BadgeDefinition;
