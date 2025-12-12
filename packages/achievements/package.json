@@ -1,0 +1,20 @@
+{
+    "name": "@app-core/achievements",
+    "version": "1.0.0",
+    "main": "src/index.ts",
+    "types": "src/index.ts",
+    "scripts": {
+        "typecheck": "tsc --noEmit"
+    },
+    "peerDependencies": {
+        "react": "*",
+        "react-native": "*",
+        "@app-core/theme": "workspace:*",
+        "expo-linear-gradient": "*",
+        "lucide-react-native": "*"
+    },
+    "devDependencies": {
+        "@types/react": "^18.2.0",
+        "typescript": "^5.1.3"
+    }
+}

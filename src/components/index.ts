@@ -1,11 +1,5 @@
 export { default as CelebrationModal } from './CelebrationModal';
+export { default as DayDetailSheet } from './DayDetailSheet';
 
-export {
-  StreakBrokenModal,
-  AllHabitsCompleteModal,
-  QuickNoteModal,
-  ConfirmationDialog,
-} from './HabitModals';
-
-export { default as SwipeableHabitCard } from './SwipeableHabitCard';
-export { default as DraggableHabitList } from './DraggableHabitList';
+// Re-export from UI package
+export { ConfirmationDialog } from '@app-core/ui';

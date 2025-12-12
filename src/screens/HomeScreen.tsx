@@ -27,12 +27,12 @@ import CelebrationModal from '@/components/CelebrationModal';
 import {
   AllHabitsCompleteModal,
   QuickNoteModal,
-  ConfirmationDialog,
 } from '@/components/HabitModals';
+import { ConfirmationDialog } from '@app-core/ui';
 import { useMascot, Mascot, MascotCelebration } from '@features/mascot';
-import { DraggableHabitList } from '@/components';
+import { HabitCard } from '@/components/HabitCard';
 import { User } from 'lucide-react-native';
-import { TimeFilter } from '@/components/filters/TimeFilter';
+import { TimeFilter } from '@app-core/ui';
 
 import { useSettingsStore } from '@/store/settingsStore';
 
@@ -94,7 +94,6 @@ const HomeScreen: React.FC = () => {
     addNoteToCompletion,
     getCompletionProgress,
     isHabitCompletedForDate,
-    reorderHabits,
   } = useHabits();
   const { subscription } = useSubscription();
   const { triggerReaction, getMascotForProgress, setMood, settings: mascotSettings, toggleMascot, petMascot } = useMascot();
@@ -362,27 +361,6 @@ const HomeScreen: React.FC = () => {
     navigation.navigate('HabitDetail', { habitId: habit.id, habitData: habit });
   };
 
-  // Handle habit reorder - convert from list index to full habits index
-  const handleReorderList = (list: Habit[], fromIndex: number, toIndex: number) => {
-    const listIds = list.map(h => h.id);
-    const fromHabitId = listIds[fromIndex];
-    const toHabitId = listIds[toIndex];
-
-    // Find actual indices in the full array
-    const actualFromIndex = habits.findIndex(h => h.id === fromHabitId);
-    const actualToIndex = habits.findIndex(h => h.id === toHabitId);
-
-    if (actualFromIndex !== -1 && actualToIndex !== -1) {
-      reorderHabits(actualFromIndex, actualToIndex);
-    }
-  };
-
-  const handleReorderPeriodHabits = (fromIndex: number, toIndex: number) => {
-    // This needs to be updated to handle specific lists if needed, 
-    // but since we are splitting lists, we might need to pass the specific list to the handler
-    // For now, let's assume reordering works within the list passed to DraggableHabitList
-  };
-
   // Helper to render a habit section
   const renderHabitSection = (title: string, period: string, sectionHabits: Habit[]) => {
     if (sectionHabits.length === 0) return null;
@@ -404,16 +382,18 @@ const HomeScreen: React.FC = () => {
             {title}
           </Text>
         </View>
-        <DraggableHabitList
-          habits={sectionHabits}
-          selectedDate={selectedDateISO}
-          onToggle={handleToggleHabit}
-          onPress={handleHabitPress}
-          onEdit={handleEditHabit}
-          onArchive={handleArchiveHabit}
-          onDelete={handleDeleteHabit}
-          onReorder={(from, to) => handleReorderList(sectionHabits, from, to)}
-        />
+        {sectionHabits.map((habit) => (
+          <HabitCard
+            key={habit.id}
+            habit={habit}
+            selectedDate={selectedDateISO}
+            onToggle={handleToggleHabit}
+            onPress={handleHabitPress}
+            onEdit={handleEditHabit}
+            onArchive={handleArchiveHabit}
+            onDelete={handleDeleteHabit}
+          />
+        ))}
       </View>
     );
   };

@@ -1,16 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Modal,
-  TouchableOpacity,
-  Animated,
-  Dimensions,
-} from 'react-native';
-import { useTheme } from '@app-core/theme';
-
-const { width, height } = Dimensions.get('window');
+import React from 'react';
+import { SuccessModal, SuccessAction, SuccessStat } from '@app-core/ui';
 
 export type CelebrationType = 'firstCheckin' | 'allComplete' | 'streak';
 
@@ -26,6 +15,12 @@ export interface CelebrationModalProps {
   onShare?: () => void;
 }
 
+/**
+ * CelebrationModal - Wrapper around SuccessModal
+ * 
+ * Maps habit celebration data to the generic SuccessModal component.
+ * Handles milestone messages, motivational quotes, and celebration types.
+ */
 const CelebrationModal: React.FC<CelebrationModalProps> = ({
   visible,
   type,
@@ -37,40 +32,6 @@ const CelebrationModal: React.FC<CelebrationModalProps> = ({
   onDismiss,
   onShare,
 }) => {
-  const { theme } = useTheme();
-  const scaleAnim = useRef(new Animated.Value(0)).current;
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const confettiAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    if (visible) {
-      // Reset animations
-      scaleAnim.setValue(0);
-      fadeAnim.setValue(0);
-      confettiAnim.setValue(0);
-
-      // Run animations
-      Animated.parallel([
-        Animated.spring(scaleAnim, {
-          toValue: 1,
-          tension: 50,
-          friction: 7,
-          useNativeDriver: true,
-        }),
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-        Animated.timing(confettiAnim, {
-          toValue: 1,
-          duration: 2000,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    }
-  }, [visible, scaleAnim, fadeAnim, confettiAnim]);
-
   const getMotivationalQuote = () => {
     const quotes = [
       "Success is the sum of small efforts repeated day in and day out.",
@@ -91,6 +52,8 @@ const CelebrationModal: React.FC<CelebrationModalProps> = ({
           title: 'All Habits Complete!',
           subtitle: `${completedCount}/${totalCount} habits • ${activeStreaks} active streaks`,
           quote: getMotivationalQuote(),
+          showConfetti: true,
+          stats: undefined,
         };
       case 'streak':
         if (streakDays === 3) {
@@ -99,6 +62,8 @@ const CelebrationModal: React.FC<CelebrationModalProps> = ({
             title: 'Great Start!',
             subtitle: `${streakDays} day streak on ${habitName || 'your habit'}`,
             quote: undefined,
+            showConfetti: false,
+            stats: [{ label: 'Day Streak', value: streakDays }],
           };
         } else if (streakDays === 7) {
           return {
@@ -106,6 +71,8 @@ const CelebrationModal: React.FC<CelebrationModalProps> = ({
             title: 'One Week!',
             subtitle: `${streakDays} day streak! You're building momentum`,
             quote: undefined,
+            showConfetti: true,
+            stats: [{ label: 'Day Streak', value: streakDays }],
           };
         } else if (streakDays === 30) {
           return {
@@ -113,6 +80,8 @@ const CelebrationModal: React.FC<CelebrationModalProps> = ({
             title: 'One Month!',
             subtitle: 'Incredible! 30 days of consistency',
             quote: undefined,
+            showConfetti: true,
+            stats: [{ label: 'Day Streak', value: streakDays }],
           };
         } else if (streakDays === 100) {
           return {
@@ -120,6 +89,8 @@ const CelebrationModal: React.FC<CelebrationModalProps> = ({
             title: 'Century!',
             subtitle: "You're unstoppable! 100 days!",
             quote: undefined,
+            showConfetti: true,
+            stats: [{ label: 'Day Streak', value: streakDays }],
           };
         } else if (streakDays === 365) {
           return {
@@ -127,6 +98,8 @@ const CelebrationModal: React.FC<CelebrationModalProps> = ({
             title: 'One Year!',
             subtitle: 'Legend status! 365 days!',
             quote: undefined,
+            showConfetti: true,
+            stats: [{ label: 'Day Streak', value: streakDays }],
           };
         }
         return {
@@ -134,6 +107,8 @@ const CelebrationModal: React.FC<CelebrationModalProps> = ({
           title: `${streakDays} Day Streak!`,
           subtitle: "Keep the momentum going!",
           quote: undefined,
+          showConfetti: false,
+          stats: [{ label: 'Day Streak', value: streakDays }],
         };
       case 'firstCheckin':
       default:
@@ -142,6 +117,8 @@ const CelebrationModal: React.FC<CelebrationModalProps> = ({
           title: 'Nice!',
           subtitle: 'Habit checked in',
           quote: undefined,
+          showConfetti: false,
+          stats: undefined,
         };
     }
   };
@@ -149,270 +126,33 @@ const CelebrationModal: React.FC<CelebrationModalProps> = ({
   const message = getMessage();
   const showShareButton = type === 'streak' && streakDays >= 7;
 
+  // Build actions
+  const primaryAction: SuccessAction = {
+    label: 'Continue',
+    onPress: onDismiss,
+  };
+
+  const secondaryAction: SuccessAction | undefined = showShareButton && onShare
+    ? {
+      label: 'Share Achievement',
+      onPress: onShare,
+    }
+    : undefined;
+
   return (
-    <Modal
+    <SuccessModal
       visible={visible}
-      transparent
-      animationType="none"
-      onRequestClose={onDismiss}
-    >
-      <TouchableOpacity
-        style={styles.backdrop}
-        activeOpacity={1}
-        onPress={onDismiss}
-      >
-        <Animated.View
-          style={[
-            styles.modalContent,
-            {
-              backgroundColor: theme.colors.backgroundSecondary,
-              opacity: fadeAnim,
-              transform: [{ scale: scaleAnim }],
-            },
-          ]}
-        >
-          {/* Confetti effect (simplified) */}
-          {type === 'allComplete' || (type === 'streak' && streakDays >= 7) ? (
-            <View style={styles.confettiContainer}>
-              <Text style={styles.confetti}>🎊</Text>
-              <Text style={styles.confetti}>✨</Text>
-              <Text style={styles.confetti}>🌟</Text>
-              <Text style={styles.confetti}>🎉</Text>
-            </View>
-          ) : null}
-
-          {/* Main Content */}
-          <Text style={styles.emoji}>{message.emoji}</Text>
-          <Text
-            style={[
-              styles.title,
-              {
-                color: theme.colors.text,
-                fontFamily: theme.typography.fontFamilyDisplay,
-                fontSize: theme.typography.fontSize2XL,
-                fontWeight: theme.typography.fontWeightBold,
-              },
-            ]}
-          >
-            {message.title}
-          </Text>
-          <Text
-            style={[
-              styles.subtitle,
-              {
-                color: theme.colors.textSecondary,
-                fontFamily: theme.typography.fontFamilyBody,
-                fontSize: theme.typography.fontSizeMD,
-                lineHeight: theme.typography.lineHeightRelaxed,
-              },
-            ]}
-          >
-            {message.subtitle}
-          </Text>
-
-          {/* Motivational Quote (for allComplete) */}
-          {type === 'allComplete' && message.quote && (
-            <View style={[styles.quoteContainer, { backgroundColor: theme.colors.background }]}>
-              <Text
-                style={[
-                  styles.quote,
-                  {
-                    color: theme.colors.text,
-                    fontFamily: theme.typography.fontFamilyBody,
-                    fontSize: theme.typography.fontSizeSM,
-                    fontStyle: 'italic',
-                    lineHeight: theme.typography.lineHeightRelaxed,
-                  },
-                ]}
-              >
-                "{message.quote}"
-              </Text>
-            </View>
-          )}
-
-          {/* Stats (for streaks) */}
-          {type === 'streak' && (
-            <View
-              style={[styles.statsContainer, { backgroundColor: theme.colors.background }]}
-            >
-              <View style={styles.statItem}>
-                <Text
-                  style={[
-                    styles.statValue,
-                    {
-                      color: theme.colors.primary,
-                      fontFamily: theme.typography.fontFamilyDisplay,
-                      fontSize: theme.typography.fontSizeXL,
-                      fontWeight: theme.typography.fontWeightBold,
-                    },
-                  ]}
-                >
-                  {streakDays}
-                </Text>
-                <Text
-                  style={[
-                    styles.statLabel,
-                    {
-                      color: theme.colors.textSecondary,
-                      fontFamily: theme.typography.fontFamilyBody,
-                      fontSize: theme.typography.fontSizeXS,
-                    },
-                  ]}
-                >
-                  Day Streak
-                </Text>
-              </View>
-            </View>
-          )}
-
-          {/* Buttons */}
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={[
-                styles.primaryButton,
-                {
-                  backgroundColor: theme.colors.primary,
-                  shadowColor: theme.shadows.shadowMD.shadowColor,
-                  shadowOffset: theme.shadows.shadowMD.shadowOffset,
-                  shadowOpacity: theme.shadows.shadowMD.shadowOpacity,
-                  shadowRadius: theme.shadows.shadowMD.shadowRadius,
-                  elevation: theme.shadows.shadowMD.elevation,
-                },
-              ]}
-              onPress={onDismiss}
-              activeOpacity={0.8}
-            >
-              <Text
-                style={[
-                  styles.primaryButtonText,
-                  {
-                    color: theme.colors.white,
-                    fontFamily: theme.typography.fontFamilyBody,
-                    fontSize: theme.typography.fontSizeMD,
-                    fontWeight: theme.typography.fontWeightSemibold,
-                  },
-                ]}
-              >
-                Continue
-              </Text>
-            </TouchableOpacity>
-
-            {showShareButton && onShare && (
-              <TouchableOpacity
-                style={[styles.secondaryButton, { borderColor: theme.colors.border }]}
-                onPress={onShare}
-                activeOpacity={0.7}
-              >
-                <Text
-                  style={[
-                    styles.secondaryButtonText,
-                    {
-                      color: theme.colors.primary,
-                      fontFamily: theme.typography.fontFamilyBody,
-                      fontSize: theme.typography.fontSizeSM,
-                      fontWeight: theme.typography.fontWeightMedium,
-                    },
-                  ]}
-                >
-                  Share Achievement
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </Animated.View>
-      </TouchableOpacity>
-    </Modal>
+      onDismiss={onDismiss}
+      emoji={message.emoji}
+      title={message.title}
+      subtitle={message.subtitle}
+      quote={message.quote}
+      stats={message.stats}
+      showConfetti={message.showConfetti}
+      primaryAction={primaryAction}
+      secondaryAction={secondaryAction}
+    />
   );
 };
-
-const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    width: width * 0.85,
-    borderRadius: 24,
-    padding: 32,
-    alignItems: 'center',
-  },
-  confettiContainer: {
-    position: 'absolute',
-    top: -20,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  confetti: {
-    fontSize: 32,
-  },
-  emoji: {
-    fontSize: 64,
-    marginBottom: 16,
-  },
-  title: {
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  subtitle: {
-    textAlign: 'center',
-    marginBottom: 24,
-  },
-  quoteContainer: {
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 24,
-    width: '100%',
-  },
-  quote: {
-    textAlign: 'center',
-  },
-  statsContainer: {
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 24,
-    width: '100%',
-  },
-  statItem: {
-    alignItems: 'center',
-  },
-  statValue: {
-    marginBottom: 4,
-  },
-  statLabel: {
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  buttonContainer: {
-    width: '100%',
-  },
-  primaryButton: {
-    width: '100%',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-  },
-  primaryButtonText: {
-    // styles from theme
-  },
-  secondaryButton: {
-    width: '100%',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  secondaryButtonText: {
-    // styles from theme
-  },
-});
 
 export default CelebrationModal;
