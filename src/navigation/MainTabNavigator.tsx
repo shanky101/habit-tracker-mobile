@@ -31,10 +31,10 @@ import {
   StatDetailScreen,
   CalendarHistoryScreen,
   BadgesScreen,
+  TemplatesScreen,
+  TemplateDetailScreen,
+  CreateTemplateScreen,
 } from '@/screens';
-import TemplatesScreen from '@/screens/TemplatesScreen';
-import TemplateDetailScreen from '@/screens/TemplateDetailScreen';
-import CreateTemplateScreen from '@/screens/CreateTemplateScreen';
 
 export type HomeStackParamList = {
   HomeMain: { newHabit?: any } | undefined;

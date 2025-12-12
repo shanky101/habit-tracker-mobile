@@ -144,7 +144,8 @@ export const HabitCard: React.FC<HabitCardProps> = ({
     ) : undefined;
 
     // Determine card height
-    const height = isMultiCompletion ? 96 : 72;
+    // Increased from 96 to 112 to give more breathing room for multi-completion habits
+    const height = isMultiCompletion ? 112 : 72;
 
     // Determine background color
     const backgroundColor = isNegative ? '#FFF5F5' : theme.colors.surface;
@@ -170,8 +171,9 @@ const styles = StyleSheet.create({
     progressBarsContainer: {
         flexDirection: 'row',
         gap: 4,
-        marginTop: 6,
-        marginBottom: 4,
+        // Increased spacing for better touch targets and visual separation
+        marginTop: 10,
+        marginBottom: 8,
         alignItems: 'center',
     },
     progressBar: {

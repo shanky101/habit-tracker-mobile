@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Dimensions, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useBadgeStore } from '../store/badgeStore';
+import { useBadgeStore } from '@/store/badgeStore';
 import { BadgeIcon, BadgeDetailModal, BadgeDefinition, BadgeCategory, BadgeState } from '@app-core/achievements';
 import { ArrowLeft, Bug } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
