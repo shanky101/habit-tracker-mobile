@@ -4,15 +4,19 @@
     "main": "src/index.ts",
     "types": "src/index.ts",
     "scripts": {
-        "build": "tsc",
-        "type-check": "tsc --noEmit"
+        "test": "jest --config ../../jest.config.json",
+        "test:watch": "jest --config ../../jest.config.json --watch",
+        "test:coverage": "jest --config ../../jest.config.json --coverage"
     },
     "peerDependencies": {
         "react": "*",
-        "react-native": "*"
+        "react-native": "*",
+        "@expo-google-fonts/outfit": "*",
+        "@expo-google-fonts/plus-jakarta-sans": "*",
+        "expo-linear-gradient": "*"
     },
     "devDependencies": {
-        "@types/react": "~19.1.10",
-        "typescript": "^5.9.3"
+        "@types/react": "^18.2.0",
+        "typescript": "^5.1.3"
     }
 }

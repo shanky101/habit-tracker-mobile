@@ -4,14 +4,17 @@
     "main": "src/index.ts",
     "types": "src/index.ts",
     "scripts": {
-        "typecheck": "tsc --noEmit"
+        "test": "jest --config ../../jest.config.json",
+        "test:watch": "jest --config ../../jest.config.json --watch",
+        "test:coverage": "jest --config ../../jest.config.json --coverage"
     },
     "peerDependencies": {
         "react": "*",
         "react-native": "*",
-        "@app-core/theme": "workspace:*",
-        "expo-linear-gradient": "*",
-        "lucide-react-native": "*"
+        "react-native-reanimated": "*",
+        "react-native-svg": "*",
+        "lucide-react-native": "*",
+        "zustand": "*"
     },
     "devDependencies": {
         "@types/react": "^18.2.0",
