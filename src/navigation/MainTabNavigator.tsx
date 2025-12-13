@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
-import { useTheme } from '@/theme';
+import { useTheme } from '@app-core/theme';
 import { Home, LayoutTemplate, Plus, TrendingUp, User } from 'lucide-react-native';
 import {
   HomeScreen,
@@ -31,10 +31,10 @@ import {
   StatDetailScreen,
   CalendarHistoryScreen,
   BadgesScreen,
+  TemplatesScreen,
+  TemplateDetailScreen,
+  CreateTemplateScreen,
 } from '@/screens';
-import TemplatesScreen from '@/screens/TemplatesScreen';
-import TemplateDetailScreen from '@/screens/TemplateDetailScreen';
-import CreateTemplateScreen from '@/screens/CreateTemplateScreen';
 
 export type HomeStackParamList = {
   HomeMain: { newHabit?: any } | undefined;

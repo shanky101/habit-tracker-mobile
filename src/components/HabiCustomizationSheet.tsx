@@ -10,9 +10,9 @@ import {
     TouchableWithoutFeedback,
     Platform,
 } from 'react-native';
-import { useTheme } from '@/theme';
-import { useMascot, MASCOT_NAME } from '@/context/MascotContext';
-import MascotRenderer from './MascotRenderer';
+import { useTheme } from '@app-core/theme';
+import { useMascot, MASCOT_NAME, HabiCustomization } from '@features/mascot';
+import MascotRenderer from '../../packages/mascot/src/components/MascotRenderer'; // Temporary direct import until exported
 import { X, Check, Sparkles, Maximize2, Minimize2 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';

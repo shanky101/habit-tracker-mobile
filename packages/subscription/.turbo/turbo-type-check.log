@@ -1,0 +1,5 @@
+
+
+> @app-core/subscription@1.0.0 type-check /Users/shashankm/Documents/react/antigravity/habit-tracker-mobile/packages/subscription
+> tsc --noEmit
+

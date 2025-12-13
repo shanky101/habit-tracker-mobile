@@ -18,9 +18,9 @@ import {
   PlusJakartaSans_600SemiBold,
   PlusJakartaSans_700Bold,
 } from '@expo-google-fonts/plus-jakarta-sans';
-import { ThemeProvider } from './src/theme';
+import { ThemeProvider } from '@app-core/theme';
+import { MascotProvider } from '@features/mascot';
 import { SubscriptionProvider } from './src/context/SubscriptionContext';
-import { MascotProvider } from './src/context/MascotContext';
 import OnboardingNavigator from './src/navigation/OnboardingNavigator';
 import { initializeDatabase } from './src/data/database';
 import { runAsyncStorageMigration } from './src/services/migration/asyncStorageMigration';

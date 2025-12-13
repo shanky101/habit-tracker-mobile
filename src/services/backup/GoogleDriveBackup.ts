@@ -1,6 +1,4 @@
 import { Platform } from 'react-native';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import { GDrive } from '@robinbobin/react-native-google-drive-api-wrapper';
 import { DataExporter } from './DataExporter';
 import { DataImporter } from './DataImporter';
 import {
@@ -11,11 +9,50 @@ import {
   ProgressCallback,
 } from './types';
 
+// Dynamically import to avoid crashes in Expo Go
+let GoogleSignin: any;
+let GDrive: any;
+
+try {
+  const GoogleSigninPackage = require('@react-native-google-signin/google-signin');
+  GoogleSignin = GoogleSigninPackage.GoogleSignin;
+  const GDrivePackage = require('@robinbobin/react-native-google-drive-api-wrapper');
+  GDrive = GDrivePackage.GDrive;
+} catch (error) {
+  console.warn('[GoogleDriveBackup] Google Sign-In native module not found. Backup features will be disabled.');
+  // Mock implementations to prevent crashes during specialized access
+  GoogleSignin = {
+    configure: () => { },
+    isSignedIn: async () => false,
+    hasPlayServices: async () => { },
+    signIn: async () => { throw new Error('Google Sign-In not available in Expo Go'); },
+    getTokens: async () => { throw new Error('Google Sign-In not available in Expo Go'); },
+    signOut: async () => { },
+    getCurrentUser: async () => null,
+  };
+  GDrive = class {
+    accessToken = '';
+    files = {
+      list: () => ({ execute: async () => ({ files: [] }) }),
+      newMultipartUploader: () => ({
+        setData: () => ({
+          setContent: () => ({
+            execute: async () => { throw new Error('Google Drive not available in Expo Go'); }
+          }),
+          execute: async () => { throw new Error('Google Drive not available in Expo Go'); }
+        })
+      }),
+      getText: async () => '',
+      delete: async () => { },
+    };
+  };
+}
+
 /**
  * GoogleDriveBackup - Backup and restore to Google Drive (Android)
  */
 export class GoogleDriveBackup {
-  private static gdrive: GDrive | null = null;
+  private static gdrive: any | null = null;
   private static backupFolderId: string | null = null;
   private static readonly FOLDER_NAME = 'HabitTrackerBackups';
 
@@ -24,11 +61,16 @@ export class GoogleDriveBackup {
    * Note: You need to set up OAuth credentials in Google Cloud Console
    */
   static configure(webClientId: string) {
-    GoogleSignin.configure({
-      webClientId,
-      scopes: ['https://www.googleapis.com/auth/drive.file'],
-      offlineAccess: true,
-    });
+    if (!GoogleSignin) return;
+    try {
+      GoogleSignin.configure({
+        webClientId,
+        scopes: ['https://www.googleapis.com/auth/drive.file'],
+        offlineAccess: true,
+      });
+    } catch (error) {
+      console.warn('[GoogleDriveBackup] Failed to configure Google Signin:', error);
+    }
   }
 
   /**
@@ -38,6 +80,9 @@ export class GoogleDriveBackup {
     if (Platform.OS !== 'android') {
       return false;
     }
+
+    // Check if module loaded successfully
+    if (!GoogleSignin || !GoogleSignin.signIn) return false;
 
     try {
       const isSignedIn = await GoogleSignin.isSignedIn();
@@ -53,6 +98,8 @@ export class GoogleDriveBackup {
    */
   static async signIn(): Promise<{ success: boolean; error?: string }> {
     try {
+      if (!GoogleSignin) throw new Error('Google Sign-In not initialized');
+
       await GoogleSignin.hasPlayServices();
       await GoogleSignin.signIn();
 
@@ -76,7 +123,9 @@ export class GoogleDriveBackup {
    */
   static async signOut(): Promise<void> {
     try {
-      await GoogleSignin.signOut();
+      if (GoogleSignin) {
+        await GoogleSignin.signOut();
+      }
       this.gdrive = null;
       this.backupFolderId = null;
     } catch (error) {
@@ -91,6 +140,7 @@ export class GoogleDriveBackup {
     if (this.gdrive) return;
 
     try {
+      if (!GoogleSignin) throw new Error('Google Sign-In not initialized');
       const tokens = await GoogleSignin.getTokens();
       this.gdrive = new GDrive();
       this.gdrive.accessToken = tokens.accessToken;

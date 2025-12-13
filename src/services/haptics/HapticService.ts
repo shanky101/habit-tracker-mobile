@@ -1,5 +1,5 @@
 import * as Haptics from 'expo-haptics';
-import { BadgeTier } from '../../types/badges';
+import { BadgeTier } from '@app-core/achievements';
 
 export const HapticService = {
     /**
